@@ -1,0 +1,102 @@
+<configuration>
+    <!-- 定义应用名称，区分应用 -->
+    <springProperty scope="context" name="APP_NAME" source="spring.application.name"/>
+    <!-- 定义日志文件的输出路径 -->
+    <springProperty scope="context" name="LOG_PATH" source="logging.fileDir.path"/>
+    <!-- 定义日志格式 -->
+    <property name="LOG_PATTERN" value="%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level[%thread]%logger{56}.%method:%L -%msg%n"/>
+
+    <!-- 将日志滚动输出到application.log文件中 -->
+    <appender name="INFO"
+              class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <!-- 输出文件目的地 -->
+        <file>${LOG_PATH}/logs/${APP_NAME}/info.log</file>
+        <encoder>
+            <!-- 使用默认的输出格式打印 -->
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+        <!-- 设置 RollingPolicy 属性，用于配置文件大小限制，保留天数、文件名格式 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 文件命名格式 -->
+            <fileNamePattern>${LOG_PATH}/logs/${APP_NAME}/info.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 文件保留最大天数 -->
+            <maxHistory>7</maxHistory>
+            <!-- 文件大小限制 -->
+            <maxFileSize>50MB</maxFileSize>
+            <!-- 文件总大小 -->
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+    </appender>
+
+    <!-- 摘取出WARN级别日志输出到warn.log中 -->
+    <appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/logs/${APP_NAME}/warn.log</file>
+        <encoder>
+            <!-- 使用默认的输出格式打印 -->
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+        <!-- 设置 RollingPolicy 属性，用于配置文件大小限制，保留天数、文件名格式 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 文件命名格式 -->
+            <fileNamePattern>${LOG_PATH}/logs/${APP_NAME}/warn.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 文件保留最大天数 -->
+            <maxHistory>7</maxHistory>
+            <!-- 文件大小限制 -->
+            <maxFileSize>50MB</maxFileSize>
+            <!-- 文件总大小 -->
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <!-- 日志过滤器，将WARN相关日志过滤出来 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>WARN</level>
+        </filter>
+    </appender>
+
+    <!-- 摘取出ERROR级别日志输出到error.log中 -->
+    <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/logs/${APP_NAME}/error.log</file>
+        <encoder>
+            <!-- 使用默认的输出格式打印 -->
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+        <!-- 设置 RollingPolicy 属性，用于配置文件大小限制，保留天数、文件名格式 -->
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <!-- 文件命名格式 -->
+            <fileNamePattern>${LOG_PATH}/logs/${APP_NAME}/error.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <!-- 文件保留最大天数 -->
+            <maxHistory>7</maxHistory>
+            <!-- 文件大小限制 -->
+            <maxFileSize>50MB</maxFileSize>
+            <!-- 文件总大小 -->
+            <totalSizeCap>500MB</totalSizeCap>
+        </rollingPolicy>
+        <!-- 日志过滤器，将ERROR相关日志过滤出来 -->
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>ERROR</level>
+        </filter>
+    </appender>
+
+    <!-- 配置控制台输出 -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <!-- 使用默认的输出格式打印 -->
+            <pattern>${LOG_PATTERN}</pattern>
+            <charset>utf8</charset>
+        </encoder>
+    </appender>
+
+    <!-- 配置输出级别 -->
+    <root level="INFO">
+        <!-- 加入控制台输出 -->
+        <appender-ref ref="CONSOLE"/>
+        <!-- 加入APPLICATION输出 -->
+        <appender-ref ref="INFO"/>
+        <!-- 加入WARN日志输出 -->
+        <appender-ref ref="WARN"/>
+        <!-- 加入ERROR日志输出 -->
+        <appender-ref ref="ERROR"/>
+    </root>
+</configuration>
