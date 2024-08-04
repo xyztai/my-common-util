@@ -32,7 +32,7 @@ public class AgController {
         return "删除完成";
     }
 
-    @GetMapping("/queryCP")
+    @GetMapping("/query-cp")
     public String queryCP(@RequestParam String time) {
         List<AgClosePriceBO> bos = dataCalc.queryCP(time);
         StringBuilder res = new StringBuilder();
@@ -44,7 +44,7 @@ public class AgController {
         return res.toString();
     }
 
-    @GetMapping("/queryDataCalc")
+    @GetMapping("/query-data-calc")
     public String queryDataCalc(@RequestParam String time) {
         List<AgDataCalcBO> bos = dataCalc.queryDataCalc(time);
         StringBuilder res = new StringBuilder();
