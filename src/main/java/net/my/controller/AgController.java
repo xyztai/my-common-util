@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.my.mapper.DataCalcMapper;
 import net.my.pojo.AgClosePriceBO;
 import net.my.pojo.AgClosePriceDTO;
+import net.my.pojo.AgDataCalcBO;
 import net.my.pojo.AgOper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -28,7 +29,31 @@ public class AgController {
         log.info("remove-time:{}", time);
         dataCalc.deleteCP(time);
         calc(time);
-        return String.format("删除完成");
+        return "删除完成";
+    }
+
+    @GetMapping("/queryCP")
+    public String queryCP(@RequestParam String time) {
+        List<AgClosePriceBO> bos = dataCalc.queryCP(time);
+        StringBuilder res = new StringBuilder();
+        if(!CollectionUtils.isEmpty(bos)) {
+            bos.forEach(
+                    f -> res.append(f.getName()).append(": ").append(f.getClosePrice()).append("\r\n")
+            );
+        }
+        return res.toString();
+    }
+
+    @GetMapping("/queryDataCalc")
+    public String queryDataCalc(@RequestParam String time) {
+        List<AgDataCalcBO> bos = dataCalc.queryDataCalc(time);
+        StringBuilder res = new StringBuilder();
+        if(!CollectionUtils.isEmpty(bos)) {
+            bos.forEach(
+                    f -> res.append(f.getName()).append(": expma5=").append(f.getExpma5()).append(", expma37=").append(f.getExpma37()).append("\r\n")
+            );
+        }
+        return res.toString();
     }
 
     @PostMapping("/add-data")
@@ -46,9 +71,9 @@ public class AgController {
             );
 
             calc(agClosePriceDTO.getTime());
-            return String.format("数据添加完成");
+            return "数据添加完成";
         } else {
-            return String.format("无数据");
+            return "无数据";
         }
     }
 

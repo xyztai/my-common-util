@@ -11,6 +11,23 @@
         <result column="sell_oper" property="sellOper" />
     </resultMap>
 
+    <resultMap id="queryCPMap" type="net.my.pojo.AgClosePriceBO">
+        <id column="id" property="id" />
+        <id column="time" property="time" />
+        <result column="type" property="type" />
+        <result column="name" property="name" />
+        <result column="close_price" property="closePrice" />
+    </resultMap>
+
+    <resultMap id="queryDataCalcMap" type="net.my.pojo.AgDataCalcBO">
+        <id column="id" property="id" />
+        <id column="time" property="time" />
+        <result column="type" property="type" />
+        <result column="name" property="name" />
+        <result column="expma_5" property="expma5" />
+        <result column="expma_37" property="expma37" />
+    </resultMap>
+
     <delete id="deleteCP">
         delete from t_raw_close_price where time = #{time}
     </delete>
@@ -32,6 +49,22 @@
     <insert id="insertCP" parameterType="net.my.pojo.AgClosePriceBO">
         insert into t_raw_close_price(time, type, close_price) values (#{time}, #{type}, #{closePrice})
     </insert>
+
+    <select id="queryCP" resultMap="queryCPMap">
+        select t2.id, t1.time, t1.type, t2.name, concat(t1.close_price, '') close_price
+        from t_raw_close_price t1, t_type t2
+        where t1.time = #{time}
+        and t1.type = t2.type
+        order by 1
+    </select>
+
+    <select id="queryDataCalc" resultMap="queryDataCalcMap">
+        select t2.id, t1.time, t1.type, t2.name, concat(t1.expma_5, '') expma_5, concat(t1.expma_37, '') expma_37
+        from t_data_calc t1, t_type t2
+        where t1.time = #{time}
+        and t1.type = t2.type
+        order by 1
+    </select>
 
     <select id="queryCalcTimes" resultType="int">
         select count(distinct t1.time)

@@ -1,6 +1,7 @@
 package net.my.mapper;
 
 import net.my.pojo.AgClosePriceBO;
+import net.my.pojo.AgDataCalcBO;
 import net.my.pojo.AgOper;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
@@ -16,6 +17,10 @@ public interface DataCalcMapper {
     int deleteDataCalcAfter(String time);
 
     int insertCP(AgClosePriceBO bos);
+
+    List<AgClosePriceBO> queryCP(String time);
+
+    List<AgDataCalcBO> queryDataCalc(String time);
 
     int queryCalcTimes();
 
