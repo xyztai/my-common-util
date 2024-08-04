@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/tai?autoReconnect=true&useSSL=false
+    username: tai
+    password: 123456@T
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 3
+      maximum-pool-size: 5
+      max-lifetime: 0
+
+mybatis:
+  mapper-locations: classpath:mapper/*.xml
+
+server:
+  port: 51666
