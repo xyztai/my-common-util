@@ -2,11 +2,10 @@ package net.my.controller;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
+import net.my.intercepter.CurrentUser;
+import net.my.intercepter.LoginRequired;
 import net.my.mapper.DataCalcMapper;
-import net.my.pojo.AgClosePriceBO;
-import net.my.pojo.AgClosePriceDTO;
-import net.my.pojo.AgDataCalcBO;
-import net.my.pojo.AgOper;
+import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -24,8 +23,10 @@ public class AgController {
     @Autowired
     private DataCalcMapper dataCalc;
 
+    @LoginRequired
     @DeleteMapping("/remove")
-    public String remove(@RequestParam String time) {
+    public String remove(@CurrentUser UserBase userBase, @RequestParam String time) {
+        log.info("userBase: {}", userBase);
         log.info("remove-time:{}", time);
         dataCalc.deleteCP(time);
         calc(time);

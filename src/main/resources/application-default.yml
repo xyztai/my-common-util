@@ -15,3 +15,6 @@ server:
 logging:
   fileDir:
     path: D:\projects\java\my-common-util
+
+jwt:
+  filter: false
