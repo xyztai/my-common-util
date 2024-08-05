@@ -36,12 +36,14 @@ public class AgController {
     public BaseResponse queryCP(@RequestParam String time) {
         List<AgClosePriceBO> bos = dataCalc.queryCP(time);
 
-        List<String> retList = new ArrayList<>();
+        Map<String, Integer> retMap = new LinkedHashMap<>();
         if(!CollectionUtils.isEmpty(bos)) {
-            retList = bos.stream().map(m -> String.format("%s: %.0f", m.getName(), m.getClosePrice())).collect(Collectors.toList());
+            bos.forEach(
+                    f -> retMap.put(f.getName(), f.getClosePrice().intValue())
+            );
         }
 
-        return RestGeneralResponse.of(retList);
+        return RestGeneralResponse.of(retMap);
     }
 
     @GetMapping("/query-data-calc")
