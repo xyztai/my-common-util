@@ -11,7 +11,7 @@ import javax.xml.bind.DatatypeConverter;
 import java.security.Key;
 import java.util.Date;
 
-public class TokenUtils {
+public class TokenUtil {
 
     public static final String SECRET = "6KDP!~GO";
 
@@ -79,6 +79,6 @@ public class TokenUtils {
     }
 
     public static void main(String[] args) {
-        System.out.println(TokenUtils.createJwtToken("11111"));
+        System.out.println(TokenUtil.createJwtToken("11111"));
     }
 }

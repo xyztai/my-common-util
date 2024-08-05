@@ -7,7 +7,7 @@ import net.my.exception.CommonException;
 import net.my.pojo.UserBase;
 import net.my.service.IUserBaseService;
 import net.my.util.SpringContextUtil;
-import net.my.util.TokenUtils;
+import net.my.util.TokenUtil;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -50,7 +50,7 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
                 // 从Redis 中查看 token 是否过期
                 Claims claims;
                 try{
-                    claims = TokenUtils.parseJWT(accessToken);
+                    claims = TokenUtil.parseJWT(accessToken);
                 }catch (ExpiredJwtException e){
                     response.setStatus(401);
                     throw new CommonException(401, "token失效，请重新登录");
