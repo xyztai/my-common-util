@@ -59,7 +59,7 @@ public class AgController {
     }
 
     @GetMapping("/expect")
-    public BaseResponse addExpectData(@RequestParam("time") String time, @RequestParam("change") Double change) {
+    public BaseResponse expect(@RequestParam("time") String time, @RequestParam("change") Double change) {
         log.info("addExpectData: time={}, change={}", time, change);
         if(dataCalc.getMaxTime().compareTo(time) >= 0) {
             return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
@@ -79,7 +79,7 @@ public class AgController {
             // 测试结束，就删除掉
             dataCalc.deleteCP(time);
             dataCalc.deleteDataCalc(time);
-            return RestGeneralResponse.of(response);
+            return response;
         } else {
             return RestGeneralResponse.of("无数据");
         }
