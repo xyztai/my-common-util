@@ -16,6 +16,8 @@ public interface DataCalcMapper {
 
     int deleteDataCalcAfter(String time);
 
+    int deleteDataCalc(String time);
+
     int insertCP(AgClosePriceBO bos);
 
     List<AgClosePriceBO> queryCP(String time);
@@ -30,5 +32,5 @@ public interface DataCalcMapper {
 
     String getMaxTime();
 
-    List<AgClosePriceBO> getExpectCP(@Param("time") String time, @Param("change") Integer change);
+    List<AgClosePriceBO> getExpectCP(@Param("time") String time, @Param("change") Double change);
 }

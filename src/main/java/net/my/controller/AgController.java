@@ -59,10 +59,10 @@ public class AgController {
     }
 
     @GetMapping("/add-expect-data")
-    public BaseResponse addExpectData(@RequestParam String time, Integer change) {
+    public BaseResponse addExpectData(@RequestParam("time") String time, @RequestParam("change") Double change) {
         log.info("addExpectData: time={}, change={}", time, change);
         if(dataCalc.getMaxTime().compareTo(time) >= 0) {
-            return RestGeneralResponse.of(String.format("需要先删除大于等于%s的数据", time));
+            return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
         }
 
         List<AgClosePriceBO> agClosePriceBOList = dataCalc.getExpectCP(time, change);
@@ -74,9 +74,14 @@ public class AgController {
             );
 
             calc(time);
-            return RestGeneralResponse.of(String.format("插入%d条数据", agClosePriceBOList.size()));
+            BaseResponse response = queryOper();
+
+            // 测试结束，就删除掉
+            dataCalc.deleteCP(time);
+            dataCalc.deleteDataCalc(time);
+            return RestGeneralResponse.of(response);
         } else {
-            return RestGeneralResponse.of("无数据插入");
+            return RestGeneralResponse.of("无数据");
         }
     }
 
