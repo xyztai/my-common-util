@@ -58,7 +58,7 @@ public class AgController {
         return RestGeneralResponse.of(retList);
     }
 
-    @GetMapping("/add-expect-data")
+    @GetMapping("/expect")
     public BaseResponse addExpectData(@RequestParam("time") String time, @RequestParam("change") Double change) {
         log.info("addExpectData: time={}, change={}", time, change);
         if(dataCalc.getMaxTime().compareTo(time) >= 0) {
