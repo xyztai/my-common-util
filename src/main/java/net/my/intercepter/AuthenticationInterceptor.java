@@ -3,13 +3,11 @@ package net.my.intercepter;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.extern.slf4j.Slf4j;
-import net.my.MyApplication;
-import net.my.config.MyAware;
 import net.my.exception.CommonException;
 import net.my.pojo.UserBase;
 import net.my.service.IUserBaseService;
+import net.my.util.SpringContextUtil;
 import net.my.util.TokenUtils;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerInterceptor;
 import org.springframework.web.servlet.ModelAndView;
@@ -27,7 +25,8 @@ public class AuthenticationInterceptor implements HandlerInterceptor {
     // 在业务处理器处理请求之前被调用
     @Override
     public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) {
-        if(!MyAware.jwtFilter()) {
+        // log.info("====> jwt.filter={}", SpringContextUtil.getProperty("jwt.filter", Boolean.class));
+        if(!SpringContextUtil.enableJwtFilter()) {
             return true;
         }
 

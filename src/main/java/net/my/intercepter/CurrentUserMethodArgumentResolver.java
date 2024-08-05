@@ -1,7 +1,7 @@
 package net.my.intercepter;
 
-import net.my.config.MyAware;
 import net.my.pojo.UserBase;
+import net.my.util.SpringContextUtil;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
 import org.springframework.web.context.request.NativeWebRequest;
@@ -26,7 +26,7 @@ public class CurrentUserMethodArgumentResolver implements HandlerMethodArgumentR
         if (user != null) {
             return user;
         } else {
-            if(MyAware.jwtFilter()) {
+            if(!SpringContextUtil.enableJwtFilter()) {
                 return UserBase.builder().userId("nobody").name("无名氏").build();
             }
         }

@@ -15,3 +15,6 @@ server:
 logging:
   fileDir:
     path: /root/my-common-util
+
+jwt:
+  filter: false
