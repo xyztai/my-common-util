@@ -1,7 +1,8 @@
 package net.my.config;
 
-import net.my.intercepter.AuthenticationInterceptor;
-import net.my.intercepter.CurrentUserMethodArgumentResolver;
+import net.my.interceptor.AuthenticationInterceptor;
+import net.my.interceptor.CurrentUserMethodArgumentResolver;
+import net.my.interceptor.log.LogInterceptor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
@@ -14,6 +15,9 @@ import java.util.List;
 public class MyWebAppConfigurer implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(logInterceptor())
+                .addPathPatterns("/**");
+
         registry.addInterceptor(authenticationInterceptor())
                 .addPathPatterns("/**")
                 .excludePathPatterns("/login", "/register");
@@ -33,5 +37,10 @@ public class MyWebAppConfigurer implements WebMvcConfigurer {
     @Bean
     public AuthenticationInterceptor authenticationInterceptor() {
         return new AuthenticationInterceptor();
+    }
+
+    @Bean
+    public LogInterceptor logInterceptor() {
+        return new LogInterceptor();
     }
 }

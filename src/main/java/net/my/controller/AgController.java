@@ -2,8 +2,8 @@ package net.my.controller;
 
 import com.alibaba.fastjson.JSON;
 import lombok.extern.slf4j.Slf4j;
-import net.my.intercepter.CurrentUser;
-import net.my.intercepter.LoginRequired;
+import net.my.interceptor.CurrentUser;
+import net.my.interceptor.LoginRequired;
 import net.my.mapper.DataCalcMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,16 +25,16 @@ public class AgController {
 
     @LoginRequired
     @DeleteMapping("/remove")
-    public String remove(@CurrentUser UserBase userBase, @RequestParam String time) {
+    public BaseResponse remove(@CurrentUser UserBase userBase, @RequestParam String time) {
         log.info("userBase: {}", userBase);
         log.info("remove-time:{}", time);
         dataCalc.deleteCP(time);
         calc(time);
-        return "删除完成";
+        return RestGeneralResponse.of("删除完成");
     }
 
     @GetMapping("/query-cp")
-    public String queryCP(@RequestParam String time) {
+    public BaseResponse queryCP(@RequestParam String time) {
         List<AgClosePriceBO> bos = dataCalc.queryCP(time);
         StringBuilder res = new StringBuilder();
         if(!CollectionUtils.isEmpty(bos)) {
@@ -42,11 +42,11 @@ public class AgController {
                     f -> res.append(f.getName()).append(": ").append(f.getClosePrice()).append("\r\n")
             );
         }
-        return res.toString();
+        return RestGeneralResponse.of(res.toString());
     }
 
     @GetMapping("/query-data-calc")
-    public String queryDataCalc(@RequestParam String time) {
+    public BaseResponse queryDataCalc(@RequestParam String time) {
         List<AgDataCalcBO> bos = dataCalc.queryDataCalc(time);
         StringBuilder res = new StringBuilder();
         if(!CollectionUtils.isEmpty(bos)) {
@@ -54,11 +54,11 @@ public class AgController {
                     f -> res.append(f.getName()).append(": expma5=").append(f.getExpma5()).append(", expma37=").append(f.getExpma37()).append("\r\n")
             );
         }
-        return res.toString();
+        return RestGeneralResponse.of(res.toString());
     }
 
     @PostMapping("/add-data")
-    public String addData(@RequestBody AgClosePriceDTO agClosePriceDTO) {
+    public BaseResponse addData(@RequestBody AgClosePriceDTO agClosePriceDTO) {
         log.info("agClosePriceDTO:{}", JSON.toJSONString(agClosePriceDTO));
         List<AgClosePriceBO> agClosePriceBOList = agClosePriceDTO.toBO();
         agClosePriceBOList = agClosePriceBOList.stream().filter(f -> !StringUtils.isEmpty(f.getClosePrice())).collect(Collectors.toList());
@@ -72,9 +72,9 @@ public class AgController {
             );
 
             calc(agClosePriceDTO.getTime());
-            return "数据添加完成";
+            return RestGeneralResponse.of("数据添加完成");
         } else {
-            return "无数据";
+            return RestGeneralResponse.of("无数据");
         }
     }
 
@@ -93,11 +93,11 @@ public class AgController {
     }
 
     @GetMapping("/query-oper")
-    public String queryOper() {
+    public BaseResponse queryOper() {
         log.info("queryOper");
         List<AgOper> opers = dataCalc.queryOper();
         if(CollectionUtils.isEmpty(opers)) {
-            return "无操作";
+            return RestGeneralResponse.of("无操作");
         }
         StringBuilder stringBuilder = new StringBuilder();
         Comparator<String> comp = (String::compareTo);
@@ -122,7 +122,7 @@ public class AgController {
             stringBuilder.append("\r\n");
         }
 
-        return stringBuilder.toString();
+        return RestGeneralResponse.of(stringBuilder.toString());
     }
 
 }

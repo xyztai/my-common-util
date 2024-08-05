@@ -1,4 +1,4 @@
-package net.my.intercepter;
+package net.my.interceptor;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;

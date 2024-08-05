@@ -1,4 +1,4 @@
-package net.my.intercepter;
+package net.my.interceptor;
 
 public class CurrentUserConstants {
     /**

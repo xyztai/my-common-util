@@ -4,7 +4,7 @@
     <!-- 定义日志文件的输出路径 -->
     <springProperty scope="context" name="LOG_PATH" source="logging.fileDir.path"/>
     <!-- 定义日志格式 -->
-    <property name="LOG_PATTERN" value="%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level[%thread]%logger{56}.%method:%L -%msg%n"/>
+    <property name="LOG_PATTERN" value="%date{yyyy-MM-dd HH:mm:ss.SSS}-[%X{THREAD_ID}]-%-5level[%thread]%logger{56}.%method:%L -%msg%n"/>
 
     <!-- 将日志滚动输出到application.log文件中 -->
     <appender name="INFO"

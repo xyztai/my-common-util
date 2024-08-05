@@ -1,4 +1,4 @@
-package net.my.intercepter;
+package net.my.interceptor;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

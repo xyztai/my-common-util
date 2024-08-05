@@ -17,4 +17,4 @@ logging:
     path: D:\projects\java\my-common-util
 
 jwt:
-  filter: true
+  filter: false
