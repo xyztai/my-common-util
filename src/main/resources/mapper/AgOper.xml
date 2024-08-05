@@ -50,6 +50,31 @@
         insert into t_raw_close_price(time, type, close_price) values (#{time}, #{type}, #{closePrice})
     </insert>
 
+    <select id="getMaxTime" resultType="string">
+        select max(time) from t_raw_close_price
+    </select>
+
+    <select id="getExpectCP" resultMap="queryCPMap">
+<![CDATA[
+        select t12.id
+             , t11.time
+             , t11.type
+             , t12.name
+             , t11.close_price * (${change} * 0.01 + 1) close_price
+        from (
+                 select
+                    #{time} time
+                    , t1.type
+                    , t1.close_price
+                    , row_number() over (partition by t1.type order by t1.time desc) rn
+                 from t_raw_close_price t1
+                 where t1.time < #{time}
+             ) t11, t_type t12
+        where t11.rn = 1
+        and t11.type = t12.type
+]]>
+    </select>
+
     <select id="queryCP" resultMap="queryCPMap">
         select t2.id, t1.time, t1.type, t2.name, t1.close_price
         from t_raw_close_price t1, t_type t2

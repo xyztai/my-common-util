@@ -27,4 +27,8 @@ public interface DataCalcMapper {
     int insertDataCalc();
 
     List<AgOper> queryOper();
+
+    String getMaxTime();
+
+    List<AgClosePriceBO> getExpectCP(@Param("time") String time, @Param("change") Integer change);
 }
