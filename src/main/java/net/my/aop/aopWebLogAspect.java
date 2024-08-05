@@ -36,15 +36,15 @@ public class aopWebLogAspect {
         log.info("========================================== Start ==========================================");
         //打印请求参数相关日志
         // 打印请求 url
-        log.info("url:{}", request.getRequestURI());
+        log.info("url: {}", request.getRequestURI());
         // 打印 Http method
-        log.info("HTTP Method:{}", request.getMethod());
+        log.info("HTTP Method: {}", request.getMethod());
         // 打印调用 controller 的全路径以及执行方法
-        log.info("Class Method:{}.{}", joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName());
+        log.info("Class Method: {}.{}", joinPoint.getSignature().getDeclaringTypeName(), joinPoint.getSignature().getName());
         // 打印请求的 IP
-        log.info("IP :{}", request.getRemoteAddr());
+        log.info("IP: {}", request.getRemoteAddr());
         // 打印请求入参
-        log.info("Request Args:{}", JSON.toJSONString(joinPoint.getArgs()));
+        log.info("Request Args: {}", JSON.toJSONString(joinPoint.getArgs()));
     }
 
     /**
@@ -63,9 +63,9 @@ public class aopWebLogAspect {
             // 将线程id赋值给返回的traceId
             result.setTraceId(MDC.get(LogInterceptor.THREAD_ID));
             //打印出参
-            log.info("Response Args : {}", JSON.toJSONString(result));
+            log.info("Response Args: {}", JSON.toJSONString(result));
             // 执行耗时
-            log.info("Time-Consuming : {} ms", System.currentTimeMillis() - startTime);
+            log.info("Time-Consuming: {} ms", System.currentTimeMillis() - startTime);
         }
         return result;
     }
