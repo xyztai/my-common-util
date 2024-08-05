@@ -51,7 +51,7 @@
     </insert>
 
     <select id="queryCP" resultMap="queryCPMap">
-        select t2.id, t1.time, t1.type, t2.name, concat(t1.close_price, '') close_price
+        select t2.id, t1.time, t1.type, t2.name, t1.close_price
         from t_raw_close_price t1, t_type t2
         where t1.time = #{time}
         and t1.type = t2.type
@@ -59,7 +59,7 @@
     </select>
 
     <select id="queryDataCalc" resultMap="queryDataCalcMap">
-        select t2.id, t1.time, t1.type, t2.name, concat(t1.expma_5, '') expma_5, concat(t1.expma_37, '') expma_37
+        select t2.id, t1.time, t1.type, t2.name, t1.expma_5, t1.expma_37
         from t_data_calc t1, t_type t2
         where t1.time = #{time}
         and t1.type = t2.type

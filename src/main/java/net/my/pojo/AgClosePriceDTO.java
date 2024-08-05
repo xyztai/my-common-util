@@ -8,22 +8,22 @@ import java.util.List;
 @Data
 public class AgClosePriceDTO {
     private String time;
-    private String sz50CP;
-    private String szzsCP;
-    private String hs300CP;
-    private String szczCP;
-    private String kc50CP;
-    private String zz1000CP;
-    private String zz2000CP;
-    private String bz50CP;
-    private String hskjzsCP;
-    private String zqCP;
-    private String ysjsCP;
-    private String gfcyCP;
-    private String ktjgCP;
-    private String rjzsCP;
-    private String hbyqCCP;
-    private String nsdk100CP;
+    private Double sz50CP;
+    private Double szzsCP;
+    private Double hs300CP;
+    private Double szczCP;
+    private Double kc50CP;
+    private Double zz1000CP;
+    private Double zz2000CP;
+    private Double bz50CP;
+    private Double hskjzsCP;
+    private Double zqCP;
+    private Double ysjsCP;
+    private Double gfcyCP;
+    private Double ktjgCP;
+    private Double rjzsCP;
+    private Double hbyqCCP;
+    private Double nsdk100CP;
 
     public List<AgClosePriceBO> toBO() {
         List<AgClosePriceBO> list = new ArrayList<>();

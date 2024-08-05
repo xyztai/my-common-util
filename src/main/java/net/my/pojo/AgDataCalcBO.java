@@ -14,6 +14,6 @@ public class AgDataCalcBO {
     private String time;
     private String type;
     private String name;
-    private String expma5;
-    private String expma37;
+    private Double expma5;
+    private Double expma37;
 }

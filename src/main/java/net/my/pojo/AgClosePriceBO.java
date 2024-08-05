@@ -14,5 +14,5 @@ public class AgClosePriceBO {
     private String time;
     private String type;
     private String name;
-    private String closePrice;
+    private Double closePrice;
 }
