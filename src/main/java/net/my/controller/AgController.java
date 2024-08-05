@@ -11,8 +11,7 @@ import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Comparator;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
@@ -36,25 +35,25 @@ public class AgController {
     @GetMapping("/query-cp")
     public BaseResponse queryCP(@RequestParam String time) {
         List<AgClosePriceBO> bos = dataCalc.queryCP(time);
-        StringBuilder res = new StringBuilder();
+
+        List<String> retList = new ArrayList<>();
         if(!CollectionUtils.isEmpty(bos)) {
-            bos.forEach(
-                    f -> res.append(f.getName()).append(": ").append(f.getClosePrice()).append("\r\n")
-            );
+            retList = bos.stream().map(m -> String.format("%s: %.0f", m.getName(), m.getClosePrice())).collect(Collectors.toList());
         }
-        return RestGeneralResponse.of(res.toString());
+
+        return RestGeneralResponse.of(retList);
     }
 
     @GetMapping("/query-data-calc")
     public BaseResponse queryDataCalc(@RequestParam String time) {
         List<AgDataCalcBO> bos = dataCalc.queryDataCalc(time);
-        StringBuilder res = new StringBuilder();
+
+        List<String> retList = new ArrayList<>();
         if(!CollectionUtils.isEmpty(bos)) {
-            bos.forEach(
-                    f -> res.append(f.getName()).append(": expma5=").append(f.getExpma5()).append(", expma37=").append(f.getExpma37()).append("\r\n")
-            );
+            retList = bos.stream().map(m -> String.format("%s: expma5=%.0f, expma37=%.0f", m.getName(), m.getExpma5(), m.getExpma37())).collect(Collectors.toList());
         }
-        return RestGeneralResponse.of(res.toString());
+
+        return RestGeneralResponse.of(retList);
     }
 
     @PostMapping("/add-data")
@@ -102,27 +101,27 @@ public class AgController {
         StringBuilder stringBuilder = new StringBuilder();
         Comparator<String> comp = (String::compareTo);
         List<String> times = opers.stream().map(AgOper::getTime).distinct().sorted(comp.reversed()).collect(Collectors.toList());
+        Map<String, Map<String, List>> retMap = new LinkedHashMap<>();
         for(String time : times) {
-            stringBuilder.append(time)
-                    .append(":\r\n");
-            List<AgOper> opersBuy = opers.stream().filter(f -> time.equals(f.getTime()) && "buy".equals(f.getOperDir())).collect(Collectors.toList());
-            if(!CollectionUtils.isEmpty(opersBuy)) {
-                stringBuilder.append("买操作:\r\n");
-                for(AgOper ag : opersBuy) {
-                    stringBuilder.append(ag.getName()).append(": ").append(ag.getBuyOper()).append("\r\n");
-                }
+            Map<String, List> timeMap = new LinkedHashMap<>();
+            List<String> buyList = opers.stream().filter(f -> time.equals(f.getTime()) && "buy".equals(f.getOperDir()))
+                    .map(m -> m.getName() + ": " + m.getBuyOper().replaceAll("buy", "买")).collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(buyList)) {
+                timeMap.put("买:", buyList);
             }
-            List<AgOper> opersSell = opers.stream().filter(f -> time.equals(f.getTime()) && "sell".equals(f.getOperDir())).collect(Collectors.toList());
-            if(!CollectionUtils.isEmpty(opersSell)) {
-                stringBuilder.append("卖操作:\r\n");
-                for(AgOper ag : opersSell) {
-                    stringBuilder.append(ag.getName()).append(": ").append(ag.getSellOper()).append("\r\n");
-                }
+
+            List<String> sellList = opers.stream().filter(f -> time.equals(f.getTime()) && "sell".equals(f.getOperDir()))
+                    .map(m -> m.getName() + ": " + m.getSellOper().replaceAll("sell", "卖")).collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(sellList)) {
+                timeMap.put("卖:", sellList);
             }
-            stringBuilder.append("\r\n");
+
+            if(!CollectionUtils.isEmpty(timeMap)) {
+                retMap.put(time, timeMap);
+            }
         }
 
-        return RestGeneralResponse.of(stringBuilder.toString());
+        return RestGeneralResponse.of(retMap);
     }
 
 }
