@@ -74,7 +74,7 @@ public class AgController {
             );
 
             calc(time);
-            BaseResponse response = queryOper();
+            BaseResponse response = querySimpleOper();
 
             // 测试结束，就删除掉
             dataCalc.deleteCP(time);
