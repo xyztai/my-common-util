@@ -103,8 +103,8 @@
     select
         t11.time
          , t11.type
-         , t11.clac_expma_5
-         , t11.clac_expma_37
+         , t11.clac_expma_5 expma_5
+         , t11.clac_expma_37 expma_37
     from
         (
             select
