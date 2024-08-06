@@ -123,7 +123,7 @@
 ]]>
     </insert>
 
-    <select id="queryOper" resultMap="queryOperResultMap">
+    <select id="queryHardOper" resultMap="queryOperResultMap">
 <![CDATA[
     select
         t11.`time`
@@ -143,7 +143,6 @@
               when t11.s_ratio_ans >= t11.s_ratio_ans_max and t11.s_ratio_ans - 1 >= s_ratio_1_in_2 then '如果涨或者小跌跌幅<1%,则 sell 二分之一'
               when t11.s_ratio_ans >= t11.s_ratio_ans_max and t11.s_ratio_ans - 1 >= s_ratio_1_in_3 then '如果涨或者小跌跌幅<1%,则 sell 三分之一'
               when t11.s_ratio_ans >= t11.s_ratio_ans_max and t11.s_ratio_ans - 1 >= s_ratio_1_in_4 then '如果涨或者小跌跌幅<1%,则 sell 四分之一'
-            -- when t11.s_ratio_ans >= t11.s_ratio_ans_max and abs(t11.s_ratio_ans - 1) >= s_ratio_1_in_4_start then '【start】 ==> 如果大涨超过3%,则 sell 四分之一'
               else null
         end as `sell_oper`
     from
@@ -154,7 +153,7 @@
                  , round(t1.`expma_5`/t1.`expma_37`, 5) s_ratio_ans
                  , round(t1.`expma_37`/t1.`expma_5`, 5) b_ratio_ans
                  , max(round(t1.`expma_5`/t1.`expma_37`, 5)) over (partition by t1.`type` order by t1.`time`) s_ratio_ans_max
-        , max(round(t1.`expma_37`/t1.`expma_5`, 5)) over (partition by t1.`type` order by t1.`time`) b_ratio_ans_max
+                 , max(round(t1.`expma_37`/t1.`expma_5`, 5)) over (partition by t1.`type` order by t1.`time`) b_ratio_ans_max
             from t_data_calc t1
         ) t11,
         (
@@ -165,7 +164,6 @@
                  , (t2.b_ratio-1) b_ratio_2000
                  , 1.2*(t2.b_ratio-1) b_ratio_3000
                  , 1.5*(t2.b_ratio-1) b_ratio_5000
-                 -- , 0.9*(t2.s_ratio-1) s_ratio_1_in_4_start  -- 准备sell
                  , 0 s_ratio_1_in_4
                  , 0.4*(t2.s_ratio-1) s_ratio_1_in_3
                  , 0.8*(t2.s_ratio-1) s_ratio_1_in_2
@@ -176,11 +174,68 @@
             select *
             from t_type t3
         ) t13
-    where t11.type = t12.type -- and t11.type = 'gfcy'
+    where t11.type = t12.type
       and t11.type = t13.type
       and ((t11.b_ratio_ans >= t11.b_ratio_ans_max and t11.b_ratio_ans - 1 >= b_ratio_500) or (t11.s_ratio_ans >= t11.s_ratio_ans_max and t11.s_ratio_ans - 1 >= s_ratio_1_in_4))
     order by 1 desc, 2, 3 desc
     limit 16
+]]>
+    </select>
+
+    <select id="querySimpleOper" resultMap="queryOperResultMap">
+<![CDATA[
+        select
+            t11.`time`
+             , case when t11.b_ratio_ans - 1 >= b_ratio_500 then 'buy' else 'sell' end as `oper_dir`
+             , case when t11.b_ratio_ans - 1 >= b_ratio_500 then t11.b_ratio_ans else t11.s_ratio_ans end ratio_c
+             , t13.name
+             -- , t11.b_ratio_ans, t12.b_ratio_500
+             , case when t11.b_ratio_ans - 1 >= b_ratio_5000 then '如果跌或者小涨涨幅<1%,则 buy 5000'
+                    when t11.b_ratio_ans - 1 >= b_ratio_3000 then '如果跌或者小涨涨幅<1%,则 buy 3000'
+                    when t11.b_ratio_ans - 1 >= b_ratio_2000 then '如果跌或者小涨涨幅<1%,则 buy 2000'
+                    when t11.b_ratio_ans - 1 >= b_ratio_1000 then '如果跌或者小涨涨幅<1%,则 buy 1000'
+                    when t11.b_ratio_ans - 1 >= b_ratio_500 then '如果跌或者小涨涨幅<1%,则 buy 500'
+                    else null
+            end as `buy_oper`
+             -- , abs(t11.s_ratio_ans - 1), s_ratio_1_in_4_start
+             , case when t11.s_ratio_ans - 1 >= s_ratio_1_in_1 then '如果涨或者小跌跌幅<1%,则 sell 全部'
+                    when t11.s_ratio_ans - 1 >= s_ratio_1_in_2 then '如果涨或者小跌跌幅<1%,则 sell 二分之一'
+                    when t11.s_ratio_ans - 1 >= s_ratio_1_in_3 then '如果涨或者小跌跌幅<1%,则 sell 三分之一'
+                    when t11.s_ratio_ans - 1 >= s_ratio_1_in_4 then '如果涨或者小跌跌幅<1%,则 sell 四分之一'
+                    else null
+            end as `sell_oper`
+        from
+            (
+                select
+                    t1.`time`
+                     , t1.`type`
+                     , round(t1.`expma_5`/t1.`expma_37`, 5) s_ratio_ans
+                     , round(t1.`expma_37`/t1.`expma_5`, 5) b_ratio_ans
+                from t_data_calc t1
+            ) t11,
+            (
+                select
+                    t2.type
+                     , 0.8*(t2.b_ratio-1) b_ratio_500
+                     , 0.9*(t2.b_ratio-1) b_ratio_1000
+                     , (t2.b_ratio-1) b_ratio_2000
+                     , 1.2*(t2.b_ratio-1) b_ratio_3000
+                     , 1.5*(t2.b_ratio-1) b_ratio_5000
+                     , 0 s_ratio_1_in_4
+                     , 0.4*(t2.s_ratio-1) s_ratio_1_in_3
+                     , 0.8*(t2.s_ratio-1) s_ratio_1_in_2
+                     , 1*(t2.s_ratio-1) s_ratio_1_in_1
+                from t_para t2
+            ) t12,
+            (
+                select *
+                from t_type t3
+            ) t13
+        where t11.type = t12.type
+          and t11.type = t13.type
+          and ((t11.b_ratio_ans - 1 >= b_ratio_500) or (t11.s_ratio_ans - 1 >= s_ratio_1_in_4))
+        order by 1 desc, 2, 3 desc
+        limit 16
 ]]>
     </select>
 </mapper>

@@ -28,7 +28,9 @@ public interface DataCalcMapper {
 
     int insertDataCalc();
 
-    List<AgOper> queryOper();
+    List<AgOper> queryHardOper();
+
+    List<AgOper> querySimpleOper();
 
     String getMaxTime();
 

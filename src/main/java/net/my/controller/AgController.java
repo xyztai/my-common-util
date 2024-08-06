@@ -120,10 +120,43 @@ public class AgController {
 
     }
 
-    @GetMapping("/query-oper")
-    public BaseResponse queryOper() {
-        log.info("queryOper");
-        List<AgOper> opers = dataCalc.queryOper();
+    @GetMapping("/query-hard-oper")
+    public BaseResponse queryHardOper() {
+        log.info("queryHardOper.");
+        List<AgOper> opers = dataCalc.queryHardOper();
+        if(CollectionUtils.isEmpty(opers)) {
+            return RestGeneralResponse.of("无操作");
+        }
+        StringBuilder stringBuilder = new StringBuilder();
+        Comparator<String> comp = (String::compareTo);
+        List<String> times = opers.stream().map(AgOper::getTime).distinct().sorted(comp.reversed()).collect(Collectors.toList());
+        Map<String, Map<String, List>> retMap = new LinkedHashMap<>();
+        for(String time : times) {
+            Map<String, List> timeMap = new LinkedHashMap<>();
+            List<String> buyList = opers.stream().filter(f -> time.equals(f.getTime()) && "buy".equals(f.getOperDir()))
+                    .map(m -> m.getName() + ": " + m.getBuyOper().replaceAll("buy", "买")).collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(buyList)) {
+                timeMap.put("买:", buyList);
+            }
+
+            List<String> sellList = opers.stream().filter(f -> time.equals(f.getTime()) && "sell".equals(f.getOperDir()))
+                    .map(m -> m.getName() + ": " + m.getSellOper().replaceAll("sell", "卖")).collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(sellList)) {
+                timeMap.put("卖:", sellList);
+            }
+
+            if(!CollectionUtils.isEmpty(timeMap)) {
+                retMap.put(time, timeMap);
+            }
+        }
+
+        return RestGeneralResponse.of(retMap);
+    }
+
+    @GetMapping("/query-simple-oper")
+    public BaseResponse querySimpleOper() {
+        log.info("querySimpleOper.");
+        List<AgOper> opers = dataCalc.querySimpleOper();
         if(CollectionUtils.isEmpty(opers)) {
             return RestGeneralResponse.of("无操作");
         }
