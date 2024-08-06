@@ -58,9 +58,36 @@ public class AgController {
         return RestGeneralResponse.of(retList);
     }
 
-    @GetMapping("/expect")
-    public BaseResponse expect(@RequestParam("time") String time, @RequestParam("change") Double change) {
-        log.info("addExpectData: time={}, change={}", time, change);
+    @GetMapping("/expect-hard")
+    public BaseResponse expectHard(@RequestParam("time") String time, @RequestParam("change") Double change) {
+        log.info("expectHard: time={}, change={}", time, change);
+        if(dataCalc.getMaxTime().compareTo(time) >= 0) {
+            return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
+        }
+
+        List<AgClosePriceBO> agClosePriceBOList = dataCalc.getExpectCP(time, change);
+        if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
+            agClosePriceBOList.forEach(
+                    f -> {
+                        dataCalc.insertCP(f);
+                    }
+            );
+
+            calc(time);
+            BaseResponse response = queryHardOper();
+
+            // 测试结束，就删除掉
+            dataCalc.deleteCP(time);
+            dataCalc.deleteDataCalc(time);
+            return response;
+        } else {
+            return RestGeneralResponse.of("无数据");
+        }
+    }
+
+    @GetMapping("/expect-simple")
+    public BaseResponse expectSimple(@RequestParam("time") String time, @RequestParam("change") Double change) {
+        log.info("expectSimple: time={}, change={}", time, change);
         if(dataCalc.getMaxTime().compareTo(time) >= 0) {
             return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
         }
