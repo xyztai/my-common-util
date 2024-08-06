@@ -101,23 +101,23 @@
 <![CDATA[
     insert into t_data_calc(time, type, expma_5, expma_37)
     select
-        t11.time
+        t11.time_max time
          , t11.type
          , t11.clac_expma_5 expma_5
          , t11.clac_expma_37 expma_37
     from
         (
             select
-                t.time
-                 , t.type
+                t.type
                  , round((t.close_price - t3.`expma_5`)*0.333 + t3.`expma_5`, 1) clac_expma_5
                  , round((t.close_price - t3.`expma_37`)*0.053 + t3.`expma_37`, 1) clac_expma_37
                  , row_number() over (partition by t.`type` order by t.`time` desc) rn_c
+		           , max(t.time) over (order by t.time desc) time_max
             from t_raw_close_price t,
                  (select t2.time, t2.type, t2.`expma_5`, t2.`expma_37`, row_number() over (partition by t2.type order by t2.time desc) rn from t_data_calc t2 where t2.time <= (select max(t.time) from t_data_calc t )) t3
-            where t.time <= (select min(t.time) from t_raw_close_price t where t.time > (select max(t.time) from t_data_calc t))
-              and t.type = t3.type
-              and t3.rn = 1
+            where t.time <= (select min(t.time) from t_raw_close_price t where t.time > (select max(t.time) time from t_data_calc t))
+		    and t.type = t3.type
+		    and t3.rn = 1
         ) t11
     where t11.rn_c = 1
 ]]>
