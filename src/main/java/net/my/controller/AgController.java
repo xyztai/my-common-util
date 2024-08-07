@@ -23,8 +23,8 @@ public class AgController {
     private DataCalcMapper dataCalc;
 
     @LoginRequired
-    @DeleteMapping("/remove")
-    public BaseResponse remove(@CurrentUser UserBase userBase, @RequestParam String time) {
+    @DeleteMapping("/remove/{time}")
+    public BaseResponse remove(@CurrentUser UserBase userBase, @PathVariable("time") String time) {
         log.info("userBase: {}", userBase);
         log.info("remove-time:{}", time);
         dataCalc.deleteCP(time);
@@ -32,8 +32,8 @@ public class AgController {
         return RestGeneralResponse.of("删除完成");
     }
 
-    @GetMapping("/query-cp")
-    public BaseResponse queryCP(@RequestParam String time) {
+    @GetMapping("/data/cp/{time}")
+    public BaseResponse queryCP(@PathVariable("time") String time) {
         List<AgClosePriceBO> bos = dataCalc.queryCP(time);
 
         Map<String, Integer> retMap = new LinkedHashMap<>();
@@ -46,8 +46,8 @@ public class AgController {
         return RestGeneralResponse.of(retMap);
     }
 
-    @GetMapping("/query-data-calc")
-    public BaseResponse queryDataCalc(@RequestParam String time) {
+    @GetMapping("/data/calc/{time}")
+    public BaseResponse queryDataCalc(@PathVariable("time") String time) {
         List<AgDataCalcBO> bos = dataCalc.queryDataCalc(time);
 
         List<String> retList = new ArrayList<>();
@@ -58,8 +58,9 @@ public class AgController {
         return RestGeneralResponse.of(retList);
     }
 
-    @GetMapping("/expect-hard")
-    public BaseResponse expectHard(@RequestParam("time") String time, @RequestParam("change") Double change) {
+    @GetMapping("/expect/hard/{change}")
+    public BaseResponse expectHard(@PathVariable("change") Double change) {
+        String time = "9999-99-99";
         log.info("expectHard: time={}, change={}", time, change);
         if(dataCalc.getMaxTime().compareTo(time) >= 0) {
             return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
@@ -85,8 +86,9 @@ public class AgController {
         }
     }
 
-    @GetMapping("/expect-simple")
-    public BaseResponse expectSimple(@RequestParam("time") String time, @RequestParam("change") Double change) {
+    @GetMapping("/expect/simple/{change}")
+    public BaseResponse expectSimple(@PathVariable("change") Double change) {
+        String time = "9999-99-99";
         log.info("expectSimple: time={}, change={}", time, change);
         if(dataCalc.getMaxTime().compareTo(time) >= 0) {
             return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
@@ -112,7 +114,7 @@ public class AgController {
         }
     }
 
-    @PostMapping("/add-data")
+    @PostMapping("/add")
     public BaseResponse addData(@RequestBody AgClosePriceDTO agClosePriceDTO) {
         log.info("agClosePriceDTO:{}", JSON.toJSONString(agClosePriceDTO));
         List<AgClosePriceBO> agClosePriceBOList = agClosePriceDTO.toBO();
@@ -147,7 +149,7 @@ public class AgController {
 
     }
 
-    @GetMapping("/query-hard-oper")
+    @GetMapping("/oper/hard")
     public BaseResponse queryHardOper() {
         log.info("queryHardOper.");
         List<AgOper> opers = dataCalc.queryHardOper();
@@ -180,7 +182,7 @@ public class AgController {
         return RestGeneralResponse.of(retMap);
     }
 
-    @GetMapping("/query-simple-oper")
+    @GetMapping("/oper/simple")
     public BaseResponse querySimpleOper() {
         log.info("querySimpleOper.");
         List<AgOper> opers = dataCalc.querySimpleOper();
