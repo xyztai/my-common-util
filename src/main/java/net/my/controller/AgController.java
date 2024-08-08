@@ -52,7 +52,8 @@ public class AgController {
 
         List<String> retList = new ArrayList<>();
         if(!CollectionUtils.isEmpty(bos)) {
-            retList = bos.stream().map(m -> String.format("%s: expma5=%.0f, expma37=%.0f", m.getName(), m.getExpma5(), m.getExpma37())).collect(Collectors.toList());
+            retList = bos.stream().map(m -> String.format("%s: expma5=%.0f, expma37=%.0f, sRatio=%.3f, bRatio=%.3f"
+                    , m.getName(), m.getExpma5(), m.getExpma37(), m.getSRatio(), m.getBRatio())).collect(Collectors.toList());
         }
 
         return RestGeneralResponse.of(retList);

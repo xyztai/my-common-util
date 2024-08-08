@@ -26,6 +26,8 @@
         <result column="name" property="name" />
         <result column="expma_5" property="expma5" />
         <result column="expma_37" property="expma37" />
+        <result column="s_ratio" property="sRatio" />
+        <result column="b_ratio" property="bRatio" />
     </resultMap>
 
     <delete id="deleteCP">
@@ -85,6 +87,7 @@
 
     <select id="queryDataCalc" resultMap="queryDataCalcMap">
         select t2.id, t1.time, t1.type, t2.name, t1.expma_5, t1.expma_37
+               , round(t1.expma_5/t1.expma_37, 3) s_ratio,  round(t1.expma_37/t1.expma_5, 3) b_ratio
         from t_data_calc t1, t_type t2
         where t1.time = #{time}
         and t1.type = t2.type

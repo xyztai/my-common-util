@@ -16,4 +16,6 @@ public class AgDataCalcBO {
     private String name;
     private Double expma5;
     private Double expma37;
+    private Double sRatio;
+    private Double bRatio;
 }
