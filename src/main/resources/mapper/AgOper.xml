@@ -26,8 +26,12 @@
         <result column="name" property="name" />
         <result column="expma_5" property="expma5" />
         <result column="expma_37" property="expma37" />
+        <result column="s_ratio_para" property="sRatioPara" />
         <result column="s_ratio" property="sRatio" />
+        <result column="s_ratio_pre" property="sRatioPre" />
+        <result column="b_ratio_para" property="bRatioPara" />
         <result column="b_ratio" property="bRatio" />
+        <result column="b_ratio_pre" property="bRatioPre" />
     </resultMap>
 
     <delete id="deleteCP">
@@ -86,12 +90,27 @@
     </select>
 
     <select id="queryDataCalc" resultMap="queryDataCalcMap">
-        select t2.id, t1.time, t1.type, t2.name, t1.expma_5, t1.expma_37
-               , round(t1.expma_5/t1.expma_37, 3) s_ratio,  round(t1.expma_37/t1.expma_5, 3) b_ratio
-        from t_data_calc t1, t_type t2
-        where t1.time = #{time}
-        and t1.type = t2.type
+<![CDATA[
+        select t.id, t.time, t.type, t.name, t.expma_5, t.expma_37
+             , t.s_ratio_para, t.s_ratio, t.s_ratio_pre
+             , t.b_ratio_para, t.b_ratio, t.b_ratio_pre
+        from (
+                 select t2.id, t1.time, t1.type, t2.name, t1.expma_5, t1.expma_37
+                      , t3.s_ratio s_ratio_para
+                      , round(t1.expma_5/t1.expma_37, 4) s_ratio
+                      , lead(round(t1.expma_5/t1.expma_37, 4)) over (partition by t1.`type` order by t1.`time` desc) s_ratio_pre
+               , t3.b_ratio b_ratio_para
+                      , round(t1.expma_37/t1.expma_5, 4) b_ratio
+                      , lead(round(t1.expma_37/t1.expma_5, 4)) over (partition by t1.`type` order by t1.`time` desc) b_ratio_pre
+               , row_number() over (partition by t1.`type` order by t1.`time` desc) rn_time
+                 from t_data_calc t1, t_type t2, t_para t3
+                 where t1.time <= #{time}
+                   and t1.type = t2.type
+                   and t1.`type` = t3.`type`
+             ) t
+        where t.rn_time = 1
         order by 1
+]]>
     </select>
 
     <select id="queryCalcTimes" resultType="int">
