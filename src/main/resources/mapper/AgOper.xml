@@ -34,6 +34,14 @@
         <result column="b_ratio_pre" property="bRatioPre" />
     </resultMap>
 
+    <resultMap id="queryDataCntMap" type="net.my.pojo.AgDataCntBO">
+        <id column="time" property="time" />
+        <result column="cnt_cp" property="cntCp" />
+        <result column="cnt_calc" property="cntCalc" />
+        <result column="cnt_gap" property="cntGap" />
+        <result column="names_miss" property="namesMiss" />
+    </resultMap>
+
     <delete id="deleteCP">
         delete from t_raw_close_price where time = #{time}
     </delete>
@@ -258,6 +266,31 @@
           and ((t11.b_ratio_ans - 1 >= b_ratio_500) or (t11.s_ratio_ans - 1 >= s_ratio_1_in_4))
         order by 1 desc, 2, 3 desc
         limit 16
+]]>
+    </select>
+
+    <select id="queryDataCnt" resultMap="queryDataCntMap">
+<![CDATA[
+        select
+            t11.time
+             , count(time_cp) cnt_cp
+             , count(time_calc) cnt_calc
+             , count(time_calc) - count(time_cp) cnt_gap
+             , group_concat(case when time_cp is null then name else null end separator ', ') as names_miss
+        from (
+                 select t1.time, tt.name, t.time time_cp, tc.time time_calc
+                 from t_type tt
+                          join (select distinct time from t_raw_close_price) t1
+                          left join t_raw_close_price t
+                                    on tt.`type` = t.`type`
+                                        and t1.`time` = t.`time`
+                          left join t_data_calc tc
+                                    on tt.`type` = tc.`type`
+                                        and t1.`time` = tc.`time`
+             ) t11
+        group by t11.time
+        order by 4 desc, 1 desc
+        limit 22
 ]]>
     </select>
 </mapper>

@@ -46,6 +46,13 @@ public class AgController {
         return RestGeneralResponse.of(retMap);
     }
 
+    @GetMapping("/data/cnt")
+    public BaseResponse queryDataCnt() {
+        List<AgDataCntBO> bos = dataCalc.queryDataCnt();
+
+        return RestGeneralResponse.of(bos);
+    }
+
     @GetMapping("/data/calc/{time}")
     public BaseResponse queryDataCalc(@PathVariable("time") String time) {
         List<AgDataCalcBO> bos = dataCalc.queryDataCalc(time);
