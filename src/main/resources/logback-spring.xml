@@ -10,7 +10,7 @@
     <appender name="INFO"
               class="ch.qos.logback.core.rolling.RollingFileAppender">
         <!-- 输出文件目的地 -->
-        <file>${LOG_PATH}/logs/${APP_NAME}/info.log</file>
+        <file>${LOG_PATH}/logs/info.log</file>
         <encoder>
             <!-- 使用默认的输出格式打印 -->
             <pattern>${LOG_PATTERN}</pattern>
@@ -19,7 +19,7 @@
         <!-- 设置 RollingPolicy 属性，用于配置文件大小限制，保留天数、文件名格式 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 文件命名格式 -->
-            <fileNamePattern>${LOG_PATH}/logs/${APP_NAME}/info.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/logs/%d{yyyy-MM-dd}/info.%d{yyyy-MM-dd}.%i.log.tar.gz</fileNamePattern>
             <!-- 文件保留最大天数 -->
             <maxHistory>7</maxHistory>
             <!-- 文件大小限制 -->
@@ -31,7 +31,7 @@
 
     <!-- 摘取出WARN级别日志输出到warn.log中 -->
     <appender name="WARN" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/logs/${APP_NAME}/warn.log</file>
+        <file>${LOG_PATH}/logs/warn.log</file>
         <encoder>
             <!-- 使用默认的输出格式打印 -->
             <pattern>${LOG_PATTERN}</pattern>
@@ -40,7 +40,7 @@
         <!-- 设置 RollingPolicy 属性，用于配置文件大小限制，保留天数、文件名格式 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 文件命名格式 -->
-            <fileNamePattern>${LOG_PATH}/logs/${APP_NAME}/warn.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/logs/%d{yyyy-MM-dd}/warn.%d{yyyy-MM-dd}.%i.log.tar.gz</fileNamePattern>
             <!-- 文件保留最大天数 -->
             <maxHistory>7</maxHistory>
             <!-- 文件大小限制 -->
@@ -56,7 +56,7 @@
 
     <!-- 摘取出ERROR级别日志输出到error.log中 -->
     <appender name="ERROR" class="ch.qos.logback.core.rolling.RollingFileAppender">
-        <file>${LOG_PATH}/logs/${APP_NAME}/error.log</file>
+        <file>${LOG_PATH}/logs/error.log</file>
         <encoder>
             <!-- 使用默认的输出格式打印 -->
             <pattern>${LOG_PATTERN}</pattern>
@@ -65,7 +65,7 @@
         <!-- 设置 RollingPolicy 属性，用于配置文件大小限制，保留天数、文件名格式 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 文件命名格式 -->
-            <fileNamePattern>${LOG_PATH}/logs/${APP_NAME}/error.%d{yyyy-MM-dd}.%i.log.gz</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/logs/%d{yyyy-MM-dd}/error.%d{yyyy-MM-dd}.%i.log.tar.gz</fileNamePattern>
             <!-- 文件保留最大天数 -->
             <maxHistory>7</maxHistory>
             <!-- 文件大小限制 -->
