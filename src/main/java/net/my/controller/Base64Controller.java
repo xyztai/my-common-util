@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/b64")
 @Slf4j
-@Api("Base64工具")
+@Api(value = "Base64工具", description = "Base64工具接口")
 public class Base64Controller {
 
     @GetMapping("/url-encode")

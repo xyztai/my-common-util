@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/login")
 @Slf4j
-@Api("登录")
+@Api(value = "登录", description = "登录接口")
 public class LoginController {
 
     @Autowired

@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/ag")
 @Slf4j
-@Api("ag")
+@Api(value = "ag", description = "ag接口")
 public class AgController {
 
     @Autowired

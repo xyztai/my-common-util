@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/passwd")
 @Slf4j
-@Api("生成随机密码工具")
+@Api(value = "生成随机密码", description = "生成随机密码接口")
 public class PasswordGeneratorController {
 
     @GetMapping("/{length}/{typesCount}")
