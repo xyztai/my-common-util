@@ -1,5 +1,6 @@
 package net.my.controller;
 
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import net.my.mapper.DataCalcMapper;
 import net.my.pojo.UserBase;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/login")
 @Slf4j
+@Api("登录")
 public class LoginController {
 
     @Autowired

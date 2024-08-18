@@ -1,5 +1,6 @@
 package net.my.controller;
 
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import net.my.pojo.BaseResponse;
 import net.my.pojo.RestGeneralResponse;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/passwd")
 @Slf4j
+@Api("生成随机密码工具")
 public class PasswordGeneratorController {
 
     @GetMapping("/{length}/{typesCount}")

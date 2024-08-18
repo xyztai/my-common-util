@@ -1,5 +1,6 @@
 package net.my.controller;
 
+import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import net.my.pojo.BaseResponse;
 import net.my.pojo.RestGeneralResponse;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/b64")
 @Slf4j
+@Api("Base64工具")
 public class Base64Controller {
 
     @GetMapping("/url-encode")

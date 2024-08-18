@@ -1,6 +1,9 @@
 package net.my.controller;
 
 import com.alibaba.fastjson.JSON;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiImplicitParam;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import net.my.interceptor.CurrentUser;
 import net.my.interceptor.LoginRequired;
@@ -17,6 +20,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/ag")
 @Slf4j
+@Api("ag")
 public class AgController {
 
     @Autowired
@@ -53,6 +57,8 @@ public class AgController {
         return RestGeneralResponse.of(bos);
     }
 
+    @ApiOperation(value = "获取计算数据", notes = "根据日期获取数据")
+    @ApiImplicitParam(name = "time", value = "日期", required = true, dataType = "String")
     @GetMapping("/data/calc/{time}")
     public BaseResponse queryDataCalc(@PathVariable("time") String time) {
         List<AgDataCalcBO> bos = dataCalc.queryDataCalc(time);
@@ -70,6 +76,7 @@ public class AgController {
         return RestGeneralResponse.of(retList);
     }
 
+    @ApiOperation(value = "获取接下来的操作", notes = "需要给出波动值")
     @GetMapping("/expect/hard/{change}")
     public BaseResponse expectHard(@PathVariable("change") Double change) {
         String time = "9999-99-99";
@@ -98,6 +105,7 @@ public class AgController {
         }
     }
 
+    @ApiOperation(value = "获取接下来的操作", notes = "需要给出波动值")
     @GetMapping("/expect/simple/{change}")
     public BaseResponse expectSimple(@PathVariable("change") Double change) {
         String time = "9999-99-99";
