@@ -185,7 +185,7 @@
                  , max(round(t1.`expma_5`/t1.`expma_37`, 5)) over (partition by t1.`type` order by t1.`time`) s_ratio_ans_max
                  , max(round(t1.`expma_37`/t1.`expma_5`, 5)) over (partition by t1.`type` order by t1.`time`) b_ratio_ans_max
             from (
-                    select t.`time` , t.`type` , t.expma_5 , t.expma_37 , row_number() over (partition by t.`type` order by t.`time` ) time_rn
+                    select t.`time` , t.`type` , t.expma_5 , t.expma_37 , row_number() over (partition by t.`type` order by t.`time` desc) time_rn
                     from t_data_calc t
                  ) t1
             where t1.time_rn <= 22
