@@ -198,7 +198,7 @@
                  , (t2.b_ratio-1) b_ratio_2000
                  , 1.2*(t2.b_ratio-1) b_ratio_3000
                  , 1.5*(t2.b_ratio-1) b_ratio_5000
-                 , -0.05 s_ratio_1_in_4
+                 , 0 s_ratio_1_in_4
                  , 0.4*(t2.s_ratio-1) s_ratio_1_in_3
                  , 0.8*(t2.s_ratio-1) s_ratio_1_in_2
                  , 1*(t2.s_ratio-1) s_ratio_1_in_1
@@ -255,7 +255,7 @@
                      , (t2.b_ratio-1) b_ratio_2000
                      , 1.2*(t2.b_ratio-1) b_ratio_3000
                      , 1.5*(t2.b_ratio-1) b_ratio_5000
-                     , -0.05 s_ratio_1_in_4
+                     , 0 s_ratio_1_in_4
                      , 0.4*(t2.s_ratio-1) s_ratio_1_in_3
                      , 0.8*(t2.s_ratio-1) s_ratio_1_in_2
                      , 1*(t2.s_ratio-1) s_ratio_1_in_1
