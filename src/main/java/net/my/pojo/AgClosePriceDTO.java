@@ -1,11 +1,17 @@
 package net.my.pojo;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class AgClosePriceDTO {
     private String time;
     private Double sz50CP;
@@ -24,6 +30,62 @@ public class AgClosePriceDTO {
     private Double rjzsCP;
     private Double hbyqCCP;
     private Double nsdk100CP;
+
+    public AgClosePriceDTO setValue(String type, Double value) {
+        switch (type) {
+            case "sz50":
+                this.setSz50CP(value);
+                break;
+            case "szzs":
+                this.setSzzsCP(value);
+                break;
+            case "hs300":
+                this.setHs300CP(value);
+                break;
+            case "szcz":
+                this.setSzczCP(value);
+                break;
+            case "kc50":
+                this.setKc50CP(value);
+                break;
+            case "zz1000":
+                this.setZz1000CP(value);
+                break;
+            case "zz2000":
+                this.setZz2000CP(value);
+                break;
+            case "bz50":
+                this.setBz50CP(value);
+                break;
+            case "hskjzs":
+                this.setHskjzsCP(value);
+                break;
+            case "zq":
+                this.setZqCP(value);
+                break;
+            case "ysjs":
+                this.setYsjsCP(value);
+                break;
+            case "gfcy":
+                this.setGfcyCP(value);
+                break;
+            case "ktjg":
+                this.setKtjgCP(value);
+                break;
+            case "rjzs":
+                this.setRjzsCP(value);
+                break;
+            case "hbyqC":
+                this.setHbyqCCP(value);
+                break;
+            case "nsdk100":
+                this.setNsdk100CP(value);
+                break;
+            default:
+                break;
+        }
+        return this;
+    }
 
     public List<AgClosePriceBO> toBO() {
         List<AgClosePriceBO> list = new ArrayList<>();

@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,8 +24,106 @@ import java.util.stream.Collectors;
 @Api(value = "ag", description = "ag接口")
 public class AgController {
 
+    static Map<String, String> map = new LinkedHashMap<>();
+
+    static {
+        map.put("sz50", "sh000016");
+        map.put("szzs", "sh000001");
+        map.put("hs300", "sz399300");
+        map.put("szcz", "sz399001");
+        map.put("kc50", "sh000688");
+        map.put("zz1000", "sh000852");
+        map.put("zz2000", "sz399303");
+        map.put("bz50", "bj899050");
+        map.put("hskjzs", "hkHSTECH");
+        map.put("nsdk100", "usNDX");
+        // map.put("zq", "sh600030"); // 中信证券
+        // map.put("ysjs", "sh000819");
+        // map.put("gfcy", "sh601012"); // 隆基
+        // map.put("ktjg", "sz930875");
+        // map.put("rjzs", "sh012637");
+        // map.put("hbyqC", "sh007844");
+    }
+
+    /*
+    sz50	上证50
+    szzs	上证指数
+    hs300	沪深300
+    szcz	深证成指
+    kc50	科创50
+    zz1000	中证1000
+    zz2000	中证2000
+    bz50	北证50
+    hskjzs	恒生科技
+    zq	    证券
+    ysjs	有色金属
+    gfcy	光伏产业
+    ktjg	空天军工
+    rjzs	软件指数
+    hbyqC	华宝油气C
+    nsdk100	纳斯达克100
+     */
+
     @Autowired
     private DataCalcMapper dataCalc;
+
+    @Autowired
+    private RestTemplate restTemplate;
+
+    public static final String URL_FORMAT = "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get?_var=kline_dayqfq&param=%s,day,,,%d,qfq";
+
+    public static final String[] TYPES = {"sh000001"};
+
+    public static final int HISTORY_DAYS = 320;
+
+    public static final int DAYS_CNT = 1;
+
+    @GetMapping("/history/{days}")
+    public BaseResponse getHistoryData(@PathVariable("days") Integer days) {
+        List<AgClosePriceDTO> agClosePriceDTOs = new ArrayList<>();
+        for(Map.Entry<String, String> entry : map.entrySet()) {
+            String zqdm = entry.getValue();
+            String url = String.format(URL_FORMAT, zqdm, days);
+            String res = restTemplate.getForObject(url, String.class);
+            assert res != null;
+            res = res.replaceAll("kline_dayqfq=", "");
+            log.info("res: {}", res);
+            String data = JSON.parseObject(res).getString("data");
+            String typeData = JSON.parseObject(data).getString(zqdm);
+            String dayData = JSON.parseObject(typeData).getString("day");
+            List list = JSON.parseObject(dayData, List.class);
+            if(list == null) {
+                dayData = JSON.parseObject(typeData).getString("qfqday");
+                list = JSON.parseObject(dayData, List.class);
+            }
+            for(Object obj : list) {
+                log.info(JSON.toJSONString(obj));
+                List innerList = JSON.parseObject(JSON.toJSONString(obj), List.class);
+                String time = ((String)innerList.get(0)).replaceAll("\"", "");
+                Double oP = Double.parseDouble (((String)innerList.get(1)).replaceAll("\"", ""));
+                Double cP = Double.parseDouble (((String)innerList.get(2)).replaceAll("\"", ""));
+                Double hP = Double.parseDouble (((String)innerList.get(3)).replaceAll("\"", ""));
+                Double lP = Double.parseDouble (((String)innerList.get(4)).replaceAll("\"", ""));
+                if(agClosePriceDTOs.stream().map(AgClosePriceDTO::getTime).collect(Collectors.toList()).contains(time)) {
+                    AgClosePriceDTO dto = agClosePriceDTOs.stream().filter(f -> time.equals(f.getTime())).findAny().get();
+                    dto.setValue(entry.getKey(), cP);
+                } else {
+                    AgClosePriceDTO dto = new AgClosePriceDTO();
+                    dto.setTime(time);
+                    dto.setValue(entry.getKey(), cP);
+                    agClosePriceDTOs.add(dto);
+                }
+            }
+        }
+
+        log.info("agClosePriceDTOs :{}", agClosePriceDTOs);
+        String timeMin = agClosePriceDTOs.stream().map(AgClosePriceDTO::getTime).sorted().findFirst().get();
+        log.info("timeMin: {}", timeMin);
+        agClosePriceDTOs.stream().filter(f -> !timeMin.equals(f.getTime())).forEach(this::onlyAddData);
+        agClosePriceDTOs.stream().filter(f -> timeMin.equals(f.getTime())).forEach(this::addData);
+        return RestGeneralResponse.of(agClosePriceDTOs);
+    }
+
 
     @LoginRequired
     @DeleteMapping("/remove/{time}")
@@ -131,6 +230,20 @@ public class AgController {
             return response;
         } else {
             return RestGeneralResponse.of("无数据");
+        }
+    }
+
+    private void onlyAddData(AgClosePriceDTO agClosePriceDTO) {
+        List<AgClosePriceBO> agClosePriceBOList = agClosePriceDTO.toBO();
+        agClosePriceBOList = agClosePriceBOList.stream().filter(f -> !StringUtils.isEmpty(f.getClosePrice())).collect(Collectors.toList());
+        if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
+            agClosePriceBOList.forEach(
+                    f -> {
+                        // 先删后插
+                        dataCalc.deleteOneCP(f.getTime(), f.getType());
+                        dataCalc.insertCP(f);
+                    }
+            );
         }
     }
 
