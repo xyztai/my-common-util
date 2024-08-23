@@ -19,7 +19,7 @@
         <!-- 设置 RollingPolicy 属性，用于配置文件大小限制，保留天数、文件名格式 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 文件命名格式 -->
-            <fileNamePattern>${LOG_PATH}/logs/%d{yyyy-MM-dd}/info.%d{yyyy-MM-dd}.%i.log.tar.gz</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/logs/%d{yyyy-MM-dd}/info.%d{yyyy-MM-dd}.%i.zip</fileNamePattern>
             <!-- 文件保留最大天数 -->
             <maxHistory>7</maxHistory>
             <!-- 文件大小限制 -->
@@ -40,7 +40,7 @@
         <!-- 设置 RollingPolicy 属性，用于配置文件大小限制，保留天数、文件名格式 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 文件命名格式 -->
-            <fileNamePattern>${LOG_PATH}/logs/%d{yyyy-MM-dd}/warn.%d{yyyy-MM-dd}.%i.log.tar.gz</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/logs/%d{yyyy-MM-dd}/warn.%d{yyyy-MM-dd}.%i.zip</fileNamePattern>
             <!-- 文件保留最大天数 -->
             <maxHistory>7</maxHistory>
             <!-- 文件大小限制 -->
@@ -65,7 +65,7 @@
         <!-- 设置 RollingPolicy 属性，用于配置文件大小限制，保留天数、文件名格式 -->
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- 文件命名格式 -->
-            <fileNamePattern>${LOG_PATH}/logs/%d{yyyy-MM-dd}/error.%d{yyyy-MM-dd}.%i.log.tar.gz</fileNamePattern>
+            <fileNamePattern>${LOG_PATH}/logs/%d{yyyy-MM-dd}/error.%d{yyyy-MM-dd}.%i.zip</fileNamePattern>
             <!-- 文件保留最大天数 -->
             <maxHistory>7</maxHistory>
             <!-- 文件大小限制 -->
