@@ -142,14 +142,19 @@
                  , round((t.close_price - t3.`expma_5`)*2.0/(5.0+1) + t3.`expma_5`, 2) clac_expma_5
                  , round((t.close_price - t3.`expma_37`)*2.0/(37.0+1) + t3.`expma_37`, 2) clac_expma_37
                  , row_number() over (partition by t.`type` order by t.`time` desc) rn_c
-		           , max(t.time) over (order by t.time desc) time_max
+                 , max(t.time) over () time_max
+                 , max(t3.time) over () time_clac_max
+                 , t3.`expma_5`
+                 , t3.`expma_37`
+                 , t3.time
             from t_raw_close_price t,
                  (select t2.time, t2.type, t2.`expma_5`, t2.`expma_37`, row_number() over (partition by t2.type order by t2.time desc) rn from t_data_calc t2 where t2.time <= (select max(t.time) from t_data_calc t )) t3
             where t.time <= (select min(t.time) from t_raw_close_price t where t.time > (select max(t.time) time from t_data_calc t))
-		    and t.type = t3.type
-		    and t3.rn = 1
+            and t.type = t3.type
+            and t3.rn = 1
         ) t11
     where t11.rn_c = 1
+      and t11.time  = time_clac_max
 ]]>
     </insert>
 
