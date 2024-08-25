@@ -157,7 +157,7 @@
                  , t.time
             from t_raw_close_price t,
                  (select t2.time, t2.type, t2.`expma_5`, t2.`expma_37`, row_number() over (partition by t2.type order by t2.time desc) rn from t_data_calc t2 where t2.time <= (select max(t.time) from t_data_calc t where t.`time` < #{time} )) t3
-            where t.time <= (select min(t.time) from t_raw_close_price t where t.time > (select max(t.time) time from t_data_calc t))
+            where t.time <= #{time} -- (select min(t.time) from t_raw_close_price t where t.time > (select max(t.time) time from t_data_calc t))
             and t.type = t3.type
             and t3.rn = 1
         ) t11
