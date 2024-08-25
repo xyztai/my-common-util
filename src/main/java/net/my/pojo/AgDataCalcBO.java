@@ -22,4 +22,8 @@ public class AgDataCalcBO {
     private Double bRatioPara;
     private Double bRatio;
     private Double bRatioPre;
+
+    public Double getMaxCompare() {
+        return Math.max(sRatio/sRatioPara, bRatio/bRatioPara);
+    }
 }

@@ -181,8 +181,7 @@ public class AgController {
     @GetMapping("/data/calc/{time}")
     public BaseResponse queryDataCalc(@PathVariable("time") String time) {
         List<AgDataCalcBO> bos = dataCalc.queryDataCalc(time);
-        bos = bos.stream().sorted(((o1, o2) -> (int)(Math.max(o1.getSRatio()/o1.getSRatioPara(), o1.getBRatio()/o1.getBRatioPara())*1.000 /
-                        Math.max(o1.getSRatio()/o1.getSRatioPara(), o1.getBRatio()/o1.getBRatioPara())))).collect(Collectors.toList());
+        bos = bos.stream().sorted(Comparator.comparingDouble(AgDataCalcBO::getMaxCompare).reversed()).collect(Collectors.toList());
 
         List<String> retList = new ArrayList<>();
         if(!CollectionUtils.isEmpty(bos)) {
