@@ -189,10 +189,10 @@ public class AgController {
             retList = bos.stream().map(m -> String.format("%s: expma5=%.2f, expma37=%.2f, sRatio=%.4f%s%s(para=%.3f, pre=%.4f), bRatio=%.4f%s%spara=%.3f, pre=%.4f)"
                     , m.getName(), m.getExpma5(), m.getExpma37()
                     , m.getSRatio(), m.getSRatio()>=1 && m.getSRatio() >= m.getSRatioPre() ? " ↑↑↑ " : ""
-                    , m.getSRatio(), m.getSRatio()>=1 && m.getSRatio() >= m.getSRatioPara() ? " *** " : ""
+                    , m.getSRatio()>=1 && m.getSRatio() >= m.getSRatioPara() ? " *** " : ""
                     , m.getSRatioPara(), m.getSRatioPre()
                     , m.getBRatio(), m.getBRatio()>=1 && m.getBRatio() >= m.getBRatioPre() ? " ↑↑↑ " : ""
-                    , m.getBRatio(), m.getBRatio()>=1 && m.getBRatio() >= m.getBRatioPara() ? " *** " : ""
+                    , m.getBRatio()>=1 && m.getBRatio() >= m.getBRatioPara() ? " *** " : ""
                     , m.getBRatioPara(), m.getBRatioPre())).collect(Collectors.toList());
         }
 
