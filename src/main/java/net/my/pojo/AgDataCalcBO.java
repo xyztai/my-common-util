@@ -24,6 +24,11 @@ public class AgDataCalcBO {
     private Double bRatioPre;
 
     public Double getMaxCompare() {
-        return Math.max(sRatio/sRatioPara, bRatio/bRatioPara);
+        return Math.max(sRatio > 1 ? sRatio/sRatioPara : 0, bRatio > 1 ? bRatio/bRatioPara : 0);
     }
+
+    public String getDirection() {
+        return sRatio/sRatioPara > bRatio/bRatioPara ? "S" : "B";
+    }
+
 }
