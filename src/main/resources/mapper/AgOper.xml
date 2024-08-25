@@ -51,12 +51,12 @@
     </delete>
 
     <delete id="deleteDataCalc">
-        delete from t_data_calc where time = #{time}
+        delete from t_data_calc where time = #{time} and can_del = 1
     </delete>
 
     <delete id="deleteDataCalcAfter">
 <![CDATA[
-        delete from t_data_calc where time >= #{time}
+        delete from t_data_calc where time >= #{time} and can_del = 1
 ]]>
     </delete>
 
