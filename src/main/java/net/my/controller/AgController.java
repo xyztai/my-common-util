@@ -116,7 +116,7 @@ public class AgController {
             }
         }
 
-        agClosePriceDTOs = agClosePriceDTOs.stream().filter(f -> "2024-07-01".compareTo(f.getTime()) < 0).collect(Collectors.toList());
+        agClosePriceDTOs = agClosePriceDTOs.stream().filter(f -> "2023-01-01".compareTo(f.getTime()) < 0).collect(Collectors.toList());
         log.info("agClosePriceDTOs :{}", agClosePriceDTOs);
         String timeMin = agClosePriceDTOs.stream().map(AgClosePriceDTO::getTime).sorted().findFirst().get();
         log.info("timeMin: {}", timeMin);
