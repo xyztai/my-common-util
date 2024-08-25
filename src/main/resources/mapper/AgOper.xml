@@ -155,6 +155,7 @@
         ) t11
     where t11.rn_c = 1
       and t11.time  = t11.time_max
+      and not EXISTS (select 1 from t_data_calc tdc where tdc.`time` = t11.time_max and tdc.`type` = t11.type)
 ]]>
     </insert>
 
