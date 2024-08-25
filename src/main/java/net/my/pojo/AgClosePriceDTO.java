@@ -30,6 +30,10 @@ public class AgClosePriceDTO {
     private Double rjzsCP;
     private Double hbyqCCP;
     private Double nsdk100CP;
+    private Double ljlnCP;
+    private Double ndsdCP;
+    private Double ymkdCP;
+    private Double tqlyCP;
 
     public AgClosePriceDTO setValue(String type, Double value) {
         switch (type) {
@@ -81,6 +85,18 @@ public class AgClosePriceDTO {
             case "nsdk100":
                 this.setNsdk100CP(value);
                 break;
+            case "ljln":
+                this.setLjlnCP(value);
+                break;
+            case "ndsd":
+                this.setNdsdCP(value);
+                break;
+            case "ymkd":
+                this.setYmkdCP(value);
+                break;
+            case "tqly":
+                this.setTqlyCP(value);
+                break;
             default:
                 break;
         }
@@ -105,6 +121,10 @@ public class AgClosePriceDTO {
         list.add(AgClosePriceBO.builder().time(time).type("rjzs").closePrice(rjzsCP).build());
         list.add(AgClosePriceBO.builder().time(time).type("hbyqC").closePrice(hbyqCCP).build());
         list.add(AgClosePriceBO.builder().time(time).type("nsdk100").closePrice(nsdk100CP).build());
+        list.add(AgClosePriceBO.builder().time(time).type("ljln").closePrice(ljlnCP).build());
+        list.add(AgClosePriceBO.builder().time(time).type("ndsd").closePrice(ndsdCP).build());
+        list.add(AgClosePriceBO.builder().time(time).type("ymkd").closePrice(ymkdCP).build());
+        list.add(AgClosePriceBO.builder().time(time).type("tqly").closePrice(tqlyCP).build());
 
         return list;
     }
