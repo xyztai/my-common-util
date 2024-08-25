@@ -208,7 +208,7 @@
 <![CDATA[
     select
         t11.`time`
-         , case when t11.b_ratio_ans >= t11.b_ratio_ans_max then 'buy' else 'sell' end as `oper_dir`
+         , case when t11.b_ratio_ans >= t11.b_ratio_ans_max and t11.b_ratio_ans - 1 >= b_ratio_500 then 'buy' else 'sell' end as `oper_dir`
          , case when t11.b_ratio_ans >= t11.b_ratio_ans_max then t11.b_ratio_ans else t11.s_ratio_ans end ratio_c
          , t13.name
          -- , t11.b_ratio_ans, t12.b_ratio_500
