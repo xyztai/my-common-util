@@ -43,6 +43,10 @@ public class AgController {
         // map.put("ktjg", "sz930875");
         // map.put("rjzs", "sh012637");
         // map.put("hbyqC", "sh007844");
+        map.put("ljln", "sh601012"); // 隆基绿能
+        map.put("ndsd", "sz300750"); // 宁德时代
+        map.put("ymkd", "sh603259"); // 药明康德
+        map.put("tqly", "sz002466"); // 天齐锂业
     }
 
     /*
