@@ -10,6 +10,7 @@ import net.my.interceptor.LoginRequired;
 import net.my.mapper.DataCalcMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
@@ -83,6 +84,7 @@ public class AgController {
     public static final int DAYS_CNT = 1;
 
     @GetMapping("/history/{days}")
+    @Transactional
     public BaseResponse getHistoryData(@PathVariable("days") Integer days) {
         List<AgClosePriceDTO> agClosePriceDTOs = new ArrayList<>();
         for(Map.Entry<String, String> entry : map.entrySet()) {
@@ -132,6 +134,7 @@ public class AgController {
 
     @LoginRequired
     @DeleteMapping("/remove/{time}")
+    @Transactional
     public BaseResponse remove(@CurrentUser UserBase userBase, @PathVariable("time") String time) {
         log.info("userBase: {}", userBase);
         log.info("remove-time:{}", time);
@@ -146,6 +149,7 @@ public class AgController {
     }
 
     @PostMapping("/updatePara")
+    @Transactional
     public BaseResponse updatePara() {
         List<AgParaBO> paras = dataCalc.queryPara();
         List<AgParaBO> maxParas = dataCalc.queryMaxPara();
@@ -206,6 +210,7 @@ public class AgController {
 
     @ApiOperation(value = "获取接下来的操作", notes = "需要给出波动值")
     @GetMapping("/expect/hard/{change}")
+    @Transactional
     public BaseResponse expectHard(@PathVariable("change") Double change) {
         String time = "9999-99-99";
         log.info("expectHard: time={}, change={}", time, change);
@@ -235,6 +240,7 @@ public class AgController {
 
     @ApiOperation(value = "获取接下来的操作", notes = "需要给出波动值")
     @GetMapping("/expect/simple/{change}")
+    @Transactional
     public BaseResponse expectSimple(@PathVariable("change") Double change) {
         String time = "9999-99-99";
         log.info("expectSimple: time={}, change={}", time, change);
@@ -277,6 +283,7 @@ public class AgController {
     }
 
     @PostMapping("/add")
+    @Transactional
     public BaseResponse addData(@RequestBody AgClosePriceDTO agClosePriceDTO) {
         log.info("agClosePriceDTO:{}", JSON.toJSONString(agClosePriceDTO));
         List<AgClosePriceBO> agClosePriceBOList = agClosePriceDTO.toBO();
