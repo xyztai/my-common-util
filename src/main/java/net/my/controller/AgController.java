@@ -274,13 +274,10 @@ public class AgController {
         dataCalc.deleteDataCalcAfter(time);
 
         // 重新计算后续所有的数据
-        int times = dataCalc.queryCalcTimes();
+        List<String> times = dataCalc.getUnCalcTimes();
 
         log.info("times:{}", times);
-        for(int i = 0; i < times; i++) {
-            dataCalc.insertDataCalc();
-        }
-
+        times.stream().sorted().forEach(dataCalc::insertDataCalc);
     }
 
     @GetMapping("/oper/hard")

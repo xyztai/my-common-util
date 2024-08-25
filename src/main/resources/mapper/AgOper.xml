@@ -107,7 +107,7 @@
                       , t3.s_ratio s_ratio_para
                       , round(t1.expma_5/t1.expma_37, 4) s_ratio
                       , lead(round(t1.expma_5/t1.expma_37, 4)) over (partition by t1.`type` order by t1.`time` desc) s_ratio_pre
-               , t3.b_ratio b_ratio_para
+                      , t3.b_ratio b_ratio_para
                       , round(t1.expma_37/t1.expma_5, 4) b_ratio
                       , lead(round(t1.expma_37/t1.expma_5, 4)) over (partition by t1.`type` order by t1.`time` desc) b_ratio_pre
                , row_number() over (partition by t1.`type` order by t1.`time` desc) rn_time
@@ -117,6 +117,7 @@
                    and t1.`type` = t3.`type`
              ) t
         where t.rn_time = 1
+          and t.time = #{time}
         order by 1
 ]]>
     </select>
@@ -125,6 +126,13 @@
         select count(distinct t1.time)
         from t_raw_close_price t1
         where not exists (select 1 from t_data_calc t2 where t1.`time` = t2.`time`)
+    </select>
+
+    <select id="getUnCalcTimes">
+        select DISTINCT t1.time
+        from t_raw_close_price t1
+        where not exists(select 1 from t_data_calc t2 where t1.`time` = t2.`time` )
+        order by 1
     </select>
 
     <insert id="insertDataCalc" parameterType="string">
@@ -148,7 +156,7 @@
                  , t3.`expma_37`
                  , t.time
             from t_raw_close_price t,
-                 (select t2.time, t2.type, t2.`expma_5`, t2.`expma_37`, row_number() over (partition by t2.type order by t2.time desc) rn from t_data_calc t2 where t2.time <= (select max(t.time) from t_data_calc t )) t3
+                 (select t2.time, t2.type, t2.`expma_5`, t2.`expma_37`, row_number() over (partition by t2.type order by t2.time desc) rn from t_data_calc t2 where t2.time <= (select max(t.time) from t_data_calc t where t.`time` < #{time} )) t3
             where t.time <= (select min(t.time) from t_raw_close_price t where t.time > (select max(t.time) time from t_data_calc t))
             and t.type = t3.type
             and t3.rn = 1
