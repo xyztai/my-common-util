@@ -159,10 +159,10 @@ public class AgController {
     public BaseResponse queryCP(@PathVariable("time") String time) {
         List<AgClosePriceBO> bos = dataCalc.queryCP(time);
 
-        Map<String, Integer> retMap = new LinkedHashMap<>();
+        Map<String, Double> retMap = new LinkedHashMap<>();
         if(!CollectionUtils.isEmpty(bos)) {
             bos.forEach(
-                    f -> retMap.put(f.getName(), f.getClosePrice().intValue())
+                    f -> retMap.put(f.getName(), f.getClosePrice())
             );
         }
 
@@ -181,14 +181,18 @@ public class AgController {
     @GetMapping("/data/calc/{time}")
     public BaseResponse queryDataCalc(@PathVariable("time") String time) {
         List<AgDataCalcBO> bos = dataCalc.queryDataCalc(time);
+        bos = bos.stream().sorted(((o1, o2) -> (int)(Math.max(o1.getSRatio()/o1.getSRatioPara(), o1.getBRatio()/o1.getBRatioPara())*1.000 /
+                        Math.max(o1.getSRatio()/o1.getSRatioPara(), o1.getBRatio()/o1.getBRatioPara())))).collect(Collectors.toList());
 
         List<String> retList = new ArrayList<>();
         if(!CollectionUtils.isEmpty(bos)) {
-            retList = bos.stream().map(m -> String.format("%s: expma5=%.2f, expma37=%.2f, sRatio=%.4f%s(para=%.3f, pre=%.4f), bRatio=%.4f%s(para=%.3f, pre=%.4f)"
+            retList = bos.stream().map(m -> String.format("%s: expma5=%.2f, expma37=%.2f, sRatio=%.4f%s%s(para=%.3f, pre=%.4f), bRatio=%.4f%s%spara=%.3f, pre=%.4f)"
                     , m.getName(), m.getExpma5(), m.getExpma37()
                     , m.getSRatio(), m.getSRatio()>=1 && m.getSRatio() >= m.getSRatioPre() ? " ↑↑↑ " : ""
+                    , m.getSRatio(), m.getSRatio()>=1 && m.getSRatio() >= m.getSRatioPara() ? " *** " : ""
                     , m.getSRatioPara(), m.getSRatioPre()
                     , m.getBRatio(), m.getBRatio()>=1 && m.getBRatio() >= m.getBRatioPre() ? " ↑↑↑ " : ""
+                    , m.getBRatio(), m.getBRatio()>=1 && m.getBRatio() >= m.getBRatioPara() ? " *** " : ""
                     , m.getBRatioPara(), m.getBRatioPre())).collect(Collectors.toList());
         }
 
