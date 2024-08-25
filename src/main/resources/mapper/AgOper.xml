@@ -128,7 +128,7 @@
         where not exists (select 1 from t_data_calc t2 where t1.`time` = t2.`time`)
     </select>
 
-    <select id="getUnCalcTimes">
+    <select id="getUnCalcTimes" resultType="string">
         select DISTINCT t1.time
         from t_raw_close_price t1
         where not exists(select 1 from t_data_calc t2 where t1.`time` = t2.`time` )

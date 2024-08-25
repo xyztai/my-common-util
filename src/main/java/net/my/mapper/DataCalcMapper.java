@@ -31,7 +31,7 @@ public interface DataCalcMapper {
 
     List<String> getUnCalcTimes();
 
-    int insertDataCalc(@Param("time") String time);;
+    int insertDataCalc(@Param("time") String time);
 
     List<AgOper> queryHardOper();
 
