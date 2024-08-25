@@ -11,6 +11,14 @@
         <result column="sell_oper" property="sellOper" />
     </resultMap>
 
+    <resultMap id="queryParaMap" type="net.my.pojo.AgParaBO">
+        <id column="id" property="id" />
+        <result column="type" property="type" />
+        <result column="name" property="name" />
+        <result column="s_ratio" property="sRatio" />
+        <result column="b_ratio" property="bRatio" />
+    </resultMap>
+
     <resultMap id="queryCPMap" type="net.my.pojo.AgClosePriceBO">
         <id column="id" property="id" />
         <id column="time" property="time" />
@@ -41,6 +49,35 @@
         <result column="cnt_gap" property="cntGap" />
         <result column="names_miss" property="namesMiss" />
     </resultMap>
+
+    <select id="queryPara" resultMap="queryParaMap">
+        select t1.id, t1.type, tt.name, t1.s_ratio, t1.b_ratio, tt.id type_id from t_para t1, t_type tt where t1.`type` = tt.`type` order by type_id
+    </select>
+
+    <update id="updatePara" parameterType="net.my.pojo.AgParaBO">
+        update t_para
+           set s_ratio = #{sRatio}
+               , b_ratio = #{bRatio}
+        where type = #{type}
+    </update>
+
+    <select id="queryMaxPara" resultMap="queryParaMap">
+<![CDATA[
+        select t2.type, max(t2.s_ratio) s_ratio, max(t2.b_ratio) b_ratio
+        from (
+                 select t1.type
+                      , t1.time
+                      , round(t1.expma_5/t1.expma_37, 4) s_ratio
+                      , row_number() over (partition by t1.type order by round(t1.expma_5/t1.expma_37, 4) desc, t1.time desc) s_rn
+	       , round(t1.expma_37/t1.expma_5, 4) b_ratio
+                      , row_number() over (partition by t1.type order by round(t1.expma_37/t1.expma_5, 4) desc, t1.time desc) b_rn
+                 from (select row_number() over (partition by t0.type order by t0.time desc) time_rn, t0.* from t_data_calc t0) t1
+                 where t1.time_rn <= 250
+             ) t2
+        where t2.s_rn = 1 or t2.b_rn = 1
+        group by t2.type
+]]>
+    </select>
 
     <delete id="deleteCP">
         delete from t_raw_close_price where time = #{time}

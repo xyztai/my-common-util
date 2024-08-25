@@ -136,6 +136,25 @@ public class AgController {
         return RestGeneralResponse.of("删除完成");
     }
 
+    @GetMapping("/para")
+    public BaseResponse queryPara() {
+        return RestGeneralResponse.of(dataCalc.queryPara());
+    }
+
+    @PostMapping("/updatePara")
+    public BaseResponse updatePara() {
+        List<AgParaBO> paras = dataCalc.queryPara();
+        List<AgParaBO> maxParas = dataCalc.queryMaxPara();
+        for(AgParaBO bo : paras) {
+            Optional<AgParaBO> tmp = maxParas.stream().filter(f -> f.getType().equals(bo.getType()) && f.getBRatio() > bo.getBRatio()).findFirst();
+            tmp.ifPresent(f -> bo.setBRatio(f.getBRatio()));
+            tmp = maxParas.stream().filter(f -> f.getType().equals(bo.getType()) && f.getSRatio() > bo.getSRatio()).findFirst();
+            tmp.ifPresent(f -> bo.setSRatio(f.getSRatio()));
+            dataCalc.updatePara(bo);
+        }
+        return queryPara();
+    }
+
     @GetMapping("/data/cp/{time}")
     public BaseResponse queryCP(@PathVariable("time") String time) {
         List<AgClosePriceBO> bos = dataCalc.queryCP(time);

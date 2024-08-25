@@ -1,9 +1,6 @@
 package net.my.mapper;
 
-import net.my.pojo.AgClosePriceBO;
-import net.my.pojo.AgDataCalcBO;
-import net.my.pojo.AgDataCntBO;
-import net.my.pojo.AgOper;
+import net.my.pojo.*;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
 
@@ -40,4 +37,10 @@ public interface DataCalcMapper {
     String getMaxTime();
 
     List<AgClosePriceBO> getExpectCP(@Param("time") String time, @Param("change") Double change);
+
+    List<AgParaBO> queryPara();
+
+    List<AgParaBO> queryMaxPara();
+
+    int updatePara(AgParaBO bo);
 }
