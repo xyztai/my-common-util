@@ -348,6 +348,7 @@ public class AgController {
         if(!times.contains("9999-99-99")) {
             retMap.put("预期操作", null);
         }
+        log.info("opers: {}", opers);
         for(String time : times) {
             Map<String, List> timeMap = new LinkedHashMap<>();
             List<String> buyList = opers.stream().filter(f -> time.equals(f.getTime()) && "buy".equals(f.getOperDir()))
