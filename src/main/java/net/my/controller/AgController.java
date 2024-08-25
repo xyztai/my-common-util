@@ -185,8 +185,9 @@ public class AgController {
 
         List<String> retList = new ArrayList<>();
         if(!CollectionUtils.isEmpty(bos)) {
-            retList = bos.stream().map(m -> String.format("%s: expma5=%.2f, expma37=%.2f, sRatio=%.4f%s%s(para=%.3f, pre=%.4f), bRatio=%.4f%s%spara=%.3f, pre=%.4f)"
+            retList = bos.stream().map(m -> String.format("%s: expma5=%.2f, expma37=%.2f, maxCompare=%.4f sRatio=%.4f%s%s(para=%.3f, pre=%.4f), bRatio=%.4f%s%s(para=%.3f, pre=%.4f)"
                     , m.getName(), m.getExpma5(), m.getExpma37()
+                    , m.getMaxCompare()
                     , m.getSRatio(), m.getSRatio()>=1 && m.getSRatio() >= m.getSRatioPre() ? " ↑↑↑ " : ""
                     , m.getSRatio()>=1 && m.getSRatio() >= m.getSRatioPara() ? " *** " : ""
                     , m.getSRatioPara(), m.getSRatioPre()
