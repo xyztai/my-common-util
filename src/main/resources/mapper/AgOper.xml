@@ -244,14 +244,14 @@
         (
             select
                 t2.type
-                 , 0.8*(t2.b_ratio-1) b_ratio_500
+                 , 0.7*(t2.b_ratio-1) b_ratio_500
                  , 0.9*(t2.b_ratio-1) b_ratio_1000
                  , (t2.b_ratio-1) b_ratio_2000
-                 , 1.2*(t2.b_ratio-1) b_ratio_3000
-                 , 1.5*(t2.b_ratio-1) b_ratio_5000
+                 , 1.1*(t2.b_ratio-1) b_ratio_3000
+                 , 1.3*(t2.b_ratio-1) b_ratio_5000
                  , 0 s_ratio_1_in_4
-                 , 0.4*(t2.s_ratio-1) s_ratio_1_in_3
-                 , 0.8*(t2.s_ratio-1) s_ratio_1_in_2
+                 , 0.3*(t2.s_ratio-1) s_ratio_1_in_3
+                 , 0.7*(t2.s_ratio-1) s_ratio_1_in_2
                  , 1*(t2.s_ratio-1) s_ratio_1_in_1
             from t_para t2
         ) t12,
@@ -301,14 +301,14 @@
             (
                 select
                     t2.type
-                     , 0.8*(t2.b_ratio-1) b_ratio_500
+                     , 0.7*(t2.b_ratio-1) b_ratio_500
                      , 0.9*(t2.b_ratio-1) b_ratio_1000
                      , (t2.b_ratio-1) b_ratio_2000
-                     , 1.2*(t2.b_ratio-1) b_ratio_3000
-                     , 1.5*(t2.b_ratio-1) b_ratio_5000
+                     , 1.1*(t2.b_ratio-1) b_ratio_3000
+                     , 1.3*(t2.b_ratio-1) b_ratio_5000
                      , 0 s_ratio_1_in_4
-                     , 0.4*(t2.s_ratio-1) s_ratio_1_in_3
-                     , 0.8*(t2.s_ratio-1) s_ratio_1_in_2
+                     , 0.3*(t2.s_ratio-1) s_ratio_1_in_3
+                     , 0.7*(t2.s_ratio-1) s_ratio_1_in_2
                      , 1*(t2.s_ratio-1) s_ratio_1_in_1
                 from t_para t2
             ) t12,
@@ -335,16 +335,16 @@
         from (
                  select t1.time, tt.name, t.time time_cp, tc.time time_calc
                  from t_type tt
-                          join (select distinct time from t_raw_close_price) t1
-                          left join t_raw_close_price t
-                                    on tt.`type` = t.`type`
-                                        and t1.`time` = t.`time`
-                          left join t_data_calc tc
-                                    on tt.`type` = tc.`type`
-                                        and t1.`time` = tc.`time`
+                 join (select distinct time from t_raw_close_price) t1
+                 left join t_raw_close_price t
+                        on tt.`type` = t.`type`
+                       and t1.`time` = t.`time`
+                 left join t_data_calc tc
+                        on tt.`type` = tc.`type`
+                       and t1.`time` = tc.`time`
              ) t11
         group by t11.time
-        order by 4 desc, 1 desc
+        order by 1 desc
         limit 22
 ]]>
     </select>
