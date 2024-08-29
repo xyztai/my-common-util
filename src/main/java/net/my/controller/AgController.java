@@ -154,9 +154,9 @@ public class AgController {
         List<AgParaBO> paras = dataCalc.queryPara();
         List<AgParaBO> maxParas = dataCalc.queryMaxPara();
         for(AgParaBO bo : paras) {
-            Optional<AgParaBO> tmp = maxParas.stream().filter(f -> f.getType().equals(bo.getType()) && f.getBRatio() > bo.getBRatio()).findFirst();
+            Optional<AgParaBO> tmp = maxParas.stream().filter(f -> f.getType().equals(bo.getType()) /*&& f.getBRatio() > bo.getBRatio()*/).findFirst();
             tmp.ifPresent(f -> bo.setBRatio(f.getBRatio()));
-            tmp = maxParas.stream().filter(f -> f.getType().equals(bo.getType()) && f.getSRatio() > bo.getSRatio()).findFirst();
+            tmp = maxParas.stream().filter(f -> f.getType().equals(bo.getType()) /*&& f.getSRatio() > bo.getSRatio()*/).findFirst();
             tmp.ifPresent(f -> bo.setSRatio(f.getSRatio()));
             dataCalc.updatePara(bo);
         }

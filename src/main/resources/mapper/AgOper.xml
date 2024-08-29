@@ -69,12 +69,18 @@
                       , t1.time
                       , round(t1.expma_5/t1.expma_37, 4) s_ratio
                       , row_number() over (partition by t1.type order by round(t1.expma_5/t1.expma_37, 4) desc, t1.time desc) s_rn
-	       , round(t1.expma_37/t1.expma_5, 4) b_ratio
+	                  , round(t1.expma_37/t1.expma_5, 4) b_ratio
                       , row_number() over (partition by t1.type order by round(t1.expma_37/t1.expma_5, 4) desc, t1.time desc) b_rn
-                 from (select row_number() over (partition by t0.type order by t0.time desc) time_rn, t0.* from t_data_calc t0) t1
+                      , cnt
+                 from (
+                        select
+                               row_number() over (partition by t0.type order by t0.time desc) time_rn
+                               , count(1) over (partition by t0.type) cnt, t0.*
+                        from t_data_calc t0
+                       ) t1
                  where t1.time_rn <= 250
              ) t2
-        where t2.s_rn = 1 or t2.b_rn = 1
+        where t2.s_rn = 10 or t2.b_rn = 10
         group by t2.type
 ]]>
     </select>
