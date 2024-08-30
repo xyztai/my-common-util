@@ -354,4 +354,45 @@
         limit 22
 ]]>
     </select>
+
+    <delete id="deleteDailyPara">
+        delete from t_para_daily
+    </delete>
+
+    <insert id="saveDailyPara" >
+<![CDATA[
+        insert into t_para_daily(time, type, s_ratio, b_ratio)
+        with tmp_1 as (
+            select
+                   row_number() over (partition by t0.type order by t0.time) time_rn
+                   , count(1) over (partition by t0.type) cnt, t0.*
+            from t_data_calc t0
+        )
+        , tmp_2 as (
+            select t1.*, t2.time para_time
+            from tmp_1 t1, tmp_1 t2
+            where t2.time_rn > 250
+            and t1.time_rn <= t2.time_rn
+            and t1.time_rn > t2.time_rn - 250
+            and t1.type = t2.type
+            -- and t2.type = 'hs300' -- 指定品种
+            -- and t2.time = '2024-08-30' -- 指定日期
+            order by t2.time, t1.time
+        )
+        select tt.para_time, tt.type, max(s_ratio) s_ratio, max(b_ratio) b_ratio
+        from (
+            select
+                   t1.para_time
+                   , t1.type
+                   , round(t1.expma_5/t1.expma_37, 4) s_ratio
+                   , row_number() over (partition by t1.para_time, t1.type order by round(t1.expma_5/t1.expma_37, 4) desc) s_ratio_rn
+                   , round(t1.expma_37/t1.expma_5, 4) b_ratio
+                   , row_number() over (partition by t1.para_time, t1.type order by round(t1.expma_37/t1.expma_5, 4) desc) b_ratio_rn
+            from tmp_2 t1
+        ) tt
+        where tt.s_ratio_rn = 9 or tt.b_ratio_rn = 9
+        group by tt.para_time, tt.type
+        order by tt.para_time, tt.type
+]]>
+    </insert>
 </mapper>

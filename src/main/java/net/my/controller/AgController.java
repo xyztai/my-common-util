@@ -10,6 +10,7 @@ import net.my.interceptor.LoginRequired;
 import net.my.mapper.DataCalcMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -151,6 +152,7 @@ public class AgController {
     @PostMapping("/updatePara")
     @Transactional
     public BaseResponse updatePara() {
+        log.info("updatePara begin");
         List<AgParaBO> paras = dataCalc.queryPara();
         List<AgParaBO> maxParas = dataCalc.queryMaxPara();
         for(AgParaBO bo : paras) {
@@ -160,8 +162,33 @@ public class AgController {
             tmp.ifPresent(f -> bo.setSRatio(f.getSRatio()));
             dataCalc.updatePara(bo);
         }
+        log.info("updatePara end");
         return queryPara();
     }
+
+    /**
+     * 只计算往前推250天的数据，根据这250天的数据计算得到当天的参数
+     * @return
+     */
+    @PostMapping("/saveDailyPara")
+    @Transactional
+    public BaseResponse saveDailyPara() {
+        log.info("saveDailyPara begin");
+        dataCalc.deleteDailyPara();
+        dataCalc.saveDailyPara();
+        log.info("saveDailyPara end");
+        return BaseResponse.OK;
+    }
+
+    @Scheduled(cron = "0 0 */4 * * ?")
+    @Transactional
+    public void execAutoTask() {
+        log.info("execAutoTask begin");
+        saveDailyPara();
+        updatePara();
+        log.info("execAutoTask end");
+    }
+
 
     @GetMapping("/data/cp/{time}")
     public BaseResponse queryCP(@PathVariable("time") String time) {

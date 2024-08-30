@@ -43,4 +43,7 @@ public interface DataCalcMapper {
     List<AgParaBO> queryMaxPara();
 
     int updatePara(AgParaBO bo);
+
+    void deleteDailyPara();
+    void saveDailyPara();
 }
