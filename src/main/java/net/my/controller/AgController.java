@@ -144,6 +144,42 @@ public class AgController {
         return RestGeneralResponse.of("删除完成");
     }
 
+    @GetMapping("/getExpectData/{type}")
+    public BaseResponse getExpectData(@PathVariable("type") String type) {
+        log.info("getExpectData: type = {}", type);
+        List<AgExpectDataBO> bos = dataCalc.getExpectData(type);
+        if(CollectionUtils.isEmpty(bos)) {
+            return RestGeneralResponse.of("无期望数据，无法预测");
+        }
+        Double initMoney = 0.0;
+        Double initPrice = bos.get(0).getClosePrice();
+        Double number = initMoney/initPrice;
+        Map<String, String> resMap = new LinkedHashMap<>();
+        Double totalAddCang = 0.0;
+        Double totalSubCang = 0.0;
+        for(int i = 1; i < bos.size(); i++) {
+            AgExpectDataBO tmp = bos.get(i);
+            if(tmp.getBAction() != null) {
+                initMoney += tmp.getBAction();
+                totalAddCang += tmp.getBAction();
+            }
+            if(tmp.getSAction() != null) {
+                // < -10，意味着是实际金额
+                if(tmp.getBAction() < -10) {
+                    initMoney += tmp.getSAction();
+                    totalSubCang -= tmp.getSAction();
+                } else {
+                    // > -10，意味着是比例
+                    initMoney *= (1 + tmp.getSAction());
+                    totalSubCang -= initMoney * tmp.getSAction();
+                }
+            }
+            resMap.put(tmp.getTime(), "成本 1000, gain " + (initMoney + totalSubCang - totalAddCang));
+        }
+
+        return RestGeneralResponse.of(resMap);
+    }
+
     @GetMapping("/para")
     public BaseResponse queryPara() {
         return RestGeneralResponse.of(dataCalc.queryPara());

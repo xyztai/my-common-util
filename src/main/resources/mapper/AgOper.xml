@@ -27,6 +27,16 @@
         <result column="close_price" property="closePrice" />
     </resultMap>
 
+    <resultMap id="queryExpectDataMap" type="net.my.pojo.AgExpectDataBO">
+        <id column="id" property="id" />
+        <result column="time" property="time" />
+        <result column="type" property="type" />
+        <result column="name" property="name" />
+        <result column="close_price" property="closePrice" />
+        <result column="b_action" property="bAction" />
+        <result column="s_action" property="sAction" />
+    </resultMap>
+
     <resultMap id="queryDataCalcMap" type="net.my.pojo.AgDataCalcBO">
         <id column="id" property="id" />
         <id column="time" property="time" />
@@ -395,4 +405,15 @@
         order by tt.para_time, tt.type
 ]]>
     </insert>
+
+
+    <select id="getExpectData" resultMap="queryExpectDataMap">
+       select t.id, t.time, t.type, t1.name, t.close_price, t.b_action, t.s_action
+       from t_history_expect t, t_type t1
+       where t.type = t1.type
+       and t.type = #{type}
+       order by 2, 1
+    </select>
+
+
 </mapper>
