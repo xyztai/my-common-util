@@ -151,30 +151,31 @@ public class AgController {
         if(CollectionUtils.isEmpty(bos)) {
             return RestGeneralResponse.of("无期望数据，无法预测");
         }
-        Double initMoney = 0.0;
+        Long initMoney = 0L;
         Double initPrice = bos.get(0).getClosePrice();
         Double number = initMoney/initPrice;
         Map<String, String> resMap = new LinkedHashMap<>();
-        Double totalAddCang = 0.0;
-        Double totalSubCang = 0.0;
+        Long totalAddCang = 0L;
+        Long totalSubCang = 0L;
         bos.forEach(f -> log.info(JSON.toJSONString(f)));
         for(int i = 1; i < bos.size(); i++) {
             AgExpectDataBO tmp = bos.get(i);
             if(tmp.getBAction() != null) {
-                initMoney += tmp.getBAction();
-                totalAddCang += tmp.getBAction();
+                initMoney += tmp.getBAction().longValue();
+                totalAddCang += tmp.getBAction().longValue();
             }
             if(tmp.getSAction() != null) {
                 // < -10，意味着是实际金额
                 if(tmp.getBAction() < -10) {
-                    initMoney += tmp.getSAction();
-                    totalSubCang -= tmp.getSAction();
+                    initMoney += tmp.getSAction().longValue();
+                    totalSubCang -= tmp.getSAction().longValue();
                 } else {
                     // > -10，意味着是比例
-                    initMoney *= (1 + tmp.getSAction());
-                    totalSubCang -= initMoney * tmp.getSAction();
+                    initMoney *= (long)(initMoney * (1 + tmp.getSAction()));
+                    totalSubCang -= (long)(initMoney * tmp.getSAction());
                 }
             }
+            initMoney = Math.round(initMoney.doubleValue());
             resMap.put(tmp.getTime(), "gain " + (initMoney + totalSubCang - totalAddCang));
         }
 
