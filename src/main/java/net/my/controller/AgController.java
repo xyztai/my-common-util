@@ -166,7 +166,7 @@ public class AgController {
             }
             if(tmp.getSAction() != null) {
                 // < -10，意味着是实际金额
-                if(tmp.getBAction() < -10) {
+                if(tmp.getSAction() < -10) {
                     initMoney += tmp.getSAction().longValue();
                     totalSubCang -= tmp.getSAction().longValue();
                 } else {
