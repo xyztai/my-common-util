@@ -157,6 +157,7 @@ public class AgController {
         Map<String, String> resMap = new LinkedHashMap<>();
         Double totalAddCang = 0.0;
         Double totalSubCang = 0.0;
+        bos.forEach(f -> log.info(JSON.toJSONString(f)));
         for(int i = 1; i < bos.size(); i++) {
             AgExpectDataBO tmp = bos.get(i);
             if(tmp.getBAction() != null) {
@@ -174,7 +175,7 @@ public class AgController {
                     totalSubCang -= initMoney * tmp.getSAction();
                 }
             }
-            resMap.put(tmp.getTime(), "成本 1000, gain " + (initMoney + totalSubCang - totalAddCang));
+            resMap.put(tmp.getTime(), "gain " + (initMoney + totalSubCang - totalAddCang));
         }
 
         return RestGeneralResponse.of(resMap);
