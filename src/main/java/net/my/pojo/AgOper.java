@@ -9,4 +9,5 @@ public class AgOper {
     private String operDir;
     private String buyOper;
     private String sellOper;
+    private Double ratioC;
 }

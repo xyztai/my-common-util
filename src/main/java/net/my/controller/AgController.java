@@ -440,7 +440,7 @@ public class AgController {
     @GetMapping("/oper/hard2")
     public BaseResponse queryHardOper2() {
         log.info("queryHardOper.");
-        List<AgOper> opers = dataCalc.queryHardOper();
+        List<AgOper> opers = dataCalc.querySimpleOper();
         if(CollectionUtils.isEmpty(opers)) {
             return RestGeneralResponse.of("无操作");
         }
@@ -452,10 +452,14 @@ public class AgController {
             AgOper tmp = opers.get(i);
             if(preOper != null
                     && tmp.getName().equals(preOper.getName())
-                    && tmp.getOperDir().equals(preOper.getOperDir())
-                    && (tmp.getBuyOper() + tmp.getSellOper()).equals(preOper.getBuyOper() + preOper.getSellOper())) {
+                    && tmp.getOperDir().equals(preOper.getOperDir())) {
+                if(preOper.getRatioC() < tmp.getRatioC()) {
+                    preOper = tmp;
+                    if(!(tmp.getBuyOper() + tmp.getSellOper()).equals(preOper.getBuyOper() + preOper.getSellOper())) {
+                        res.add(tmp);
+                    }
+                }
             } else {
-                res.add(tmp);
                 preOper = tmp;
             }
         }

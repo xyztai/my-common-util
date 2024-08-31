@@ -9,6 +9,7 @@
         <result column="oper_dir" property="operDir" />
         <result column="buy_oper" property="buyOper" />
         <result column="sell_oper" property="sellOper" />
+        <result column="ratio_c" property="ratioC" />
     </resultMap>
 
     <resultMap id="queryParaMap" type="net.my.pojo.AgParaBO">
