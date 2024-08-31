@@ -175,7 +175,7 @@ public class AgController {
                     totalSubCang += (long)(initNumber * tmp.getSAction() * tmp.getClosePrice());
                 }
             }
-            initMoney = (long)(initMoney * tmp.getClosePrice() * tmp.getClosePrice());
+            initMoney = (long)(initMoney * tmp.getClosePrice());
             resMap.put(tmp.getTime(), "gain " + (initMoney + totalSubCang - totalAddCang));
         }
 
