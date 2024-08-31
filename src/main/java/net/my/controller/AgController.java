@@ -170,11 +170,15 @@ public class AgController {
                 addCangTotal += tmp.getBAction().longValue();
                 sRatioAns = 0.0;
                 sActionMax = 0.0;
+                bRatioAns = tmp.getBRatioAns();
+                bActionMax = tmp.getBAction();
                 operStr = "+c " + tmp.getBAction().longValue();
             }
             if(tmp.getSAction() != null && moneyInit >= 100 && sRatioAns < tmp.getSRatioAns() && sActionMax < tmp.getSAction()) {
                 bRatioAns = 0.0;
                 bActionMax = 0.0;
+                sRatioAns = tmp.getSRatioAns();
+                sActionMax = tmp.getSAction();
                 // > 1，意味着是实际金额
                 if(tmp.getSAction() > 1) {
                     numberInit -= tmp.getSAction() / tmp.getClosePrice();
