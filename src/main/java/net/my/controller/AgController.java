@@ -153,7 +153,7 @@ public class AgController {
         }
         Long initMoney = 0L;
         Double initPrice = bos.get(0).getClosePrice();
-        Double number = initMoney/initPrice;
+        Double initNumber = initMoney/initPrice;
         Map<String, String> resMap = new LinkedHashMap<>();
         Long totalAddCang = 0L;
         Long totalSubCang = 0L;
@@ -161,21 +161,21 @@ public class AgController {
         for(int i = 1; i < bos.size(); i++) {
             AgExpectDataBO tmp = bos.get(i);
             if(tmp.getBAction() != null) {
-                initMoney += tmp.getBAction().longValue();
+                initNumber += tmp.getBAction() / tmp.getClosePrice();
                 totalAddCang += tmp.getBAction().longValue();
             }
             if(tmp.getSAction() != null) {
-                // < -10，意味着是实际金额
-                if(tmp.getSAction() < -10) {
-                    initMoney += tmp.getSAction().longValue();
-                    totalSubCang -= tmp.getSAction().longValue();
+                // > 1，意味着是实际金额
+                if(tmp.getSAction() > 1) {
+                    initNumber -= tmp.getSAction() / tmp.getClosePrice();
+                    totalSubCang += tmp.getSAction().longValue();
                 } else {
-                    // > -10，意味着是比例
-                    initMoney *= (long)(initMoney * (1 + tmp.getSAction()));
-                    totalSubCang -= (long)(initMoney * tmp.getSAction());
+                    // <= 1，意味着是比例
+                    initNumber = initNumber * (1 - tmp.getSAction());
+                    totalSubCang += (long)(initNumber * tmp.getSAction() * tmp.getClosePrice());
                 }
             }
-            initMoney = Math.round(initMoney.doubleValue());
+            initMoney = (long)(initMoney * tmp.getClosePrice() * tmp.getClosePrice());
             resMap.put(tmp.getTime(), "gain " + (initMoney + totalSubCang - totalAddCang));
         }
 
