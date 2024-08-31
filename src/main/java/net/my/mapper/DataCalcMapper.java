@@ -30,7 +30,7 @@ public interface DataCalcMapper {
 
     int insertDataCalc(@Param("time") String time);
 
-    List<AgOper> queryHardOper();
+//    List<AgOper> queryHardOper();
 
     List<AgOper> querySimpleOper();
 

@@ -429,10 +429,37 @@ public class AgController {
     @GetMapping("/oper/hard")
     public BaseResponse queryHardOper() {
         log.info("queryHardOper.");
-        List<AgOper> opers = dataCalc.queryHardOper();
+        List<AgOper> opers = dataCalc.querySimpleOper();
         if(CollectionUtils.isEmpty(opers)) {
             return RestGeneralResponse.of("无操作");
         }
+        opers.forEach(f -> log.info("queryHardOper dataCalc.querySimpleOper() {}", JSON.toJSONString(f)));
+
+        opers = opers.stream().sorted(Comparator.comparing(AgOper::getName).thenComparing(AgOper::getTime)).collect(Collectors.toList());
+        List<AgOper> res = new ArrayList<>();
+        AgOper pre = opers.get(0);
+        for(int i = 1; i < opers.size(); i++) {
+            AgOper curr = opers.get(i);
+            if(pre != null
+                    && curr.getName().equals(pre.getName())
+                    && curr.getOperDir().equals(pre.getOperDir())) {
+                if(pre.getRatioC() < curr.getRatioC()) {
+                    res.add(curr);
+                    pre = curr;
+                }
+            } else {
+                pre = curr;
+                res.add(curr);
+            }
+        }
+
+        if(CollectionUtils.isEmpty(res)) {
+            return RestGeneralResponse.of("无操作");
+        }
+
+        res = res.stream().sorted(Comparator.comparing(AgOper::getTime).reversed().thenComparing(AgOper::getOperDir)).collect(Collectors.toList());
+
+        res.forEach(f -> log.info("queryHardOper res {}", JSON.toJSONString(f)));
 
         return RestGeneralResponse.of(makeMap(opers));
     }
