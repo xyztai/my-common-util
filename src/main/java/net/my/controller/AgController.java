@@ -290,6 +290,36 @@ public class AgController {
     }
 
     @ApiOperation(value = "获取接下来的操作", notes = "需要给出波动值")
+    @GetMapping("/expect/hard2/{change}")
+    @Transactional
+    public BaseResponse expectHard2(@PathVariable("change") Double change) {
+        String time = "9999-99-99";
+        log.info("expectHard: time={}, change={}", time, change);
+        if(dataCalc.getMaxTime().compareTo(time) >= 0) {
+            return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
+        }
+
+        List<AgClosePriceBO> agClosePriceBOList = dataCalc.getExpectCP(time, change);
+        if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
+            agClosePriceBOList.forEach(
+                    f -> {
+                        dataCalc.insertCP(f);
+                    }
+            );
+
+            calc(time);
+            BaseResponse response = queryHardOper2();
+
+            // 测试结束，就删除掉
+            dataCalc.deleteCP(time);
+            dataCalc.deleteDataCalc(time);
+            return response;
+        } else {
+            return RestGeneralResponse.of("无数据");
+        }
+    }
+
+    @ApiOperation(value = "获取接下来的操作", notes = "需要给出波动值")
     @GetMapping("/expect/hard/{change}")
     @Transactional
     public BaseResponse expectHard(@PathVariable("change") Double change) {
@@ -405,6 +435,38 @@ public class AgController {
         }
 
         return RestGeneralResponse.of(makeMap(opers));
+    }
+
+    @GetMapping("/oper/hard2")
+    public BaseResponse queryHardOper2() {
+        log.info("queryHardOper.");
+        List<AgOper> opers = dataCalc.queryHardOper();
+        if(CollectionUtils.isEmpty(opers)) {
+            return RestGeneralResponse.of("无操作");
+        }
+
+        opers = opers.stream().sorted(Comparator.comparing(AgOper::getName).thenComparing(AgOper::getTime)).collect(Collectors.toList());
+        List<AgOper> res = new ArrayList<>();
+        AgOper preOper = null;
+        for(int i = 0; i < opers.size(); i++) {
+            AgOper tmp = opers.get(i);
+            if(preOper != null
+                    && tmp.getTime().equals(preOper.getTime())
+                    && tmp.getName().equals(preOper.getName())
+                    && tmp.getOperDir().equals(preOper.getOperDir())
+                    && (tmp.getBuyOper() + tmp.getSellOper()).equals(preOper.getBuyOper() + preOper.getSellOper())) {
+            } else {
+                res.add(tmp);
+                preOper = tmp;
+            }
+        }
+
+        if(CollectionUtils.isEmpty(res)) {
+            return RestGeneralResponse.of("无操作");
+        }
+
+        res = res.stream().sorted(Comparator.comparing(AgOper::getTime).reversed().thenComparing(AgOper::getOperDir)).collect(Collectors.toList());
+        return RestGeneralResponse.of(makeMap(res));
     }
 
     @GetMapping("/oper/simple")
