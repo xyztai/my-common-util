@@ -171,8 +171,8 @@ public class AgController {
                     totalSubCang += tmp.getSAction().longValue();
                 } else {
                     // <= 1，意味着是比例
-                    initNumber = initNumber * (1 - tmp.getSAction());
                     totalSubCang += (long)(initNumber * tmp.getSAction() * tmp.getClosePrice());
+                    initNumber = initNumber * (1 - tmp.getSAction());
                 }
             }
             initMoney = (long)(initMoney * tmp.getClosePrice());
