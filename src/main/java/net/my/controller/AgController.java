@@ -447,8 +447,8 @@ public class AgController {
 
         opers = opers.stream().sorted(Comparator.comparing(AgOper::getName).thenComparing(AgOper::getTime)).collect(Collectors.toList());
         List<AgOper> res = new ArrayList<>();
-        AgOper preOper = null;
-        for(int i = 0; i < opers.size(); i++) {
+        AgOper preOper = opers.get(0);
+        for(int i = 1; i < opers.size(); i++) {
             AgOper tmp = opers.get(i);
             if(preOper != null
                     && tmp.getName().equals(preOper.getName())
@@ -461,6 +461,7 @@ public class AgController {
                 }
             } else {
                 preOper = tmp;
+                res.add(tmp);
             }
         }
 
