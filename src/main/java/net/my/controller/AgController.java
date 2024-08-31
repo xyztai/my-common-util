@@ -192,7 +192,7 @@ public class AgController {
                 }
             }
             moneyInit = (long)(numberInit * tmp.getClosePrice());
-            resMap.put(tmp.getTime(), operStr + " gain " + (moneyInit + subCangTotal - addCangTotal));
+            resMap.put(tmp.getTime(), operStr + ", moneyNow " + moneyInit + ",  gain " + (moneyInit + subCangTotal - addCangTotal));
         }
 
         return RestGeneralResponse.of(resMap);
