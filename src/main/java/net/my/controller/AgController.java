@@ -441,9 +441,11 @@ public class AgController {
     public BaseResponse queryHardOper2() {
         log.info("queryHardOper.");
         List<AgOper> opers = dataCalc.querySimpleOper();
+
         if(CollectionUtils.isEmpty(opers)) {
             return RestGeneralResponse.of("无操作");
         }
+        opers.forEach(f -> log.info("queryHardOper2 dataCalc.querySimpleOper() {}", JSON.toJSONString(f)));
 
         opers = opers.stream().sorted(Comparator.comparing(AgOper::getName).thenComparing(AgOper::getTime)).collect(Collectors.toList());
         List<AgOper> res = new ArrayList<>();
@@ -470,6 +472,8 @@ public class AgController {
         }
 
         res = res.stream().sorted(Comparator.comparing(AgOper::getTime).reversed().thenComparing(AgOper::getOperDir)).collect(Collectors.toList());
+
+        res.forEach(f -> log.info("queryHardOper2 res {}", JSON.toJSONString(f)));
         return RestGeneralResponse.of(makeMap(res));
     }
 
