@@ -451,7 +451,6 @@ public class AgController {
         for(int i = 0; i < opers.size(); i++) {
             AgOper tmp = opers.get(i);
             if(preOper != null
-                    && tmp.getTime().equals(preOper.getTime())
                     && tmp.getName().equals(preOper.getName())
                     && tmp.getOperDir().equals(preOper.getOperDir())
                     && (tmp.getBuyOper() + tmp.getSellOper()).equals(preOper.getBuyOper() + preOper.getSellOper())) {
