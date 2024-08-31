@@ -281,7 +281,7 @@
       and t11.type = t13.type
       and ((t11.b_ratio_ans >= t11.b_ratio_ans_max and t11.b_ratio_ans - 1 >= b_ratio_1000) or (t11.s_ratio_ans >= t11.s_ratio_ans_max and t11.s_ratio_ans - 1 >= s_ratio_1_in_4))
     order by 1 desc, 2, 3 desc
-    limit 200
+    limit 500
 ]]>
     </select>
 
@@ -338,7 +338,7 @@
           and t11.type = t13.type
           and ((t11.b_ratio_ans - 1 >= b_ratio_1000) or (t11.s_ratio_ans - 1 >= s_ratio_1_in_4))
         order by 1 desc, 2, 3 desc
-        limit 200
+        limit 500
 ]]>
     </select>
 
