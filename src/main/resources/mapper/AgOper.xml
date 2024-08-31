@@ -257,7 +257,7 @@
                     select t.`time` , t.`type` , t.expma_5 , t.expma_37 , row_number() over (partition by t.`type` order by t.`time` desc) time_rn
                     from t_data_calc t
                  ) t1
-            where t1.time_rn <= 22
+            where t1.time_rn <= 66
         ) t11,
         (
             select
