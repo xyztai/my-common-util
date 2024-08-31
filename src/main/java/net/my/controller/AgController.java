@@ -180,6 +180,7 @@ public class AgController {
                     // <= 1，意味着是比例
                     subCangTotal += (long)(numberInit * tmp.getSAction() * tmp.getClosePrice());
                     numberInit = numberInit * (1 - tmp.getSAction());
+                    operStr = "-c " + tmp.getBAction();
                 }
             }
             moneyInit = (long)(numberInit * tmp.getClosePrice());
