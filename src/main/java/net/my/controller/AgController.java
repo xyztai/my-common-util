@@ -162,10 +162,12 @@ public class AgController {
         bos.forEach(f -> log.info(JSON.toJSONString(f)));
         for(int i = 1; i < bos.size(); i++) {
             AgExpectDataBO tmp = bos.get(i);
+            String operStr = "nop......";
             if(tmp.getBAction() != null && bRatioAns < tmp.getBRatioAns()) {
                 numberInit += tmp.getBAction() / tmp.getClosePrice();
                 addCangTotal += tmp.getBAction().longValue();
                 sRatioAns = 0.0;
+                operStr = "+c " + tmp.getBAction().longValue();
             }
             if(tmp.getSAction() != null && moneyInit >= 100 && sRatioAns < tmp.getSRatioAns()) {
                 bRatioAns = 0.0;
@@ -173,6 +175,7 @@ public class AgController {
                 if(tmp.getSAction() > 1) {
                     numberInit -= tmp.getSAction() / tmp.getClosePrice();
                     subCangTotal += tmp.getSAction().longValue();
+                    operStr = "-c " + tmp.getBAction().longValue();
                 } else {
                     // <= 1，意味着是比例
                     subCangTotal += (long)(numberInit * tmp.getSAction() * tmp.getClosePrice());
@@ -180,7 +183,7 @@ public class AgController {
                 }
             }
             moneyInit = (long)(numberInit * tmp.getClosePrice());
-            resMap.put(tmp.getTime(), "gain " + (moneyInit + subCangTotal - addCangTotal));
+            resMap.put(tmp.getTime(), operStr + " gain " + (moneyInit + subCangTotal - addCangTotal));
         }
 
         return RestGeneralResponse.of(resMap);
