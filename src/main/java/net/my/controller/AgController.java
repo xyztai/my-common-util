@@ -164,7 +164,7 @@ public class AgController {
                 initNumber += tmp.getBAction() / tmp.getClosePrice();
                 totalAddCang += tmp.getBAction().longValue();
             }
-            if(tmp.getSAction() != null) {
+            if(tmp.getSAction() != null && initMoney >= 100) {
                 // > 1，意味着是实际金额
                 if(tmp.getSAction() > 1) {
                     initNumber -= tmp.getSAction() / tmp.getClosePrice();
