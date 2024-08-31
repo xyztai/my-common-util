@@ -157,14 +157,18 @@ public class AgController {
         Map<String, String> resMap = new LinkedHashMap<>();
         Long addCangTotal = 0L;
         Long subCangTotal = 0L;
+        Double bRatioAns = 0.0;
+        Double sRatioAns = 0.0;
         bos.forEach(f -> log.info(JSON.toJSONString(f)));
         for(int i = 1; i < bos.size(); i++) {
             AgExpectDataBO tmp = bos.get(i);
-            if(tmp.getBAction() != null) {
+            if(tmp.getBAction() != null && bRatioAns < tmp.getBRatioAns()) {
                 numberInit += tmp.getBAction() / tmp.getClosePrice();
                 addCangTotal += tmp.getBAction().longValue();
+                sRatioAns = 0.0;
             }
-            if(tmp.getSAction() != null && moneyInit >= 100) {
+            if(tmp.getSAction() != null && moneyInit >= 100 && sRatioAns < tmp.getSRatioAns()) {
+                bRatioAns = 0.0;
                 // > 1，意味着是实际金额
                 if(tmp.getSAction() > 1) {
                     numberInit -= tmp.getSAction() / tmp.getClosePrice();

@@ -17,4 +17,6 @@ public class AgExpectDataBO {
     private Double closePrice;
     private Double bAction;
     private Double sAction;
+    private Double bRatioAns;
+    private Double sRatioAns;
 }

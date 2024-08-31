@@ -35,6 +35,8 @@
         <result column="close_price" property="closePrice" />
         <result column="b_action" property="bAction" />
         <result column="s_action" property="sAction" />
+        <result column="b_ratio_ans" property="bRatioAns" />
+        <result column="s_ratio_ans" property="sRatioAns" />
     </resultMap>
 
     <resultMap id="queryDataCalcMap" type="net.my.pojo.AgDataCalcBO">
@@ -408,7 +410,7 @@
 
 
     <select id="getExpectData" resultMap="queryExpectDataMap">
-       select t.id, t.time, t.type, t1.name, t.close_price, t.b_action, t.s_action
+       select t.id, t.time, t.type, t1.name, t.close_price, t.b_action, t.s_action, t.b_ratio_ans, t.s_ratio_ans
        from t_history_expect t, t_type t1
        where t.type = t1.type
        and t.type = #{type}
