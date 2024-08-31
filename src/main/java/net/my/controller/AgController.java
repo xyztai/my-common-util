@@ -449,21 +449,21 @@ public class AgController {
 
         opers = opers.stream().sorted(Comparator.comparing(AgOper::getName).thenComparing(AgOper::getTime)).collect(Collectors.toList());
         List<AgOper> res = new ArrayList<>();
-        AgOper preOper = opers.get(0);
+        AgOper pre = opers.get(0);
         for(int i = 1; i < opers.size(); i++) {
-            AgOper tmp = opers.get(i);
-            if(preOper != null
-                    && tmp.getName().equals(preOper.getName())
-                    && tmp.getOperDir().equals(preOper.getOperDir())) {
-                if(preOper.getRatioC() < tmp.getRatioC()) {
-                    preOper = tmp;
-                    if(!(tmp.getBuyOper() + tmp.getSellOper()).equals(preOper.getBuyOper() + preOper.getSellOper())) {
-                        res.add(tmp);
+            AgOper curr = opers.get(i);
+            if(pre != null
+                    && curr.getName().equals(pre.getName())
+                    && curr.getOperDir().equals(pre.getOperDir())) {
+                if(pre.getRatioC() < curr.getRatioC()) {
+                    if(!(curr.getBuyOper() + curr.getSellOper()).equals(pre.getBuyOper() + pre.getSellOper())) {
+                        res.add(curr);
                     }
+                    pre = curr;
                 }
             } else {
-                preOper = tmp;
-                res.add(tmp);
+                pre = curr;
+                res.add(curr);
             }
         }
 
