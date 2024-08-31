@@ -159,18 +159,22 @@ public class AgController {
         Long subCangTotal = 0L;
         Double bRatioAns = 0.0;
         Double sRatioAns = 0.0;
+        Double bActionMax = 0.0;
+        Double sActionMax = 0.0;
         bos.forEach(f -> log.info(JSON.toJSONString(f)));
         for(int i = 1; i < bos.size(); i++) {
             AgExpectDataBO tmp = bos.get(i);
             String operStr = "nop......";
-            if(tmp.getBAction() != null && bRatioAns < tmp.getBRatioAns()) {
+            if(tmp.getBAction() != null && bRatioAns < tmp.getBRatioAns() && bActionMax < tmp.getBAction()) {
                 numberInit += tmp.getBAction() / tmp.getClosePrice();
                 addCangTotal += tmp.getBAction().longValue();
                 sRatioAns = 0.0;
+                sActionMax = 0.0;
                 operStr = "+c " + tmp.getBAction().longValue();
             }
-            if(tmp.getSAction() != null && moneyInit >= 100 && sRatioAns < tmp.getSRatioAns()) {
+            if(tmp.getSAction() != null && moneyInit >= 100 && sRatioAns < tmp.getSRatioAns() && sActionMax < tmp.getSAction()) {
                 bRatioAns = 0.0;
+                bActionMax = 0.0;
                 // > 1，意味着是实际金额
                 if(tmp.getSAction() > 1) {
                     numberInit -= tmp.getSAction() / tmp.getClosePrice();
