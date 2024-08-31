@@ -27,9 +27,9 @@ select
     end as `b_action`
      -- , abs(t11.s_ratio_ans - 1), s_ratio_1_in_4_start
      , case when t11.s_ratio_ans - 1 >= s_ratio_1_in_1 then 1
-            when t11.s_ratio_ans - 1 >= s_ratio_1_in_2 then 0.75
+            when t11.s_ratio_ans - 1 >= s_ratio_1_in_2 then 1
             when t11.s_ratio_ans - 1 >= s_ratio_1_in_3 then 0.5
-            when t11.s_ratio_ans - 1 >= s_ratio_1_in_4 then 0.25
+            when t11.s_ratio_ans - 1 >= s_ratio_1_in_4 then 0.33
             else null
     end as `s_action`
      , t11.b_ratio_ans, t12.b_ratio_para
@@ -49,10 +49,10 @@ from
              , t2.time
              , t2.b_ratio b_ratio_para
              , 0.5*(t2.b_ratio-1) b_ratio_1000
-             , 0.7*(t2.b_ratio-1) b_ratio_2000
-             , 0.9*(t2.b_ratio-1) b_ratio_3000
-             , 1.1*(t2.b_ratio-1) b_ratio_4000
-             , 1.3*(t2.b_ratio-1) b_ratio_5000
+             , 0.6*(t2.b_ratio-1) b_ratio_2000
+             , 0.7*(t2.b_ratio-1) b_ratio_3000
+             , 0.9*(t2.b_ratio-1) b_ratio_4000
+             , 1.1*(t2.b_ratio-1) b_ratio_5000
              , t2.s_ratio s_ratio_para
              , 0 s_ratio_1_in_4
              , 0.3*(t2.s_ratio-1) s_ratio_1_in_3
@@ -72,4 +72,3 @@ where t11.type = t12.type
   and t11.type = t14.type
   and ((t11.b_ratio_ans - 1 >= b_ratio_1000) or (t11.s_ratio_ans - 1 >= s_ratio_1_in_4))
 order by 1 desc, 2, 3 desc;
-
