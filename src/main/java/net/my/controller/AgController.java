@@ -151,32 +151,32 @@ public class AgController {
         if(CollectionUtils.isEmpty(bos)) {
             return RestGeneralResponse.of("无期望数据，无法预测");
         }
-        Long initMoney = 0L;
+        Long moneyInit = 0L;
         Double initPrice = bos.get(0).getClosePrice();
-        Double initNumber = initMoney/initPrice;
+        Double numberInit = moneyInit/initPrice;
         Map<String, String> resMap = new LinkedHashMap<>();
-        Long totalAddCang = 0L;
-        Long totalSubCang = 0L;
+        Long addCangTotal = 0L;
+        Long subCangTotal = 0L;
         bos.forEach(f -> log.info(JSON.toJSONString(f)));
         for(int i = 1; i < bos.size(); i++) {
             AgExpectDataBO tmp = bos.get(i);
             if(tmp.getBAction() != null) {
-                initNumber += tmp.getBAction() / tmp.getClosePrice();
-                totalAddCang += tmp.getBAction().longValue();
+                numberInit += tmp.getBAction() / tmp.getClosePrice();
+                addCangTotal += tmp.getBAction().longValue();
             }
-            if(tmp.getSAction() != null && initMoney >= 100) {
+            if(tmp.getSAction() != null && moneyInit >= 100) {
                 // > 1，意味着是实际金额
                 if(tmp.getSAction() > 1) {
-                    initNumber -= tmp.getSAction() / tmp.getClosePrice();
-                    totalSubCang += tmp.getSAction().longValue();
+                    numberInit -= tmp.getSAction() / tmp.getClosePrice();
+                    subCangTotal += tmp.getSAction().longValue();
                 } else {
                     // <= 1，意味着是比例
-                    totalSubCang += (long)(initNumber * tmp.getSAction() * tmp.getClosePrice());
-                    initNumber = initNumber * (1 - tmp.getSAction());
+                    subCangTotal += (long)(numberInit * tmp.getSAction() * tmp.getClosePrice());
+                    numberInit = numberInit * (1 - tmp.getSAction());
                 }
             }
-            initMoney = (long)(initMoney * tmp.getClosePrice());
-            resMap.put(tmp.getTime(), "gain " + (initMoney + totalSubCang - totalAddCang));
+            moneyInit = (long)(numberInit * tmp.getClosePrice());
+            resMap.put(tmp.getTime(), "gain " + (moneyInit + subCangTotal - addCangTotal));
         }
 
         return RestGeneralResponse.of(resMap);
