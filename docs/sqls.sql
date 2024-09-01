@@ -10,6 +10,8 @@ and t2.`type` = t3.`type`
 -- and t1.type = 'hs300'
 
 
+truncate TABLE t_history_expect;
+
 insert into t_history_expect(time, type, close_price, b_action, s_action, b_ratio_ans, b_ratio_para, s_ratio_ans, s_ratio_para)
 select
     t11.`time`
