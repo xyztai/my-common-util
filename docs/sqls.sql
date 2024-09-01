@@ -18,10 +18,12 @@ select
      , t13.type
      -- , t13.name
      , t14.close_price
-     , case when t11.b_ratio_ans - 1 >= b_ratio_5000 then 5000
+     , case when t11.b_ratio_ans - 1 >= b_ratio_6000 then 6000
+            when t11.b_ratio_ans - 1 >= b_ratio_5000 then 5000
             when t11.b_ratio_ans - 1 >= b_ratio_4000 then 4000
             when t11.b_ratio_ans - 1 >= b_ratio_3000 then 3000
             when t11.b_ratio_ans - 1 >= b_ratio_2000 then 2000
+            when t11.b_ratio_ans - 1 >= b_ratio_1500 then 1500
             when t11.b_ratio_ans - 1 >= b_ratio_1000 then 1000
             else null
     end as `b_action`
@@ -49,10 +51,12 @@ from
              , t2.time
              , t2.b_ratio b_ratio_para
              , 0.5*(t2.b_ratio-1) b_ratio_1000
-             , 0.6*(t2.b_ratio-1) b_ratio_2000
-             , 0.7*(t2.b_ratio-1) b_ratio_3000
-             , 0.9*(t2.b_ratio-1) b_ratio_4000
-             , 1.1*(t2.b_ratio-1) b_ratio_5000
+             , 0.6*(t2.b_ratio-1) b_ratio_1500
+             , 0.7*(t2.b_ratio-1) b_ratio_2000
+             , 0.9*(t2.b_ratio-1) b_ratio_3000
+             , 1.1*(t2.b_ratio-1) b_ratio_4000
+             , 1.3*(t2.b_ratio-1) b_ratio_5000
+             , 1.5*(t2.b_ratio-1) b_ratio_6000
              , t2.s_ratio s_ratio_para
              , 0 s_ratio_1_in_4
              , 0.3*(t2.s_ratio-1) s_ratio_1_in_3

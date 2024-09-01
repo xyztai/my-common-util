@@ -231,10 +231,12 @@
          , case when t11.b_ratio_ans >= t11.b_ratio_ans_max then t11.b_ratio_ans else t11.s_ratio_ans end ratio_c
          , t13.name
          -- , t11.b_ratio_ans, t12.b_ratio_1000
-         , case when t11.b_ratio_ans >= t11.b_ratio_ans_max and t11.b_ratio_ans - 1 >= b_ratio_5000 then '如果跌或者小涨涨幅<1%,则 buy 5000'
+         , case when t11.b_ratio_ans >= t11.b_ratio_ans_max and t11.b_ratio_ans - 1 >= b_ratio_6000 then '如果跌或者小涨涨幅<1%,则 buy 6000'
+                when t11.b_ratio_ans >= t11.b_ratio_ans_max and t11.b_ratio_ans - 1 >= b_ratio_5000 then '如果跌或者小涨涨幅<1%,则 buy 5000'
                 when t11.b_ratio_ans >= t11.b_ratio_ans_max and t11.b_ratio_ans - 1 >= b_ratio_4000 then '如果跌或者小涨涨幅<1%,则 buy 4000'
                 when t11.b_ratio_ans >= t11.b_ratio_ans_max and t11.b_ratio_ans - 1 >= b_ratio_3000 then '如果跌或者小涨涨幅<1%,则 buy 3000'
                 when t11.b_ratio_ans >= t11.b_ratio_ans_max and t11.b_ratio_ans - 1 >= b_ratio_2000 then '如果跌或者小涨涨幅<1%,则 buy 2000'
+                when t11.b_ratio_ans >= t11.b_ratio_ans_max and t11.b_ratio_ans - 1 >= b_ratio_1500 then '如果跌或者小涨涨幅<1%,则 buy 1500'
                 when t11.b_ratio_ans >= t11.b_ratio_ans_max and t11.b_ratio_ans - 1 >= b_ratio_1000 then '如果跌或者小涨涨幅<1%,则 buy 1000'
                 else null
         end as `buy_oper`
@@ -264,10 +266,12 @@
             select
                 t2.type
                  , 0.5*(t2.b_ratio-1) b_ratio_1000
-                 , 0.6*(t2.b_ratio-1) b_ratio_2000
-                 , 0.7*(t2.b_ratio-1) b_ratio_3000
-                 , 0.9*(t2.b_ratio-1) b_ratio_4000
-                 , 1.1*(t2.b_ratio-1) b_ratio_5000
+                 , 0.6*(t2.b_ratio-1) b_ratio_1500
+                 , 0.7*(t2.b_ratio-1) b_ratio_2000
+                 , 0.9*(t2.b_ratio-1) b_ratio_3000
+                 , 1.1*(t2.b_ratio-1) b_ratio_4000
+                 , 1.3*(t2.b_ratio-1) b_ratio_5000
+                 , 1.5*(t2.b_ratio-1) b_ratio_6000
                  , 0 s_ratio_1_in_4
                  , 0.3*(t2.s_ratio-1) s_ratio_1_in_3
                  , 0.7*(t2.s_ratio-1) s_ratio_1_in_2
@@ -294,10 +298,12 @@
              , case when t11.b_ratio_ans - 1 >= b_ratio_1000 then t11.b_ratio_ans else t11.s_ratio_ans end ratio_c
              , t13.name
              -- , t11.b_ratio_ans, t12.b_ratio_1000
-             , case when t11.b_ratio_ans - 1 >= b_ratio_5000 then '如果跌或者小涨涨幅<1%,则 buy 5000'
+             , case when t11.b_ratio_ans - 1 >= b_ratio_6000 then '如果跌或者小涨涨幅<1%,则 buy 6000'
+                    when t11.b_ratio_ans - 1 >= b_ratio_5000 then '如果跌或者小涨涨幅<1%,则 buy 5000'
                     when t11.b_ratio_ans - 1 >= b_ratio_4000 then '如果跌或者小涨涨幅<1%,则 buy 4000'
                     when t11.b_ratio_ans - 1 >= b_ratio_3000 then '如果跌或者小涨涨幅<1%,则 buy 3000'
                     when t11.b_ratio_ans - 1 >= b_ratio_2000 then '如果跌或者小涨涨幅<1%,则 buy 2000'
+                    when t11.b_ratio_ans - 1 >= b_ratio_1500 then '如果跌或者小涨涨幅<1%,则 buy 1500'
                     when t11.b_ratio_ans - 1 >= b_ratio_1000 then '如果跌或者小涨涨幅<1%,则 buy 1000'
                     else null
             end as `buy_oper`
@@ -321,10 +327,12 @@
                 select
                     t2.type
                      , 0.5*(t2.b_ratio-1) b_ratio_1000
-                     , 0.6*(t2.b_ratio-1) b_ratio_2000
-                     , 0.7*(t2.b_ratio-1) b_ratio_3000
-                     , 0.9*(t2.b_ratio-1) b_ratio_4000
-                     , 1.1*(t2.b_ratio-1) b_ratio_5000
+                     , 0.6*(t2.b_ratio-1) b_ratio_1500
+                     , 0.7*(t2.b_ratio-1) b_ratio_2000
+                     , 0.9*(t2.b_ratio-1) b_ratio_3000
+                     , 1.1*(t2.b_ratio-1) b_ratio_4000
+                     , 1.3*(t2.b_ratio-1) b_ratio_5000
+                     , 1.5*(t2.b_ratio-1) b_ratio_6000
                      , 0 s_ratio_1_in_4
                      , 0.3*(t2.s_ratio-1) s_ratio_1_in_3
                      , 0.7*(t2.s_ratio-1) s_ratio_1_in_2
