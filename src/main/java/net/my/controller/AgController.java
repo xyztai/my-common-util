@@ -10,6 +10,8 @@ import net.my.interceptor.LoginRequired;
 import net.my.mapper.DataCalcMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
@@ -27,6 +29,7 @@ import java.util.stream.Collectors;
 public class AgController {
 
     static Map<String, String> map = new LinkedHashMap<>();
+    static Map<String, String> eastmoneyMap = new LinkedHashMap<>();
 
     static {
         map.put("sz50", "sh000016");
@@ -49,6 +52,13 @@ public class AgController {
         map.put("ndsd", "sz300750"); // 宁德时代
         map.put("ymkd", "sh603259"); // 药明康德
         map.put("tqly", "sz002466"); // 天齐锂业
+
+
+        eastmoneyMap.put("zq", "1.512880"); // 证券
+        eastmoneyMap.put("ysjs", "1.000819"); // 有色金属
+        eastmoneyMap.put("gfcy", "2.931151"); // 光伏产业
+        eastmoneyMap.put("ktjg", "2.930875"); // 空天军工
+        eastmoneyMap.put("rjzs", "2.H30202"); // 软件指数
     }
 
     /*
@@ -77,7 +87,10 @@ public class AgController {
     private RestTemplate restTemplate;
 
     public static final String URL_FORMAT = "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get?_var=kline_dayqfq&param=%s,day,,,%d,qfq";
-
+    public static final String EASTMONEY_URL_FORMAT =
+            "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=101&fqt=1&lmt=%d";
+    // public static final String EASTMONEY_URL_FORMAT_SUFFIX = "&end=20500000&iscca=1&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf62%2Cf63%2Cf64&ut=f057cbcbce2a86e2866ab8877db1d059&forcect=1";
+    public static final String EASTMONEY_URL_FORMAT_SUFFIX = "&end=20500000&fields1=f1,f2,f3,f4,f5,f6,f7,f8&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64";
     public static final String[] TYPES = {"sh000001"};
 
     public static final int HISTORY_DAYS = 320;
@@ -123,12 +136,48 @@ public class AgController {
             }
         }
 
+        for(Map.Entry<String, String> entry : eastmoneyMap.entrySet()) {
+            String zqdm = entry.getValue();
+            String url = String.format(EASTMONEY_URL_FORMAT, zqdm, days) + EASTMONEY_URL_FORMAT_SUFFIX;
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+            headers.set("Referer", "https://wap.eastmoney.com/");
+            headers.set("Origin", "https://wap.eastmoney.com");
+            headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36");
+
+            String res = restTemplate.getForObject(url, String.class, headers);
+            assert res != null;
+            log.info("url: {}, zqdm: {}, res: {}", url, zqdm, res);
+            String data = JSON.parseObject(res).getString("data");
+            String dayData = JSON.parseObject(data).getString("klines");
+            List<String> list = JSON.parseObject(dayData, List.class);
+            for(String obj : list) {
+                String[] tmp = obj.split(",");
+                String time = tmp[0];
+                // Double oP = Double.parseDouble (((String)innerList.get(1)).replaceAll("\"", ""));
+                Double cP = Double.parseDouble (tmp[2]);
+                // Double hP = Double.parseDouble (((String)innerList.get(3)).replaceAll("\"", ""));
+                // Double lP = Double.parseDouble (((String)innerList.get(4)).replaceAll("\"", ""));
+                if(agClosePriceDTOs.stream().map(AgClosePriceDTO::getTime).collect(Collectors.toList()).contains(time)) {
+                    AgClosePriceDTO dto = agClosePriceDTOs.stream().filter(f -> time.equals(f.getTime())).findAny().get();
+                    dto.setValue(entry.getKey(), cP);
+                } else {
+                    AgClosePriceDTO dto = new AgClosePriceDTO();
+                    dto.setTime(time);
+                    dto.setValue(entry.getKey(), cP);
+                    agClosePriceDTOs.add(dto);
+                }
+            }
+        }
+
         agClosePriceDTOs = agClosePriceDTOs.stream().filter(f -> "2023-01-03".compareTo(f.getTime()) < 0).collect(Collectors.toList());
         log.info("agClosePriceDTOs :{}", agClosePriceDTOs);
         String timeMin = agClosePriceDTOs.stream().map(AgClosePriceDTO::getTime).sorted().findFirst().get();
         log.info("timeMin: {}", timeMin);
         agClosePriceDTOs.stream().filter(f -> !timeMin.equals(f.getTime())).forEach(this::onlyAddData);
         agClosePriceDTOs.stream().filter(f -> timeMin.equals(f.getTime())).forEach(this::addData);
+        
         return RestGeneralResponse.of(agClosePriceDTOs);
     }
 
