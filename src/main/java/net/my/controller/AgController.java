@@ -177,7 +177,7 @@ public class AgController {
         log.info("timeMin: {}", timeMin);
         agClosePriceDTOs.stream().filter(f -> !timeMin.equals(f.getTime())).forEach(this::onlyAddData);
         agClosePriceDTOs.stream().filter(f -> timeMin.equals(f.getTime())).forEach(this::addData);
-        
+
         return RestGeneralResponse.of(agClosePriceDTOs);
     }
 
@@ -323,7 +323,7 @@ public class AgController {
 
         List<String> retList = new ArrayList<>();
         if(!CollectionUtils.isEmpty(bos)) {
-            retList = bos.stream().map(m -> String.format("%s %s: expma5=%.2f, expma37=%.2f, maxCompare=%.4f%s sRatio=%.4f%s%s(para=%.3f, pre=%.4f), bRatio=%.4f%s%s(para=%.3f, pre=%.4f)"
+            retList = bos.stream().map(m -> String.format("%s %s: expma5=%.3f, expma37=%.3f, maxCompare=%.4f%s sRatio=%.4f%s%s(para=%.3f, pre=%.4f), bRatio=%.4f%s%s(para=%.3f, pre=%.4f)"
                     , m.getDirection()
                     , m.getName(), m.getExpma5(), m.getExpma37()
                     , m.getMaxCompare(), " %"
