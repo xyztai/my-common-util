@@ -30,6 +30,7 @@ public class AgController {
 
     static Map<String, String> map = new LinkedHashMap<>();
     static Map<String, String> eastmoneyMap = new LinkedHashMap<>();
+    static Map<String, String> eastmoneyHbyqCMap = new LinkedHashMap<>();
 
     static {
         map.put("sz50", "sh000016");
@@ -59,6 +60,8 @@ public class AgController {
         eastmoneyMap.put("gfcy", "2.931151"); // 光伏产业
         eastmoneyMap.put("ktjg", "2.930875"); // 空天军工
         eastmoneyMap.put("rjzs", "2.H30202"); // 软件指数
+
+        eastmoneyHbyqCMap.put("hbyqC", "007844.OF");
     }
 
     /*
@@ -91,6 +94,7 @@ public class AgController {
             "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=101&fqt=1&lmt=%d";
     // public static final String EASTMONEY_URL_FORMAT_SUFFIX = "&end=20500000&iscca=1&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf62%2Cf63%2Cf64&ut=f057cbcbce2a86e2866ab8877db1d059&forcect=1";
     public static final String EASTMONEY_URL_FORMAT_SUFFIX = "&end=20500000&fields1=f1,f2,f3,f4,f5,f6,f7,f8&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64";
+    public static final String EASTMONEY_URL_FORMAT_HBYQC = "https://datacenter.eastmoney.com//securities/api/data/get?type=RPT_F10_FUND_PERNAV&sty=SECURITY_CODE,END_DATE,PER_NAV&filter=(SECUCODE=\"%s\")&source=HSF10&client=APP&p=1&ps=%d&sr=-1&st=END_DATE";
     public static final String[] TYPES = {"sh000001"};
 
     public static final int HISTORY_DAYS = 320;
@@ -157,6 +161,40 @@ public class AgController {
                 String time = tmp[0];
                 // Double oP = Double.parseDouble (((String)innerList.get(1)).replaceAll("\"", ""));
                 Double cP = Double.parseDouble (tmp[2]);
+                // Double hP = Double.parseDouble (((String)innerList.get(3)).replaceAll("\"", ""));
+                // Double lP = Double.parseDouble (((String)innerList.get(4)).replaceAll("\"", ""));
+                if(agClosePriceDTOs.stream().map(AgClosePriceDTO::getTime).collect(Collectors.toList()).contains(time)) {
+                    AgClosePriceDTO dto = agClosePriceDTOs.stream().filter(f -> time.equals(f.getTime())).findAny().get();
+                    dto.setValue(entry.getKey(), cP);
+                } else {
+                    AgClosePriceDTO dto = new AgClosePriceDTO();
+                    dto.setTime(time);
+                    dto.setValue(entry.getKey(), cP);
+                    agClosePriceDTOs.add(dto);
+                }
+            }
+        }
+
+        for(Map.Entry<String, String> entry : eastmoneyHbyqCMap.entrySet()) {
+            String zqdm = entry.getValue();
+            String url = String.format(EASTMONEY_URL_FORMAT_HBYQC, zqdm, days);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+            headers.set("Referer", "https://wap.eastmoney.com/");
+            headers.set("Origin", "https://wap.eastmoney.com");
+            headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36");
+
+            String res = restTemplate.getForObject(url, String.class, headers);
+            assert res != null;
+            log.info("url: {}, zqdm: {}, res: {}", url, zqdm, res);
+            String result = JSON.parseObject(res).getString("result");
+            String dayData = JSON.parseObject(result).getString("data");
+            List list = JSON.parseObject(dayData, List.class);
+            for(Object obj : list) {
+                String time = JSON.parseObject(obj.toString()).getString("END_DATE").split(" ")[0];
+                // Double oP = Double.parseDouble (((String)innerList.get(1)).replaceAll("\"", ""));
+                Double cP = Double.parseDouble (JSON.parseObject(obj.toString()).getString("PER_NAV"));
                 // Double hP = Double.parseDouble (((String)innerList.get(3)).replaceAll("\"", ""));
                 // Double lP = Double.parseDouble (((String)innerList.get(4)).replaceAll("\"", ""));
                 if(agClosePriceDTOs.stream().map(AgClosePriceDTO::getTime).collect(Collectors.toList()).contains(time)) {
