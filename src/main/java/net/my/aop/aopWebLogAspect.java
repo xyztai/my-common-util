@@ -32,6 +32,9 @@ public class aopWebLogAspect {
     @Before("webLog()")
     public void doBefore(JoinPoint joinPoint) {
         ServletRequestAttributes attributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if(attributes == null || attributes.getRequest() == null) {
+            return;
+        }
         HttpServletRequest request = attributes.getRequest();
         log.info("========================================== Start ==========================================");
         //打印请求参数相关日志
