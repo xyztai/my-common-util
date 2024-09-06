@@ -66,7 +66,7 @@ public class ScheduledTasks {
         // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = beijingTime.format(formatter);
-        System.out.println("Beijing Time: " + formattedTime);
+        log.info("Beijing Time: " + formattedTime);
         if(formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:10:00") < 0) {
             log.info("time to execGetHistoryData");
         } else {
