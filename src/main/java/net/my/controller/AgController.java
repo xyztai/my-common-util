@@ -19,6 +19,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
@@ -338,7 +340,9 @@ public class AgController {
     public void execGetHistoryData() {
         log.info("execGetHistoryData begin");
         // 设置时区为北京
-        ZonedDateTime beijingTime = ZonedDateTime.now(ZoneId.from(ZonedDateTime.parse("Asia/Shanghai")));
+        LocalDateTime now = LocalDateTime.now();
+        ZoneId beijngZoneId = ZoneId.of("Asia/Shanghai");
+        ZonedDateTime beijingTime = now.atZone(beijngZoneId);
         // 输出北京时间
         // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
