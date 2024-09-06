@@ -3,7 +3,6 @@ package net.my.config;
 import lombok.extern.slf4j.Slf4j;
 import net.my.controller.AgController;
 import net.my.mapper.DataCalcMapper;
-import net.my.pojo.AgParaBO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
@@ -14,9 +13,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -32,13 +28,11 @@ public class ScheduledTasks {
     /**
      * 更新历史参数，以及历史预算数据
      */
-    @Scheduled(cron = "0 0 */4 * * ?")
+    @Scheduled(cron = "0 0 */12 * * ?")
     @Transactional
     public void execHistoryExpect() {
         log.info("execHistoryExpect begin");
-        agController.genDailyPara();
-        dataCalc.deleteHistoryExpect();
-        dataCalc.insertHistoryExpect();
+        agController.genDailyParaAndHistoryExpect();
         log.info("execHistoryExpect end");
     }
 

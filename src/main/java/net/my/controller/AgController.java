@@ -325,17 +325,19 @@ public class AgController {
     }
 
     /**
-     * 只计算往前推250天的数据，根据这250天的数据计算得到当天的参数
+     * 只计算往前推250天的数据，根据这250天的数据计算得到当天的参数，再重新计算预估的expma值
      * @return
      */
-    @ApiOperation(value = "生成历史上逐日的参数数据", notes = "只计算往前推250天的数据，根据这250天的数据计算得到当天的参数")
-    @PostMapping("/genDailyPara")
+    @ApiOperation(value = "生成历史上逐日的参数数据，以及预估的expma值", notes = "只计算往前推250天的数据，根据这250天的数据计算得到当天的参数，再重新计算预估的expma值")
+    @PostMapping("/genDailyParaAndHistoryExpect")
     @Transactional
-    public BaseResponse genDailyPara() {
-        log.info("genDailyPara begin");
+    public BaseResponse genDailyParaAndHistoryExpect() {
+        log.info("genDailyParaAndHistoryExpect begin");
         dataCalc.deleteDailyPara();
         dataCalc.saveDailyPara();
-        log.info("genDailyPara end");
+        dataCalc.deleteHistoryExpect();
+        dataCalc.insertHistoryExpect();
+        log.info("genDailyParaAndHistoryExpect end");
         return BaseResponse.OK;
     }
 
