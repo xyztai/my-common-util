@@ -54,7 +54,7 @@ public class ScheduledTasks {
         log.info("execAutoTask end");
     }
 
-    @Scheduled(cron = "*/30 * * * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     @Transactional
     public void execGetHistoryData() {
         log.info("execGetHistoryData begin");
@@ -69,7 +69,6 @@ public class ScheduledTasks {
         log.info("Beijing Time: " + formattedTime);
         if(
                         (formattedTime.compareTo("03:01:00") > 0 && formattedTime.compareTo("03:13:00") < 0) ||
-                                (formattedTime.compareTo("00:01:00") > 0 && formattedTime.compareTo("03:13:00") < 0) ||
                         (formattedTime.compareTo("06:01:00") > 0 && formattedTime.compareTo("06:13:00") < 0) ||
                         (formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:13:00") < 0) ||
                         (formattedTime.compareTo("18:01:00") > 0 && formattedTime.compareTo("18:13:00") < 0)
