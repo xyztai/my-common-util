@@ -29,31 +29,33 @@ public class ScheduledTasks {
     @Autowired
     private AgController agController;
 
-    @Scheduled(initialDelay = 1000 * 5, fixedRate = 1000 * 3600 * 3)
-    public void refreshAgPara() {
-        log.info("refreshAgPara begin. now: {}", dateFormat.format(new Date()));
-        List<AgParaBO> paras = dataCalc.queryPara();
-        List<AgParaBO> maxParas = dataCalc.queryMaxPara();
-        for(AgParaBO bo : paras) {
-            Optional<AgParaBO> tmp = maxParas.stream().filter(f -> f.getType().equals(bo.getType()) && f.getBRatio() > bo.getBRatio()).findFirst();
-            tmp.ifPresent(f -> bo.setBRatio(f.getBRatio()));
-            tmp = maxParas.stream().filter(f -> f.getType().equals(bo.getType()) && f.getSRatio() > bo.getSRatio()).findFirst();
-            tmp.ifPresent(f -> bo.setSRatio(f.getSRatio()));
-            dataCalc.updatePara(bo);
-        }
-        log.info("refreshAgPara end. now: {}", dateFormat.format(new Date()));
-    }
-
-
+    /**
+     * 更新历史参数，以及历史预算数据
+     */
     @Scheduled(cron = "0 0 */4 * * ?")
     @Transactional
-    public void execAutoTask() {
-        log.info("execAutoTask begin");
-        agController.saveDailyPara();
-        agController.updatePara();
-        log.info("execAutoTask end");
+    public void execHistoryExpect() {
+        log.info("execHistoryExpect begin");
+        agController.genDailyPara();
+        dataCalc.deleteHistoryExpect();
+        dataCalc.insertHistoryExpect();
+        log.info("execHistoryExpect end");
     }
 
+    /**
+     * 更新当前使用的参数数据
+     */
+    @Scheduled(initialDelay = 1000 * 5, fixedRate = 1000 * 3600 * 3)
+    @Transactional
+    public void execUpdatePara() {
+        log.info("execUpdatePara begin");
+        agController.updatePara();
+        log.info("execUpdatePara end");
+    }
+
+    /**
+     * 自动获取/更新历史上5天的cp数据
+     */
     @Scheduled(cron = "0 */5 * * * ?")
     @Transactional
     public void execGetHistoryData() {
@@ -66,7 +68,7 @@ public class ScheduledTasks {
         // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = beijingTime.format(formatter);
-        log.info("Beijing Time: " + formattedTime);
+        log.info("time: {}", formattedTime);
         if(
                         (formattedTime.compareTo("03:01:00") > 0 && formattedTime.compareTo("03:13:00") < 0) ||
                         (formattedTime.compareTo("06:01:00") > 0 && formattedTime.compareTo("06:13:00") < 0) ||

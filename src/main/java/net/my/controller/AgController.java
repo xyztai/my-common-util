@@ -106,6 +106,8 @@ public class AgController {
 
     public static final int DAYS_CNT = 1;
 
+    @ApiOperation(value = "获取历史的cp数据", notes = "访问互联网接口获取数据")
+    @ApiImplicitParam(name = "days", value = "制定历史上最近N天的数据", required = true, dataType = "String")
     @GetMapping("/history/{days}")
     @Transactional
     public BaseResponse getHistoryData(@PathVariable("days") Integer days) {
@@ -225,6 +227,8 @@ public class AgController {
     }
 
 
+    @ApiOperation(value = "删除cp数据", notes = "删除指定日期的cp数据")
+    @ApiImplicitParam(name = "time", value = "日期", required = true, dataType = "String")
     @LoginRequired
     @DeleteMapping("/remove/{time}")
     @Transactional
@@ -236,6 +240,8 @@ public class AgController {
         return RestGeneralResponse.of("删除完成");
     }
 
+    @ApiOperation(value = "获取预期结果数据", notes = "根据策略，得到指定类型的交易结果")
+    @ApiImplicitParam(name = "type", value = "类型", required = true, dataType = "String")
     @GetMapping("/getExpectData/{type}")
     public BaseResponse getExpectData(@PathVariable("type") String type) {
         log.info("getExpectData: type = {}", type);
@@ -290,24 +296,30 @@ public class AgController {
         return RestGeneralResponse.of(resMap);
     }
 
+    @ApiOperation(value = "查询当前使用的参数值")
     @GetMapping("/para")
     public BaseResponse queryPara() {
         return RestGeneralResponse.of(dataCalc.queryPara());
     }
 
+    @ApiOperation(value = "更新当前使用的参数值", notes = "根据策略，得到指定类型的交易结果")
     @PostMapping("/updatePara")
     @Transactional
     public BaseResponse updatePara() {
         log.info("updatePara begin");
+        /*
         List<AgParaBO> paras = dataCalc.queryPara();
         List<AgParaBO> maxParas = dataCalc.queryMaxPara();
         for(AgParaBO bo : paras) {
-            Optional<AgParaBO> tmp = maxParas.stream().filter(f -> f.getType().equals(bo.getType()) /*&& f.getBRatio() > bo.getBRatio()*/).findFirst();
+            Optional<AgParaBO> tmp = maxParas.stream().filter(f -> f.getType().equals(bo.getType()) *//*&& f.getBRatio() > bo.getBRatio()*//*).findFirst();
             tmp.ifPresent(f -> bo.setBRatio(f.getBRatio()));
-            tmp = maxParas.stream().filter(f -> f.getType().equals(bo.getType()) /*&& f.getSRatio() > bo.getSRatio()*/).findFirst();
+            tmp = maxParas.stream().filter(f -> f.getType().equals(bo.getType()) *//*&& f.getSRatio() > bo.getSRatio()*//*).findFirst();
             tmp.ifPresent(f -> bo.setSRatio(f.getSRatio()));
             dataCalc.updatePara(bo);
         }
+        */
+        List<AgParaBO> maxParas = dataCalc.queryMaxPara();
+        maxParas.forEach(f -> dataCalc.updatePara(f));
         log.info("updatePara end");
         return queryPara();
     }
@@ -316,17 +328,20 @@ public class AgController {
      * 只计算往前推250天的数据，根据这250天的数据计算得到当天的参数
      * @return
      */
-    @PostMapping("/saveDailyPara")
+    @ApiOperation(value = "生成历史上逐日的参数数据", notes = "只计算往前推250天的数据，根据这250天的数据计算得到当天的参数")
+    @PostMapping("/genDailyPara")
     @Transactional
-    public BaseResponse saveDailyPara() {
-        log.info("saveDailyPara begin");
+    public BaseResponse genDailyPara() {
+        log.info("genDailyPara begin");
         dataCalc.deleteDailyPara();
         dataCalc.saveDailyPara();
-        log.info("saveDailyPara end");
+        log.info("genDailyPara end");
         return BaseResponse.OK;
     }
 
 
+    @ApiOperation(value = "获取cp数据", notes = "根据日期获取数据")
+    @ApiImplicitParam(name = "time", value = "日期", required = true, dataType = "String")
     @GetMapping("/data/cp/{time}")
     public BaseResponse queryCP(@PathVariable("time") String time) {
         List<AgClosePriceBO> bos = dataCalc.queryCP(time);
@@ -341,6 +356,7 @@ public class AgController {
         return RestGeneralResponse.of(retMap);
     }
 
+    @ApiOperation(value = "统计每天有多少expma数据", notes = "结果按照日期倒排")
     @GetMapping("/data/cnt")
     public BaseResponse queryDataCnt() {
         List<AgDataCntBO> bos = dataCalc.queryDataCnt();
@@ -348,7 +364,7 @@ public class AgController {
         return RestGeneralResponse.of(bos);
     }
 
-    @ApiOperation(value = "获取计算数据", notes = "根据日期获取数据")
+    @ApiOperation(value = "获取expma数据", notes = "根据日期获取数据")
     @ApiImplicitParam(name = "time", value = "日期", required = true, dataType = "String")
     @GetMapping("/data/calc/{time}")
     public BaseResponse queryDataCalc(@PathVariable("time") String time) {
@@ -372,7 +388,8 @@ public class AgController {
         return RestGeneralResponse.of(retList);
     }
 
-    @ApiOperation(value = "获取接下来的操作", notes = "需要给出波动值")
+    @ApiOperation(value = "获取接下来的操作，每个操作只会执行一次", notes = "需要给出波动值")
+    @ApiImplicitParam(name = "change", value = "波动值", required = true, dataType = "Double")
     @GetMapping("/expect/hard2/{change}")
     @Transactional
     public BaseResponse expectHard2(@PathVariable("change") Double change) {
@@ -402,7 +419,8 @@ public class AgController {
         }
     }
 
-    @ApiOperation(value = "获取接下来的操作", notes = "需要给出波动值")
+    @ApiOperation(value = "获取接下来的操作，只要严于上一次的操作参数就会再执行，即使操作与上一次操作相同", notes = "需要给出波动值")
+    @ApiImplicitParam(name = "change", value = "波动值", required = true, dataType = "Double")
     @GetMapping("/expect/hard/{change}")
     @Transactional
     public BaseResponse expectHard(@PathVariable("change") Double change) {
@@ -432,7 +450,8 @@ public class AgController {
         }
     }
 
-    @ApiOperation(value = "获取接下来的操作", notes = "需要给出波动值")
+    @ApiOperation(value = "获取接下来的操作，高于给定的参数值，就会执行", notes = "需要给出波动值")
+    @ApiImplicitParam(name = "change", value = "波动值", required = true, dataType = "Double")
     @GetMapping("/expect/simple/{change}")
     @Transactional
     public BaseResponse expectSimple(@PathVariable("change") Double change) {
@@ -476,6 +495,8 @@ public class AgController {
         }
     }
 
+    @ApiOperation(value = "手动添加/更新cp值")
+    @ApiImplicitParam(name = "agClosePriceDTO", value = "cp值", required = true, dataType = "net.my.pojo.AgClosePriceDTO")
     @PostMapping("/add")
     @Transactional
     public BaseResponse addData(@RequestBody AgClosePriceDTO agClosePriceDTO) {

@@ -48,4 +48,7 @@ public interface DataCalcMapper {
     void saveDailyPara();
 
     List<AgExpectDataBO> getExpectData(@Param("type") String type);
+
+    void deleteHistoryExpect();
+    void insertHistoryExpect();
 }
