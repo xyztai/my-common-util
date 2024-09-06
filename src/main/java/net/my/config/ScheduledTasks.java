@@ -54,7 +54,7 @@ public class ScheduledTasks {
         log.info("execAutoTask end");
     }
 
-    @Scheduled(cron = "*/5 * * * * ?")
+    @Scheduled(cron = "0 */5 * * * ?")
     @Transactional
     public void execGetHistoryData() {
         log.info("execGetHistoryData begin");
@@ -67,12 +67,17 @@ public class ScheduledTasks {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
         String formattedTime = beijingTime.format(formatter);
         log.info("Beijing Time: " + formattedTime);
-        if(formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:10:00") < 0) {
+        if(
+                        (formattedTime.compareTo("03:01:00") > 0 && formattedTime.compareTo("03:13:00") < 0) ||
+                        (formattedTime.compareTo("06:01:00") > 0 && formattedTime.compareTo("06:13:00") < 0) ||
+                        (formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:13:00") < 0) ||
+                        (formattedTime.compareTo("18:01:00") > 0 && formattedTime.compareTo("18:13:00") < 0)
+        ) {
             log.info("time to execGetHistoryData");
+            agController.getHistoryData(5);
         } else {
             log.info("not time to execGetHistoryData");
         }
-        // getHistoryData(5);
         log.info("execGetHistoryData end");
     }
 }
