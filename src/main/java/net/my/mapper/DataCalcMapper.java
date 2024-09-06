@@ -1,12 +1,12 @@
 package net.my.mapper;
 
 import net.my.pojo.*;
-import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Param;
+import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
-@Mapper
+@Repository
 public interface DataCalcMapper {
     int deleteCP(String time);
 
