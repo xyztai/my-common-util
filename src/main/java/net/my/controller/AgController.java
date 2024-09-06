@@ -19,6 +19,9 @@ import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -328,6 +331,26 @@ public class AgController {
         saveDailyPara();
         updatePara();
         log.info("execAutoTask end");
+    }
+
+    @Scheduled(cron = "*/5 * * * * ?")
+    @Transactional
+    public void execGetHistoryData() {
+        log.info("execGetHistoryData begin");
+        // 设置时区为北京
+        ZonedDateTime beijingTime = ZonedDateTime.now(ZoneId.from(ZonedDateTime.parse("Asia/Shanghai")));
+        // 输出北京时间
+        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String formattedTime = beijingTime.format(formatter);
+        System.out.println("Beijing Time: " + formattedTime);
+        if(formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:10:00") < 0) {
+            log.info("time to execGetHistoryData");
+        } else {
+            log.info("not time to execGetHistoryData");
+        }
+        // getHistoryData(5);
+        log.info("execGetHistoryData end");
     }
 
 
