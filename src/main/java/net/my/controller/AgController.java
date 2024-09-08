@@ -273,6 +273,7 @@ public class AgController {
                 }
             }
         } catch (Exception ex) {
+            log.error("", ex.getMessage(), ex);
             ex.printStackTrace();
         }
         agIndustryCalcBOList.forEach(f -> dataCalc.delIndustryCalc(f.getType(), f.getTime()));
