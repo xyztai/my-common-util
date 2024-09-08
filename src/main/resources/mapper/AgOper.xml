@@ -542,7 +542,7 @@
 ]]>
     </select>
 
-    <select id="getHistoryBuyRatio">
+    <select id="getHistoryBuyRatio" resultType="string">
 <![CDATA[
         select info
         from (
