@@ -525,7 +525,7 @@
         (#{time}, #{type}, #{name}, #{expma5}, #{expma37}, #{sRatio}, #{bRatio}, #{closePrice})
     </insert>
 
-    <select id="getBuyInfo">
+    <select id="getBuyInfo" resultType="string">
 <![CDATA[
         select info
         from (
