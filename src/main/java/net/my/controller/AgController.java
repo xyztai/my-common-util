@@ -195,7 +195,7 @@ public class AgController {
         try {
             eastmoneyIndustryMap.clear();
             Resource resource = applicationContext.getResource("classpath:sidemenu.json");
-            log.info("file-path: {}", resource.getFile().getAbsoluteFile());
+            // log.info("file-path: {}", resource.getFile().getAbsoluteFile());
             InputStream inputStream = resource.getInputStream();
             StringWriter writer = new StringWriter();
             IOUtils.copy(inputStream, writer, "UTF-8");
