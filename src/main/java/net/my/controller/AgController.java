@@ -1,6 +1,7 @@
 package net.my.controller;
 
 import com.alibaba.fastjson.JSON;
+import com.google.gson.Gson;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
@@ -9,23 +10,32 @@ import net.my.interceptor.CurrentUser;
 import net.my.interceptor.LoginRequired;
 import net.my.mapper.DataCalcMapper;
 import net.my.pojo.*;
+import org.apache.commons.io.IOUtils;
+import org.apache.logging.log4j.util.Strings;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
+import org.springframework.core.io.Resource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ResourceUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeFormatter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.math.BigDecimal;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+
 
 @RestController
 @RequestMapping("/ag")
@@ -36,6 +46,8 @@ public class AgController {
     static Map<String, String> map = new LinkedHashMap<>();
     static Map<String, String> eastmoneyMap = new LinkedHashMap<>();
     static Map<String, String> eastmoneyHbyqCMap = new LinkedHashMap<>();
+
+    static Map<String, String> eastmoneyIndustryMap = new LinkedHashMap<>();
 
     static {
         map.put("sz50", "sh000016");
@@ -89,6 +101,9 @@ public class AgController {
      */
 
     @Autowired
+    private ApplicationContext applicationContext;
+
+    @Autowired
     private DataCalcMapper dataCalc;
 
     @Autowired
@@ -105,6 +120,176 @@ public class AgController {
     public static final int HISTORY_DAYS = 320;
 
     public static final int DAYS_CNT = 1;
+
+    // 将远程的json文件拉取到本地
+    public static void main(String[] args) {
+        String urlString = "https://quote.eastmoney.com/center/api/sidemenu.json"; // 获取行业基础信息的json
+        String filePath = "sidemenu.json"; // 本地文件路径
+
+        try (InputStream inputStream = new URL(urlString).openStream();
+             FileOutputStream outputStream = new FileOutputStream(filePath)
+        ) {
+
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            System.out.println("JSON文件已保存至: " + filePath);
+            // 读取刚刚存的文件数据
+            if(true) {
+                String jsonString = new String(Files.readAllBytes(Paths.get(filePath)));
+                Gson gson = new Gson();
+                List<EastmoneyIndustryPOJO> list = JSON.parseArray(jsonString, EastmoneyIndustryPOJO.class);
+                System.out.println(list);
+                for(EastmoneyIndustryPOJO l1 : list) {
+                    if("沪深京板块".equals(l1.getTitle()) && !CollectionUtils.isEmpty(l1.getNext())) {
+                        List<EastmoneyIndustryPOJO> l2List = l1.getNext();
+                        for(EastmoneyIndustryPOJO l2 : l2List) {
+                            if("行业板块".equals(l2.getTitle()) && !CollectionUtils.isEmpty(l2.getNext())) {
+                                List<EastmoneyIndustryPOJO> l3List = l2.getNext();
+                                for(EastmoneyIndustryPOJO l3 : l3List) {
+                                    if(Strings.isNotEmpty(l3.getKey()) && l3.getKey().split("-").length > 1)
+                                        System.out.println(String.format("%s: %s", l3.getTitle(), l3.getKey().split("-")[1]));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            // 读取resources下的文件数据
+            if(true) {
+                File file = ResourceUtils.getFile("sidemenu.json");
+                System.out.println(file.toPath().toAbsolutePath().toString());
+                String jsonString = org.apache.commons.io.FileUtils.readFileToString(file, StandardCharsets.UTF_8);
+                Gson gson = new Gson();
+                List<EastmoneyIndustryPOJO> list = JSON.parseArray(jsonString, EastmoneyIndustryPOJO.class);
+                System.out.println(list);
+                for(EastmoneyIndustryPOJO l1 : list) {
+                    if("沪深京板块".equals(l1.getTitle()) && !CollectionUtils.isEmpty(l1.getNext())) {
+                        List<EastmoneyIndustryPOJO> l2List = l1.getNext();
+                        for(EastmoneyIndustryPOJO l2 : l2List) {
+                            if("行业板块".equals(l2.getTitle()) && !CollectionUtils.isEmpty(l2.getNext())) {
+                                List<EastmoneyIndustryPOJO> l3List = l2.getNext();
+                                for(EastmoneyIndustryPOJO l3 : l3List) {
+                                    if(Strings.isNotEmpty(l3.getKey()) && l3.getKey().split("-").length > 1)
+                                        System.out.println(String.format("%s: %s", l3.getTitle(), l3.getKey().split("-")[1]));
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    @GetMapping("/industry/{days}")
+    public BaseResponse getIndustryHistoryData(@PathVariable("days") Integer days) {
+        List<AgIndustryCalcBO> agIndustryCalcBOList = new ArrayList<>();
+        try {
+            eastmoneyIndustryMap.clear();
+            Resource resource = applicationContext.getResource("classpath:sidemenu.json");
+            log.info("file-path: {}", resource.getFile().getAbsoluteFile());
+            InputStream inputStream = resource.getInputStream();
+            StringWriter writer = new StringWriter();
+            IOUtils.copy(inputStream, writer, "UTF-8");
+            String jsonString = writer.toString();
+            List<EastmoneyIndustryPOJO> l1List = JSON.parseArray(jsonString, EastmoneyIndustryPOJO.class);
+            for(EastmoneyIndustryPOJO l1 : l1List) {
+                if("沪深京板块".equals(l1.getTitle()) && !CollectionUtils.isEmpty(l1.getNext())) {
+                    List<EastmoneyIndustryPOJO> l2List = l1.getNext();
+                    for(EastmoneyIndustryPOJO l2 : l2List) {
+                        if("行业板块".equals(l2.getTitle()) && !CollectionUtils.isEmpty(l2.getNext())) {
+                            List<EastmoneyIndustryPOJO> l3List = l2.getNext();
+                            for(EastmoneyIndustryPOJO l3 : l3List) {
+                                if(Strings.isNotEmpty(l3.getKey()) && l3.getKey().split("-").length > 1) {
+                                    eastmoneyIndustryMap.put(l3.getTitle(), l3.getKey().split("-")[1]);
+                                    log.info("{}: {}", l3.getTitle(), l3.getKey().split("-")[1]);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            for(Map.Entry<String, String> entry : eastmoneyIndustryMap.entrySet()) {
+                String zqdm = entry.getValue();
+                String url = String.format(EASTMONEY_URL_FORMAT, zqdm, days) + EASTMONEY_URL_FORMAT_SUFFIX;
+
+                HttpHeaders headers = new HttpHeaders();
+                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
+                headers.set("Referer", "https://wap.eastmoney.com/");
+                headers.set("Origin", "https://wap.eastmoney.com");
+                headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36");
+
+                String res = restTemplate.getForObject(url, String.class, headers);
+                assert res != null;
+                log.info("url: {}, zqdm: {}, res: {}", url, zqdm, res);
+                String data = JSON.parseObject(res).getString("data");
+                String dayData = JSON.parseObject(data).getString("klines");
+                List<String> list = JSON.parseObject(dayData, List.class);
+                for(String obj : list) {
+                    String[] tmp = obj.split(",");
+                    String time = tmp[0];
+                    if("2023-01-03".compareTo(time) >= 0)
+                        continue;
+                    // Double oP = Double.parseDouble (((String)innerList.get(1)).replaceAll("\"", ""));
+                    Double cP = Double.parseDouble (tmp[2]);
+                    // Double hP = Double.parseDouble (((String)innerList.get(3)).replaceAll("\"", ""));
+                    // Double lP = Double.parseDouble (((String)innerList.get(4)).replaceAll("\"", ""));
+                    AgIndustryCalcBO bo = AgIndustryCalcBO.builder().name(entry.getKey()).type(zqdm).closePrice(cP).time(time).build();
+                    agIndustryCalcBOList.add(bo);
+                }
+            }
+            agIndustryCalcBOList = agIndustryCalcBOList.stream().sorted(Comparator.comparing(AgIndustryCalcBO::getName).thenComparing(AgIndustryCalcBO::getTime)).collect(Collectors.toList());
+            // expma_5: round((t.close_price - t3.`expma_5`)*2.0/(5.0+1) + t3.`expma_5`, 6) clac_expma_5
+            // expma_37: round((t.close_price - t3.`expma_37`)*2.0/(37.0+1) + t3.`expma_37`, 6) clac_expma_37
+            List<String> names = agIndustryCalcBOList.stream().map(AgIndustryCalcBO::getName).distinct().collect(Collectors.toList());
+            for(String name : names) {
+                List<AgIndustryCalcBO> tmpList = agIndustryCalcBOList.stream().filter(f -> name.equals(f.getName()))
+                        .sorted(Comparator.comparing(AgIndustryCalcBO::getTime)).collect(Collectors.toList());
+                if(!CollectionUtils.isEmpty(tmpList)) {
+                    tmpList.get(0).setExpma5(tmpList.get(0).getClosePrice());
+                    tmpList.get(0).setExpma37(tmpList.get(0).getClosePrice());
+                    tmpList.get(0).setSRatio(1.0);
+                    tmpList.get(0).setBRatio(1.0);
+                    for(int i = 1; i < tmpList.size(); i++) {
+                        Double cp = tmpList.get(i).getClosePrice();
+                        Double expma5 = (cp - tmpList.get(i - 1).getExpma5()) * 2.0 / (5.0 + 1) + tmpList.get(i - 1).getExpma5();
+                        tmpList.get(i).setExpma5(getScaleDouble(expma5, 6));
+                        Double expma37 = (cp - tmpList.get(i - 1).getExpma37()) * 2.0 / (37.0 + 1) + tmpList.get(i - 1).getExpma37();
+                        tmpList.get(i).setExpma37(getScaleDouble(expma37, 6));
+                        Double sRation = expma5 / expma37;
+                        tmpList.get(i).setSRatio(getScaleDouble(sRation, 6));
+                        Double bRation = expma37 / expma5;
+                        tmpList.get(i).setBRatio(getScaleDouble(bRation, 6));
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
+        agIndustryCalcBOList.forEach(f -> dataCalc.delIndustryCalc(f.getType(), f.getTime()));
+        agIndustryCalcBOList.forEach(f -> dataCalc.saveIndustryCalc(f));
+        Map<String, Object> resMap = new LinkedHashMap<>();
+        resMap.put("insertSize", agIndustryCalcBOList.size());
+        List<String> buyInfos = dataCalc.getBuyInfo();
+        resMap.put("todayBuyInfos", buyInfos);
+        List<String> historyBuyRatioInfos = dataCalc.getHistoryBuyRatio();
+        resMap.put("historyBuyRatioInfos", historyBuyRatioInfos);
+        return RestGeneralResponse.of(resMap);
+    }
+
+    private Double getScaleDouble(Double dou, int scale) {
+        BigDecimal bd = new BigDecimal(dou);
+        return bd.setScale(scale, BigDecimal.ROUND_HALF_UP).doubleValue();
+    }
 
     @ApiOperation(value = "获取历史的cp数据", notes = "访问互联网接口获取数据")
     @ApiImplicitParam(name = "days", value = "制定历史上最近N天的数据", required = true, dataType = "String")

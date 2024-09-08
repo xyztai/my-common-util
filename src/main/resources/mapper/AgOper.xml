@@ -55,6 +55,18 @@
         <result column="b_ratio_pre" property="bRatioPre" />
     </resultMap>
 
+    <resultMap id="queryIndustryCalcMap" type="net.my.pojo.AgIndustryCalcBO">
+        <id column="id" property="id" />
+        <id column="time" property="time" />
+        <result column="type" property="type" />
+        <result column="name" property="name" />
+        <result column="expma_5" property="expma5" />
+        <result column="expma_37" property="expma37" />
+        <result column="s_ratio" property="sRatio" />
+        <result column="b_ratio" property="bRatio" />
+        <result column="close_price" property="closePrice" />
+    </resultMap>
+
     <resultMap id="queryDataCntMap" type="net.my.pojo.AgDataCntBO">
         <id column="time" property="time" />
         <result column="cnt_cp" property="cntCp" />
@@ -500,5 +512,51 @@
         order by 1 desc, 2, 3 desc
 ]]>
     </insert>
+
+    <delete id="delIndustryCalc">
+        delete from t_industry_calc
+        where time = #{time}
+        and   type = #{type}
+    </delete>
+
+    <insert id="saveIndustryCalc" parameterType="net.my.pojo.AgIndustryCalcBO">
+        insert into t_industry_calc(time, type, name, expma_5, expma_37, s_ratio, b_ratio, close_price)
+        values
+        (#{time}, #{type}, #{name}, #{expma5}, #{expma37}, #{sRatio}, #{bRatio}, #{closePrice})
+    </insert>
+
+    <select id="getBuyInfo">
+<![CDATA[
+        select info
+        from (
+                 select
+                     concat(t.time, ', ', t.name, ', ', t.type, ', bRatio= ', t.b_ratio) info
+                      , row_number() over (partition by t.type order by t.b_ratio desc) b_rn
+	                  , row_number() over (partition by t.type order by t.s_ratio desc) s_rn
+	                  , row_number() over (partition by t.type order by t.time desc) time_rn
+                 from t_industry_calc t
+                 where t.create_time >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+             ) tt
+        where tt.b_rn = 1 and time_rn = 1
+        order by 1
+]]>
+    </select>
+
+    <select id="getHistoryBuyRatio">
+<![CDATA[
+        select info
+        from (
+                 select
+                     concat(t.time, ', ', t.name, ', ', t.type, ', bRatio= ', t.b_ratio) info
+                     , row_number() over (partition by t.type order by t.b_ratio desc) b_rn
+	                 , row_number() over (partition by t.type order by t.s_ratio desc) s_rn
+	                 , row_number() over (partition by t.type order by t.time desc) time_rn
+                 from t_industry_calc t
+                 where t.create_time >= DATE_SUB(CURDATE(), INTERVAL 1 YEAR)
+             ) tt
+        where tt.b_rn = 1
+        order by 1
+        ]]>
+    </select>
 
 </mapper>

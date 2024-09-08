@@ -51,4 +51,9 @@ public interface DataCalcMapper {
 
     void deleteHistoryExpect();
     void insertHistoryExpect();
+
+    void delIndustryCalc(@Param("type") String type, @Param("time") String time);
+    int saveIndustryCalc(AgIndustryCalcBO bo);
+    List<String> getBuyInfo();
+    List<String> getHistoryBuyRatio();
 }
