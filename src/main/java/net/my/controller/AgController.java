@@ -272,7 +272,7 @@ public class AgController {
                             agIndustryCalcBOs.stream().anyMatch(f -> name.equals(f.getName()))) {
                         AgIndustryCalcBO tmpBo = agIndustryCalcBOs.stream().filter(f -> name.equals(f.getName())).findFirst().get();
                         tmpList = tmpList.stream().filter(f -> f.getTime().compareTo(tmpBo.getTime()) > 0).collect(Collectors.toList());
-                        if(!CollectionUtils.isEmpty(tmpList)) {
+                        if(!CollectionUtils.isEmpty(tmpList) && tmpBo != null) {
                             Double cp = tmpList.get(0).getClosePrice();
                             Double expma5 = (cp - tmpBo.getExpma5()) * 2.0 / (5.0 + 1) + tmpBo.getExpma5();
                             tmpList.get(0).setExpma5(getScaleDouble(expma5, 6));
