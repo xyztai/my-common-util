@@ -203,6 +203,7 @@ public class AgController {
 
     @GetMapping("/industry/{days}")
     public BaseResponse getIndustryHistoryData(@PathVariable("days") Integer days) {
+        List<AgIndustryCalcBO> todoList = new ArrayList<>();
         List<AgIndustryCalcBO> agIndustryCalcBOList = new ArrayList<>();
         try {
             eastmoneyIndustryMap.clear();
@@ -303,16 +304,17 @@ public class AgController {
                             tmpList.get(i).setBRatio(getScaleDouble(bRation, 6));
                         }
                     }
+                    todoList.addAll(tmpList);
                 }
             }
         } catch (Exception ex) {
             log.error("", ex.getMessage(), ex);
             ex.printStackTrace();
         }
-        agIndustryCalcBOList.forEach(f -> dataCalc.delIndustryCalc(f.getType(), f.getTime()));
-        agIndustryCalcBOList.forEach(f -> dataCalc.saveIndustryCalc(f));
+        todoList.forEach(f -> dataCalc.delIndustryCalc(f.getType(), f.getTime()));
+        todoList.forEach(f -> dataCalc.saveIndustryCalc(f));
         Map<String, Object> resMap = new LinkedHashMap<>();
-        resMap.put("insertSize", agIndustryCalcBOList.size());
+        resMap.put("insertSize", todoList.size());
         List<String> buyInfos = dataCalc.getBuyInfo();
         resMap.put("todayBuyInfos", buyInfos);
         List<String> historyBuyRatioInfos = dataCalc.getHistoryBuyRatio();
