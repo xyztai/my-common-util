@@ -188,6 +188,18 @@ public class AgController {
         }
     }
 
+    @GetMapping("/industry")
+    public BaseResponse getIndustryHistoryData() {
+        Map<String, Object> resMap = new LinkedHashMap<>();
+        List<String> buyInfos = dataCalc.getBuyInfo();
+        resMap.put("todayBuyInfosSize", CollectionUtils.isEmpty(buyInfos) ? 0 : buyInfos.size());
+        resMap.put("todayBuyInfos", buyInfos);
+        List<String> historyBuyRatioInfos = dataCalc.getHistoryBuyRatio();
+        resMap.put("historyBuyRatioInfosSize", CollectionUtils.isEmpty(historyBuyRatioInfos) ? 0 : historyBuyRatioInfos.size());
+        resMap.put("historyBuyRatioInfos", historyBuyRatioInfos);
+        return RestGeneralResponse.of(resMap);
+    }
+
 
     @GetMapping("/industry/{days}")
     public BaseResponse getIndustryHistoryData(@PathVariable("days") Integer days) {
