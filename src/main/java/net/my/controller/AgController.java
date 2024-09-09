@@ -271,6 +271,7 @@ public class AgController {
                     if(!CollectionUtils.isEmpty(agIndustryCalcBOs) &&
                             agIndustryCalcBOs.stream().anyMatch(f -> name.equals(f.getName()))) {
                         AgIndustryCalcBO tmpBo = agIndustryCalcBOs.stream().filter(f -> name.equals(f.getName())).findFirst().get();
+                        log.info("tmpBo: {}", tmpBo);
                         tmpList = tmpList.stream().filter(f -> f.getTime().compareTo(tmpBo.getTime()) > 0).collect(Collectors.toList());
                         if(!CollectionUtils.isEmpty(tmpList) && tmpBo != null) {
                             Double cp = tmpList.get(0).getClosePrice();
