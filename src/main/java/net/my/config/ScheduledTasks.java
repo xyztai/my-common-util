@@ -71,6 +71,7 @@ public class ScheduledTasks {
         ) {
             log.info("time to execGetHistoryData");
             agController.getHistoryData(5);
+            agController.getIndustryHistoryData(5);
         } else {
             log.info("not time to execGetHistoryData");
         }
