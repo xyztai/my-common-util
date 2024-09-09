@@ -559,4 +559,14 @@
         ]]>
     </select>
 
+    <select id="getLastestIndustryData" resultMap="queryIndustryCalcMap">
+        select *
+        from (
+            select t.*
+                   , row_number() over (partition by t.`type` order by 'time' desc) time_rn
+            from t_industry_calc t
+        ) tt
+        where tt.time_rn = 1
+    </select>
+
 </mapper>

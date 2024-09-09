@@ -56,4 +56,5 @@ public interface DataCalcMapper {
     int saveIndustryCalc(AgIndustryCalcBO bo);
     List<String> getBuyInfo();
     List<String> getHistoryBuyRatio();
+    List<AgIndustryCalcBO> getLastestIndustryData();
 }

@@ -251,24 +251,44 @@ public class AgController {
             // expma_5: round((t.close_price - t3.`expma_5`)*2.0/(5.0+1) + t3.`expma_5`, 6) clac_expma_5
             // expma_37: round((t.close_price - t3.`expma_37`)*2.0/(37.0+1) + t3.`expma_37`, 6) clac_expma_37
             List<String> names = agIndustryCalcBOList.stream().map(AgIndustryCalcBO::getName).distinct().collect(Collectors.toList());
+            List<AgIndustryCalcBO> agIndustryCalcBOs = dataCalc.getLastestIndustryData();
             for(String name : names) {
                 List<AgIndustryCalcBO> tmpList = agIndustryCalcBOList.stream().filter(f -> name.equals(f.getName()))
                         .sorted(Comparator.comparing(AgIndustryCalcBO::getTime)).collect(Collectors.toList());
                 if(!CollectionUtils.isEmpty(tmpList)) {
-                    tmpList.get(0).setExpma5(tmpList.get(0).getClosePrice());
-                    tmpList.get(0).setExpma37(tmpList.get(0).getClosePrice());
-                    tmpList.get(0).setSRatio(1.0);
-                    tmpList.get(0).setBRatio(1.0);
-                    for(int i = 1; i < tmpList.size(); i++) {
-                        Double cp = tmpList.get(i).getClosePrice();
-                        Double expma5 = (cp - tmpList.get(i - 1).getExpma5()) * 2.0 / (5.0 + 1) + tmpList.get(i - 1).getExpma5();
-                        tmpList.get(i).setExpma5(getScaleDouble(expma5, 6));
-                        Double expma37 = (cp - tmpList.get(i - 1).getExpma37()) * 2.0 / (37.0 + 1) + tmpList.get(i - 1).getExpma37();
-                        tmpList.get(i).setExpma37(getScaleDouble(expma37, 6));
-                        Double sRation = expma5 / expma37;
-                        tmpList.get(i).setSRatio(getScaleDouble(sRation, 6));
-                        Double bRation = expma37 / expma5;
-                        tmpList.get(i).setBRatio(getScaleDouble(bRation, 6));
+                    if(!CollectionUtils.isEmpty(agIndustryCalcBOs) &&
+                            agIndustryCalcBOs.stream().anyMatch(f -> name.equals(f.getName()))) {
+                        AgIndustryCalcBO tmpBo = agIndustryCalcBOs.stream().filter(f -> name.equals(f.getName())).findFirst().get();
+                        tmpList = tmpList.stream().filter(f -> f.getTime().compareTo(tmpBo.getTime()) > 0).collect(Collectors.toList());
+                        if(!CollectionUtils.isEmpty(tmpList)) {
+                            Double cp = tmpList.get(0).getClosePrice();
+                            Double expma5 = (cp - tmpBo.getExpma5()) * 2.0 / (5.0 + 1) + tmpBo.getExpma5();
+                            tmpList.get(0).setExpma5(getScaleDouble(expma5, 6));
+                            Double expma37 = (cp - tmpBo.getExpma37()) * 2.0 / (37.0 + 1) + tmpBo.getExpma37();
+                            tmpList.get(0).setExpma37(getScaleDouble(expma37, 6));
+                            Double sRation = expma5 / expma37;
+                            tmpList.get(0).setSRatio(getScaleDouble(sRation, 6));
+                            Double bRation = expma37 / expma5;
+                            tmpList.get(0).setBRatio(getScaleDouble(bRation, 6));
+                        }
+                    } else {
+                        tmpList.get(0).setExpma5(tmpList.get(0).getClosePrice());
+                        tmpList.get(0).setExpma37(tmpList.get(0).getClosePrice());
+                        tmpList.get(0).setSRatio(1.0);
+                        tmpList.get(0).setBRatio(1.0);
+                    }
+                    if(!CollectionUtils.isEmpty(tmpList)) {
+                        for(int i = 1; i < tmpList.size(); i++) {
+                            Double cp = tmpList.get(i).getClosePrice();
+                            Double expma5 = (cp - tmpList.get(i - 1).getExpma5()) * 2.0 / (5.0 + 1) + tmpList.get(i - 1).getExpma5();
+                            tmpList.get(i).setExpma5(getScaleDouble(expma5, 6));
+                            Double expma37 = (cp - tmpList.get(i - 1).getExpma37()) * 2.0 / (37.0 + 1) + tmpList.get(i - 1).getExpma37();
+                            tmpList.get(i).setExpma37(getScaleDouble(expma37, 6));
+                            Double sRation = expma5 / expma37;
+                            tmpList.get(i).setSRatio(getScaleDouble(sRation, 6));
+                            Double bRation = expma37 / expma5;
+                            tmpList.get(i).setBRatio(getScaleDouble(bRation, 6));
+                        }
                     }
                 }
             }
