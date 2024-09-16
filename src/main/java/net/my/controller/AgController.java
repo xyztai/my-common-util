@@ -672,6 +672,14 @@ public class AgController {
                 res = res.stream().filter(f -> name.equals(f.getName())).collect(Collectors.toList());
             }
 
+            if(!CollectionUtils.isEmpty(res)) {
+                for (AgOper ag : res) {
+                    if("9999-99-99".equals(ag.getTime())) {
+                        ag.setTime("预期操作");
+                    }
+                }
+            }
+
             return RestGeneralResponse.of(res);
         } else {
             return RestGeneralResponse.of("无数据");
