@@ -642,6 +642,42 @@ public class AgController {
         }
     }
 
+    @ApiOperation(value = "获取接下来的操作，每个操作只会执行一次", notes = "需要给出波动值")
+    @ApiImplicitParam(name = "change", value = "波动值", required = true, dataType = "Double")
+    @GetMapping("/expect/hard2/{name}/{change}")
+    @Transactional
+    public BaseResponse expectHardType2(@PathVariable("name") Double name, @PathVariable("change") Double change) {
+        String time = "9999-99-99";
+        log.info("expectHard: time={}, change={}", time, change);
+        if(dataCalc.getMaxTime().compareTo(time) >= 0) {
+            return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
+        }
+
+        List<AgClosePriceBO> agClosePriceBOList = dataCalc.getExpectCP(time, change);
+        if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
+            agClosePriceBOList.forEach(
+                    f -> {
+                        dataCalc.insertCP(f);
+                    }
+            );
+
+            calc(time);
+            List<AgOper> res = getHardOper2();
+
+            // 测试结束，就删除掉
+            dataCalc.deleteCP(time);
+            dataCalc.deleteDataCalc(time);
+
+            if(!CollectionUtils.isEmpty(res) && !"全部".equals(name)) {
+                res = res.stream().filter(f -> name.equals(f.getName())).collect(Collectors.toList());
+            }
+
+            return RestGeneralResponse.of(res);
+        } else {
+            return RestGeneralResponse.of("无数据");
+        }
+    }
+
     @ApiOperation(value = "获取接下来的操作，只要严于上一次的操作参数就会再执行，即使操作与上一次操作相同", notes = "需要给出波动值")
     @ApiImplicitParam(name = "change", value = "波动值", required = true, dataType = "Double")
     @GetMapping("/expect/hard/{change}")
@@ -793,13 +829,22 @@ public class AgController {
 
     @GetMapping("/oper/hard2")
     public BaseResponse queryHardOper2() {
-        log.info("queryHardOper.");
+        log.info("queryHardOper2.");
+        List<AgOper> res = getHardOper2();
+        if(CollectionUtils.isEmpty(res)) {
+            return RestGeneralResponse.of("无操作");
+        }
+        return RestGeneralResponse.of(makeMap(res));
+    }
+
+    private List<AgOper> getHardOper2() {
+        log.info("getHardOper2.");
         List<AgOper> opers = dataCalc.querySimpleOper();
 
         if(CollectionUtils.isEmpty(opers)) {
-            return RestGeneralResponse.of("无操作");
+            return new ArrayList<>();
         }
-        opers.forEach(f -> log.info("queryHardOper2 dataCalc.querySimpleOper() {}", JSON.toJSONString(f)));
+        opers.forEach(f -> log.info("getHardOper2 dataCalc.querySimpleOper() {}", JSON.toJSONString(f)));
 
         opers = opers.stream().sorted(Comparator.comparing(AgOper::getName).thenComparing(AgOper::getTime)).collect(Collectors.toList());
         List<AgOper> res = new ArrayList<>();
@@ -822,13 +867,12 @@ public class AgController {
         }
 
         if(CollectionUtils.isEmpty(res)) {
-            return RestGeneralResponse.of("无操作");
+            return res;
         }
 
         res = res.stream().sorted(Comparator.comparing(AgOper::getTime).reversed().thenComparing(AgOper::getOperDir)).collect(Collectors.toList());
-
         res.forEach(f -> log.info("queryHardOper2 res {}", JSON.toJSONString(f)));
-        return RestGeneralResponse.of(makeMap(res));
+        return res;
     }
 
     @GetMapping("/oper/simple")
