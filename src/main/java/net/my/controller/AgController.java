@@ -646,7 +646,7 @@ public class AgController {
     @ApiImplicitParam(name = "change", value = "波动值", required = true, dataType = "Double")
     @GetMapping("/expect/hard2/{name}/{change}")
     @Transactional
-    public BaseResponse expectHardType2(@PathVariable("name") Double name, @PathVariable("change") Double change) {
+    public BaseResponse expectHardType2(@PathVariable("name") String name, @PathVariable("change") Double change) {
         String time = "9999-99-99";
         log.info("expectHard: time={}, change={}", time, change);
         if(dataCalc.getMaxTime().compareTo(time) >= 0) {
