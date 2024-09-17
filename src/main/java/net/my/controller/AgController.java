@@ -591,6 +591,7 @@ public class AgController {
     @ApiImplicitParam(name = "time", value = "日期", required = true, dataType = "String")
     @GetMapping("/data/calc/{time}")
     public BaseResponse queryDataCalc(@PathVariable("time") String time) {
+        log.info("queryDataCalc: time={}", time);
         List<AgDataCalcBO> bos = queryExpmaCalc(time);
         bos = bos.stream().sorted(Comparator.comparingDouble(AgDataCalcBO::getMaxCompare).reversed()).collect(Collectors.toList());
 
@@ -613,7 +614,8 @@ public class AgController {
 
 
     @GetMapping("/data/expma/{time}")
-    public List<AgDataCalcBO> queryExpmaCalc(String time) {
+    public List<AgDataCalcBO> queryExpmaCalc(@PathVariable("time") String time) {
+        log.info("queryExpmaCalc: time={}", time);
         return dataCalc.queryDataCalc(time);
     }
 
