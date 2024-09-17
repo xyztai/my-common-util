@@ -592,7 +592,7 @@ public class AgController {
     @GetMapping("/data/calc/{time}")
     public BaseResponse queryDataCalc(@PathVariable("time") String time) {
         log.info("queryDataCalc: time={}", time);
-        List<AgDataCalcBO> bos = queryExpmaCalc(time);
+        List<AgDataCalcBO> bos = getDataCalc(time);
         bos = bos.stream().sorted(Comparator.comparingDouble(AgDataCalcBO::getMaxCompare).reversed()).collect(Collectors.toList());
 
         List<String> retList = new ArrayList<>();
@@ -614,8 +614,12 @@ public class AgController {
 
 
     @GetMapping("/data/expma/{time}")
-    public List<AgDataCalcBO> queryExpmaCalc(@PathVariable("time") String time) {
+    public BaseResponse queryExpmaCalc(@PathVariable("time") String time) {
         log.info("queryExpmaCalc: time={}", time);
+        return RestGeneralResponse.of(getDataCalc(time));
+    }
+
+    private List<AgDataCalcBO> getDataCalc(String time) {
         return dataCalc.queryDataCalc(time);
     }
 
