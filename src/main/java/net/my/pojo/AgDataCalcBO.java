@@ -14,6 +14,7 @@ public class AgDataCalcBO {
     private String time;
     private String type;
     private String name;
+    private Double closePrice;
     private Double expma5;
     private Double expma37;
     private Double sRatioPara;

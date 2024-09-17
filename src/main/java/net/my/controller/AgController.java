@@ -616,7 +616,15 @@ public class AgController {
     @GetMapping("/data/expma/{time}")
     public BaseResponse queryExpmaCalc(@PathVariable("time") String time) {
         log.info("queryExpmaCalc: time={}", time);
-        return RestGeneralResponse.of(getDataCalc(time));
+        List<AgDataCalcBO> calcBos = getDataCalc(time);
+        List<AgClosePriceBO> cpBos = dataCalc.queryCP(time);
+        if(!CollectionUtils.isEmpty(calcBos) && !CollectionUtils.isEmpty(cpBos)) {
+            for(AgDataCalcBO bo : calcBos) {
+                Optional<AgClosePriceBO> tmp = cpBos.stream().filter(f -> f.getName().equals(bo.getName())).findAny();
+                tmp.ifPresent(i -> bo.setClosePrice(i.getClosePrice()));
+            }
+        }
+        return RestGeneralResponse.of(calcBos);
     }
 
     private List<AgDataCalcBO> getDataCalc(String time) {

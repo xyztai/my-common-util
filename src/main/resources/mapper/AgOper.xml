@@ -45,6 +45,7 @@
         <id column="time" property="time" />
         <result column="type" property="type" />
         <result column="name" property="name" />
+        <result column="close_price" property="closePrice" />
         <result column="expma_5" property="expma5" />
         <result column="expma_37" property="expma37" />
         <result column="s_ratio_para" property="sRatioPara" />
