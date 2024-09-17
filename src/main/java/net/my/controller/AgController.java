@@ -591,7 +591,7 @@ public class AgController {
     @ApiImplicitParam(name = "time", value = "日期", required = true, dataType = "String")
     @GetMapping("/data/calc/{time}")
     public BaseResponse queryDataCalc(@PathVariable("time") String time) {
-        List<AgDataCalcBO> bos = dataCalc.queryDataCalc(time);
+        List<AgDataCalcBO> bos = queryExpmaCalc(time);
         bos = bos.stream().sorted(Comparator.comparingDouble(AgDataCalcBO::getMaxCompare).reversed()).collect(Collectors.toList());
 
         List<String> retList = new ArrayList<>();
@@ -609,6 +609,12 @@ public class AgController {
         }
 
         return RestGeneralResponse.of(retList);
+    }
+
+
+    @GetMapping("/data/expma/{time}")
+    public List<AgDataCalcBO> queryExpmaCalc(String time) {
+        return dataCalc.queryDataCalc(time);
     }
 
     @ApiOperation(value = "获取接下来的操作，每个操作只会执行一次", notes = "需要给出波动值")
