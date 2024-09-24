@@ -665,9 +665,9 @@ public class AgController {
 
     @ApiOperation(value = "获取接下来的操作，每个操作只会执行一次", notes = "需要给出波动值")
     @ApiImplicitParam(name = "change", value = "波动值", required = true, dataType = "Double")
-    @GetMapping("/expect/hard2/{name}/{change}")
+    @GetMapping("/expect/hard2/{name}/{change}/{change2}/{change3}")
     @Transactional
-    public BaseResponse expectHardType2(@PathVariable("name") String name, @PathVariable("change") Double change) {
+    public BaseResponse expectHardType2(@PathVariable("name") String name, @PathVariable("change") Double change, @PathVariable("change2") Double change2, @PathVariable("change3") Double change3) {
         String time = "9999-99-99";
         log.info("expectHard: time={}, change={}", time, change);
         if(dataCalc.getMaxTime().compareTo(time) >= 0) {
@@ -686,14 +686,14 @@ public class AgController {
         }
 
         time = "9999-99-02";
-        if(change.compareTo(0D) > 0) {
+        /*if(change.compareTo(0D) > 0) {
             change = 1D;
         } else if(change.compareTo(0D) < 0) {
             change = -1D;
         } else {
             change = 0D;
-        }
-        agClosePriceBOList = dataCalc.getExpectCP(time, change);
+        }*/
+        agClosePriceBOList = dataCalc.getExpectCP(time, change2);
         if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
             agClosePriceBOList.forEach(
                     f -> {
@@ -704,7 +704,7 @@ public class AgController {
         }
 
         time = "9999-99-03";
-        agClosePriceBOList = dataCalc.getExpectCP(time, change);
+        agClosePriceBOList = dataCalc.getExpectCP(time, change3);
         if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
             agClosePriceBOList.forEach(
                     f -> {
