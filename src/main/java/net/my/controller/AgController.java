@@ -750,14 +750,14 @@ public class AgController {
             if(!CollectionUtils.isEmpty(res02)) {
                 for(AgOper f : res02) {
                     if(!names01.contains(f.getName())) {
-                        f.setName("√ " + f.getName());
+                        f.setName("√√ " + f.getName());
                     }
                 }
             }
 
             if(!CollectionUtils.isEmpty(res01)) {
                 for(AgOper f : res01) {
-                    f.setName("√ " + f.getName());
+                    f.setName("√√√ " + f.getName());
                 }
             }
         }
