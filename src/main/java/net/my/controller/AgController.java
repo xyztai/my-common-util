@@ -729,13 +729,13 @@ public class AgController {
         if(!CollectionUtils.isEmpty(res)) {
             for (AgOper ag : res) {
                 if("9999-99-01".equals(ag.getTime())) {
-                    ag.setTime("T+1操作");
+                    ag.setTime("T+1 操作");
                 }
                 if("9999-99-02".equals(ag.getTime())) {
-                    ag.setTime("T+2操作");
+                    ag.setTime("T+2 操作");
                 }
                 if("9999-99-03".equals(ag.getTime())) {
-                    ag.setTime("T+3操作");
+                    ag.setTime("T+3 操作");
                 }
             }
             return RestGeneralResponse.of(res);
