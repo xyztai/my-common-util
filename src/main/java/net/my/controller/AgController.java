@@ -727,6 +727,42 @@ public class AgController {
         }
 
         if(!CollectionUtils.isEmpty(res)) {
+            List<AgOper> res01 = res.stream().filter(f -> f.getTime().equals("9999-99-01")).collect(Collectors.toList());
+            List<AgOper> res02 = res.stream().filter(f -> f.getTime().equals("9999-99-02")).collect(Collectors.toList());
+            List<AgOper> res03 = res.stream().filter(f -> f.getTime().equals("9999-99-03")).collect(Collectors.toList());
+            List<String> names01 = new ArrayList<>();
+            List<String> names02 = new ArrayList<>();
+            if(!CollectionUtils.isEmpty(res01)) {
+                names01 = res01.stream().map(AgOper::getName).collect(Collectors.toList());
+            }
+            if(!CollectionUtils.isEmpty(res02)) {
+                names02 = res02.stream().map(AgOper::getName).collect(Collectors.toList());
+            }
+
+            if(!CollectionUtils.isEmpty(res03)) {
+                for(AgOper f : res03) {
+                    if(!names01.contains(f.getName()) && !names02.contains(f.getName())) {
+                        f.setName("√ " + f.getName());
+                    }
+                }
+            }
+
+            if(!CollectionUtils.isEmpty(res02)) {
+                for(AgOper f : res02) {
+                    if(!names01.contains(f.getName())) {
+                        f.setName("√ " + f.getName());
+                    }
+                }
+            }
+
+            if(!CollectionUtils.isEmpty(res01)) {
+                for(AgOper f : res01) {
+                    f.setName("√ " + f.getName());
+                }
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(res)) {
             for (AgOper ag : res) {
                 if("9999-99-01".equals(ag.getTime())) {
                     ag.setTime("T+1 操作");
