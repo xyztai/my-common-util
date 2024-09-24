@@ -35,6 +35,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 @RestController
@@ -673,6 +674,7 @@ public class AgController {
             return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
         }
 
+        time = "9999-99-01";
         List<AgClosePriceBO> agClosePriceBOList = dataCalc.getExpectCP(time, change);
         if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
             agClosePriceBOList.forEach(
@@ -680,26 +682,62 @@ public class AgController {
                         dataCalc.insertCP(f);
                     }
             );
-
             calc(time);
-            List<AgOper> res = getHardOper2();
+        }
 
-            // 测试结束，就删除掉
-            dataCalc.deleteCP(time);
-            dataCalc.deleteDataCalc(time);
-
-            if(!CollectionUtils.isEmpty(res) && !"全部".equals(name)) {
-                res = res.stream().filter(f -> name.equals(f.getName())).collect(Collectors.toList());
-            }
-
-            if(!CollectionUtils.isEmpty(res)) {
-                for (AgOper ag : res) {
-                    if("9999-99-99".equals(ag.getTime())) {
-                        ag.setTime("预期操作");
+        time = "9999-99-02";
+        if(change.compareTo(0D) > 0) {
+            change = 1D;
+        } else if(change.compareTo(0D) < 0) {
+            change = -1D;
+        } else {
+            change = 0D;
+        }
+        agClosePriceBOList = dataCalc.getExpectCP(time, change);
+        if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
+            agClosePriceBOList.forEach(
+                    f -> {
+                        dataCalc.insertCP(f);
                     }
+            );
+            calc(time);
+        }
+
+        time = "9999-99-03";
+        agClosePriceBOList = dataCalc.getExpectCP(time, change);
+        if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
+            agClosePriceBOList.forEach(
+                    f -> {
+                        dataCalc.insertCP(f);
+                    }
+            );
+            calc(time);
+        }
+
+        List<AgOper> res = getHardOper2();
+
+        // 测试结束，就删除掉
+        Stream.of("9999-99-01", "9999-99-02", "9999-99-03").forEach(t -> {
+            dataCalc.deleteCP(t);
+            dataCalc.deleteDataCalc(t);
+        });
+
+        if(!CollectionUtils.isEmpty(res) && !"全部".equals(name)) {
+            res = res.stream().filter(f -> name.equals(f.getName())).collect(Collectors.toList());
+        }
+
+        if(!CollectionUtils.isEmpty(res)) {
+            for (AgOper ag : res) {
+                if("9999-99-01".equals(ag.getTime())) {
+                    ag.setTime("T+1操作");
+                }
+                if("9999-99-02".equals(ag.getTime())) {
+                    ag.setTime("T+2操作");
+                }
+                if("9999-99-03".equals(ag.getTime())) {
+                    ag.setTime("T+3操作");
                 }
             }
-
             return RestGeneralResponse.of(res);
         } else {
             return RestGeneralResponse.of("无数据");
