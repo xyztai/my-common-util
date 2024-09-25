@@ -6,6 +6,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
+import net.my.cache.MyCaffeineCache;
 import net.my.interceptor.CurrentUser;
 import net.my.interceptor.LoginRequired;
 import net.my.mapper.DataCalcMapper;
@@ -33,6 +34,7 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -100,6 +102,9 @@ public class AgController {
     hbyqC	华宝油气C
     nsdk100	纳斯达克100
      */
+
+    @Autowired
+    private MyCaffeineCache myCaffeineCache;
 
     @Autowired
     private ApplicationContext applicationContext;
@@ -674,6 +679,17 @@ public class AgController {
             return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
         }
 
+
+        Date date = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        String formattedDate = dateFormat.format(date);
+        String key = formattedDate + "-" + name + "-" + change + "-" + change2 + "-" + change3;
+        List<AgOper> cacheRes = (List<AgOper>) myCaffeineCache.get(key);
+        if(cacheRes != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, cacheRes);
+            return RestGeneralResponse.of(cacheRes);
+        }
+
         time = "9999-99-01";
         List<AgClosePriceBO> agClosePriceBOList = dataCalc.getExpectCP(time, change);
         if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
@@ -774,6 +790,8 @@ public class AgController {
                     ag.setTime("T+3 操作");
                 }
             }
+            myCaffeineCache.put(key, res);
+            log.info("myCaffeineCache put, key={}, res={}", key, res);
             return RestGeneralResponse.of(res);
         } else {
             return RestGeneralResponse.of("无数据");
