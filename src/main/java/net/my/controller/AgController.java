@@ -674,7 +674,10 @@ public class AgController {
     @Transactional
     public BaseResponse expectHardType2(@PathVariable("name") String name, @PathVariable("change") Double change, @PathVariable("change2") Double change2, @PathVariable("change3") Double change3) {
         String time = "9999-99-99";
-        log.info("expectHard: time={}, change={}", time, change);
+        if(change == null) change = 0D;
+        if(change2 == null) change2 = 0D;
+        if(change3 == null) change3 = 0D;
+        log.info("expectHardType2: time={}, change={}, change2={}, change3={}", time, change, change2, change3);
         if(dataCalc.getMaxTime().compareTo(time) >= 0) {
             return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
         }
@@ -683,60 +686,63 @@ public class AgController {
         Date date = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
         String formattedDate = dateFormat.format(date);
-        String key = formattedDate + "-" + name + "-" + change + "-" + change2 + "-" + change3;
-        List<AgOper> cacheRes = (List<AgOper>) myCaffeineCache.get(key);
-        if(cacheRes != null) {
-            log.info("myCaffeineCache get, key={}, cacheRes={}", key, cacheRes);
-            return RestGeneralResponse.of(cacheRes);
-        }
-
-        time = "9999-99-01";
-        List<AgClosePriceBO> agClosePriceBOList = dataCalc.getExpectCP(time, change);
-        if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
-            agClosePriceBOList.forEach(
-                    f -> {
-                        dataCalc.insertCP(f);
-                    }
-            );
-            calc(time);
-        }
-
-        time = "9999-99-02";
-        /*if(change.compareTo(0D) > 0) {
-            change = 1D;
-        } else if(change.compareTo(0D) < 0) {
-            change = -1D;
+        String key = formattedDate + "-" + "全部" + "-" + change + "-" + change2 + "-" + change3;
+        List<AgOper> res = (List<AgOper>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            // return RestGeneralResponse.of(cacheRes);
         } else {
-            change = 0D;
-        }*/
-        agClosePriceBOList = dataCalc.getExpectCP(time, change2);
-        if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
-            agClosePriceBOList.forEach(
-                    f -> {
-                        dataCalc.insertCP(f);
-                    }
-            );
-            calc(time);
+            time = "9999-99-01";
+            List<AgClosePriceBO> agClosePriceBOList = dataCalc.getExpectCP(time, change);
+            if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
+                agClosePriceBOList.forEach(
+                        f -> {
+                            dataCalc.insertCP(f);
+                        }
+                );
+                calc(time);
+            }
+
+            time = "9999-99-02";
+            /*if(change.compareTo(0D) > 0) {
+                change = 1D;
+            } else if(change.compareTo(0D) < 0) {
+                change = -1D;
+            } else {
+                change = 0D;
+            }*/
+            agClosePriceBOList = dataCalc.getExpectCP(time, change2);
+            if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
+                agClosePriceBOList.forEach(
+                        f -> {
+                            dataCalc.insertCP(f);
+                        }
+                );
+                calc(time);
+            }
+
+            time = "9999-99-03";
+            agClosePriceBOList = dataCalc.getExpectCP(time, change3);
+            if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
+                agClosePriceBOList.forEach(
+                        f -> {
+                            dataCalc.insertCP(f);
+                        }
+                );
+                calc(time);
+            }
+
+            res = getHardOper2();
+
+            // 测试结束，就删除掉
+            Stream.of("9999-99-01", "9999-99-02", "9999-99-03").forEach(t -> {
+                dataCalc.deleteCP(t);
+                dataCalc.deleteDataCalc(t);
+            });
+
+            myCaffeineCache.put(key, res);
+            log.info("myCaffeineCache put, key={}, res={}", key, res);
         }
-
-        time = "9999-99-03";
-        agClosePriceBOList = dataCalc.getExpectCP(time, change3);
-        if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
-            agClosePriceBOList.forEach(
-                    f -> {
-                        dataCalc.insertCP(f);
-                    }
-            );
-            calc(time);
-        }
-
-        List<AgOper> res = getHardOper2();
-
-        // 测试结束，就删除掉
-        Stream.of("9999-99-01", "9999-99-02", "9999-99-03").forEach(t -> {
-            dataCalc.deleteCP(t);
-            dataCalc.deleteDataCalc(t);
-        });
 
         if(!CollectionUtils.isEmpty(res) && !"全部".equals(name)) {
             res = res.stream().filter(f -> name.equals(f.getName())).collect(Collectors.toList());
@@ -790,8 +796,6 @@ public class AgController {
                     ag.setTime("T+3 操作");
                 }
             }
-            myCaffeineCache.put(key, res);
-            log.info("myCaffeineCache put, key={}, res={}", key, res);
             return RestGeneralResponse.of(res);
         } else {
             return RestGeneralResponse.of("无数据");
