@@ -684,7 +684,7 @@ public class AgController {
 
 
         Date date = new Date();
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHH");
         String formattedDate = dateFormat.format(date);
         String key = formattedDate + "-" + "全部" + "-" + change + "-" + change2 + "-" + change3;
         List<AgOper> res = (List<AgOper>) myCaffeineCache.get(key);
