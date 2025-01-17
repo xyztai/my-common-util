@@ -980,7 +980,7 @@ public class AgController {
                     && curr.getName().equals(pre.getName())
                     && curr.getOperDir().equals(pre.getOperDir())) {
                 if(pre.getRatioC() < curr.getRatioC()) {
-                    if(curr.getBuyOper().contains("6000") || !(curr.getBuyOper() + curr.getSellOper()).equals(pre.getBuyOper() + pre.getSellOper())) {
+                    if((curr.getBuyOper() != null && curr.getBuyOper().contains("6000")) || !(curr.getBuyOper() + curr.getSellOper()).equals(pre.getBuyOper() + pre.getSellOper())) {
                         res.add(curr);
                     }
                     pre = curr;
