@@ -355,6 +355,7 @@
             (
                 select *
                 from t_type t3
+                where t3.status = 1
             ) t13
         where t11.type = t12.type
           and t11.type = t13.type
