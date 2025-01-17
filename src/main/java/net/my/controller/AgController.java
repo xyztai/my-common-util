@@ -796,7 +796,8 @@ public class AgController {
                     ag.setTime("T+3 操作");
                 }
             }
-            return RestGeneralResponse.of(res);
+            return RestGeneralResponse.of(res.stream().filter(f -> !StringUtils.isEmpty(f.getSellOper()) && !StringUtils.isEmpty(f.getBuyOper()))
+                    .collect(Collectors.toList()));
         } else {
             return RestGeneralResponse.of("无数据");
         }
