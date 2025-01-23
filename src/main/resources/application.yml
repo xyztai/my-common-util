@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: default
+    active: vm
   application:
     name: my-common-util
 
