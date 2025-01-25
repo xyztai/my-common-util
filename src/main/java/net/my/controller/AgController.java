@@ -744,9 +744,9 @@ public class AgController {
             log.info("myCaffeineCache put, key={}, res={}", key, res);
         }
 
-        if(!CollectionUtils.isEmpty(res) && !"全部".equals(name)) {
-            res = res.stream().filter(f -> name.equals(f.getName())).collect(Collectors.toList());
-        }
+//        if(!CollectionUtils.isEmpty(res) && !"全部".equals(name)) {
+//            res = res.stream().filter(f -> name.equals(f.getName())).collect(Collectors.toList());
+//        }
 
         if(!CollectionUtils.isEmpty(res)) {
             List<AgOper> res01 = res.stream().filter(f -> f.getTime().equals("9999-99-01")).collect(Collectors.toList());
@@ -795,6 +795,9 @@ public class AgController {
                 if("9999-99-03".equals(ag.getTime())) {
                     ag.setTime("T+3 操作");
                 }
+            }
+            if(!CollectionUtils.isEmpty(res) && !"全部".equals(name)) {
+                res = res.stream().filter(f -> name.equals(f.getName())).collect(Collectors.toList());
             }
             return RestGeneralResponse.of(res.stream().filter(f -> !StringUtils.isEmpty(f.getSellOper()) || !StringUtils.isEmpty(f.getBuyOper()))
                     .collect(Collectors.toList()));
