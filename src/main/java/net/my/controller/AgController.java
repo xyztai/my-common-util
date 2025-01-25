@@ -797,7 +797,7 @@ public class AgController {
                 }
             }
             if(!CollectionUtils.isEmpty(res) && !"全部".equals(name)) {
-                res = res.stream().filter(f -> name.equals(f.getName())).collect(Collectors.toList());
+                res = res.stream().filter(f -> f.getName().endsWith(name)).collect(Collectors.toList());
             }
             return RestGeneralResponse.of(res.stream().filter(f -> !StringUtils.isEmpty(f.getSellOper()) || !StringUtils.isEmpty(f.getBuyOper()))
                     .collect(Collectors.toList()));
