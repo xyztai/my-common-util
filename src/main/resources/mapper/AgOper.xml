@@ -372,7 +372,7 @@
              , count(time_cp) cnt_cp
              , count(time_calc) cnt_calc
              , count(time_calc) - count(time_cp) cnt_gap
-             , group_concat(case when time_cp is null then name else null end separator ', ') as names_miss
+             , group_concat(case when time_cp is null then name else null end order by name separator ', ') as names_miss
         from (
                  select t1.time, tt.name, t.time time_cp, tc.time time_calc
                  from t_type tt
@@ -383,6 +383,7 @@
                  left join t_data_calc tc
                         on tt.`type` = tc.`type`
                        and t1.`time` = tc.`time`
+                 where tt.status = 1
              ) t11
         group by t11.time
         order by 1 desc
