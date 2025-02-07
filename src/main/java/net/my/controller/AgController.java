@@ -975,6 +975,7 @@ public class AgController {
         opers.forEach(f -> log.info("getHardOper2 dataCalc.querySimpleOper() {}", JSON.toJSONString(f)));
 
         opers = opers.stream().sorted(Comparator.comparing(AgOper::getName).thenComparing(AgOper::getTime)).collect(Collectors.toList());
+        opers.forEach(f -> log.info("sort getHardOper2 dataCalc.querySimpleOper() {}", JSON.toJSONString(f)));
         List<AgOper> res = new ArrayList<>();
         AgOper pre = opers.get(0);
         for(int i = 1; i < opers.size(); i++) {
