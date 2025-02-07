@@ -990,7 +990,7 @@ public class AgController {
 
             // 同方向的操作
             if(pre.getRatioC() < curr.getRatioC()) {
-                if(curr.getBuyOper() != null)
+                if(curr.getBuyOper() != null){
                     if(!curr.getBuyOper().equals(pre.getBuyOper()) || curr.getBuyOper().contains("6k")) {
                         res.add(curr);
                         pre = curr;
