@@ -317,7 +317,7 @@
                     when t11.b_ratio_ans - 1 >= b_ratio_3000 then '(跌<0)或(涨<1%) buy 3k'
                     -- when t11.b_ratio_ans - 1 >= b_ratio_2000 then '如果跌或者小涨涨幅<1%,则 buy 2000'
                     -- when t11.b_ratio_ans - 1 >= b_ratio_1500 then '如果跌或者小涨涨幅<1%,则 buy 1500'
-                    -- when t11.b_ratio_ans - 1 >= b_ratio_1000 then '如果跌或者小涨涨幅<1%,则 buy 1000'
+                    when t11.b_ratio_ans - 1 >= b_ratio_1000 then '如果跌或者小涨涨幅<1%,则 buy 1k'
                     else null
             end as `buy_oper`
              -- , abs(t11.s_ratio_ans - 1), s_ratio_1_in_4_start
