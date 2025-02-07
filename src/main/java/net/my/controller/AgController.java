@@ -978,20 +978,27 @@ public class AgController {
         opers.forEach(f -> log.info("sort getHardOper2 dataCalc.querySimpleOper() {}", JSON.toJSONString(f)));
         List<AgOper> res = new ArrayList<>();
         AgOper pre = opers.get(0);
+        res.add(pre);
         for(int i = 1; i < opers.size(); i++) {
             AgOper curr = opers.get(i);
-            if(pre != null
-                    && curr.getName().equals(pre.getName())
-                    && curr.getOperDir().equals(pre.getOperDir())) {
-                if(pre.getRatioC() < curr.getRatioC()) {
-                    if((curr.getBuyOper() != null && curr.getBuyOper().contains("6k")) || !(curr.getBuyOper() + curr.getSellOper()).equals(pre.getBuyOper() + pre.getSellOper())) {
-                        res.add(curr);
-                    }
+            if(!curr.getName().equals(pre.getName())
+                    || !curr.getOperDir().equals(pre.getOperDir())) {
+                res.add(curr);
+                pre = curr;
+                continue;
+            }
+
+            // 同方向的操作
+            if(pre.getRatioC() < curr.getRatioC()) {
+                if(curr.getBuyOper() != null && curr.getBuyOper().contains("6k")) {
+                    res.add(curr);
                     pre = curr;
                 }
-            } else {
-                pre = curr;
-                res.add(curr);
+
+                if(curr.getSellOper() != null) {
+                    res.add(curr);
+                    pre = curr;
+                }
             }
         }
 
