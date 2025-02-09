@@ -339,7 +339,7 @@
             (
                 select
                     t2.type
-                     , 0.8*(t2.b_ratio-1) b_ratio_1000
+                     , 0.6*(t2.b_ratio-1) b_ratio_1000
                      , 0.85*(t2.b_ratio-1) b_ratio_1500
                      , 0.9*(t2.b_ratio-1) b_ratio_2000
                      , 0.95*(t2.b_ratio-1) b_ratio_3000
