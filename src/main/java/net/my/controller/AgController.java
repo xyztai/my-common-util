@@ -797,7 +797,19 @@ public class AgController {
                 }
             }
             if(!CollectionUtils.isEmpty(res) && !"全部".equals(name)) {
-                res = res.stream().filter(f -> f.getName().endsWith(name)).collect(Collectors.toList());
+                List<String> excludeNames = new ArrayList<>();
+                if(Arrays.asList("A", "AH").contains(name)) {
+                    if("A".equals(name)) {
+                        excludeNames.addAll(Arrays.asList("恒生科技", "纳斯达克100", "华宝油气C"));
+                    }
+
+                    if("AH".equals(name)) {
+                        excludeNames.addAll(Arrays.asList("纳斯达克100", "华宝油气C"));
+                    }
+                    res = res.stream().filter(f -> !excludeNames.stream().anyMatch(x -> f.getName().endsWith(x))).collect(Collectors.toList());
+                } else {
+                    res = res.stream().filter(f -> f.getName().endsWith(name)).collect(Collectors.toList());
+                }
             }
             return RestGeneralResponse.of(res.stream().filter(f -> !StringUtils.isEmpty(f.getSellOper()) || !StringUtils.isEmpty(f.getBuyOper()))
                     .collect(Collectors.toList()));
