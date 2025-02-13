@@ -110,7 +110,7 @@ public class AgController {
     private ApplicationContext applicationContext;
 
     @Autowired
-    private DataCalcMapper dataCalc;
+    private DataCalcMapper dataCalcMapper;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -197,10 +197,10 @@ public class AgController {
     @GetMapping("/industry")
     public BaseResponse getIndustryHistoryData() {
         Map<String, Object> resMap = new LinkedHashMap<>();
-        List<String> buyInfos = dataCalc.getBuyInfo();
+        List<String> buyInfos = dataCalcMapper.getBuyInfo();
         resMap.put("todayBuyInfosSize", CollectionUtils.isEmpty(buyInfos) ? 0 : buyInfos.size());
         resMap.put("todayBuyInfos", buyInfos);
-        List<String> historyBuyRatioInfos = dataCalc.getHistoryBuyRatio();
+        List<String> historyBuyRatioInfos = dataCalcMapper.getHistoryBuyRatio();
         resMap.put("historyBuyRatioInfosSize", CollectionUtils.isEmpty(historyBuyRatioInfos) ? 0 : historyBuyRatioInfos.size());
         resMap.put("historyBuyRatioInfos", historyBuyRatioInfos);
         return RestGeneralResponse.of(resMap);
@@ -270,7 +270,7 @@ public class AgController {
             // expma_5: round((t.close_price - t3.`expma_5`)*2.0/(5.0+1) + t3.`expma_5`, 6) clac_expma_5
             // expma_37: round((t.close_price - t3.`expma_37`)*2.0/(37.0+1) + t3.`expma_37`, 6) clac_expma_37
             List<String> names = agIndustryCalcBOList.stream().map(AgIndustryCalcBO::getName).distinct().collect(Collectors.toList());
-            List<AgIndustryCalcBO> agIndustryCalcBOs = dataCalc.getLastestIndustryData();
+            List<AgIndustryCalcBO> agIndustryCalcBOs = dataCalcMapper.getLastestIndustryData();
             for(String name : names) {
                 List<AgIndustryCalcBO> tmpList = agIndustryCalcBOList.stream().filter(f -> name.equals(f.getName()))
                         .sorted(Comparator.comparing(AgIndustryCalcBO::getTime)).collect(Collectors.toList());
@@ -317,13 +317,13 @@ public class AgController {
             log.error("", ex.getMessage(), ex);
             ex.printStackTrace();
         }
-        todoList.forEach(f -> dataCalc.delIndustryCalc(f.getType(), f.getTime()));
-        todoList.forEach(f -> dataCalc.saveIndustryCalc(f));
+        todoList.forEach(f -> dataCalcMapper.delIndustryCalc(f.getType(), f.getTime()));
+        todoList.forEach(f -> dataCalcMapper.saveIndustryCalc(f));
         Map<String, Object> resMap = new LinkedHashMap<>();
         resMap.put("insertSize", todoList.size());
-        List<String> buyInfos = dataCalc.getBuyInfo();
+        List<String> buyInfos = dataCalcMapper.getBuyInfo();
         resMap.put("todayBuyInfos", buyInfos);
-        List<String> historyBuyRatioInfos = dataCalc.getHistoryBuyRatio();
+        List<String> historyBuyRatioInfos = dataCalcMapper.getHistoryBuyRatio();
         resMap.put("historyBuyRatioInfos", historyBuyRatioInfos);
         return RestGeneralResponse.of(resMap);
     }
@@ -462,7 +462,7 @@ public class AgController {
     public BaseResponse remove(@CurrentUser UserBase userBase, @PathVariable("time") String time) {
         log.info("userBase: {}", userBase);
         log.info("remove-time:{}", time);
-        dataCalc.deleteCP(time);
+        dataCalcMapper.deleteCP(time);
         calc(time);
         return RestGeneralResponse.of("删除完成");
     }
@@ -472,7 +472,7 @@ public class AgController {
     @GetMapping("/getExpectData/{type}")
     public BaseResponse getExpectData(@PathVariable("type") String type) {
         log.info("getExpectData: type = {}", type);
-        List<AgExpectDataBO> bos = dataCalc.getExpectData(type);
+        List<AgExpectDataBO> bos = dataCalcMapper.getExpectData(type);
         if(CollectionUtils.isEmpty(bos)) {
             return RestGeneralResponse.of("无期望数据，无法预测");
         }
@@ -526,7 +526,7 @@ public class AgController {
     @ApiOperation(value = "查询当前使用的参数值")
     @GetMapping("/para")
     public BaseResponse queryPara() {
-        return RestGeneralResponse.of(dataCalc.queryPara());
+        return RestGeneralResponse.of(dataCalcMapper.queryPara());
     }
 
     @ApiOperation(value = "更新当前使用的参数值", notes = "根据策略，得到指定类型的交易结果")
@@ -545,8 +545,8 @@ public class AgController {
             dataCalc.updatePara(bo);
         }
         */
-        List<AgParaBO> maxParas = dataCalc.queryMaxPara();
-        maxParas.forEach(f -> dataCalc.updatePara(f));
+        List<AgParaBO> maxParas = dataCalcMapper.queryMaxPara();
+        maxParas.forEach(f -> dataCalcMapper.updatePara(f));
         log.info("updatePara end");
         return queryPara();
     }
@@ -560,10 +560,10 @@ public class AgController {
     @Transactional
     public BaseResponse genDailyParaAndHistoryExpect() {
         log.info("genDailyParaAndHistoryExpect begin");
-        dataCalc.deleteDailyPara();
-        dataCalc.saveDailyPara();
-        dataCalc.deleteHistoryExpect();
-        dataCalc.insertHistoryExpect();
+        dataCalcMapper.deleteDailyPara();
+        dataCalcMapper.saveDailyPara();
+        dataCalcMapper.deleteHistoryExpect();
+        dataCalcMapper.insertHistoryExpect();
         log.info("genDailyParaAndHistoryExpect end");
         return BaseResponse.OK;
     }
@@ -573,7 +573,7 @@ public class AgController {
     @ApiImplicitParam(name = "time", value = "日期", required = true, dataType = "String")
     @GetMapping("/data/cp/{time}")
     public BaseResponse queryCP(@PathVariable("time") String time) {
-        List<AgClosePriceBO> bos = dataCalc.queryCP(time);
+        List<AgClosePriceBO> bos = dataCalcMapper.queryCP(time);
 
         Map<String, Double> retMap = new LinkedHashMap<>();
         if(!CollectionUtils.isEmpty(bos)) {
@@ -588,7 +588,7 @@ public class AgController {
     @ApiOperation(value = "统计每天有多少expma数据", notes = "结果按照日期倒排")
     @GetMapping("/data/cnt")
     public BaseResponse queryDataCnt() {
-        List<AgDataCntBO> bos = dataCalc.queryDataCnt();
+        List<AgDataCntBO> bos = dataCalcMapper.queryDataCnt();
 
         return RestGeneralResponse.of(bos);
     }
@@ -623,7 +623,7 @@ public class AgController {
     public BaseResponse queryExpmaCalc(@PathVariable("time") String time) {
         log.info("queryExpmaCalc: time={}", time);
         List<AgDataCalcBO> calcBos = getDataCalc(time);
-        List<AgClosePriceBO> cpBos = dataCalc.queryCP(time);
+        List<AgClosePriceBO> cpBos = dataCalcMapper.queryCP(time);
         if(!CollectionUtils.isEmpty(calcBos) && !CollectionUtils.isEmpty(cpBos)) {
             for(AgDataCalcBO bo : calcBos) {
                 Optional<AgClosePriceBO> tmp = cpBos.stream().filter(f -> f.getName().equals(bo.getName())).findAny();
@@ -634,7 +634,7 @@ public class AgController {
     }
 
     private List<AgDataCalcBO> getDataCalc(String time) {
-        return dataCalc.queryDataCalc(time);
+        return dataCalcMapper.queryDataCalc(time);
     }
 
     @ApiOperation(value = "获取接下来的操作，每个操作只会执行一次", notes = "需要给出波动值")
@@ -644,15 +644,15 @@ public class AgController {
     public BaseResponse expectHard2(@PathVariable("change") Double change) {
         String time = "9999-99-99";
         log.info("expectHard: time={}, change={}", time, change);
-        if(dataCalc.getMaxTime().compareTo(time) >= 0) {
+        if(dataCalcMapper.getMaxTime().compareTo(time) >= 0) {
             return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
         }
 
-        List<AgClosePriceBO> agClosePriceBOList = dataCalc.getExpectCP(time, change);
+        List<AgClosePriceBO> agClosePriceBOList = dataCalcMapper.getExpectCP(time, change);
         if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
             agClosePriceBOList.forEach(
                     f -> {
-                        dataCalc.insertCP(f);
+                        dataCalcMapper.insertCP(f);
                     }
             );
 
@@ -660,15 +660,39 @@ public class AgController {
             BaseResponse response = queryHardOper2();
 
             // 测试结束，就删除掉
-            dataCalc.deleteCP(time);
-            dataCalc.deleteDataCalc(time);
+            dataCalcMapper.deleteCP(time);
+            dataCalcMapper.deleteDataCalc(time);
             return response;
         } else {
             return RestGeneralResponse.of("无数据");
         }
     }
 
-    @ApiOperation(value = "获取接下来的操作，每个操作只会执行一次", notes = "需要给出波动值")
+
+    @ApiOperation(value = "获取因子", notes = "默认值为1，即只看历史极值")
+    @ApiImplicitParam(name = "change", value = "波动值", required = true, dataType = "Double")
+    @GetMapping("/get-factor")
+    @Transactional
+    public BaseResponse getFactor(@PathVariable("name") String name, @PathVariable("change") Double change, @PathVariable("change2") Double change2, @PathVariable("change3") Double change3) {
+        List<String> factors = dataCalcMapper.getFactor();
+        log.info("getFactor={}", JSON.toJSON(factors));
+        return RestGeneralResponse.of(factors);
+    }
+
+
+    @ApiOperation(value = "修改因子", notes = "默认值为1，即只看历史极值")
+    @GetMapping("/update-factor/${buyFactor}/{sellFactor}")
+    @Transactional
+    public BaseResponse updateFactor(
+            @PathVariable("buyFactor") String buyFactor
+            , @PathVariable("sellFactor") String sellFactor) {
+        dataCalcMapper.updateFactor(buyFactor, sellFactor);
+        log.info("updateFactor...");
+        return RestGeneralResponse.OK;
+    }
+
+
+        @ApiOperation(value = "获取接下来的操作，每个操作只会执行一次", notes = "需要给出波动值")
     @ApiImplicitParam(name = "change", value = "波动值", required = true, dataType = "Double")
     @GetMapping("/expect/hard2/{name}/{change}/{change2}/{change3}")
     @Transactional
@@ -678,7 +702,7 @@ public class AgController {
         if(change2 == null) change2 = 0D;
         if(change3 == null) change3 = 0D;
         log.info("expectHardType2: time={}, change={}, change2={}, change3={}", time, change, change2, change3);
-        if(dataCalc.getMaxTime().compareTo(time) >= 0) {
+        if(dataCalcMapper.getMaxTime().compareTo(time) >= 0) {
             return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
         }
 
@@ -693,11 +717,11 @@ public class AgController {
             // return RestGeneralResponse.of(cacheRes);
         } else {
             time = "9999-99-01";
-            List<AgClosePriceBO> agClosePriceBOList = dataCalc.getExpectCP(time, change);
+            List<AgClosePriceBO> agClosePriceBOList = dataCalcMapper.getExpectCP(time, change);
             if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
                 agClosePriceBOList.forEach(
                         f -> {
-                            dataCalc.insertCP(f);
+                            dataCalcMapper.insertCP(f);
                         }
                 );
                 calc(time);
@@ -711,22 +735,22 @@ public class AgController {
             } else {
                 change = 0D;
             }*/
-            agClosePriceBOList = dataCalc.getExpectCP(time, change2);
+            agClosePriceBOList = dataCalcMapper.getExpectCP(time, change2);
             if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
                 agClosePriceBOList.forEach(
                         f -> {
-                            dataCalc.insertCP(f);
+                            dataCalcMapper.insertCP(f);
                         }
                 );
                 calc(time);
             }
 
             time = "9999-99-03";
-            agClosePriceBOList = dataCalc.getExpectCP(time, change3);
+            agClosePriceBOList = dataCalcMapper.getExpectCP(time, change3);
             if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
                 agClosePriceBOList.forEach(
                         f -> {
-                            dataCalc.insertCP(f);
+                            dataCalcMapper.insertCP(f);
                         }
                 );
                 calc(time);
@@ -736,8 +760,8 @@ public class AgController {
 
             // 测试结束，就删除掉
             Stream.of("9999-99-01", "9999-99-02", "9999-99-03").forEach(t -> {
-                dataCalc.deleteCP(t);
-                dataCalc.deleteDataCalc(t);
+                dataCalcMapper.deleteCP(t);
+                dataCalcMapper.deleteDataCalc(t);
             });
 
             myCaffeineCache.put(key, res);
@@ -825,15 +849,15 @@ public class AgController {
     public BaseResponse expectHard(@PathVariable("change") Double change) {
         String time = "9999-99-99";
         log.info("expectHard: time={}, change={}", time, change);
-        if(dataCalc.getMaxTime().compareTo(time) >= 0) {
+        if(dataCalcMapper.getMaxTime().compareTo(time) >= 0) {
             return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
         }
 
-        List<AgClosePriceBO> agClosePriceBOList = dataCalc.getExpectCP(time, change);
+        List<AgClosePriceBO> agClosePriceBOList = dataCalcMapper.getExpectCP(time, change);
         if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
             agClosePriceBOList.forEach(
                     f -> {
-                        dataCalc.insertCP(f);
+                        dataCalcMapper.insertCP(f);
                     }
             );
 
@@ -841,8 +865,8 @@ public class AgController {
             BaseResponse response = queryHardOper();
 
             // 测试结束，就删除掉
-            dataCalc.deleteCP(time);
-            dataCalc.deleteDataCalc(time);
+            dataCalcMapper.deleteCP(time);
+            dataCalcMapper.deleteDataCalc(time);
             return response;
         } else {
             return RestGeneralResponse.of("无数据");
@@ -856,15 +880,15 @@ public class AgController {
     public BaseResponse expectSimple(@PathVariable("change") Double change) {
         String time = "9999-99-99";
         log.info("expectSimple: time={}, change={}", time, change);
-        if(dataCalc.getMaxTime().compareTo(time) >= 0) {
+        if(dataCalcMapper.getMaxTime().compareTo(time) >= 0) {
             return RestGeneralResponse.of(String.format("已存在日期大于或等于 %s 的数据，无需预测~", time));
         }
 
-        List<AgClosePriceBO> agClosePriceBOList = dataCalc.getExpectCP(time, change);
+        List<AgClosePriceBO> agClosePriceBOList = dataCalcMapper.getExpectCP(time, change);
         if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
             agClosePriceBOList.forEach(
                     f -> {
-                        dataCalc.insertCP(f);
+                        dataCalcMapper.insertCP(f);
                     }
             );
 
@@ -872,8 +896,8 @@ public class AgController {
             BaseResponse response = querySimpleOper();
 
             // 测试结束，就删除掉
-            dataCalc.deleteCP(time);
-            dataCalc.deleteDataCalc(time);
+            dataCalcMapper.deleteCP(time);
+            dataCalcMapper.deleteDataCalc(time);
             return response;
         } else {
             return RestGeneralResponse.of("无数据");
@@ -887,8 +911,8 @@ public class AgController {
             agClosePriceBOList.forEach(
                     f -> {
                         // 先删后插
-                        dataCalc.deleteOneCP(f.getTime(), f.getType());
-                        dataCalc.insertCP(f);
+                        dataCalcMapper.deleteOneCP(f.getTime(), f.getType());
+                        dataCalcMapper.insertCP(f);
                     }
             );
         }
@@ -906,8 +930,8 @@ public class AgController {
             agClosePriceBOList.forEach(
                     f -> {
                         // 先删后插
-                        dataCalc.deleteOneCP(f.getTime(), f.getType());
-                        dataCalc.insertCP(f);
+                        dataCalcMapper.deleteOneCP(f.getTime(), f.getType());
+                        dataCalcMapper.insertCP(f);
                     }
             );
 
@@ -920,19 +944,19 @@ public class AgController {
 
     private void calc(String time) {
         // 删掉比插入的数据时间大的所有数据
-        dataCalc.deleteDataCalcAfter(time);
+        dataCalcMapper.deleteDataCalcAfter(time);
 
         // 重新计算后续所有的数据
-        List<String> times = dataCalc.getUnCalcTimes();
+        List<String> times = dataCalcMapper.getUnCalcTimes();
 
         log.info("times:{}", times);
-        times.stream().sorted().forEach(dataCalc::insertDataCalc);
+        times.stream().sorted().forEach(dataCalcMapper::insertDataCalc);
     }
 
     @GetMapping("/oper/hard")
     public BaseResponse queryHardOper() {
         log.info("queryHardOper.");
-        List<AgOper> opers = dataCalc.querySimpleOper();
+        List<AgOper> opers = dataCalcMapper.querySimpleOper();
         if(CollectionUtils.isEmpty(opers)) {
             return RestGeneralResponse.of("无操作");
         }
@@ -979,7 +1003,7 @@ public class AgController {
 
     private List<AgOper> getHardOper2() {
         log.info("getHardOper2.");
-        List<AgOper> opers = dataCalc.querySimpleOper();
+        List<AgOper> opers = dataCalcMapper.querySimpleOper();
 
         if(CollectionUtils.isEmpty(opers)) {
             return new ArrayList<>();
@@ -1030,7 +1054,7 @@ public class AgController {
     @GetMapping("/oper/simple")
     public BaseResponse querySimpleOper() {
         log.info("querySimpleOper.");
-        List<AgOper> opers = dataCalc.querySimpleOper();
+        List<AgOper> opers = dataCalcMapper.querySimpleOper();
         if(CollectionUtils.isEmpty(opers)) {
             return RestGeneralResponse.of("无操作");
         }

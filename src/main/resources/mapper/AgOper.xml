@@ -572,4 +572,16 @@
         where tt.time_rn = 1
     </select>
 
+    <select id="getFactor" resultType="string">
+        select distinct buy_factor from t_para
+        union all
+        select distinct sell_factor from t_para
+    </select>
+
+    <update id="updateFactor">
+        update t_para
+        set buy_factor = ${buyFactor},
+            sell_factor = ${sellFactor}
+    </update>
+
 </mapper>

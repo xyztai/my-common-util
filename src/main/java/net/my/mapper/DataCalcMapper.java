@@ -57,4 +57,6 @@ public interface DataCalcMapper {
     List<String> getBuyInfo();
     List<String> getHistoryBuyRatio();
     List<AgIndustryCalcBO> getLastestIndustryData();
+    List<String> getFactor();
+    void updateFactor(@Param("buyFactor") String buyFactor, @Param("sellFactor") String sellFactor);
 }
