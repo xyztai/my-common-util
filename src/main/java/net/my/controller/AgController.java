@@ -685,6 +685,7 @@ public class AgController {
             @PathVariable("buyFactor") String buyFactor
             , @PathVariable("sellFactor") String sellFactor) {
         dataCalcMapper.updateFactor(buyFactor, sellFactor);
+        myCaffeineCache.invalidateAll();
         log.info("updateFactor...");
         return RestGeneralResponse.OK;
     }

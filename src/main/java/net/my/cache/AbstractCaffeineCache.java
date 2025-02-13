@@ -1,7 +1,6 @@
 package net.my.cache;
 
 import com.github.benmanes.caffeine.cache.LoadingCache;
-import sun.rmi.server.LoaderHandler;
 
 /**
  * @Author tai
@@ -10,6 +9,11 @@ import sun.rmi.server.LoaderHandler;
 public abstract class AbstractCaffeineCache<T> {
     protected LoadingCache<String, T> loadingCache;
     abstract LoadingCache<String, T> createLoadingCache();
+
+    public void invalidateAll() {
+        loadingCache.invalidateAll();
+    }
+
     public boolean put(String key, T value) {
         if(loadingCache == null) {
             loadingCache = createLoadingCache();
