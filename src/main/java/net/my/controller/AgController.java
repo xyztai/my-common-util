@@ -673,7 +673,7 @@ public class AgController {
     @ApiImplicitParam(name = "change", value = "波动值", required = true, dataType = "Double")
     @GetMapping("/get-factor")
     @Transactional
-    public BaseResponse getFactor(@PathVariable("name") String name, @PathVariable("change") Double change, @PathVariable("change2") Double change2, @PathVariable("change3") Double change3) {
+    public BaseResponse getFactor() {
         List<String> factors = dataCalcMapper.getFactor();
         log.info("getFactor={}", JSON.toJSON(factors));
         return RestGeneralResponse.of(factors);
