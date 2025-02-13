@@ -679,7 +679,7 @@ public class AgController {
 
 
     @ApiOperation(value = "修改因子", notes = "默认值为1，即只看历史极值")
-    @GetMapping("/update-factor/${buyFactor}/{sellFactor}")
+    @GetMapping("/update-factor/${buyFactor}/${sellFactor}")
     @Transactional
     public BaseResponse updateFactor(
             @PathVariable("buyFactor") String buyFactor
