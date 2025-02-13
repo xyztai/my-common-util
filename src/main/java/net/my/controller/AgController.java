@@ -670,9 +670,7 @@ public class AgController {
 
 
     @ApiOperation(value = "获取因子", notes = "默认值为1，即只看历史极值")
-    @ApiImplicitParam(name = "change", value = "波动值", required = true, dataType = "Double")
     @GetMapping("/get-factor")
-    @Transactional
     public BaseResponse getFactor() {
         List<String> factors = dataCalcMapper.getFactor();
         log.info("getFactor={}", JSON.toJSON(factors));
