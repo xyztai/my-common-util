@@ -34,6 +34,9 @@ public class AgClosePriceDTO {
     private Double ndsdCP;
     private Double ymkdCP;
     private Double tqlyCP;
+    private Double bjCP;
+    private Double mtCP;
+    private Double yycxCP;
 
     public AgClosePriceDTO setValue(String type, Double value) {
         switch (type) {
@@ -94,8 +97,14 @@ public class AgClosePriceDTO {
             case "ymkd":
                 this.setYmkdCP(value);
                 break;
-            case "tqly":
-                this.setTqlyCP(value);
+            case "bj":
+                this.setBjCP(value);
+                break;
+            case "mt":
+                this.setMtCP(value);
+                break;
+            case "yycx":
+                this.setYycxCP(value);
                 break;
             default:
                 break;
@@ -125,6 +134,9 @@ public class AgClosePriceDTO {
         list.add(AgClosePriceBO.builder().time(time).type("ndsd").closePrice(ndsdCP).build());
         list.add(AgClosePriceBO.builder().time(time).type("ymkd").closePrice(ymkdCP).build());
         list.add(AgClosePriceBO.builder().time(time).type("tqly").closePrice(tqlyCP).build());
+        list.add(AgClosePriceBO.builder().time(time).type("bj").closePrice(bjCP).build());
+        list.add(AgClosePriceBO.builder().time(time).type("mt").closePrice(mtCP).build());
+        list.add(AgClosePriceBO.builder().time(time).type("yycx").closePrice(yycxCP).build());
 
         return list;
     }

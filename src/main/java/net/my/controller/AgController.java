@@ -80,6 +80,9 @@ public class AgController {
         eastmoneyMap.put("gfcy", "2.931151"); // 光伏产业
         eastmoneyMap.put("ktjg", "2.930875"); // 空天军工
         eastmoneyMap.put("rjzs", "2.H30202"); // 软件指数
+        eastmoneyMap.put("bj", "0.399997"); // 中证白酒
+        eastmoneyMap.put("mt", "0.399998"); // 中证煤炭
+        eastmoneyMap.put("yycx", "2.931484"); // 医药创新
 
         eastmoneyHbyqCMap.put("hbyqC", "007844.OF");
     }
