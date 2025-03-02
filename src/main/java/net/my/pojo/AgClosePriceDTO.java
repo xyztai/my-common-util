@@ -38,7 +38,7 @@ public class AgClosePriceDTO {
     private Double mtCP;
     private Double yycxCP;
 
-    public AgClosePriceDTO setValue(String type, Double value) {
+    public void setValue(String type, Double value) {
         switch (type) {
             case "sz50":
                 this.setSz50CP(value);
@@ -109,7 +109,6 @@ public class AgClosePriceDTO {
             default:
                 break;
         }
-        return this;
     }
 
     public List<AgClosePriceBO> toBO() {
