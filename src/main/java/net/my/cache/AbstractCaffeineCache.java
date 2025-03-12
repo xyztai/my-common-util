@@ -11,7 +11,9 @@ public abstract class AbstractCaffeineCache<T> {
     abstract LoadingCache<String, T> createLoadingCache();
 
     public void invalidateAll() {
-        loadingCache.invalidateAll();
+        if(loadingCache != null) {
+            loadingCache.invalidateAll();
+        }
     }
 
     public boolean put(String key, T value) {
