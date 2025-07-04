@@ -694,7 +694,7 @@ public class AgController {
     }
 
 
-    @ApiOperation(value = "获取接下来的操作，每个操作只会执行一次", notes = "需要给出波动值")
+        @ApiOperation(value = "获取接下来的操作，每个操作只会执行一次", notes = "需要给出波动值")
     @ApiImplicitParam(name = "change", value = "波动值", required = true, dataType = "Double")
     @GetMapping("/expect/hard2/{name}/{change}/{change2}/{change3}")
     @Transactional
