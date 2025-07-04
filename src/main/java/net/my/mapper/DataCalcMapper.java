@@ -18,6 +18,8 @@ public interface DataCalcMapper {
 
     int insertCP(AgClosePriceBO bos);
 
+    String queryMaxTime(String time);
+
     List<AgClosePriceBO> queryCP(String time);
 
     List<AgDataCalcBO> queryDataCalc(String time);

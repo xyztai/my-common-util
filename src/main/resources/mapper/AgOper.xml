@@ -158,6 +158,14 @@
 ]]>
     </select>
 
+    <select id="queryMaxTime" resultType="string">
+<![CDATA[
+        select max(time)
+        from t_raw_close_price
+        where time <= #{time}
+]]>
+    </select>
+
     <select id="queryCP" resultMap="queryCPMap">
         select t2.id, t1.time, t1.type, t2.name, t1.close_price
         from t_raw_close_price t1, t_type t2

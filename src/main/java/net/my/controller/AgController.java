@@ -625,6 +625,12 @@ public class AgController {
     @GetMapping("/data/expma/{time}")
     public BaseResponse queryExpmaCalc(@PathVariable("time") String time) {
         log.info("queryExpmaCalc: time={}", time);
+        time = dataCalcMapper.queryMaxTime(time);
+        log.info("queryExpmaCalc: maxTime={}", time);
+        if(StringUtils.isEmpty(time)) {
+            return RestGeneralResponse.OK;
+        }
+        
         List<AgDataCalcBO> calcBos = getDataCalc(time);
         List<AgClosePriceBO> cpBos = dataCalcMapper.queryCP(time);
         if(!CollectionUtils.isEmpty(calcBos) && !CollectionUtils.isEmpty(cpBos)) {
