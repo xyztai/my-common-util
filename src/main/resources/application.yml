@@ -16,7 +16,7 @@ management:
   endpoints:
     web:
       exposure:
-        include: 'prometheus, health, info'
+        include: 'health, info, metrics, prometheus'
       base-path: '/my' # Optional, defaults to /actuator
   metrics:
     web:
