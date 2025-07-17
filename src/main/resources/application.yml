@@ -9,3 +9,16 @@ mybatis:
 
 logging:
   config: classpath:logback-spring.xml
+
+management:
+  server:
+    port: 8081  # 设置Actuator端口为独立端口，例如8081
+  endpoints:
+    web:
+      exposure:
+        include: 'prometheus, health, info'
+      base-path: '/my' # Optional, defaults to /actuator
+  metrics:
+    web:
+      server:
+        auto-time-requests: true # Optional, automatically time web requests and expose metrics for them.
