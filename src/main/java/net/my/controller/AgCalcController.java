@@ -41,7 +41,7 @@ public class AgCalcController {
 
         Map<String, Object> resMap = new LinkedHashMap<>();
         resMap.put("buy", resMapBuy);
-        resMap.put("=== cp", cpD);
+        resMap.put("**** cp", cpD + " **********");
         resMap.put("sell", resMapSell);
         return RestGeneralResponse.of(resMap);
     }
