@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,24 +24,32 @@ public class AgCalcController {
 
     @GetMapping("/calc/{cp}")
     public BaseResponse getCalcData(@PathVariable("cp") String cp) {
-        Map<Double, Double> resMapBuy = new LinkedHashMap<>();
-        List<Double> buyRatioList = Arrays.asList(0.975, 0.98, 0.985, 0.99);
         Double cpD = Double.parseDouble(cp);
+
+        Map<Double, Double> resMapBuy = new LinkedHashMap<>();
+        List<Double> buyRatioList = Arrays.asList(0.975, 0.980, 0.985, 0.990);
         for(Double ratio : buyRatioList) {
-            resMapBuy.put(ratio, cpD * ratio);
+            resMapBuy.put(ratio, getRoundDouble(cpD * ratio));
         }
 
         Map<Double, Double> resMapSell = new LinkedHashMap<>();
-        List<Double> sellRatioList = Arrays.asList(1.01, 1.015, 1.02, 1.025);
+        List<Double> sellRatioList = Arrays.asList(1.010, 1.015, 1.020, 1.025);
         for(Double ratio : sellRatioList) {
-            resMapSell.put(ratio, cpD * ratio);
+            resMapSell.put(ratio, getRoundDouble(cpD * ratio));
         }
 
 
         Map<String, Object> resMap = new LinkedHashMap<>();
         resMap.put("buy", resMapBuy);
-        resMap.put("=====", "==========");
+        resMap.put("=== cp", cpD);
         resMap.put("sell", resMapSell);
         return RestGeneralResponse.of(resMap);
+    }
+
+    private Double getRoundDouble(Double dou) {
+        BigDecimal bd = new BigDecimal(Double.toString(dou));
+        bd = bd.setScale(4, RoundingMode.HALF_UP); // 保留四位小数，HALF_UP为四舍五入
+        double roundedNumber = bd.doubleValue();
+        return roundedNumber;
     }
 }
