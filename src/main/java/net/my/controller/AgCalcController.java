@@ -26,16 +26,16 @@ public class AgCalcController {
     public BaseResponse getCalcData(@PathVariable("cp") String cp) {
         Double cpD = Double.parseDouble(cp);
 
-        Map<Double, Double> resMapBuy = new LinkedHashMap<>();
-        List<Double> buyRatioList = Arrays.asList(0.975, 0.980, 0.985, 0.990);
-        for(Double ratio : buyRatioList) {
-            resMapBuy.put(ratio, getRoundDouble(cpD * ratio));
+        Map<String, Double> resMapBuy = new LinkedHashMap<>();
+        List<String> buyRatioList = Arrays.asList("0.975", "0.980", "0.985", "0.990");
+        for(String ratio : buyRatioList) {
+            resMapBuy.put(ratio, getRoundDouble(cpD * Double.parseDouble(ratio)));
         }
 
-        Map<Double, Double> resMapSell = new LinkedHashMap<>();
-        List<Double> sellRatioList = Arrays.asList(1.010, 1.015, 1.020, 1.025);
-        for(Double ratio : sellRatioList) {
-            resMapSell.put(ratio, getRoundDouble(cpD * ratio));
+        Map<String, Double> resMapSell = new LinkedHashMap<>();
+        List<String> sellRatioList = Arrays.asList("1.010", "1.015", "1.020", "1.025");
+        for(String ratio : sellRatioList) {
+            resMapSell.put(ratio, getRoundDouble(cpD * Double.parseDouble(ratio)));
         }
 
 
