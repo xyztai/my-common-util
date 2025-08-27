@@ -48,7 +48,7 @@ public class AgCalcController {
 
     private Double getRoundDouble(Double dou) {
         BigDecimal bd = new BigDecimal(Double.toString(dou));
-        bd = bd.setScale(4, RoundingMode.HALF_UP); // 保留四位小数，HALF_UP为四舍五入
+        bd = bd.setScale(3, RoundingMode.HALF_UP); // 保留四位小数，HALF_UP为四舍五入
         double roundedNumber = bd.doubleValue();
         return roundedNumber;
     }
