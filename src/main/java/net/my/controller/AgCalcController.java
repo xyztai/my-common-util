@@ -27,13 +27,13 @@ public class AgCalcController {
         Double cpD = Double.parseDouble(cp);
 
         Map<String, Double> resMapBuy = new LinkedHashMap<>();
-        List<String> buyRatioList = Arrays.asList("0.975", "0.980", "0.985", "0.990");
+        List<String> buyRatioList = Arrays.asList("0.970", "0.975", "0.980", "0.985", "0.990");
         for(String ratio : buyRatioList) {
             resMapBuy.put(ratio, getRoundDouble(cpD * Double.parseDouble(ratio)));
         }
 
         Map<String, Double> resMapSell = new LinkedHashMap<>();
-        List<String> sellRatioList = Arrays.asList("1.010", "1.015", "1.020", "1.025");
+        List<String> sellRatioList = Arrays.asList("1.010", "1.015", "1.020", "1.025", "1.030");
         for(String ratio : sellRatioList) {
             resMapSell.put(ratio, getRoundDouble(cpD * Double.parseDouble(ratio)));
         }
