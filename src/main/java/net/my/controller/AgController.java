@@ -388,7 +388,8 @@ public class AgController {
             headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36");
 
             log.info("url: {}, zqdm: {}", url, zqdm);
-            String res = restTemplate.getForObject(url, String.class, headers);
+//            String res = restTemplate.getForObject(url, String.class, headers);
+            String res = restTemplate.getForObject(url, String.class);
             assert res != null;
             log.info("url: {}, zqdm: {}, res: {}", url, zqdm, res);
             String data = JSON.parseObject(res).getString("data");
