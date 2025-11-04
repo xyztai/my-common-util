@@ -387,6 +387,7 @@ public class AgController {
             headers.set("Origin", "https://wap.eastmoney.com");
             headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36");
 
+            log.info("url: {}, zqdm: {}", url, zqdm);
             String res = restTemplate.getForObject(url, String.class, headers);
             assert res != null;
             log.info("url: {}, zqdm: {}, res: {}", url, zqdm, res);
