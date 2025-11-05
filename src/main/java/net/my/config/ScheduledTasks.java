@@ -64,10 +64,10 @@ public class ScheduledTasks {
         String formattedTime = beijingTime.format(formatter);
         log.info("time: {}", formattedTime);
         if(
-                        (formattedTime.compareTo("03:01:00") > 0 && formattedTime.compareTo("03:13:00") < 0) ||
-                        (formattedTime.compareTo("06:01:00") > 0 && formattedTime.compareTo("06:13:00") < 0) ||
-                        (formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:13:00") < 0) ||
-                        (formattedTime.compareTo("18:01:00") > 0 && formattedTime.compareTo("18:13:00") < 0)
+                        (formattedTime.compareTo("03:01:00") > 0 && formattedTime.compareTo("03:55:00") < 0) ||
+                        (formattedTime.compareTo("06:01:00") > 0 && formattedTime.compareTo("06:55:00") < 0) ||
+                        (formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:55:00") < 0) ||
+                        (formattedTime.compareTo("18:01:00") > 0 && formattedTime.compareTo("18:55:00") < 0)
         ) {
             log.info("time to execGetHistoryData");
             agController.getHistoryData(5);
