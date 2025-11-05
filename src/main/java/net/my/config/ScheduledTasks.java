@@ -50,7 +50,7 @@ public class ScheduledTasks {
     /**
      * 自动获取/更新历史上5天的cp数据
      */
-    @Scheduled(cron = "0 */30 * * * ?")
+    @Scheduled(cron = "0 */33 * * * ?")
     @Transactional
     public void execGetHistoryData() {
         log.info("execGetHistoryData begin");
