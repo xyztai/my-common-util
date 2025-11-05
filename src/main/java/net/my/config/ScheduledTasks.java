@@ -50,7 +50,7 @@ public class ScheduledTasks {
     /**
      * 自动获取/更新历史上5天的cp数据
      */
-    @Scheduled(cron = "0 */5 * * * ?")
+    @Scheduled(cron = "0 */30 * * * ?")
     @Transactional
     public void execGetHistoryData() {
         log.info("execGetHistoryData begin");
@@ -70,8 +70,8 @@ public class ScheduledTasks {
                         (formattedTime.compareTo("18:01:00") > 0 && formattedTime.compareTo("18:13:00") < 0)
         ) {
             log.info("time to execGetHistoryData");
-            agController.getHistoryData(5);
-            agController.getIndustryHistoryData(5);
+            agController.getHistoryData(10);
+//            agController.getIndustryHistoryData(5);
         } else {
             log.info("not time to execGetHistoryData");
         }
