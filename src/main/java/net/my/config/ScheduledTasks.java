@@ -70,7 +70,7 @@ public class ScheduledTasks {
                         (formattedTime.compareTo("18:01:00") > 0 && formattedTime.compareTo("18:13:00") < 0)
         ) {
             log.info("time to execGetHistoryData");
-            agController.getHistoryData(10);
+            agController.getHistoryData(5);
 //            agController.getIndustryHistoryData(5);
         } else {
             log.info("not time to execGetHistoryData");
