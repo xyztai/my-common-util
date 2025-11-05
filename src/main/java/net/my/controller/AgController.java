@@ -252,16 +252,17 @@ public class AgController {
 
                 log.info("url: {}, zqdm: {}, headers: {}", url, zqdm, JSON.toJSON(headers));
                 String res = "";
-                try {
-                    for(int i = 0; i < 50; i++) {
+                for(int i = 0; i < 50; i++) {
+                    try {
                         res = restTemplate.getForObject(url, String.class, headers);
                         if(!StringUtils.isEmpty(res)) {
                             break;
                         }
+                    } catch (Exception ex) {
+                        ;
                     }
-                } catch (Exception ex) {
-                    ;
                 }
+
                 assert res != null;
                 log.info("url: {}, zqdm: {}, res: {}", url, zqdm, res);
                 String data = JSON.parseObject(res).getString("data");
@@ -358,15 +359,15 @@ public class AgController {
             String url = String.format(URL_FORMAT, zqdm, days);
             log.info("url: {}, zqdm: {}, days: {}", url, zqdm, days);
             String res = "";
-            try {
-                for(int i = 0; i < 50; i++) {
+            for(int i = 0; i < 50; i++) {
+                try {
                     res = restTemplate.getForObject(url, String.class);
                     if(!StringUtils.isEmpty(res)) {
                         break;
                     }
+                } catch (Exception ex) {
+                    ;
                 }
-            } catch (Exception ex) {
-                ;
             }
             assert res != null;
             res = res.replaceAll("kline_dayqfq=", "");
@@ -411,15 +412,15 @@ public class AgController {
 
             log.info("url: {}, zqdm: {}", url, zqdm);
             String res = "";
-            try {
-                for(int i = 0; i < 50; i++) {
+            for(int i = 0; i < 50; i++) {
+                try {
                     res = restTemplate.getForObject(url, String.class, headers);
                     if(!StringUtils.isEmpty(res)) {
                         break;
                     }
+                } catch (Exception ex) {
+                    ;
                 }
-            } catch (Exception ex) {
-                ;
             }
 //            String res = restTemplate.getForObject(url, String.class);
             assert res != null;
@@ -458,15 +459,15 @@ public class AgController {
 
             log.info("url: {}, zqdm: {}, headers: {}", url, zqdm, JSON.toJSON(headers));
             String res = "";
-            try {
-                for(int i = 0; i < 50; i++) {
+            for(int i = 0; i < 50; i++) {
+                try {
                     res = restTemplate.getForObject(url, String.class, headers);
                     if(!StringUtils.isEmpty(res)) {
                         break;
                     }
+                } catch (Exception ex) {
+                    ;
                 }
-            } catch (Exception ex) {
-                ;
             }
             assert res != null;
             log.info("url: {}, zqdm: {}, res: {}", url, zqdm, res);
