@@ -252,7 +252,7 @@ public class AgController {
 
                 log.info("url: {}, zqdm: {}, headers: {}", url, zqdm, JSON.toJSON(headers));
                 String res = "";
-                for(int i = 0; i < 50; i++) {
+                for(int i = 0; i < 200; i++) {
                     try {
                         Thread.sleep(1000);
                         log.info("try num={}", i);
@@ -364,7 +364,7 @@ public class AgController {
             String url = String.format(URL_FORMAT, zqdm, days);
             log.info("url: {}, zqdm: {}, days: {}", url, zqdm, days);
             String res = "";
-            for(int i = 0; i < 50; i++) {
+            for(int i = 0; i < 200; i++) {
                 try {
                     Thread.sleep(1000);
                     log.info("try num={}", i);
@@ -423,7 +423,7 @@ public class AgController {
 
             log.info("url: {}, zqdm: {}", url, zqdm);
             String res = "";
-            for(int i = 0; i < 50; i++) {
+            for(int i = 0; i < 200; i++) {
                 try {
                     Thread.sleep(1000);
                     log.info("try num={}", i);
@@ -476,7 +476,7 @@ public class AgController {
 
             log.info("url: {}, zqdm: {}, headers: {}", url, zqdm, JSON.toJSON(headers));
             String res = "";
-            for(int i = 0; i < 50; i++) {
+            for(int i = 0; i < 200; i++) {
                 try {
                     Thread.sleep(1000);
                     log.info("try num={}", i);
