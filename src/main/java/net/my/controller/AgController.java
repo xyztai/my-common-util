@@ -254,8 +254,8 @@ public class AgController {
                 String res = "";
                 for(int i = 0; i < 200; i++) {
                     try {
-                        Thread.sleep(1000);
-                        log.info("try num={}", i);
+                        Thread.sleep(200);
+                        log.info("try num={}, url={}", i, url);
                         res = restTemplate.getForObject(url, String.class, headers);
                         if(!StringUtils.isEmpty(res)) {
                             break;
@@ -366,8 +366,8 @@ public class AgController {
             String res = "";
             for(int i = 0; i < 200; i++) {
                 try {
-                    Thread.sleep(1000);
-                    log.info("try num={}", i);
+                    Thread.sleep(200);
+                    log.info("try num={}, url={}", i, url);
                     res = restTemplate.getForObject(url, String.class);
                     if(!StringUtils.isEmpty(res)) {
                         break;
@@ -425,8 +425,8 @@ public class AgController {
             String res = "";
             for(int i = 0; i < 200; i++) {
                 try {
-                    Thread.sleep(1000);
-                    log.info("try num={}", i);
+                    Thread.sleep(200);
+                    log.info("try num={}, url={}", i, url);
                     res = restTemplate.getForObject(url, String.class, headers);
                     if(!StringUtils.isEmpty(res)) {
                         break;
@@ -478,8 +478,8 @@ public class AgController {
             String res = "";
             for(int i = 0; i < 200; i++) {
                 try {
-                    Thread.sleep(1000);
-                    log.info("try num={}", i);
+                    Thread.sleep(200);
+                    log.info("try num={}, url={}", i, url);
                     res = restTemplate.getForObject(url, String.class, headers);
                     if(!StringUtils.isEmpty(res)) {
                         break;
