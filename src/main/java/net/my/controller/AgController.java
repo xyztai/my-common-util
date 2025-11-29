@@ -255,7 +255,7 @@ public class AgController {
                 for(int i = 0; i < 200; i++) {
                     try {
                         Thread.sleep(200);
-                        log.info("try num={}, url={}", i, url);
+                        log.info("try num={}, zqdm={}, url={}", i, zqdm, url);
                         res = restTemplate.getForObject(url, String.class, headers);
                         if(!StringUtils.isEmpty(res)) {
                             break;
@@ -367,7 +367,7 @@ public class AgController {
             for(int i = 0; i < 200; i++) {
                 try {
                     Thread.sleep(200);
-                    log.info("try num={}, url={}", i, url);
+                    log.info("try num={}, zqdm={}, url={}", i, zqdm, url);
                     res = restTemplate.getForObject(url, String.class);
                     if(!StringUtils.isEmpty(res)) {
                         break;
@@ -426,7 +426,7 @@ public class AgController {
             for(int i = 0; i < 200; i++) {
                 try {
                     Thread.sleep(200);
-                    log.info("try num={}, url={}", i, url);
+                    log.info("try num={}, zqdm={}, url={}", i, zqdm, url);
                     res = restTemplate.getForObject(url, String.class, headers);
                     if(!StringUtils.isEmpty(res)) {
                         break;
@@ -479,7 +479,7 @@ public class AgController {
             for(int i = 0; i < 200; i++) {
                 try {
                     Thread.sleep(200);
-                    log.info("try num={}, url={}", i, url);
+                    log.info("try num={}, zqdm={}, url={}", i, zqdm, url);
                     res = restTemplate.getForObject(url, String.class, headers);
                     if(!StringUtils.isEmpty(res)) {
                         break;
