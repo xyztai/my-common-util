@@ -108,6 +108,7 @@ public class AgNewController {
 
         int startNum = 0;
         int stopNum = 5;
+        log.info("qqNodeList={}", JSON.toJSON(qqNodeList));
         while(stopNum < qqNodeList.size()) {
             List<QqNode> tmpNodes = qqNodeList.stream().skip(startNum).limit(stopNum).collect(Collectors.toList());
             log.info("tmpNodes={}", JSON.toJSON(tmpNodes));
