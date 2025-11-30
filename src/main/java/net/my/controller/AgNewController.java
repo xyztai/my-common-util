@@ -111,7 +111,7 @@ public class AgNewController {
 //        log.info("qqNodeList={}", JSON.toJSON(qqNodeList));
         while(startNum < qqNodeList.size()) {
             List<QqNode> tmpNodes = qqNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
-            log.info("tmpNodes={}", JSON.toJSON(tmpNodes));
+            log.info("tmpNodes.size={}", tmpNodes.size());
             dataCalcMapper.saveQqNodes(tmpNodes);
             startNum += stepNum;
         }
