@@ -604,8 +604,8 @@
         insert into t_qq_node(date, stockCode, open, last, high, low, volume, amount, exchangeRaw)
         values
         <foreach collection="list" item="item" separator=",">
-            (#{item.date}, #{item.stockCode}, #{item.open},
-            #{item.last}, #{item.high}, #{item.low}, #{item.volume}, #{item.amount}, #{item.exchangeRaw})
+            (#{item.date}, #{item.stockCode}, #{item.open}, #{item.last},
+            #{item.high}, #{item.low}, #{item.volume}, #{item.amount}, #{item.exchangeRaw})
         </foreach>
     </insert>
 
