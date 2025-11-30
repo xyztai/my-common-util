@@ -2,6 +2,7 @@ package net.my.config;
 
 import lombok.extern.slf4j.Slf4j;
 import net.my.controller.AgController;
+import net.my.controller.AgNewController;
 import net.my.mapper.DataCalcMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -24,6 +25,9 @@ public class ScheduledTasks {
 
     @Autowired
     private AgController agController;
+
+    @Autowired
+    private AgNewController agNewController;
 
     /**
      * 更新历史参数，以及历史预算数据
@@ -70,6 +74,7 @@ public class ScheduledTasks {
                         (formattedTime.compareTo("18:01:00") > 0 && formattedTime.compareTo("18:55:00") < 0)
         ) {
             log.info("time to execGetHistoryData");
+            agNewController.getHistoryData(5);
             agController.getHistoryData(5);
 //            agController.getIndustryHistoryData(5);
         } else {
