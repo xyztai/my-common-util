@@ -602,7 +602,7 @@
 
     <insert id="saveQqNodes" parameterType="java.util.List">
         INSERT IGNORE INTO t_qq_node(date, stockCode, open, last, high, low, volume, amount, exchangeRaw,
-        clac_expma_5, clac_expma_10, lac_expma_20, clac_expma_37, clac_expma_60)
+        clac_expma_5, clac_expma_10, clac_expma_20, clac_expma_37, clac_expma_60)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.date}, #{item.stockCode}, #{item.open}, #{item.last},
