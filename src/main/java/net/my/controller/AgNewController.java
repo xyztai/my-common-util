@@ -78,6 +78,7 @@ public class AgNewController {
     public BaseResponse getHistoryData(@PathVariable("days") Integer days) {
         List<AgClosePriceDTO> agClosePriceDTOs = new ArrayList<>();
         Map<String, QqNode> qqNodeMap = new LinkedHashMap<>();
+        List<QqNode> qqNodeList = new ArrayList<>();
         for(Map.Entry<String, String> entry : PROXY_FINANCE_QQ.entrySet()) {
             String zqdm = entry.getValue();
             String url = String.format(PROXY_FINANCE_QQ_URL_FORMAT, zqdm, days);
@@ -102,9 +103,18 @@ public class AgNewController {
             QqRes qqRes = JSON.parseObject(res, QqRes.class);
             qqRes.getData().getNodes().forEach(f -> f.setStockCode(entry.getKey()));
             qqNodeMap.put(entry.getKey(), qqRes.getData().getNodes().get(0));
+            qqNodeList.addAll(qqRes.getData().getNodes());
         }
 
-        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
+        int startNum = 0;
+        int stopNum = 5;
+        while(stopNum < qqNodeList.size()) {
+            List<QqNode> tmpNodes = qqNodeList.stream().skip(startNum).limit(stopNum).collect(Collectors.toList());
+            dataCalcMapper.saveQqNodes(tmpNodes);
+            startNum += stopNum;
+        }
+
+//        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
         return RestGeneralResponse.of(qqNodeMap);
     }
 
