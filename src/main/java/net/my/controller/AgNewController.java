@@ -126,18 +126,18 @@ public class AgNewController {
                             } else {
                                 // private double calcExpma(double step, double lastValue, double cp) {
                                 currNode.setExpma5(calcExpma(5.0, existsNode.getExpma5(), currNode.getLast()));
-                                currNode.setExpma10(calcExpma(5.0, existsNode.getExpma10(), currNode.getLast()));
-                                currNode.setExpma20(calcExpma(5.0, existsNode.getExpma20(), currNode.getLast()));
-                                currNode.setExpma37(calcExpma(5.0, existsNode.getExpma37(), currNode.getLast()));
-                                currNode.setExpma60(calcExpma(5.0, existsNode.getExpma60(), currNode.getLast()));
+                                currNode.setExpma10(calcExpma(10.0, existsNode.getExpma10(), currNode.getLast()));
+                                currNode.setExpma20(calcExpma(20.0, existsNode.getExpma20(), currNode.getLast()));
+                                currNode.setExpma37(calcExpma(37.0, existsNode.getExpma37(), currNode.getLast()));
+                                currNode.setExpma60(calcExpma(60.0, existsNode.getExpma60(), currNode.getLast()));
                             }
                         } else {
                             QqNode lastNode = tmpNodes.get(i - 1);
                             currNode.setExpma5(calcExpma(5.0, lastNode.getExpma5(), currNode.getLast()));
-                            currNode.setExpma10(calcExpma(5.0, lastNode.getExpma10(), currNode.getLast()));
-                            currNode.setExpma20(calcExpma(5.0, lastNode.getExpma20(), currNode.getLast()));
-                            currNode.setExpma37(calcExpma(5.0, lastNode.getExpma37(), currNode.getLast()));
-                            currNode.setExpma60(calcExpma(5.0, lastNode.getExpma60(), currNode.getLast()));
+                            currNode.setExpma10(calcExpma(10.0, lastNode.getExpma10(), currNode.getLast()));
+                            currNode.setExpma20(calcExpma(20.0, lastNode.getExpma20(), currNode.getLast()));
+                            currNode.setExpma37(calcExpma(37.0, lastNode.getExpma37(), currNode.getLast()));
+                            currNode.setExpma60(calcExpma(60.0, lastNode.getExpma60(), currNode.getLast()));
                         }
                     }
                     // 把最新的数据拿出来
