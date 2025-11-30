@@ -168,7 +168,9 @@ public class AgNewController {
         BigDecimal bigDecimalLastValue = BigDecimal.valueOf(lastValue);
         BigDecimal bigDecimalCp = BigDecimal.valueOf(cp);
         return bigDecimalLastValue.add(
-                bigDecimalCp.subtract(bigDecimalLastValue).multiply(new BigDecimal("2.0").divide(new BigDecimal(step + 1))))
+                bigDecimalCp.subtract(bigDecimalLastValue)
+                        .multiply(new BigDecimal("2.0"))
+                        .divide(new BigDecimal(step + 1)))
                 .doubleValue();
     }
 
