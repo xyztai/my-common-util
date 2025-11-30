@@ -107,13 +107,13 @@ public class AgNewController {
         }
 
         int startNum = 0;
-        int stopNum = 5;
+        int stepNum = 5;
         log.info("qqNodeList={}", JSON.toJSON(qqNodeList));
-        while(stopNum < qqNodeList.size()) {
-            List<QqNode> tmpNodes = qqNodeList.stream().skip(startNum).limit(stopNum).collect(Collectors.toList());
+        while(startNum < qqNodeList.size()) {
+            List<QqNode> tmpNodes = qqNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
             log.info("tmpNodes={}", JSON.toJSON(tmpNodes));
             dataCalcMapper.saveQqNodes(tmpNodes);
-            startNum += stopNum;
+            startNum += stepNum;
         }
 
 //        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
