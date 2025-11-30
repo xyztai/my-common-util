@@ -112,7 +112,6 @@ public class AgNewController {
                             .filter(f -> f.getDate().compareTo(existsNode.getDate()) > 0).collect(Collectors.toList());
                 }
 
-                List<QqNode> targetNodes = new ArrayList<>();
                 if(!CollectionUtils.isEmpty(tmpNodes)) {
                     for(int i = 0; i < tmpNodes.size(); i++) {
                         QqNode currNode = tmpNodes.get(i);
