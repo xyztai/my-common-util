@@ -607,7 +607,6 @@
             (#{item.date}, #{item.stockCode}, #{item.open}, #{item.last},
             #{item.high}, #{item.low}, #{item.volume}, #{item.amount}, #{item.exchangeRaw})
         </foreach>
-        on
     </insert>
 
 
