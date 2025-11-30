@@ -607,7 +607,7 @@
         <foreach collection="list" item="item" separator=",">
             (#{item.date}, #{item.stockCode}, #{item.open}, #{item.last},
             #{item.high}, #{item.low}, #{item.volume}, #{item.amount}, #{item.exchangeRaw},
-            #{item.expma5}, #{item.expma10}, #{item.expma20}, #{item.expma37}, #{item.expma60},
+            #{item.expma5}, #{item.expma10}, #{item.expma20}, #{item.expma37}, #{item.expma60}
             )
         </foreach>
     </insert>
