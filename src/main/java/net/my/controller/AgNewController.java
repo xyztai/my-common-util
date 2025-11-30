@@ -164,15 +164,16 @@ public class AgNewController {
     }
 
     private double calcExpma(double step, double lastValue, double cp) {
+        return (cp - lastValue) * 2.0 / (step + 1) + lastValue;
         // round((t.close_price - t3.`expma_5`)*2.0/(5.0+1) + t3.`expma_5`, 6)
-        BigDecimal bigDecimalLastValue = BigDecimal.valueOf(lastValue);
-        BigDecimal bigDecimalCp = BigDecimal.valueOf(cp);
-        return bigDecimalLastValue.add(
-                (bigDecimalCp.subtract(bigDecimalLastValue))
-                        .multiply(new BigDecimal(2.0))
-                        .divide(new BigDecimal(step + 1))
-        )
-                .doubleValue();
+//        BigDecimal bigDecimalLastValue = BigDecimal.valueOf(lastValue);
+//        BigDecimal bigDecimalCp = BigDecimal.valueOf(cp);
+//        return bigDecimalLastValue.add(
+//                (bigDecimalCp.subtract(bigDecimalLastValue))
+//                        .multiply(new BigDecimal(2.0))
+//                        .divide(new BigDecimal(step + 1))
+//        )
+//                .doubleValue();
     }
 
 
