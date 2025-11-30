@@ -63,5 +63,5 @@ public interface DataCalcMapper {
     List<String> getFactor();
     void updateFactor(@Param("buyFactor") String buyFactor, @Param("sellFactor") String sellFactor);
 
-    int saveQqNode(AgNewController.QqNode qqNode);
+    int saveQqNode(QqNode qqNode);
 }
