@@ -592,4 +592,11 @@
             sell_factor = ${sellFactor}
     </update>
 
+
+    <insert id="saveQqNode" parameterType="net.my.controller.AgNewController.QqNode">
+        insert into t_qq_node(date, stockCode, open, last, high, low, volume, amount, exchangeRaw)
+        values
+        (#{date}, #{stockCode}, #{open}, #{last}, #{high}, #{low}, #{volume}, #{amount}, #{exchangeRaw})
+    </insert>
+
 </mapper>

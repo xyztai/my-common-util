@@ -1,5 +1,6 @@
 package net.my.mapper;
 
+import net.my.controller.AgNewController;
 import net.my.pojo.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
@@ -61,4 +62,6 @@ public interface DataCalcMapper {
     List<AgIndustryCalcBO> getLastestIndustryData();
     List<String> getFactor();
     void updateFactor(@Param("buyFactor") String buyFactor, @Param("sellFactor") String sellFactor);
+
+    int saveQqNode(AgNewController.QqNode qqNode);
 }

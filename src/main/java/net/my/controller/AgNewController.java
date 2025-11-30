@@ -86,7 +86,7 @@ public class AgNewController {
             for(int i = 0; i < 200; i++) {
                 try {
                     Thread.sleep(200);
-                    log.info("try num={}, zqdm={}, url={}", i, zqdm, url);
+                    log.info("try num={}, stockCode={}, url={}", i, entry.getKey(), url);
                     res = restTemplate.getForObject(url, String.class);
                     if(!StringUtils.isEmpty(res)) {
                         break;
@@ -100,9 +100,11 @@ public class AgNewController {
             }
 
             QqRes qqRes = JSON.parseObject(res, QqRes.class);
+            qqRes.getData().getNodes().forEach(f -> f.setStockCode(entry.getKey()));
             qqNodeMap.put(entry.getKey(), qqRes.getData().getNodes().get(0));
         }
 
+        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
         return RestGeneralResponse.of(qqNodeMap);
     }
 
@@ -120,6 +122,7 @@ public class AgNewController {
 
     @Data
     public class QqNode{
+        private String stockCode;
         private String date;
         private Double open;
         private Double last;
