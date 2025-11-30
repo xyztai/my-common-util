@@ -615,7 +615,8 @@
 
     <select id="getMaxQqNode" resultType="net.my.pojo.QqNode">
         select date, stockCode, open, last, high, low, volume, amount, exchangeRaw,
-                clac_expma_5, clac_expma_10，clac_expma_20，clac_expma_37, clac_expma_60
+                clac_expma_5 expma5, clac_expma_10 expma10，
+                clac_expma_20 expma20，clac_expma_37 expma37, clac_expma_60 expma60
         from t_qq_node
         where stockCode = #{stockCode}
         order by date desc
