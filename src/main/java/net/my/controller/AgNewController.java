@@ -107,7 +107,7 @@ public class AgNewController {
         }
 
         int startNum = 0;
-        int stepNum = 6;
+        int stepNum = 100;
         log.info("qqNodeList={}", JSON.toJSON(qqNodeList));
         while(startNum < qqNodeList.size()) {
             List<QqNode> tmpNodes = qqNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
