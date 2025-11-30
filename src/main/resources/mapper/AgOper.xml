@@ -624,7 +624,6 @@
     </select>
 
     <select id="specialCare" resultType="net.my.pojo.SpecialCarePoJo">
-        <![CDATA[
         with tmp_a as (
             select stockCode, `date`, `last`, clac_expma_5, clac_expma_10, clac_expma_20, clac_expma_37, clac_expma_60
             , rank() over (PARTITION by stockCode order by `date` desc) rank_date
@@ -634,7 +633,7 @@
             , rank() over (PARTITION by stockCode order by clac_expma_60/clac_expma_5 desc) rank_60_5
             from t_qq_node
             <if test="time != null and time != ''">
-                where `date` <= #{time}
+                where `date` <![CDATA[ <= ]]> #{time}
             </if>
         ),
         tmp_b as (
@@ -666,7 +665,6 @@
             where t2.stockCode = t3.stockCode
         ) t5
         order by ratioB, ratioS
-        ]]>
     </select>
 
 </mapper>
