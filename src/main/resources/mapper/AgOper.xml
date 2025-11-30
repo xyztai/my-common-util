@@ -601,13 +601,26 @@
 
 
     <insert id="saveQqNodes" parameterType="java.util.List">
-        INSERT IGNORE INTO t_qq_node(date, stockCode, open, last, high, low, volume, amount, exchangeRaw)
+        INSERT IGNORE INTO t_qq_node(date, stockCode, open, last, high, low, volume, amount, exchangeRaw,
+        clac_expma_5, clac_expma_10，clac_expma_20，clac_expma_37, clac_expma_60)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.date}, #{item.stockCode}, #{item.open}, #{item.last},
-            #{item.high}, #{item.low}, #{item.volume}, #{item.amount}, #{item.exchangeRaw})
+            #{item.high}, #{item.low}, #{item.volume}, #{item.amount}, #{item.exchangeRaw},
+            #{item.expma5}, #{item.expma10}, #{item.expma20}, #{item.expma37}, #{item.expma60},
+            )
         </foreach>
     </insert>
+
+
+    <select id="getMaxQqNode" resultType="net.my.pojo.QqNode">
+        select date, stockCode, open, last, high, low, volume, amount, exchangeRaw,
+                clac_expma_5, clac_expma_10，clac_expma_20，clac_expma_37, clac_expma_60
+        from t_qq_node
+        where stockCode = #{stockCode}
+        order by date desc
+        limit 1
+    </select>
 
 
 </mapper>

@@ -12,6 +12,7 @@ import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
@@ -102,10 +103,48 @@ public class AgNewController {
 
             try {
                 QqRes qqRes = JSON.parseObject(res, QqRes.class);
-                qqRes.getData().getNodes().forEach(f -> f.setStockCode(entry.getKey()));
-                // 把最新的数据拿出来
-                qqNodeMap.put(entry.getKey(), qqRes.getData().getNodes().get(qqRes.getData().getNodes().size() - 1));
-                qqNodeList.addAll(qqRes.getData().getNodes());
+                List<QqNode> tmpNodes = qqRes.getData().getNodes().stream()
+                        .sorted(Comparator.comparing(QqNode::getDate)).collect(Collectors.toList());
+
+                QqNode existsNode = dataCalcMapper.getMaxQqNode(entry.getKey());
+                if(existsNode != null) {
+                    tmpNodes = tmpNodes.stream()
+                            .filter(f -> f.getDate().compareTo(existsNode.getDate()) > 0).collect(Collectors.toList());
+                }
+
+                List<QqNode> targetNodes = new ArrayList<>();
+                if(!CollectionUtils.isEmpty(tmpNodes)) {
+                    for(int i = 0; i < tmpNodes.size(); i++) {
+                        QqNode currNode = tmpNodes.get(i);
+                        currNode.setStockCode(entry.getKey());
+                        if(0 == i) {
+                            if(existsNode == null) {
+                                currNode.setExpma5(currNode.getLast());
+                                currNode.setExpma10(currNode.getLast());
+                                currNode.setExpma20(currNode.getLast());
+                                currNode.setExpma37(currNode.getLast());
+                                currNode.setExpma60(currNode.getLast());
+                            } else {
+                                // private double calcExpma(double step, double lastValue, double cp) {
+                                currNode.setExpma5(calcExpma(5.0, existsNode.getExpma5(), currNode.getLast()));
+                                currNode.setExpma10(calcExpma(5.0, existsNode.getExpma10(), currNode.getLast()));
+                                currNode.setExpma20(calcExpma(5.0, existsNode.getExpma20(), currNode.getLast()));
+                                currNode.setExpma37(calcExpma(5.0, existsNode.getExpma37(), currNode.getLast()));
+                                currNode.setExpma60(calcExpma(5.0, existsNode.getExpma60(), currNode.getLast()));
+                            }
+                        } else {
+                            QqNode lastNode = tmpNodes.get(i - 1);
+                            currNode.setExpma5(calcExpma(5.0, lastNode.getExpma5(), currNode.getLast()));
+                            currNode.setExpma10(calcExpma(5.0, lastNode.getExpma10(), currNode.getLast()));
+                            currNode.setExpma20(calcExpma(5.0, lastNode.getExpma20(), currNode.getLast()));
+                            currNode.setExpma37(calcExpma(5.0, lastNode.getExpma37(), currNode.getLast()));
+                            currNode.setExpma60(calcExpma(5.0, lastNode.getExpma60(), currNode.getLast()));
+                        }
+                    }
+                    // 把最新的数据拿出来
+                    qqNodeMap.put(entry.getKey(), tmpNodes.get(tmpNodes.size() - 1));
+                    qqNodeList.addAll(tmpNodes);
+                }
             } catch (Exception ex) {
                 log.error("{}", ex);
             }
@@ -124,6 +163,16 @@ public class AgNewController {
 //        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
         return RestGeneralResponse.of(qqNodeMap);
     }
+
+    private double calcExpma(double step, double lastValue, double cp) {
+        // round((t.close_price - t3.`expma_5`)*2.0/(5.0+1) + t3.`expma_5`, 6)
+        BigDecimal bigDecimalLastValue = BigDecimal.valueOf(lastValue);
+        BigDecimal bigDecimalCp = BigDecimal.valueOf(cp);
+        return bigDecimalLastValue.add(
+                bigDecimalCp.subtract(bigDecimalLastValue).multiply(new BigDecimal("2.0").divide(new BigDecimal(step + 1))))
+                .doubleValue();
+    }
+
 
     @Data
     public class QqRes{

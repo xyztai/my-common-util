@@ -14,4 +14,9 @@ public class QqNode{
     private Double volume;
     private Double amount;
     private Double exchangeRaw;
+    private Double expma5;
+    private Double expma10;
+    private Double expma20;
+    private Double expma37;
+    private Double expma60;
 }
