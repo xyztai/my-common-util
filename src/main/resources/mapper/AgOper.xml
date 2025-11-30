@@ -600,7 +600,7 @@
     </insert>
 
 
-    <insert id="saveQqNodes">
+    <insert id="saveQqNodes" parameterType="java.util.List">
         insert into t_qq_node(date, stockCode, open, last, high, low, volume, amount, exchangeRaw)
         values
         <foreach collection="qqNodes" item="item" separator=",">
