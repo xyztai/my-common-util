@@ -100,10 +100,15 @@ public class AgNewController {
                 continue;
             }
 
-            QqRes qqRes = JSON.parseObject(res, QqRes.class);
-            qqRes.getData().getNodes().forEach(f -> f.setStockCode(entry.getKey()));
-            qqNodeMap.put(entry.getKey(), qqRes.getData().getNodes().get(0));
-            qqNodeList.addAll(qqRes.getData().getNodes());
+            try {
+                QqRes qqRes = JSON.parseObject(res, QqRes.class);
+                qqRes.getData().getNodes().forEach(f -> f.setStockCode(entry.getKey()));
+                // 把最新的数据拿出来
+                qqNodeMap.put(entry.getKey(), qqRes.getData().getNodes().get(qqRes.getData().getNodes().size() - 1));
+                qqNodeList.addAll(qqRes.getData().getNodes());
+            } catch (Exception ex) {
+                log.error("{}", ex);
+            }
         }
 
         int startNum = 0;
