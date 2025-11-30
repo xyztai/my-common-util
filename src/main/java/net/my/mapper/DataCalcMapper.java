@@ -66,5 +66,5 @@ public interface DataCalcMapper {
     int saveQqNode(QqNode qqNode);
     int saveQqNodes(List<QqNode> qqNodes);
     QqNode getMaxQqNode(@Param("stockCode") String stockCode);
-    List<SpecialCarePoJo> specialCare();
+    List<SpecialCarePoJo> specialCare(@Param("time") String time);
 }

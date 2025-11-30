@@ -163,10 +163,10 @@ public class AgNewController {
         return RestGeneralResponse.of(qqNodeMap);
     }
 
-    @GetMapping("/special-care")
-    public BaseResponse specialCare() {
+    @GetMapping("/special-care/{time}")
+    public BaseResponse specialCare(@PathVariable("time") String time) {
         log.info("specialCare.");
-        List<SpecialCarePoJo> opers = dataCalcMapper.specialCare();
+        List<SpecialCarePoJo> opers = dataCalcMapper.specialCare(time);
 
         return RestGeneralResponse.of(opers);
     }
