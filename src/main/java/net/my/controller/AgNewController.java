@@ -45,12 +45,12 @@ public class AgNewController {
         PROXY_FINANCE_QQ.put("科创芯片EFT-588200", "sh588200");
         PROXY_FINANCE_QQ.put("煤炭ETF-515220", "sh515220");
         PROXY_FINANCE_QQ.put("有色金属ETF-512400", "sh512400");
-        PROXY_FINANCE_QQ.put("交通银行-601328", "sz601328");
-        PROXY_FINANCE_QQ.put("农业银行-601288", "sz601288");
-        PROXY_FINANCE_QQ.put("工商银行-601398", "sz601398");
-        PROXY_FINANCE_QQ.put("中国银行-601988", "sz601988");
-        PROXY_FINANCE_QQ.put("邮储银行-601658", "sz601658");
-        PROXY_FINANCE_QQ.put("京沪高铁-601816", "sz601816");
+        PROXY_FINANCE_QQ.put("交通银行-601328", "sh601328");
+        PROXY_FINANCE_QQ.put("农业银行-601288", "sh601288");
+        PROXY_FINANCE_QQ.put("工商银行-601398", "sh601398");
+        PROXY_FINANCE_QQ.put("中国银行-601988", "sh601988");
+        PROXY_FINANCE_QQ.put("邮储银行-601658", "sh601658");
+        PROXY_FINANCE_QQ.put("京沪高铁-601816", "sh601816");
     }
 
     @Autowired
