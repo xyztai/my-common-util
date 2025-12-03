@@ -678,4 +678,15 @@
         order by 1 desc
     </select>
 
+    <select id="selectExistedData" resultType="net.my.pojo.SpecialCarePoJo">
+        select stockCode, date, last, ratioB, ratioS
+        from t_qq_node_buy
+        where date = #{day}
+    </select>
+
+    <insert id="insertSpecialData" parameterType="net.my.pojo.SpecialCarePoJo">
+        insert into t_qq_node_buy(stockCode, date, last, ratioB, ratioS)
+        values (#{stockCode}, #{date}, #{last}, #{ratioB}, #{ratioS})
+    </insert>
+
 </mapper>

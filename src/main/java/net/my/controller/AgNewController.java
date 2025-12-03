@@ -199,10 +199,25 @@ public class AgNewController {
         List<String> times = dataCalcMapper.getLatestDates(Integer.parseInt(days));
         List<SpecialCarePoJo> res = new ArrayList<>();
         for(String time : times) {
-            List<SpecialCarePoJo> opers = dataCalcMapper.specialCare(time);
-            opers = opers.stream().filter(f -> f.getRatioB() < 0.15).collect(Collectors.toList());
-            if(!CollectionUtils.isEmpty(opers)) {
-                res.addAll(opers);
+            // 查询表是否有数据
+            List<SpecialCarePoJo> selectExistedData = dataCalcMapper.selectExistedData(time);
+            if(CollectionUtils.isEmpty(selectExistedData)) {
+                // 没有数据则重新计算
+                List<SpecialCarePoJo> opers = dataCalcMapper.specialCare(time);
+                opers = opers.stream().filter(f -> f.getRatioB() < 0.15).collect(Collectors.toList());
+                if(!CollectionUtils.isEmpty(opers)) {
+                    res.addAll(opers);
+                    res.forEach(f -> dataCalcMapper.insertSpecialData(f));
+                } else {
+                    SpecialCarePoJo pojo = new SpecialCarePoJo();
+                    pojo.setDate(time);
+                    dataCalcMapper.insertSpecialData(pojo);
+                }
+            } else {
+                selectExistedData = selectExistedData.stream().filter(f -> !StringUtils.isEmpty(f.getStockCode())).collect(Collectors.toList());
+                if(!CollectionUtils.isEmpty(selectExistedData)) {
+                    res.addAll(selectExistedData);
+                }
             }
         }
 
