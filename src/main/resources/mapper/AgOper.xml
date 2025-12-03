@@ -704,7 +704,7 @@
                 union all
                 select * from
                 (
-                    select tt.stockCode, '2099-12-31' as 'date', `last`*(1+0.01*(${swing}})) 'last'
+                    select tt.stockCode, '2099-12-31' as 'date', `last`*(1+0.01*(${swing})) 'last'
                     , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (5 + 1) + `last` clac_expma_5
                     , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (10 + 1) + `last` clac_expma_10
                     , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (20 + 1) + `last` clac_expma_20
