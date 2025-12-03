@@ -207,7 +207,7 @@ public class AgNewController {
                 opers = opers.stream().filter(f -> f.getRatioB() < 0.15).collect(Collectors.toList());
                 if(!CollectionUtils.isEmpty(opers)) {
                     res.addAll(opers);
-                    res.forEach(f -> dataCalcMapper.insertSpecialData(f));
+                    opers.forEach(f -> dataCalcMapper.insertSpecialData(f));
                 } else {
                     SpecialCarePoJo pojo = new SpecialCarePoJo();
                     pojo.setDate(time);
