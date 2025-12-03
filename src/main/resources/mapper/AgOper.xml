@@ -667,4 +667,15 @@
         order by ratioB, ratioS
     </select>
 
+    <select id="getLatestDates" resultType="string">
+        with tmp_a as (
+            select `date`, DENSE_RANK() over (order by `date` desc) rank_
+            from t_qq_node tqn
+        )
+        select DISTINCT `date`
+        from tmp_a
+        where rank_ <![CDATA[ <= ]]> #{days}
+        order by 1 desc
+    </select>
+
 </mapper>

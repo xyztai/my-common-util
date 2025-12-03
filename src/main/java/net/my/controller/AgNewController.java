@@ -184,6 +184,34 @@ public class AgNewController {
         return RestGeneralResponse.of(opers);
     }
 
+    @GetMapping("/special-care/{days}")
+    public BaseResponse specialCareDays(@PathVariable("days") String days) {
+        log.info("specialCare.");
+        if(StringUtils.isEmpty(days)) {
+            days = "30";
+        } else {
+            days = days.trim();
+            if(StringUtils.isEmpty(days)) {
+                days = "30";
+            }
+        }
+
+        List<String> times = dataCalcMapper.getLatestDates(Integer.parseInt(days));
+        List<SpecialCarePoJo> res = new ArrayList<>();
+        for(String time : times) {
+            List<SpecialCarePoJo> opers = dataCalcMapper.specialCare(time);
+            opers = opers.stream().filter(f -> f.getRatioB() < 0.15).collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(opers)) {
+                res.addAll(opers);
+            }
+        }
+
+        res = res.stream().sorted(Comparator.comparing(SpecialCarePoJo::getStockCode)
+                .thenComparing(SpecialCarePoJo::getDate, Comparator.reverseOrder())).collect(Collectors.toList());
+
+        return RestGeneralResponse.of(res);
+    }
+
     private double calcExpma(double step, double lastValue, double cp) {
         return (cp - lastValue) * 2.0 / (step + 1) + lastValue;
         // round((t.close_price - t3.`expma_5`)*2.0/(5.0+1) + t3.`expma_5`, 6)
