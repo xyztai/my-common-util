@@ -238,6 +238,7 @@ public class AgNewController {
             pojo.setStockCode("无数据");
             res.add(pojo);
         } else {
+            opersExpect.forEach(f -> f.setDate("T+1"));
             res.addAll(opersExpect);
         }
 
