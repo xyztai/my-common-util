@@ -184,9 +184,18 @@ public class AgNewController {
         return RestGeneralResponse.of(opers);
     }
 
-    @GetMapping("/special-care-days/{days}")
-    public BaseResponse specialCareDays(@PathVariable("days") String days) {
+    @GetMapping("/special-care-days/{swing}/{days}")
+    public BaseResponse specialCareDays(@PathVariable("swing") String swing, @PathVariable("days") String days) {
         log.info("specialCare.");
+        if(StringUtils.isEmpty(swing)) {
+            swing = "-1";
+        } else {
+            swing = swing.trim();
+            if(StringUtils.isEmpty(swing)) {
+                swing = "-1";
+            }
+        }
+
         if(StringUtils.isEmpty(days)) {
             days = "30";
         } else {
@@ -221,8 +230,19 @@ public class AgNewController {
             }
         }
 
-        res = res.stream().sorted(Comparator.comparing(SpecialCarePoJo::getStockCode)
-                .thenComparing(SpecialCarePoJo::getDate, Comparator.reverseOrder())).collect(Collectors.toList());
+        List<SpecialCarePoJo> opersExpect = dataCalcMapper.expectSpcialCare(Double.parseDouble(swing));
+        opersExpect = opersExpect.stream().filter(f -> f.getRatioB() < 0.15).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(opersExpect)) {
+            SpecialCarePoJo pojo = new SpecialCarePoJo();
+            pojo.setDate("T+1");
+            pojo.setStockCode("无数据");
+            res.add(pojo);
+        } else {
+            res.addAll(opersExpect);
+        }
+
+        res = res.stream().sorted(Comparator.comparing(SpecialCarePoJo::getDate, Comparator.reverseOrder())
+                .thenComparing(SpecialCarePoJo::getStockCode)).collect(Collectors.toList());
 
         return RestGeneralResponse.of(res);
     }

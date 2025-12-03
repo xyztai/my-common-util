@@ -689,4 +689,65 @@
         values (#{stockCode}, #{date}, #{last}, #{ratioB}, #{ratioS})
     </insert>
 
+    <select id="expectSpcialCare" resultType="net.my.pojo.SpecialCarePoJo">
+        with tmp_a as (
+            select stockCode, `date`, `last`, clac_expma_5, clac_expma_10, clac_expma_20, clac_expma_37, clac_expma_60
+            , rank() over (PARTITION by stockCode order by `date` desc) rank_date
+            , rank() over (PARTITION by stockCode order by clac_expma_10/clac_expma_5 desc) rank_10_5
+            , rank() over (PARTITION by stockCode order by clac_expma_20/clac_expma_5 desc) rank_20_5
+            , rank() over (PARTITION by stockCode order by clac_expma_37/clac_expma_5 desc) rank_37_5
+            , rank() over (PARTITION by stockCode order by clac_expma_60/clac_expma_5 desc) rank_60_5
+            from
+            (
+                select stockCode, `date`, `last`, clac_expma_5, clac_expma_10, clac_expma_20, clac_expma_37, clac_expma_60
+                from t_qq_node
+                union all
+                select * from
+                (
+                    select tt.stockCode, '2099-12-31' as 'date', `last`*(1+0.01*(${swing}})) 'last'
+                    , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (5 + 1) + `last` clac_expma_5
+                    , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (10 + 1) + `last` clac_expma_10
+                    , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (20 + 1) + `last` clac_expma_20
+                    , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (37 + 1) + `last` clac_expma_37
+                    , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (60 + 1) + `last` clac_expma_60
+                    from (
+                        select stockCode, `date`, `last`, rank() over (PARTITION by stockCode order by `date` desc) rank_date
+                        , clac_expma_5, clac_expma_10, clac_expma_37, clac_expma_60
+                        from t_qq_node
+                    ) tt
+                    where rank_date = 1
+                ) tmp_expect
+            ) tmp_all
+        ),
+        tmp_b as (
+            select t1.*
+            from tmp_a t1
+            where rank_date = 1
+            -- where `date` = '2025-11-21'
+        ),
+        tmp_c as (
+            select stockCode
+            , max(rank_10_5) rank_cnt
+            from tmp_a
+            group by stockCode
+        )
+        select t5.stockCode, t5.`date`, t5.`last`
+        , round(ratio_b/4, 6) ratioB
+        , round(ratio_s/4, 6) ratioS
+        from (
+            select t2.*
+                , round(rank_10_5/t3.rank_cnt, 6)
+                + round(rank_20_5/t3.rank_cnt, 6)
+                + round(rank_37_5/t3.rank_cnt, 6)
+                + round(rank_60_5/t3.rank_cnt, 6) ratio_b
+                , round(1 - (1+rank_10_5)/t3.rank_cnt, 6)
+                + round(1 - (1+rank_20_5)/t3.rank_cnt, 6)
+                + round(1 - (1+rank_37_5)/t3.rank_cnt, 6)
+                + round(1 - (1+rank_60_5)/t3.rank_cnt, 6) ratio_s
+            from tmp_b t2, tmp_c t3
+            where t2.stockCode = t3.stockCode
+        ) t5
+        order by ratioB, ratioS
+    </select>
+
 </mapper>

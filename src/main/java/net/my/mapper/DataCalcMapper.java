@@ -69,5 +69,6 @@ public interface DataCalcMapper {
     List<SpecialCarePoJo> specialCare(@Param("time") String time);
     List<String> getLatestDates(@Param("days") Integer days);
     List<SpecialCarePoJo> selectExistedData(@Param("day") String day);
+    List<SpecialCarePoJo> expectSpcialCare(@Param("swing") Double swing);
     int insertSpecialData(SpecialCarePoJo pojo);
 }
