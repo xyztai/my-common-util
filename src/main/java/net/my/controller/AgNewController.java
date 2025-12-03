@@ -184,7 +184,7 @@ public class AgNewController {
         return RestGeneralResponse.of(opers);
     }
 
-    @GetMapping("/special-care/{days}")
+    @GetMapping("/special-care-days/{days}")
     public BaseResponse specialCareDays(@PathVariable("days") String days) {
         log.info("specialCare.");
         if(StringUtils.isEmpty(days)) {
