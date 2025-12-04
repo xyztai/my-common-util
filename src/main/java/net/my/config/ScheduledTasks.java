@@ -74,8 +74,40 @@ public class ScheduledTasks {
                         (formattedTime.compareTo("18:01:00") > 0 && formattedTime.compareTo("18:55:00") < 0)
         ) {
             log.info("time to execGetHistoryData");
-            agNewController.getHistoryData(5);
+//            agNewController.getHistoryData(5);
             agController.getHistoryData(5);
+//            agController.getIndustryHistoryData(5);
+        } else {
+            log.info("not time to execGetHistoryData");
+        }
+        log.info("execGetHistoryData end");
+    }
+
+    /**
+     * 自动获取/更新历史上5天的cp数据
+     */
+    @Scheduled(cron = "0 */13 * * * ?")
+    @Transactional
+    public void execGetHistoryDataNew() {
+        log.info("execGetHistoryData begin");
+        // 设置时区为北京
+        LocalDateTime now = LocalDateTime.now();
+        ZoneId beijngZoneId = ZoneId.of("Asia/Shanghai");
+        ZonedDateTime beijingTime = now.atZone(beijngZoneId);
+        // 输出北京时间
+        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String formattedTime = beijingTime.format(formatter);
+        log.info("time: {}", formattedTime);
+        if(
+                        (formattedTime.compareTo("02:01:00") > 0 && formattedTime.compareTo("02:55:00") < 0) ||
+                        (formattedTime.compareTo("05:01:00") > 0 && formattedTime.compareTo("05:55:00") < 0) ||
+                        (formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:55:00") < 0) ||
+                        (formattedTime.compareTo("16:01:00") > 0 && formattedTime.compareTo("16:55:00") < 0)
+        ) {
+            log.info("time to execGetHistoryData");
+            agNewController.getHistoryData(5);
+//            agController.getHistoryData(5);
 //            agController.getIndustryHistoryData(5);
         } else {
             log.info("not time to execGetHistoryData");
