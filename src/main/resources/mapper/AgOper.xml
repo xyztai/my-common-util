@@ -653,14 +653,14 @@
             , round(ratio_s/4, 6) ratioS
         from (
             select t2.*
-            , round(rank_10_5/t3.rank_cnt, 6)
-            + round(rank_20_5/t3.rank_cnt, 6)
-            + round(rank_37_5/t3.rank_cnt, 6)
-            + round(rank_60_5/t3.rank_cnt, 6) ratio_b
-            , round(1 - (1+rank_10_5)/t3.rank_cnt, 6)
-            + round(1 - (1+rank_20_5)/t3.rank_cnt, 6)
-            + round(1 - (1+rank_37_5)/t3.rank_cnt, 6)
-            + round(1 - (1+rank_60_5)/t3.rank_cnt, 6) ratio_s
+            , round(rank_10_5/t3.rank_cnt, 6) * 4 ratio_b
+<!--            + round(rank_20_5/t3.rank_cnt, 6)-->
+<!--            + round(rank_37_5/t3.rank_cnt, 6)-->
+<!--            + round(rank_60_5/t3.rank_cnt, 6) ratio_b-->
+            , round(1 - (1+rank_10_5)/t3.rank_cnt, 6) * 4 ratio_s
+<!--            + round(1 - (1+rank_20_5)/t3.rank_cnt, 6)-->
+<!--            + round(1 - (1+rank_37_5)/t3.rank_cnt, 6)-->
+<!--            + round(1 - (1+rank_60_5)/t3.rank_cnt, 6) ratio_s-->
             from tmp_b t2, tmp_c t3
             where t2.stockCode = t3.stockCode
         ) t5
@@ -736,14 +736,14 @@
         , round(ratio_s/4, 6) ratioS
         from (
             select t2.*
-                , round(rank_10_5/t3.rank_cnt, 6)
-                + round(rank_20_5/t3.rank_cnt, 6)
-                + round(rank_37_5/t3.rank_cnt, 6)
-                + round(rank_60_5/t3.rank_cnt, 6) ratio_b
-                , round(1 - (1+rank_10_5)/t3.rank_cnt, 6)
-                + round(1 - (1+rank_20_5)/t3.rank_cnt, 6)
-                + round(1 - (1+rank_37_5)/t3.rank_cnt, 6)
-                + round(1 - (1+rank_60_5)/t3.rank_cnt, 6) ratio_s
+                , round(rank_10_5/t3.rank_cnt, 6) * 4 ratio_b
+<!--                + round(rank_20_5/t3.rank_cnt, 6)-->
+<!--                + round(rank_37_5/t3.rank_cnt, 6)-->
+<!--                + round(rank_60_5/t3.rank_cnt, 6) ratio_b-->
+                , round(1 - (1+rank_10_5)/t3.rank_cnt, 6) * 4 ratio_s
+<!--                + round(1 - (1+rank_20_5)/t3.rank_cnt, 6)-->
+<!--                + round(1 - (1+rank_37_5)/t3.rank_cnt, 6)-->
+<!--                + round(1 - (1+rank_60_5)/t3.rank_cnt, 6) ratio_s-->
             from tmp_b t2, tmp_c t3
             where t2.stockCode = t3.stockCode
         ) t5
