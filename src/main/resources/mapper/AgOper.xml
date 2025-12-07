@@ -731,7 +731,7 @@
             from tmp_a
             group by stockCode
         )
-        select t5.stockCode, t5.`date`, t5.`last`
+        select t5.stockCode, t5.`date`, round(t5.`last`, 6) 'last'
         , round(ratio_b/4, 6) ratioB
         , round(ratio_s/4, 6) ratioS
         from (
