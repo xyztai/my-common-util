@@ -34,7 +34,7 @@ public class AgNewController {
 //    public static final String URL_FORMAT = "https://proxy.finance.qq.com/cgi/cgi-bin/stockinfoquery/kline/app/get?code=sh512880&ktype=day&limit=500";
 
     static {
-        PROXY_FINANCE_QQ.put("001纳斯达克100EFT-159659", "sz159659");
+        PROXY_FINANCE_QQ.put("001纳斯达克100ETF-159659", "sz159659");
         PROXY_FINANCE_QQ.put("002纳指100ETF-159660", "sz159660");
         PROXY_FINANCE_QQ.put("003恒生科技ETF-513130", "sh513130");
         PROXY_FINANCE_QQ.put("004日经ETF-513520", "sh513520");
@@ -55,18 +55,18 @@ public class AgNewController {
         PROXY_FINANCE_QQ.put("108石油天然气ETF-159588", "sz159588");
         PROXY_FINANCE_QQ.put("109储能电池ETF-159566", "sz159566");
         PROXY_FINANCE_QQ.put("110半导体设备ETF-159516", "sz159516");
-        PROXY_FINANCE_QQ.put("111科创芯片EFT-588200", "sh588200");
+        PROXY_FINANCE_QQ.put("111科创芯片ETF-588200", "sh588200");
         PROXY_FINANCE_QQ.put("112机器人ETF-562500", "sh562500");
         PROXY_FINANCE_QQ.put("113卫星ETF-159206", "sz159206");
-        PROXY_FINANCE_QQ.put("114医疗创新EFT-516820", "sh516820");
+        PROXY_FINANCE_QQ.put("114医疗创新ETF-516820", "sh516820");
         PROXY_FINANCE_QQ.put("115电池ETF-159755", "sz159755");
         PROXY_FINANCE_QQ.put("116军工ETF-512660", "sh512660");
         PROXY_FINANCE_QQ.put("117空天军工LOF-160643", "sz160643");
         PROXY_FINANCE_QQ.put("118黄金股ETF-517520", "sh517520");
         PROXY_FINANCE_QQ.put("119游戏ETF-159869", "sz159869");
         PROXY_FINANCE_QQ.put("120软件ETF-515230", "sh515230");
-        PROXY_FINANCE_QQ.put("121光伏EFT-515790", "sh515790");
-        PROXY_FINANCE_QQ.put("122科创50EFT-588000", "sh588000");
+        PROXY_FINANCE_QQ.put("121光伏ETF-515790", "sh515790");
+        PROXY_FINANCE_QQ.put("122科创50ETF-588000", "sh588000");
         PROXY_FINANCE_QQ.put("1235G通信ETF-515050", "sh515050");
         PROXY_FINANCE_QQ.put("124农业ETF-159825", "sz159825");
         PROXY_FINANCE_QQ.put("125基建ETF-516950", "sh516950");
@@ -75,7 +75,7 @@ public class AgNewController {
 
 
 //        PROXY_FINANCE_QQ.put("* 港股创新药ETF-159567", "sz159567");
-//        PROXY_FINANCE_QQ.put("上证50EFT-510050", "sh510050");
+//        PROXY_FINANCE_QQ.put("上证50ETF-510050", "sh510050");
 //        PROXY_FINANCE_QQ.put("人工智能ETF-515980", "sh515980");
 //        PROXY_FINANCE_QQ.put("医药ETF-512010", "sh512010");
 //        PROXY_FINANCE_QQ.put("中国银行-601988", "sh601988");
@@ -87,7 +87,7 @@ public class AgNewController {
 //        PROXY_FINANCE_QQ.put("半导体ETF-512480", "sh512480");
 //        PROXY_FINANCE_QQ.put("工商银行-601398", "sh601398");
 //        PROXY_FINANCE_QQ.put("有色金属ETF-512400", "sh512400");
-//        PROXY_FINANCE_QQ.put("沪深300EFT-510300", "sh510300");
+//        PROXY_FINANCE_QQ.put("沪深300ETF-510300", "sh510300");
 //        PROXY_FINANCE_QQ.put("煤炭ETF-515220", "sh515220");
 //        PROXY_FINANCE_QQ.put("白酒基金LOF-161725", "sz161725");
 //        PROXY_FINANCE_QQ.put("邮储银行-601658", "sh601658");
