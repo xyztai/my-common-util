@@ -705,14 +705,14 @@
                 select * from
                 (
                     select tt.stockCode, '2099-12-31' as 'date', `last`*(1+0.01*(${swing})) 'last'
-                    , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (5 + 1) + `last` clac_expma_5
-                    , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (10 + 1) + `last` clac_expma_10
-                    , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (20 + 1) + `last` clac_expma_20
-                    , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (37 + 1) + `last` clac_expma_37
-                    , (`last`*(1+0.01*(${swing})) - `last`) * 2.0 / (60 + 1) + `last` clac_expma_60
+                    , (`last`*(1+0.01*(${swing})) - clac_expma_5) * 2.0 / (5 + 1) + clac_expma_5 clac_expma_5
+                    , (`last`*(1+0.01*(${swing})) - clac_expma_10) * 2.0 / (10 + 1) + clac_expma_10 clac_expma_10
+                    , (`last`*(1+0.01*(${swing})) - clac_expma_20) * 2.0 / (20 + 1) + clac_expma_20 clac_expma_20
+                    , (`last`*(1+0.01*(${swing})) - clac_expma_37) * 2.0 / (37 + 1) + clac_expma_37 clac_expma_37
+                    , (`last`*(1+0.01*(${swing})) - clac_expma_60) * 2.0 / (60 + 1) + clac_expma_60 clac_expma_60
                     from (
                         select stockCode, `date`, `last`, rank() over (PARTITION by stockCode order by `date` desc) rank_date
-                        , clac_expma_5, clac_expma_10, clac_expma_37, clac_expma_60
+                        , clac_expma_5, clac_expma_10, clac_expma_20, clac_expma_37, clac_expma_60
                         from t_qq_node
                     ) tt
                     where rank_date = 1
