@@ -245,7 +245,7 @@ public class AgNewController {
         }
 
         // 参数设置为 0.15
-        res = res.stream().filter(f -> f.getRatioB() < 0.1).collect(Collectors.toList());
+        res = res.stream().filter(f -> f.getRatioB() < 0.05).collect(Collectors.toList());
         res = res.stream().sorted(Comparator.comparing(SpecialCarePoJo::getDate, Comparator.reverseOrder())
                 .thenComparing(SpecialCarePoJo::getStockCode)).collect(Collectors.toList());
 
