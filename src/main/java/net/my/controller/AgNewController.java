@@ -213,7 +213,7 @@ public class AgNewController {
             if(CollectionUtils.isEmpty(selectExistedData)) {
                 // 没有数据则重新计算
                 List<SpecialCarePoJo> opers = dataCalcMapper.specialCare(time);
-                opers = opers.stream().filter(f -> f.getRatioB() < 0.15).collect(Collectors.toList());
+//                opers = opers.stream().filter(f -> f.getRatioB() < 0.15).collect(Collectors.toList());
                 if(!CollectionUtils.isEmpty(opers)) {
                     res.addAll(opers);
                     opers.forEach(f -> dataCalcMapper.insertSpecialData(f));
@@ -231,7 +231,7 @@ public class AgNewController {
         }
 
         List<SpecialCarePoJo> opersExpect = dataCalcMapper.expectSpcialCare(Double.parseDouble(swing));
-        opersExpect = opersExpect.stream().filter(f -> f.getRatioB() < 0.15).collect(Collectors.toList());
+//        opersExpect = opersExpect.stream().filter(f -> f.getRatioB() < 0.15).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(opersExpect)) {
             SpecialCarePoJo pojo = new SpecialCarePoJo();
             pojo.setDate("T+1");
@@ -242,6 +242,8 @@ public class AgNewController {
             res.addAll(opersExpect);
         }
 
+        // 参数设置为 0.15
+        res = res.stream().filter(f -> f.getRatioB() < 0.15).collect(Collectors.toList());
         res = res.stream().sorted(Comparator.comparing(SpecialCarePoJo::getDate, Comparator.reverseOrder())
                 .thenComparing(SpecialCarePoJo::getStockCode)).collect(Collectors.toList());
 
