@@ -71,6 +71,7 @@ public class AgNewController {
         PROXY_FINANCE_QQ.put("124农业ETF-159825", "sz159825");
         PROXY_FINANCE_QQ.put("125基建ETF-516950", "sh516950");
         PROXY_FINANCE_QQ.put("126旅游ETF-159766", "sz159766");
+        PROXY_FINANCE_QQ.put("127银行ETF天弘-515290", "sh515290");
 
 
 //        PROXY_FINANCE_QQ.put("* 港股创新药ETF-159567", "sz159567");
