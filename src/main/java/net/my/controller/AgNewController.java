@@ -34,14 +34,15 @@ public class AgNewController {
 //    public static final String URL_FORMAT = "https://proxy.finance.qq.com/cgi/cgi-bin/stockinfoquery/kline/app/get?code=sh512880&ktype=day&limit=500";
 
     static {
+        PROXY_FINANCE_QQ.put("日经ETF-513520", "sh513520");
+        PROXY_FINANCE_QQ.put("纳斯达克100EFT-159659", "sz159659");
+        PROXY_FINANCE_QQ.put("华宝油气LOF-162411", "sz162411");
         PROXY_FINANCE_QQ.put("恒生科技ETF-513130", "sh513130");
         PROXY_FINANCE_QQ.put("医疗创新EFT-516820", "sh516820");
         PROXY_FINANCE_QQ.put("上证50EFT-510050", "sh510050");
         PROXY_FINANCE_QQ.put("科创50EFT-588000", "sh588000");
         PROXY_FINANCE_QQ.put("沪深300EFT-510300", "sh510300");
         PROXY_FINANCE_QQ.put("光伏EFT-515790", "sh515790");
-        PROXY_FINANCE_QQ.put("纳斯达克100EFT-159659", "sz159659");
-        PROXY_FINANCE_QQ.put("华宝油气LOF-162411", "sz162411");
         PROXY_FINANCE_QQ.put("空天军工LOF-160643", "sz160643");
         PROXY_FINANCE_QQ.put("科创芯片EFT-588200", "sh588200");
         PROXY_FINANCE_QQ.put("煤炭ETF-515220", "sh515220");
