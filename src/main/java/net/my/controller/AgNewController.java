@@ -187,7 +187,7 @@ public class AgNewController {
 
     @GetMapping("/special-care-days/{swing}/{days}")
     public BaseResponse specialCareDays(@PathVariable("swing") String swing, @PathVariable("days") String days) {
-        log.info("specialCare.");
+        log.info("special-care-days swing={}, days={}", swing, days);
         if(StringUtils.isEmpty(swing)) {
             swing = "-1";
         } else {
@@ -209,6 +209,7 @@ public class AgNewController {
         List<String> times = dataCalcMapper.getLatestDates(Integer.parseInt(days));
         List<SpecialCarePoJo> res = new ArrayList<>();
         for(String time : times) {
+            log.info("special-care-days time={}", time);
             // 查询表是否有数据
             List<SpecialCarePoJo> selectExistedData = dataCalcMapper.selectExistedData(time);
             if(CollectionUtils.isEmpty(selectExistedData)) {
