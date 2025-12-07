@@ -271,12 +271,18 @@ public class AgNewController {
             res.addAll(opersExpect);
         }
 
-        // 参数设置为 0.15
-        res = res.stream().filter(f -> f.getRatioB() < 0.05).collect(Collectors.toList());
-        res = res.stream().sorted(Comparator.comparing(SpecialCarePoJo::getDate, Comparator.reverseOrder())
+        // 参数设置：T+0的为0.10，T+1的为0.05
+        List<SpecialCarePoJo> resPoJos = new ArrayList<>();
+        resPoJos.addAll(res.stream()
+                .filter(f -> f.getStockCode().startsWith("0") && f.getRatioB() < 0.10)
+                .collect(Collectors.toList()));
+        resPoJos.addAll(res.stream()
+                .filter(f -> f.getStockCode().startsWith("1") && f.getRatioB() < 0.05)
+                .collect(Collectors.toList()));
+        resPoJos = resPoJos.stream().sorted(Comparator.comparing(SpecialCarePoJo::getDate, Comparator.reverseOrder())
                 .thenComparing(SpecialCarePoJo::getStockCode)).collect(Collectors.toList());
 
-        return RestGeneralResponse.of(res);
+        return RestGeneralResponse.of(resPoJos);
     }
 
     private double calcExpma(double step, double lastValue, double cp) {
