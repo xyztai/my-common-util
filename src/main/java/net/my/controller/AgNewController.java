@@ -209,7 +209,8 @@ public class AgNewController {
         log.info("specialCare.");
         List<SpecialCarePoJo> opers = dataCalcMapper.specialCare(time);
 
-        return RestGeneralResponse.of(opers);
+        return RestGeneralResponse.of(opers.stream().filter(f -> !f.getStockCode().startsWith("3_") || f.getRatioB() < 0.02)
+                .collect(Collectors.toList()));
     }
 
     @GetMapping("/special-care-days/{swing}/{days}")
@@ -278,6 +279,9 @@ public class AgNewController {
                 .collect(Collectors.toList()));
         resPoJos.addAll(res.stream()
                 .filter(f -> f.getStockCode().startsWith("1") && f.getRatioB() < 0.05)
+                .collect(Collectors.toList()));
+        resPoJos.addAll(res.stream()
+                .filter(f -> f.getStockCode().startsWith("3_") && f.getRatioB() < 0.02)
                 .collect(Collectors.toList()));
         resPoJos = resPoJos.stream().sorted(Comparator.comparing(SpecialCarePoJo::getDate, Comparator.reverseOrder())
                 .thenComparing(SpecialCarePoJo::getStockCode)).collect(Collectors.toList());
