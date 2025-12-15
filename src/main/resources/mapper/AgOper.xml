@@ -685,7 +685,7 @@
     </select>
 
     <insert id="insertSpecialData" parameterType="net.my.pojo.SpecialCarePoJo">
-        insert into t_qq_node_buy(stockCode, date, last, ratioB, ratioS)
+        REPLACE  into t_qq_node_buy(stockCode, date, last, ratioB, ratioS)
         values (#{stockCode}, #{date}, #{last}, #{ratioB}, #{ratioS})
     </insert>
 
