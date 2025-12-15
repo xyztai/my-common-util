@@ -153,7 +153,7 @@ public class AgNew300Controller {
                     qqNodeList.addAll(tmpNodes);
                 }
             } catch (Exception ex) {
-                log.error("{}", ex);
+                log.error("", ex);
             }
         }
 
@@ -208,17 +208,17 @@ public class AgNew300Controller {
          *                     ""
          *                 ]
          */
-        private List<String> multiStr;
+        private List<Object> multiStr;
         public QqNode toVo() {
             return QqNode.builder()
-                    .date(multiStr.get(0))
-                    .open(Double.parseDouble(multiStr.get(1)))
-                    .last(Double.parseDouble(multiStr.get(2)))
-                    .high(Double.parseDouble(multiStr.get(3)))
-                    .low(Double.parseDouble(multiStr.get(4)))
-                    .volume(Double.parseDouble(multiStr.get(5)))
-                    .amount(Double.parseDouble(multiStr.get(8)))
-                    .exchangeRaw(Double.parseDouble(multiStr.get(7)))
+                    .date(multiStr.get(0).toString())
+                    .open(Double.parseDouble(multiStr.get(1).toString()))
+                    .last(Double.parseDouble(multiStr.get(2).toString()))
+                    .high(Double.parseDouble(multiStr.get(3).toString()))
+                    .low(Double.parseDouble(multiStr.get(4).toString()))
+                    .volume(Double.parseDouble(multiStr.get(5).toString()))
+                    .amount(Double.parseDouble(multiStr.get(8).toString()))
+                    .exchangeRaw(Double.parseDouble(multiStr.get(7).toString()))
                     .build();
         }
     }
