@@ -1,9 +1,11 @@
 package net.my.pojo;
 
 
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class QqNode{
     private String stockCode;
     private String date;

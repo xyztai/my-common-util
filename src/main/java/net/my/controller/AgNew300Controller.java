@@ -109,9 +109,10 @@ public class AgNew300Controller {
             }
 
             try {
-                QqRes qqRes = JSON.parseObject(res, QqRes.class);
-                List<QqNode> tmpNodes = qqRes.getData().getNodes().stream()
-                        .sorted(Comparator.comparing(QqNode::getDate)).collect(Collectors.toList());
+                Hs300Res qqRes = JSON.parseObject(res.replace("kline_dayqfq=", ""), Hs300Res.class);
+                List<Hs300POJO> pojos = qqRes.getData().get(zqdm).get("qfqday");
+                List<QqNode> tmpNodes = pojos.stream().map(Hs300POJO::toVo).sorted(Comparator.comparing(QqNode::getDate)).collect(Collectors.toList());
+                tmpNodes.forEach(f -> f.setStockCode(entry.getKey()));
 
                 QqNode existsNode = dataCalcMapper.getMaxQqNode(entry.getKey());
                 if(existsNode != null) {
@@ -185,15 +186,41 @@ public class AgNew300Controller {
 
 
     @Data
-    public class QqRes{
+    public class Hs300Res{
         private Integer code;
-        private String message;
-        private QqData data;
+        private String msg;
+        private Map<String, Map<String, List<Hs300POJO>>> data;
     }
 
     @Data
-    public class QqData{
-        private List<QqNode> nodes;
+    public class Hs300POJO{
+        /**
+         * [
+         *                     "2023-04-28", // 日期
+         *                     "10.78",  // 开
+         *                     "10.99",  // 收
+         *                     "11.08",  // 高
+         *                     "10.70",  // 低
+         *                     "1975714.00", // 量
+         *                     {},
+         *                     "2.58", // 换手率
+         *                     "233884.16", // 金额，单位 万元
+         *                     ""
+         *                 ]
+         */
+        private List<String> multiStr;
+        public QqNode toVo() {
+            return QqNode.builder()
+                    .date(multiStr.get(0))
+                    .open(Double.parseDouble(multiStr.get(1)))
+                    .last(Double.parseDouble(multiStr.get(2)))
+                    .high(Double.parseDouble(multiStr.get(3)))
+                    .low(Double.parseDouble(multiStr.get(4)))
+                    .volume(Double.parseDouble(multiStr.get(5)))
+                    .amount(Double.parseDouble(multiStr.get(8)))
+                    .exchangeRaw(Double.parseDouble(multiStr.get(7)))
+                    .build();
+        }
     }
-
 }
+
