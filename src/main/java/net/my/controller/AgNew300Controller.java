@@ -109,7 +109,8 @@ public class AgNew300Controller {
             }
 
             try {
-                res = res.replace("kline_dayqfq=", "");
+                res = res.replace("kline_dayqfq=", "").replace(",{},", ",");
+                
                 log.info("res={}", res);
                 Hs300Res qqRes = JSON.parseObject(res, Hs300Res.class);
                 List<Hs300POJO> pojos = qqRes.getData().get(zqdm).get("qfqday");
