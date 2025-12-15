@@ -117,6 +117,12 @@ public class AgNew300Controller {
 //                List<QqNode> tmpNodes = pojos.stream().map(Hs300POJO::toVo).sorted(Comparator.comparing(QqNode::getDate)).collect(Collectors.toList());
 
                 List<List<Object>> pojos = qqRes.getData().get(zqdm).get("qfqday");
+                if(pojos == null) {
+                    pojos = qqRes.getData().get(zqdm).get("day");
+                }
+                if(pojos == null) {
+                    continue;
+                }
                 List<QqNode> tmpNodes = pojos.stream()
                         .map(Hs300POJO::toVo2)
                         .sorted(Comparator.comparing(QqNode::getDate))
