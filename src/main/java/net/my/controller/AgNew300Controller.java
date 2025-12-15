@@ -109,7 +109,7 @@ public class AgNew300Controller {
             }
 
             try {
-                res = res.replace("kline_dayqfq=", "").replace(",{},", ",");
+                res = res.replace("kline_dayqfq=", "");//.replace(",{},", ",");
                 res = res.substring(0, res.indexOf(",\"qt\"")) + "}}}";
                 log.info("res={}", res);
                 Hs300Res qqRes = JSON.parseObject(res, Hs300Res.class);
@@ -240,10 +240,10 @@ public class AgNew300Controller {
                     .high(Double.parseDouble(objects.get(3).toString()))
                     .low(Double.parseDouble(objects.get(4).toString()))
                     .volume(Double.parseDouble(objects.get(5).toString()))
-                    .amount(Double.parseDouble(objects.get(7).toString()))
-                    .exchangeRaw(Double.parseDouble(objects.get(6).toString()))
-//                    .amount(Double.parseDouble(multiStr.get(8).toString()))
-//                    .exchangeRaw(Double.parseDouble(multiStr.get(7).toString()))
+//                    .amount(Double.parseDouble(objects.get(7).toString()))
+//                    .exchangeRaw(Double.parseDouble(objects.get(6).toString()))
+                    .amount(Double.parseDouble(objects.get(8).toString()))
+                    .exchangeRaw(Double.parseDouble(objects.get(7).toString()))
                     .build();
         }
     }
