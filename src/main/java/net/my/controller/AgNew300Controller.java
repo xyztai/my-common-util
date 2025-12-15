@@ -109,7 +109,9 @@ public class AgNew300Controller {
             }
 
             try {
-                Hs300Res qqRes = JSON.parseObject(res.replace("kline_dayqfq=", ""), Hs300Res.class);
+                res = res.replace("kline_dayqfq=", "");
+                log.info("res={}", res);
+                Hs300Res qqRes = JSON.parseObject(res, Hs300Res.class);
                 List<Hs300POJO> pojos = qqRes.getData().get(zqdm).get("qfqday");
                 List<QqNode> tmpNodes = pojos.stream().map(Hs300POJO::toVo).sorted(Comparator.comparing(QqNode::getDate)).collect(Collectors.toList());
                 tmpNodes.forEach(f -> f.setStockCode(entry.getKey()));
