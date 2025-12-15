@@ -71,4 +71,8 @@ public interface DataCalcMapper {
     List<SpecialCarePoJo> selectExistedData(@Param("day") String day);
     List<SpecialCarePoJo> expectSpcialCare(@Param("swing") Double swing);
     int insertSpecialData(SpecialCarePoJo pojo);
+
+    // hs300 数据
+    List<Hs300PO> getHs300List();
+
 }

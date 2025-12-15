@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/ag-new-300")
+@RequestMapping("/ag-new-hs300")
 @Slf4j
 @Api(value = "ag", description = "ag接口")
 public class AgNew300Controller {
@@ -73,7 +73,21 @@ public class AgNew300Controller {
         List<AgClosePriceDTO> agClosePriceDTOs = new ArrayList<>();
         Map<String, QqNode> qqNodeMap = new LinkedHashMap<>();
         List<QqNode> qqNodeList = new ArrayList<>();
-        for(Map.Entry<String, String> entry : PROXY_FINANCE_QQ.entrySet()) {
+        List<Hs300PO> hs300List = dataCalcMapper.getHs300List();
+
+        if(CollectionUtils.isEmpty(hs300List)) {
+            return BaseResponse.OK;
+        }
+
+        Map<String, String> hs300Map = new LinkedHashMap<>();
+        for(Hs300PO po : hs300List) {
+            String key = "3_" + po.getStockName() + "-" + po.getStockCode();
+            String value = 0 == po.getStockType() ? "sz" + po.getStockCode() : "sh" + po.getStockCode();
+            hs300Map.put(key, value);
+        }
+
+
+        for(Map.Entry<String, String> entry : hs300Map.entrySet()) {
             String zqdm = entry.getValue();
             String url = String.format(PROXY_FINANCE_QQ_URL_FORMAT_QFQ, zqdm, days);
             log.info("url: {}, zqdm: {}, days: {}", url, zqdm, days);

@@ -750,4 +750,10 @@
         order by ratioB, ratioS
     </select>
 
+    <select id="getHs300List" resultType="net.my.pojo.Hs300PO">
+        select stockCode, stockType, stockName
+        from t_hs300
+        order by 1
+    </select>
+
 </mapper>
