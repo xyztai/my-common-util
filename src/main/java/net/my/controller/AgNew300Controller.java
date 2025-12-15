@@ -113,8 +113,14 @@ public class AgNew300Controller {
                 res = res.substring(0, res.indexOf(",\"qt\"")) + "}}}";
                 log.info("res={}", res);
                 Hs300Res qqRes = JSON.parseObject(res, Hs300Res.class);
-                List<Hs300POJO> pojos = qqRes.getData().get(zqdm).get("qfqday");
-                List<QqNode> tmpNodes = pojos.stream().map(Hs300POJO::toVo).sorted(Comparator.comparing(QqNode::getDate)).collect(Collectors.toList());
+//                List<Hs300POJO> pojos = qqRes.getData().get(zqdm).get("qfqday");
+//                List<QqNode> tmpNodes = pojos.stream().map(Hs300POJO::toVo).sorted(Comparator.comparing(QqNode::getDate)).collect(Collectors.toList());
+
+                List<List<Object>> pojos = qqRes.getData().get(zqdm).get("qfqday");
+                List<QqNode> tmpNodes = pojos.stream()
+                        .map(Hs300POJO::toVo2)
+                        .sorted(Comparator.comparing(QqNode::getDate))
+                        .collect(Collectors.toList());
                 tmpNodes.forEach(f -> f.setStockCode(entry.getKey()));
 
                 QqNode existsNode = dataCalcMapper.getMaxQqNode(entry.getKey());
@@ -192,11 +198,11 @@ public class AgNew300Controller {
     public class Hs300Res{
         private Integer code;
         private String msg;
-        private Map<String, Map<String, List<Hs300POJO>>> data;
+        private Map<String, Map<String, List<List<Object>>>> data;
     }
 
     @Data
-    public class Hs300POJO{
+    public static class Hs300POJO{
         /**
          * [
          *                     "2023-04-28", // 日期
@@ -222,6 +228,20 @@ public class AgNew300Controller {
                     .volume(Double.parseDouble(multiStr.get(5).toString()))
                     .amount(Double.parseDouble(multiStr.get(7).toString()))
                     .exchangeRaw(Double.parseDouble(multiStr.get(6).toString()))
+//                    .amount(Double.parseDouble(multiStr.get(8).toString()))
+//                    .exchangeRaw(Double.parseDouble(multiStr.get(7).toString()))
+                    .build();
+        }
+        public static QqNode toVo2(List<Object> objects) {
+            return QqNode.builder()
+                    .date(objects.get(0).toString())
+                    .open(Double.parseDouble(objects.get(1).toString()))
+                    .last(Double.parseDouble(objects.get(2).toString()))
+                    .high(Double.parseDouble(objects.get(3).toString()))
+                    .low(Double.parseDouble(objects.get(4).toString()))
+                    .volume(Double.parseDouble(objects.get(5).toString()))
+                    .amount(Double.parseDouble(objects.get(7).toString()))
+                    .exchangeRaw(Double.parseDouble(objects.get(6).toString()))
 //                    .amount(Double.parseDouble(multiStr.get(8).toString()))
 //                    .exchangeRaw(Double.parseDouble(multiStr.get(7).toString()))
                     .build();
