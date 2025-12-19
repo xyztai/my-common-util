@@ -75,4 +75,7 @@ public interface DataCalcMapper {
     // hs300 数据
     List<Hs300PO> getHs300List();
 
+    // hs300 参数
+    List<Hs300Para> getHistoryParas();
+
 }

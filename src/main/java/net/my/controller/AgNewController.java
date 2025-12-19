@@ -207,10 +207,32 @@ public class AgNewController {
     @GetMapping("/special-care/{time}")
     public BaseResponse specialCare(@PathVariable("time") String time) {
         log.info("specialCare.");
-        List<SpecialCarePoJo> opers = dataCalcMapper.specialCare(time);
+        List<SpecialCarePoJo> res = dataCalcMapper.specialCare(time);
 
-        return RestGeneralResponse.of(opers.stream().filter(f -> !f.getStockCode().startsWith("3_") || f.getRatioB() < 0.008)
-                .collect(Collectors.toList()));
+
+        // 参数根据历史数据来获得
+        List<Hs300Para> historyParas =  dataCalcMapper.getHistoryParas();
+        List<SpecialCarePoJo> resPoJos = new ArrayList<>();
+        for(SpecialCarePoJo item : res) {
+            if(!item.getStockCode().startsWith("3_")) {
+                resPoJos.add(item);
+                continue;
+            }
+
+            List<Hs300Para> tmp = historyParas.stream()
+                    .filter(f -> item.getStockCode().equals(f.getStockCode()) && item.getRatioB() <= f.getRatioB()).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(tmp)) {
+                continue;
+            }
+            Integer rankR = tmp.stream().map(Hs300Para::getRankR).sorted().findFirst().get();
+            item.setStockCode(item.getStockCode() + "-" + rankR);
+            resPoJos.add(item);
+        }
+
+        return RestGeneralResponse.of(resPoJos);
+
+//        return RestGeneralResponse.of(opers.stream().filter(f -> !f.getStockCode().startsWith("3_") || f.getRatioB() < 0.008)
+//                .collect(Collectors.toList()));
     }
 
     @GetMapping("/special-care-days/{swing}/{days}")
@@ -272,17 +294,31 @@ public class AgNewController {
             res.addAll(opersExpect);
         }
 
-        // 参数设置：T+0的为0.10，T+1的为0.05
+        // 参数根据历史数据来获得
+        List<Hs300Para> historyParas =  dataCalcMapper.getHistoryParas();
         List<SpecialCarePoJo> resPoJos = new ArrayList<>();
-        resPoJos.addAll(res.stream()
-                .filter(f -> f.getStockCode().startsWith("0") && f.getRatioB() < 0.10)
-                .collect(Collectors.toList()));
-        resPoJos.addAll(res.stream()
-                .filter(f -> f.getStockCode().startsWith("1") && f.getRatioB() < 0.05)
-                .collect(Collectors.toList()));
-        resPoJos.addAll(res.stream()
-                .filter(f -> f.getStockCode().startsWith("3_") && f.getRatioB() < 0.008)
-                .collect(Collectors.toList()));
+        for(SpecialCarePoJo item : res) {
+            List<Hs300Para> tmp = historyParas.stream()
+                    .filter(f -> item.getStockCode().equals(f.getStockCode()) && item.getRatioB() <= f.getRatioB()).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(tmp)) {
+                continue;
+            }
+            Integer rankR = tmp.stream().map(Hs300Para::getRankR).sorted().findFirst().get();
+            item.setStockCode(item.getStockCode() + "-" + rankR);
+            resPoJos.add(item);
+        }
+
+//        // 参数设置：T+0的为0.10，T+1的为0.05
+//        List<SpecialCarePoJo> resPoJos = new ArrayList<>();
+//        resPoJos.addAll(res.stream()
+//                .filter(f -> f.getStockCode().startsWith("0") && f.getRatioB() < 0.10)
+//                .collect(Collectors.toList()));
+//        resPoJos.addAll(res.stream()
+//                .filter(f -> f.getStockCode().startsWith("1") && f.getRatioB() < 0.05)
+//                .collect(Collectors.toList()));
+//        resPoJos.addAll(res.stream()
+//                .filter(f -> f.getStockCode().startsWith("3_") && f.getRatioB() < 0.008)
+//                .collect(Collectors.toList()));
         resPoJos = resPoJos.stream().sorted(Comparator.comparing(SpecialCarePoJo::getDate, Comparator.reverseOrder())
                 .thenComparing(SpecialCarePoJo::getStockCode)).collect(Collectors.toList());
 

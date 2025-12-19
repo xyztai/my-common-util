@@ -756,4 +756,38 @@
         order by 1
     </select>
 
+    <select id="getHistoryParas" resultType="net.my.pojo.Hs300Para">
+        <![CDATA[
+        select `date` , stockCode, ratioB , rank_ as rankR
+        from (
+            select *
+            from (
+                select *
+                from (
+                    select `date` , stockCode, ratioB , rank() over (partition by tqnb.stockCode order by ratioB, `date` desc ) rank_ , count(1) over(partition by stockCode ) * 0.045 rank_limit_
+                    from t_qq_node_buy tqnb
+                ) tt
+                where rank_ <= rank_limit_
+                and stockCode like '0%'
+                union all
+                select *
+                from (
+                    select `date` , stockCode, ratioB , rank() over (partition by tqnb.stockCode order by ratioB, `date` desc ) rank_ , count(1) over(partition by stockCode ) * 0.035 rank_limit_
+                    from t_qq_node_buy tqnb
+                ) tt
+                where rank_ <= rank_limit_
+                and stockCode like '1%'
+                union all
+                select *
+                from (
+                    select `date` , stockCode, ratioB , rank() over (partition by tqnb.stockCode order by ratioB, `date` desc ) rank_ , count(1) over(partition by stockCode ) * 0.015 rank_limit_
+                    from t_qq_node_buy tqnb
+                ) tt
+                where rank_ <= rank_limit_
+                and stockCode like '3%'
+            ) tt
+        ) tt2
+        ]]>
+    </select>
+
 </mapper>
