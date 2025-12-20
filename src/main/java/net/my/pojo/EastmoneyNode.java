@@ -16,8 +16,8 @@ public class EastmoneyNode {
     private Double low;
     private Double volume;
     private Double amount;
-    private Double expma5;
-    private Double expma10;
     private Double exchangeRaw;
     private String infoRaw;
+    private Double expma5;
+    private Double expma10;
 }
