@@ -181,6 +181,7 @@ public class AgNew300UsingEastmoneyController {
                     currNode.setExpma5(calcExpma(5.0, lastNode.getExpma5(), currNode.getLast()));
                     currNode.setExpma10(calcExpma(10.0, lastNode.getExpma10(), currNode.getLast()));
                 }
+                log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
                 dataCalcMapper.updateExpmaEastmoney(currNode);
             }
         }

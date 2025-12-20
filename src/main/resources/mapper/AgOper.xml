@@ -791,7 +791,7 @@
     </select>
 
 
-    
+
 
     <insert id="saveEastMoneyDatas" parameterType="java.util.List">
         insert into t_eastmoney_node(`date`, `stockCode`, `infoRaw`)
@@ -814,7 +814,7 @@
         select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
         from t_eastmoney_node
         where stockCode = #{stockCode}
-        and clac_expma_5 is not null
+        and clac_expma_5 is null
         order by date
     </select>
 
