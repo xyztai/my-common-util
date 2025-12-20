@@ -36,6 +36,11 @@ public class AgNew300UsingEastmoneyController {
     public static final String EASTMONEY_URL_FORMAT_QFQ =
             "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=101&fqt=1&beg=0&end=20500101&fields1=f1&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61";
 
+    public static final String EASTMONEY_URL_BEGIN_FORMAT_QFQ =
+            "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=101&fqt=1&beg=%s&end=20500101&fields1=f1&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61";
+
+
+
 
     @Autowired
     private MyCaffeineCache myCaffeineCache;
@@ -75,6 +80,12 @@ public class AgNew300UsingEastmoneyController {
         for(Map.Entry<String, String> entry : hs300Map.entrySet()) {
             String zqdm = entry.getValue();
             String url = String.format(EASTMONEY_URL_FORMAT_QFQ, zqdm);
+
+            EastmoneyNode existsNode = dataCalcMapper.getMaxEastMoneyNode(entry.getKey());
+            if(existsNode != null) {
+                url = String.format(EASTMONEY_URL_BEGIN_FORMAT_QFQ, zqdm, existsNode.getDate().replaceAll("-", ""));
+            }
+
             log.info("url: {}, zqdm: {}", url, zqdm);
             String res = "";
             for(int i = 0; i < 200; i++) {
@@ -113,7 +124,6 @@ public class AgNew300UsingEastmoneyController {
                 }
 
 
-                EastmoneyNode existsNode = dataCalcMapper.getMaxEastMoneyNode(entry.getKey());
                 if(existsNode != null) {
                     nodes = nodes.stream()
                             .filter(f -> f.getDate().compareTo(existsNode.getDate()) > 0).collect(Collectors.toList());
