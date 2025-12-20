@@ -86,5 +86,5 @@ public interface DataCalcMapper {
     EastmoneyNode getMaxEastMoneyNodeHasExpma(@Param("stockCode") String stockCode);
     List<EastmoneyNode> getEastMoneyNodes(@Param("stockCode") String stockCode);
     int updateEastMoneyDatas();
-    int updateExpmaEastmoney(@Param("node") EastmoneyNode node);
+    int updateExpmaEastmoney(EastmoneyNode node);
 }
