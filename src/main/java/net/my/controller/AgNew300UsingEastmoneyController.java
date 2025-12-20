@@ -148,7 +148,9 @@ public class AgNew300UsingEastmoneyController {
         }
 
         log.info("开始更新数据字段");
+        // 更新基础字段
         dataCalcMapper.updateEastMoneyDatas();
+        // 更新expma字段
         updateExpma();
 
 //        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
@@ -169,7 +171,7 @@ public class AgNew300UsingEastmoneyController {
 //            String zqdm = "0.000001";
             List<EastmoneyNode> needUpdateExpmas = dataCalcMapper.getEastMoneyNodes(zqdm);
             if(CollectionUtils.isEmpty(needUpdateExpmas)) {
-                return BaseResponse.OK;
+                continue;
             }
 
             needUpdateExpmas = needUpdateExpmas.stream().sorted(Comparator.comparing(EastmoneyNode::getDate)).collect(Collectors.toList());
