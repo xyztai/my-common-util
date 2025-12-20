@@ -83,5 +83,5 @@ public interface DataCalcMapper {
 
     int saveEastMoneyDatas(List<EastmoneyNode> eastmoneyNodes);
     EastmoneyNode getMaxEastMoneyNode(@Param("stockCode") String stockCode);
-
+    int updateEastMoneyDatas();
 }

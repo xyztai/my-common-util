@@ -147,6 +147,9 @@ public class AgNew300UsingEastmoneyController {
             startNum += stepNum;
         }
 
+        log.info("开始更新数据字段");
+        dataCalcMapper.updateEastMoneyDatas();
+
 //        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
         return RestGeneralResponse.of(eastmoneyNodeMap);
     }
