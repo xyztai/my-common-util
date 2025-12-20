@@ -154,6 +154,38 @@ public class AgNew300UsingEastmoneyController {
         return RestGeneralResponse.of(eastmoneyNodeMap);
     }
 
+    @GetMapping("/updateExpma")
+    public void updateExpma() {
+        String zqdm = "0.000001";
+        List<EastmoneyNode> needUpdateExpmas = dataCalcMapper.getEastMoneyNodes(zqdm);
+        if(CollectionUtils.isEmpty(needUpdateExpmas)) {
+            return;
+        }
+
+        needUpdateExpmas = needUpdateExpmas.stream().sorted(Comparator.comparing(EastmoneyNode::getDate)).collect(Collectors.toList());
+        EastmoneyNode existsNode = dataCalcMapper.getMaxEastMoneyNodeHasExpma(zqdm);
+
+        if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
+            for(int i = 0; i < needUpdateExpmas.size(); i++) {
+                EastmoneyNode currNode = needUpdateExpmas.get(i);
+                if(0 == i) {
+                    if(existsNode == null) {
+                        currNode.setExpma5(currNode.getLast());
+                        currNode.setExpma10(currNode.getLast());
+                    } else {
+                        currNode.setExpma5(calcExpma(5.0, existsNode.getExpma5(), currNode.getLast()));
+                        currNode.setExpma10(calcExpma(10.0, existsNode.getExpma10(), currNode.getLast()));
+                    }
+                } else {
+                    EastmoneyNode lastNode = needUpdateExpmas.get(i - 1);
+                    currNode.setExpma5(calcExpma(5.0, lastNode.getExpma5(), currNode.getLast()));
+                    currNode.setExpma10(calcExpma(10.0, lastNode.getExpma10(), currNode.getLast()));
+                }
+                dataCalcMapper.updateExpmaEastmoney(currNode);
+            }
+        }
+    }
+
     private double calcExpma(double step, double lastValue, double cp) {
         return (cp - lastValue) * 2.0 / (step + 1) + lastValue;
         // round((t.close_price - t3.`expma_5`)*2.0/(5.0+1) + t3.`expma_5`, 6)

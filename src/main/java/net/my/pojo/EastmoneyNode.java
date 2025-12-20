@@ -7,6 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class EastmoneyNode {
+    private Long id;
     private String stockCode;
     private String date;
     private Double open;
@@ -15,6 +16,8 @@ public class EastmoneyNode {
     private Double low;
     private Double volume;
     private Double amount;
+    private Double expma5;
+    private Double expma10;
     private Double exchangeRaw;
     private String infoRaw;
 }
