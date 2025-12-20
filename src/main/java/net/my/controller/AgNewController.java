@@ -248,11 +248,11 @@ public class AgNewController {
         }
 
         if(StringUtils.isEmpty(days)) {
-            days = "30";
+            days = "300";
         } else {
             days = days.trim();
             if(StringUtils.isEmpty(days)) {
-                days = "30";
+                days = "300";
             }
         }
 
@@ -325,8 +325,8 @@ public class AgNewController {
         List<SpecialCarePoJo> resPoJos2 = new ArrayList<>();
 
         Set<String> stockCodesT = resPoJos.stream().filter(f -> f.getDate().startsWith("T+1")).map(SpecialCarePoJo::getStockCode).collect(Collectors.toSet());
-        resPoJos2.addAll(resPoJos.stream().filter(f -> stockCodesT.contains(f.getStockCode())).sorted(Comparator.comparing(SpecialCarePoJo::getDate, Comparator.reverseOrder())
-                .thenComparing(SpecialCarePoJo::getStockCode)).collect(Collectors.toList()));
+        resPoJos2.addAll(resPoJos.stream().filter(f -> stockCodesT.contains(f.getStockCode())).sorted(Comparator.comparing(SpecialCarePoJo::getStockCode).thenComparing(SpecialCarePoJo::getDate, Comparator.reverseOrder()))
+               .collect(Collectors.toList()));
         resPoJos2.addAll(resPoJos.stream().filter(f -> !stockCodesT.contains(f.getStockCode())).collect(Collectors.toList()));
 
         return RestGeneralResponse.of(resPoJos2);
