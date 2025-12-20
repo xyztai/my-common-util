@@ -78,4 +78,8 @@ public interface DataCalcMapper {
     // hs300 参数
     List<Hs300Para> getHistoryParas();
 
+    // 从东财获取所有的历史数据
+    List<Hs300PO> getHs300FromEastmoneyList();
+
+
 }
