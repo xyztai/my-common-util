@@ -56,8 +56,8 @@ public class AgNew300UsingEastmoneyController {
     @Transactional
     public BaseResponse getHistoryData() {
         List<AgClosePriceDTO> agClosePriceDTOs = new ArrayList<>();
-        Map<String, QqNode> qqNodeMap = new LinkedHashMap<>();
-        List<QqNode> qqNodeList = new ArrayList<>();
+        List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
+        Map<String, EastmoneyNode> eastmoneyNodeMap = new LinkedHashMap<>();
         List<Hs300PO> hs300List = dataCalcMapper.getHs300List();
 
         if(CollectionUtils.isEmpty(hs300List)) {
@@ -99,58 +99,28 @@ public class AgNew300UsingEastmoneyController {
                 log.info("eastmoneyRes={}", JSON.toJSONString(eastmoneyRes));
 
                 break;
-//
-//                List<List<Object>> pojos = eastmoneyRes.getData().get(zqdm).get("qfqday");
-//                if(pojos == null) {
-//                    pojos = eastmoneyRes.getData().get(zqdm).get("day");
-//                }
-//                if(pojos == null) {
-//                    continue;
-//                }
-//                List<QqNode> tmpNodes = pojos.stream()
-//                        .map(Hs300POJO::toVo2)
-//                        .sorted(Comparator.comparing(QqNode::getDate))
-//                        .collect(Collectors.toList());
-//                tmpNodes.forEach(f -> f.setStockCode(entry.getKey()));
-//
-//                QqNode existsNode = dataCalcMapper.getMaxQqNode(entry.getKey());
-//                if(existsNode != null) {
-//                    tmpNodes = tmpNodes.stream()
-//                            .filter(f -> f.getDate().compareTo(existsNode.getDate()) > 0).collect(Collectors.toList());
-//                }
-//
-//                if(!CollectionUtils.isEmpty(tmpNodes)) {
-//                    for(int i = 0; i < tmpNodes.size(); i++) {
-//                        QqNode currNode = tmpNodes.get(i);
-//                        currNode.setStockCode(entry.getKey());
-//                        if(0 == i) {
-//                            if(existsNode == null) {
-//                                currNode.setExpma5(currNode.getLast());
-//                                currNode.setExpma10(currNode.getLast());
-//                                currNode.setExpma20(currNode.getLast());
-//                                currNode.setExpma37(currNode.getLast());
-//                                currNode.setExpma60(currNode.getLast());
-//                            } else {
-//                                // private double calcExpma(double step, double lastValue, double cp) {
-//                                currNode.setExpma5(calcExpma(5.0, existsNode.getExpma5(), currNode.getLast()));
-//                                currNode.setExpma10(calcExpma(10.0, existsNode.getExpma10(), currNode.getLast()));
-//                                currNode.setExpma20(calcExpma(20.0, existsNode.getExpma20(), currNode.getLast()));
-//                                currNode.setExpma37(calcExpma(37.0, existsNode.getExpma37(), currNode.getLast()));
-//                                currNode.setExpma60(calcExpma(60.0, existsNode.getExpma60(), currNode.getLast()));
-//                            }
-//                        } else {
-//                            QqNode lastNode = tmpNodes.get(i - 1);
-//                            currNode.setExpma5(calcExpma(5.0, lastNode.getExpma5(), currNode.getLast()));
-//                            currNode.setExpma10(calcExpma(10.0, lastNode.getExpma10(), currNode.getLast()));
-//                            currNode.setExpma20(calcExpma(20.0, lastNode.getExpma20(), currNode.getLast()));
-//                            currNode.setExpma37(calcExpma(37.0, lastNode.getExpma37(), currNode.getLast()));
-//                            currNode.setExpma60(calcExpma(60.0, lastNode.getExpma60(), currNode.getLast()));
-//                        }
-//                    }
-//                    // 把最新的数据拿出来
-//                    qqNodeMap.put(entry.getKey(), tmpNodes.get(tmpNodes.size() - 1));
-//                    qqNodeList.addAll(tmpNodes);
-//                }
+
+                // saveEastMoneyDatas
+                if(eastmoneyRes == null || eastmoneyRes.getData() == null || CollectionUtils.isEmpty(eastmoneyRes.getData().getKlines())) {
+                    break ;
+                }
+
+                List<String> klines = eastmoneyRes.getData().getKlines();
+                List<EastmoneyNode> nodes = new ArrayList<>();
+                for(String item : klines) {
+                    String[] xxs = item.split(",");
+                    nodes.add(EastmoneyNode.builder().date(xxs[0]).stockCode(zqdm).infoRaw(item).build());
+                }
+
+
+                EastmoneyNode existsNode = dataCalcMapper.getMaxEastMoneyNode(entry.getKey());
+                if(existsNode != null) {
+                    nodes = nodes.stream()
+                            .filter(f -> f.getDate().compareTo(existsNode.getDate()) > 0).collect(Collectors.toList());
+                }
+
+                eastmoneyNodeMap.put(entry.getKey(), nodes.get(nodes.size() - 1));
+                eastmoneyNodeList.addAll(nodes);
             } catch (Exception ex) {
                 log.error("", ex);
             }
@@ -158,16 +128,15 @@ public class AgNew300UsingEastmoneyController {
 
         int startNum = 0;
         int stepNum = 100;
-//        log.info("qqNodeList={}", JSON.toJSON(qqNodeList));
-        while(startNum < qqNodeList.size()) {
-            List<QqNode> tmpNodes = qqNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
+        while(startNum < eastmoneyNodeList.size()) {
+            List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
             log.info("tmpNodes.size={}", tmpNodes.size());
-            dataCalcMapper.saveQqNodes(tmpNodes);
+            dataCalcMapper.saveEastMoneyDatas(tmpNodes);
             startNum += stepNum;
         }
 
 //        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
-        return RestGeneralResponse.of(qqNodeMap);
+        return RestGeneralResponse.of(eastmoneyNodeMap);
     }
 
     private double calcExpma(double step, double lastValue, double cp) {

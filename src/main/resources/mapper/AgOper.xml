@@ -790,4 +790,22 @@
         ]]>
     </select>
 
+
+    <insert id="saveEastMoneyDatas" parameterType="java.util.List">
+        insert into t_eastmoney_node(`date`, `stockCode`, `infoRaw`)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.date}, #{item.stockCode}, #{item.infoRaw}
+            )
+        </foreach>
+    </insert>
+
+    <select id="getMaxEastMoneyNode" resultType="net.my.pojo.EastmoneyNode">
+        select date, stockCode
+        from t_eastmoney_node
+        where stockCode = #{stockCode}
+        order by date desc
+        limit 1
+    </select>
+
 </mapper>

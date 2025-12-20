@@ -81,5 +81,7 @@ public interface DataCalcMapper {
     // 从东财获取所有的历史数据
     List<Hs300PO> getHs300FromEastmoneyList();
 
+    int saveEastMoneyDatas(List<EastmoneyNode> eastmoneyNodes);
+    EastmoneyNode getMaxEastMoneyNode(@Param("stockCode") String stockCode);
 
 }
