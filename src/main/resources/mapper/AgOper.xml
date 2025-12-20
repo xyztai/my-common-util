@@ -801,7 +801,7 @@
     </insert>
 
     <select id="getMaxEastMoneyNode" resultType="net.my.pojo.EastmoneyNode">
-        select date, stockCode
+        select date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw
         from t_eastmoney_node
         where stockCode = #{stockCode}
         order by date desc
