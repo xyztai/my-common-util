@@ -3,6 +3,7 @@ package net.my.config;
 import lombok.extern.slf4j.Slf4j;
 import net.my.controller.AgController;
 import net.my.controller.AgNew300Controller;
+import net.my.controller.AgNew300UsingEastmoneyController;
 import net.my.controller.AgNewController;
 import net.my.mapper.DataCalcMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +33,9 @@ public class ScheduledTasks {
 
     @Autowired
     private AgNew300Controller agNew300Controller;
+
+    @Autowired
+    private AgNew300UsingEastmoneyController agNew300UsingEastmoneyController;
 
     /**
      * 更新历史参数，以及历史预算数据
@@ -112,6 +116,7 @@ public class ScheduledTasks {
             log.info("time to execGetHistoryData");
             agNewController.getHistoryData(5);
             agNew300Controller.getHistoryData(5);
+            agNew300UsingEastmoneyController.getHistoryData();
 //            agController.getHistoryData(5);
 //            agController.getIndustryHistoryData(5);
         } else {
