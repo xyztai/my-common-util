@@ -98,7 +98,7 @@ public class AgNew300UsingEastmoneyController {
                 Hs300EastmoneyRes eastmoneyRes = JSON.parseObject(res, Hs300EastmoneyRes.class);
                 log.info("eastmoneyRes={}", JSON.toJSONString(eastmoneyRes));
 
-                break;
+//                break;
 
                 // saveEastMoneyDatas
                 if(eastmoneyRes == null || eastmoneyRes.getData() == null || CollectionUtils.isEmpty(eastmoneyRes.getData().getKlines())) {
