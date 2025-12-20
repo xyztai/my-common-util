@@ -322,7 +322,14 @@ public class AgNewController {
         resPoJos = resPoJos.stream().sorted(Comparator.comparing(SpecialCarePoJo::getDate, Comparator.reverseOrder())
                 .thenComparing(SpecialCarePoJo::getStockCode)).collect(Collectors.toList());
 
-        return RestGeneralResponse.of(resPoJos);
+        List<SpecialCarePoJo> resPoJos2 = new ArrayList<>();
+
+        Set<String> stockCodesT = resPoJos.stream().filter(f -> f.getDate().startsWith("T+1")).map(SpecialCarePoJo::getStockCode).collect(Collectors.toSet());
+        resPoJos2.addAll(resPoJos.stream().filter(f -> stockCodesT.contains(f.getStockCode())).sorted(Comparator.comparing(SpecialCarePoJo::getDate, Comparator.reverseOrder())
+                .thenComparing(SpecialCarePoJo::getStockCode)).collect(Collectors.toList()));
+        resPoJos2.addAll(resPoJos.stream().filter(f -> !stockCodesT.contains(f.getStockCode())).collect(Collectors.toList()));
+
+        return RestGeneralResponse.of(resPoJos2);
     }
 
     private double calcExpma(double step, double lastValue, double cp) {
