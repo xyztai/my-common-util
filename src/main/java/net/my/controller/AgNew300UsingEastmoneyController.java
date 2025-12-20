@@ -81,7 +81,7 @@ public class AgNew300UsingEastmoneyController {
             String zqdm = entry.getValue();
             String url = String.format(EASTMONEY_URL_FORMAT_QFQ, zqdm);
 
-            EastmoneyNode existsNode = dataCalcMapper.getMaxEastMoneyNode(entry.getKey());
+            EastmoneyNode existsNode = dataCalcMapper.getMaxEastMoneyNode(zqdm);
             if(existsNode != null) {
                 url = String.format(EASTMONEY_URL_BEGIN_FORMAT_QFQ, zqdm, existsNode.getDate().replaceAll("-", ""));
             }
