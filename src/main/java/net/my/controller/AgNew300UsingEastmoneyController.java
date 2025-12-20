@@ -119,8 +119,10 @@ public class AgNew300UsingEastmoneyController {
                             .filter(f -> f.getDate().compareTo(existsNode.getDate()) > 0).collect(Collectors.toList());
                 }
 
-                eastmoneyNodeMap.put(entry.getKey(), nodes.get(nodes.size() - 1));
-                eastmoneyNodeList.addAll(nodes);
+                if(!CollectionUtils.isEmpty(nodes)) {
+                    eastmoneyNodeMap.put(entry.getKey(), nodes.get(nodes.size() - 1));
+                    eastmoneyNodeList.addAll(nodes);
+                }
             } catch (Exception ex) {
                 log.error("", ex);
             }
