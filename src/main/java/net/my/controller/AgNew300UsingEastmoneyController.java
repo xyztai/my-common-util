@@ -149,42 +149,55 @@ public class AgNew300UsingEastmoneyController {
 
         log.info("开始更新数据字段");
         dataCalcMapper.updateEastMoneyDatas();
+        updateExpma();
 
 //        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
         return RestGeneralResponse.of(eastmoneyNodeMap);
     }
 
     @GetMapping("/updateExpma")
-    public void updateExpma() {
-        String zqdm = "0.000001";
-        List<EastmoneyNode> needUpdateExpmas = dataCalcMapper.getEastMoneyNodes(zqdm);
-        if(CollectionUtils.isEmpty(needUpdateExpmas)) {
-            return;
+    public BaseResponse updateExpma() {
+        List<Hs300PO> hs300List = dataCalcMapper.getHs300List();
+        if(CollectionUtils.isEmpty(hs300List)) {
+            return BaseResponse.OK;
         }
 
-        needUpdateExpmas = needUpdateExpmas.stream().sorted(Comparator.comparing(EastmoneyNode::getDate)).collect(Collectors.toList());
-        EastmoneyNode existsNode = dataCalcMapper.getMaxEastMoneyNodeHasExpma(zqdm);
+        List<String> zqdms = new ArrayList<>();
+        hs300List.forEach(po -> zqdms.add(0 == po.getStockType() ? "0." + po.getStockCode() : "1." + po.getStockCode()));
 
-        if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
-            for(int i = 0; i < needUpdateExpmas.size(); i++) {
-                EastmoneyNode currNode = needUpdateExpmas.get(i);
-                if(0 == i) {
-                    if(existsNode == null) {
-                        currNode.setExpma5(currNode.getLast());
-                        currNode.setExpma10(currNode.getLast());
+        for(String zqdm : zqdms) {
+//            String zqdm = "0.000001";
+            List<EastmoneyNode> needUpdateExpmas = dataCalcMapper.getEastMoneyNodes(zqdm);
+            if(CollectionUtils.isEmpty(needUpdateExpmas)) {
+                return BaseResponse.OK;
+            }
+
+            needUpdateExpmas = needUpdateExpmas.stream().sorted(Comparator.comparing(EastmoneyNode::getDate)).collect(Collectors.toList());
+            EastmoneyNode existsNode = dataCalcMapper.getMaxEastMoneyNodeHasExpma(zqdm);
+
+            if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
+                for(int i = 0; i < needUpdateExpmas.size(); i++) {
+                    EastmoneyNode currNode = needUpdateExpmas.get(i);
+                    if(0 == i) {
+                        if(existsNode == null) {
+                            currNode.setExpma5(currNode.getLast());
+                            currNode.setExpma10(currNode.getLast());
+                        } else {
+                            currNode.setExpma5(calcExpma(5.0, existsNode.getExpma5(), currNode.getLast()));
+                            currNode.setExpma10(calcExpma(10.0, existsNode.getExpma10(), currNode.getLast()));
+                        }
                     } else {
-                        currNode.setExpma5(calcExpma(5.0, existsNode.getExpma5(), currNode.getLast()));
-                        currNode.setExpma10(calcExpma(10.0, existsNode.getExpma10(), currNode.getLast()));
+                        EastmoneyNode lastNode = needUpdateExpmas.get(i - 1);
+                        currNode.setExpma5(calcExpma(5.0, lastNode.getExpma5(), currNode.getLast()));
+                        currNode.setExpma10(calcExpma(10.0, lastNode.getExpma10(), currNode.getLast()));
                     }
-                } else {
-                    EastmoneyNode lastNode = needUpdateExpmas.get(i - 1);
-                    currNode.setExpma5(calcExpma(5.0, lastNode.getExpma5(), currNode.getLast()));
-                    currNode.setExpma10(calcExpma(10.0, lastNode.getExpma10(), currNode.getLast()));
+                    log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
+                    dataCalcMapper.updateExpmaEastmoney(currNode);
                 }
-                log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
-                dataCalcMapper.updateExpmaEastmoney(currNode);
             }
         }
+
+        return BaseResponse.OK;
     }
 
     private double calcExpma(double step, double lastValue, double cp) {
