@@ -7,7 +7,7 @@ import lombok.Data;
 @Data
 @Builder
 public class EastmoneyNode {
-    private Long id;
+    private Integer id;
     private String stockCode;
     private String date;
     private Double open;
