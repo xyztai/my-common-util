@@ -155,6 +155,7 @@ public class AgNew300UsingEastmoneyController {
         // 更新基础字段
         dataCalcMapper.updateEastMoneyDatas();
         // 更新expma字段
+        log.info("开始更新expma字段");
         updateExpma();
         // 更新buy表
         List<String> needCalcBuys = dataCalcMapper.getNeedCalcDates("2025-06-01", "20");
@@ -186,6 +187,7 @@ public class AgNew300UsingEastmoneyController {
                 continue;
             }
 
+            log.info("needUpdateExpmas={}", JSON.toJSONString(needUpdateExpmas));
             needUpdateExpmas = needUpdateExpmas.stream().sorted(Comparator.comparing(EastmoneyNode::getDate)).collect(Collectors.toList());
             EastmoneyNode existsNode = dataCalcMapper.getMaxEastMoneyNodeHasExpma(zqdm);
 
