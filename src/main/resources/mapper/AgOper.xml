@@ -848,4 +848,39 @@
         set clac_expma_5 = #{expma5}, clac_expma_10=#{expma10}
         where id = #{id}
     </update>
+
+
+
+    <insert id="saveEastmoneyNodeBuys">
+        <![CDATA[
+            replace into t_eastmoney_node_buy (`date`, stockCode, `last` , clac_expma_5, clac_expma_10, ratioB, rank_, period_cnt_, rank_limit_)
+            select *
+            from (
+                select `date`
+                      , stockCode
+                      , tqnb .`last`
+                      , clac_expma_5
+                      , clac_expma_10
+                      , clac_expma_10/clac_expma_5 ratioB
+                      , rank() over (partition by tqnb.stockCode order by clac_expma_10/clac_expma_5 desc, `date` desc ) rank_
+                      , count(1) over(partition by stockCode ) period_cnt_
+                      , count(1) over(partition by stockCode ) * 0.015 rank_limit_
+                from t_eastmoney_node tqnb
+                where `date` > '2020-01-01'
+                and `date` <= #{currDate}
+                -- order by 3, 2
+            ) tt
+            where rank_ <= rank_limit_
+            and period_cnt_ > 100
+            and `date` = #{currDate}
+        ]]>
+    </insert>
+
+    <select id="getNeedCalcDates" parameterType="string">
+        select distinct ten.`date`
+        from t_eastmoney_node ten
+        where ten.`date` > #{startDate}
+        order by 1 DESC
+        limit ${limitCnt}
+    </select>
 </mapper>

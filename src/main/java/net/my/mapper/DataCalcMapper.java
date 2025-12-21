@@ -87,4 +87,6 @@ public interface DataCalcMapper {
     List<EastmoneyNode> getEastMoneyNodes(@Param("stockCode") String stockCode);
     int updateEastMoneyDatas();
     int updateExpmaEastmoney(EastmoneyNode node);
+    int saveEastmoneyNodeBuys(@Param("currDate") String currDate);
+    List<String> getNeedCalcDates(@Param("startDate") String startDate, @Param("limitCnt") String limitCnt);
 }
