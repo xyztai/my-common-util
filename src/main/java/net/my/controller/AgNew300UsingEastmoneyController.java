@@ -77,9 +77,10 @@ public class AgNew300UsingEastmoneyController {
 
         for(Map.Entry<String, String> entry : hs300Map.entrySet()) {
             String zqdm = entry.getValue();
-            if(!zqdm.equals("0.000001")) {
-                continue;
-            }
+//            if(!zqdm.equals("0.000001")) {
+//                continue;
+//            }
+            
             String url = String.format(EASTMONEY_URL_FORMAT_QFQ, zqdm);
 
             EastmoneyNode existsNode = dataCalcMapper.getMaxEastMoneyNode(zqdm);
@@ -148,6 +149,9 @@ public class AgNew300UsingEastmoneyController {
             startNum += stepNum;
         }
 
+        // 删除 预期数据
+        log.info("deleteExpect99999");
+        dataCalcMapper.deleteExpect99999();
         // 开始插入 预期数据
         log.info("insertExpect2099");
         dataCalcMapper.insertExpect99999();

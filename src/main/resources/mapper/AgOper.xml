@@ -943,4 +943,10 @@
         from one_info
         ]]>
     </insert>
+
+    <delete id="deleteExpect99999">
+        DELETE
+        from t_eastmoney_node
+        where `date` like '99999%'
+    </delete>
 </mapper>

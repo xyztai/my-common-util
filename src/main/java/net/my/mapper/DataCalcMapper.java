@@ -92,4 +92,5 @@ public interface DataCalcMapper {
     List<String> getLatestDatesFromEastmoney(@Param("days") String days);
     List<SpecialCarePoJo> selectExistedBuyDataFromEastmoney(@Param("days") String days);
     int insertExpect99999();
+    int deleteExpect99999();
 }
