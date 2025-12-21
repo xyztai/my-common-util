@@ -89,4 +89,6 @@ public interface DataCalcMapper {
     int updateExpmaEastmoney(EastmoneyNode node);
     int saveEastmoneyNodeBuys(@Param("currDate") String currDate);
     List<String> getNeedCalcDates(@Param("startDate") String startDate, @Param("limitCnt") String limitCnt);
+    List<String> getLatestDatesFromEastmoney(@Param("days") String days);
+    List<SpecialCarePoJo> selectExistedBuyDataFromEastmoney(@Param("days") String days);
 }

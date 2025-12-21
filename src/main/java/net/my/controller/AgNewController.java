@@ -332,6 +332,31 @@ public class AgNewController {
         return RestGeneralResponse.of(resPoJos2);
     }
 
+    @GetMapping("/special-care-days-eastmoney/{swing}/{days}")
+    public BaseResponse specialCareDaysEastmoney(@PathVariable("swing") String swing, @PathVariable("days") String days) {
+        log.info("specialCareDaysEastmoney swing={}, days={}", swing, days);
+        if(StringUtils.isEmpty(swing)) {
+            swing = "-1";
+        } else {
+            swing = swing.trim();
+            if(StringUtils.isEmpty(swing)) {
+                swing = "-1";
+            }
+        }
+
+        if(StringUtils.isEmpty(days)) {
+            days = "300";
+        } else {
+            days = days.trim();
+            if(StringUtils.isEmpty(days)) {
+                days = "300";
+            }
+        }
+
+        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectExistedBuyDataFromEastmoney(days);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
     private double calcExpma(double step, double lastValue, double cp) {
         return (cp - lastValue) * 2.0 / (step + 1) + lastValue;
         // round((t.close_price - t3.`expma_5`)*2.0/(5.0+1) + t3.`expma_5`, 6)
