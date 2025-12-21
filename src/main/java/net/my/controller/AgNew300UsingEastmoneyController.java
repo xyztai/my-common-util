@@ -15,12 +15,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.math.BigDecimal;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -147,6 +145,9 @@ public class AgNew300UsingEastmoneyController {
             startNum += stepNum;
         }
 
+        // 开始插入 预期数据
+        log.info("insertExpect2099");
+        dataCalcMapper.insertExpect99999();
         log.info("开始更新数据字段");
         // 更新基础字段
         dataCalcMapper.updateEastMoneyDatas();

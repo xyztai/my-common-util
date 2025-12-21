@@ -806,6 +806,7 @@
         select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
         from t_eastmoney_node
         where stockCode = #{stockCode}
+        and `date` not like '99999%'
         order by date desc
         limit 1
     </select>
@@ -913,4 +914,31 @@
         order by 2 desc, 1
         ]]>
     </select>
+    
+    <insert id="insertExpect99999">
+        <![CDATA[
+        replace INTO t_eastmoney_node (`date`,stockCode,infoRaw,`open`,`last`,high,low,volume,amount,exchangeRaw,clac_expma_5,clac_expma_10)
+        with lastest_info as (
+            select ten.`date` , ten.stockCode , ten.`last`, ten.infoRaw , rank() over (partition by ten.stockCode order by `date` desc) rank_
+            from t_eastmoney_node ten
+            where ten.`date` > '2025-06-01'
+        )
+        , one_info as (
+            select *
+            from lastest_info tt
+            where tt.rank_ = 1
+        )
+        select '99999-0.00' date, stockCode stockCode, concat('99999-0.00', ',0,', round(`last`*(1-0.00), 3), ',0,0,0,0,0,0,0,0') infoRaw, null, null, null, null, null, null, null, null, null
+        from one_info
+        union all
+        select '99999-0.01' date, stockCode stockCode, concat('99999-0.01', ',0,', round(`last`*(1-0.01), 3), ',0,0,0,0,0,0,0,0') infoRaw, null, null, null, null, null, null, null, null, null
+        from one_info
+        union all
+        select '99999-0.02' date, stockCode stockCode, concat('99999-0.02', ',0,', round(`last`*(1-0.02), 3), ',0,0,0,0,0,0,0,0') infoRaw, null, null, null, null, null, null, null, null, null
+        from one_info
+        union all
+        select '99999-0.03' date, stockCode stockCode, concat('99999-0.03', ',0,', round(`last`*(1-0.03), 3), ',0,0,0,0,0,0,0,0') infoRaw, null, null, null, null, null, null, null, null, null
+        from one_info
+        ]]>
+    </insert>
 </mapper>
