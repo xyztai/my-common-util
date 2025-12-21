@@ -8,8 +8,8 @@ import lombok.Data;
 @Builder
 public class EastmoneyNode {
     private Integer id;
-    private String stockCode;
     private String date;
+    private String stockCode;
     private Double open;
     private Double last;
     private Double high;
