@@ -824,6 +824,7 @@
         from t_eastmoney_node
         where stockCode = #{stockCode}
         and clac_expma_5 is not null
+        and `date` not like '99999%'
         order by date desc
         limit 1
     </select>
@@ -869,6 +870,7 @@
                 from t_eastmoney_node tqnb
                 where `date` > '2020-01-01'
                 and `date` <= #{currDate}
+                and (`date` not like '99999%' or `date` = #{currDate})
                 -- order by 3, 2
             ) tt
             where rank_ <= rank_limit_

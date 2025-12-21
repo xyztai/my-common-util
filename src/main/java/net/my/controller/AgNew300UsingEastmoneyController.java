@@ -189,6 +189,9 @@ public class AgNew300UsingEastmoneyController {
             if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
                 for(int i = 0; i < needUpdateExpmas.size(); i++) {
                     EastmoneyNode currNode = needUpdateExpmas.get(i);
+                    if(currNode.getDate().startsWith("99999")) {
+                        continue;
+                    }
                     if(0 == i) {
                         if(existsNode == null) {
                             currNode.setExpma5(currNode.getLast());
@@ -204,6 +207,20 @@ public class AgNew300UsingEastmoneyController {
                     }
                     log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
                     dataCalcMapper.updateExpmaEastmoney(currNode);
+                }
+
+                needUpdateExpmas = needUpdateExpmas.stream().filter(f -> f.getDate().startsWith("99999")).collect(Collectors.toList());
+                if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
+                    existsNode = dataCalcMapper.getMaxEastMoneyNodeHasExpma(zqdm);
+                    if(existsNode != null) {
+                        for(int i = 0; i < needUpdateExpmas.size(); i++) {
+                            EastmoneyNode currNode = needUpdateExpmas.get(i);
+                            currNode.setExpma5(calcExpma(5.0, existsNode.getExpma5(), currNode.getLast()));
+                            currNode.setExpma10(calcExpma(10.0, existsNode.getExpma10(), currNode.getLast()));
+                            log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
+                            dataCalcMapper.updateExpmaEastmoney(currNode);
+                        }
+                    }
                 }
             }
         }
