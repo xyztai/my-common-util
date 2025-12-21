@@ -152,6 +152,14 @@ public class AgNew300UsingEastmoneyController {
         dataCalcMapper.updateEastMoneyDatas();
         // 更新expma字段
         updateExpma();
+        // 更新buy表
+        List<String> needCalcBuys = dataCalcMapper.getNeedCalcDates("2025-06-01", "20");
+        if(!CollectionUtils.isEmpty(needCalcBuys)) {
+            for(String currDate : needCalcBuys) {
+                log.info("calcBuy currDate={}", currDate);
+                dataCalcMapper.saveEastmoneyNodeBuys(currDate);
+            }
+        }
 
 //        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
         return RestGeneralResponse.of(eastmoneyNodeMap);
