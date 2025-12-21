@@ -876,7 +876,7 @@
         ]]>
     </insert>
 
-    <select id="getNeedCalcDates" parameterType="string">
+    <select id="getNeedCalcDates" parameterType="string" resultType="string">
         select distinct ten.`date`
         from t_eastmoney_node ten
         where ten.`date` > #{startDate}
