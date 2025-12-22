@@ -180,6 +180,31 @@ public class AgNew300UsingEastmoneyController {
         return RestGeneralResponse.of(eastmoneyNodeMap);
     }
 
+    @GetMapping("/insert99999")
+    public BaseResponse insert99999() {
+        // 删除 预期数据
+        log.info("阶段2-99999数据-deleteExpect99999");
+        dataCalcMapper.deleteExpect99999();
+        // 开始插入 预期数据
+        log.info("阶段2-99999数据-insertExpect2099");
+        dataCalcMapper.insertExpect99999();
+        log.info("阶段2-99999数据-开始更新基础字段");
+        // 更新基础字段
+        dataCalcMapper.updateEastMoneyDatas();
+        // 更新expma字段
+        log.info("阶段2-99999数据-开始更新expma字段");
+        updateExpma();
+        // 更新buy表
+        List<String> needCalcBuys = dataCalcMapper.getNeedCalcDates("2025-06-01", "3");
+        if(!CollectionUtils.isEmpty(needCalcBuys)) {
+            for(String currDate : needCalcBuys) {
+                log.info("calcBuy currDate={}", currDate);
+                dataCalcMapper.saveEastmoneyNodeBuys(currDate);
+            }
+        }
+        return BaseResponse.OK;
+    }
+
     @GetMapping("/updateExpma")
     public BaseResponse updateExpma() {
         List<Hs300PO> hs300List = dataCalcMapper.getHs300List();
