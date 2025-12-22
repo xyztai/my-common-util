@@ -909,7 +909,7 @@
             order by 1 DESC
             limit ${days}
             )
-        select concat('3_', t3.stockCode, '-', t3.stockName, '-', round(t1.ratioB, 3), '-', t1.rank_, '/', t1.rank_limit_, '-', round(t1.clac_expma_5, 3), '-', round(t1.clac_expma_10, 3) ) stockCode, t1.date, t1.last, t1.ratioB
+        select concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', '') ,round(t1.ratioB, 3), '-', t1.rank_, '/', t1.rank_limit_, '-', round(t1.clac_expma_5, 3), '-', round(t1.clac_expma_10, 3) ) stockCode, t1.date, t1.last, t1.ratioB
         from t_eastmoney_node_buy t1, tmp_days t2, t_hs300 t3
         where t1.`date` = t2.`date`
           and t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
