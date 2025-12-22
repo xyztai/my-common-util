@@ -930,6 +930,9 @@
             from lastest_info tt
             where tt.rank_ = 1
         )
+        select '99999+0.01' date, stockCode stockCode, concat('99999+0.01', ',0,', round(`last`*(1+0.01), 3), ',0,0,0,0,0,0,0,0') infoRaw, null, null, null, null, null, null, null, null, null
+        from one_info
+        union all
         select '99999-0.00' date, stockCode stockCode, concat('99999-0.00', ',0,', round(`last`*(1-0.00), 3), ',0,0,0,0,0,0,0,0') infoRaw, null, null, null, null, null, null, null, null, null
         from one_info
         union all
