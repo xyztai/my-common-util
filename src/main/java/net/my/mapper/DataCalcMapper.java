@@ -94,4 +94,5 @@ public interface DataCalcMapper {
     int insertExpect99999();
     int deleteExpect99999();
     List<SpecialCarePoJo> selectExistedBuyDataFromEastmoneyLast365();
+    List<SpecialCarePoJo> selectExistedBuyDataFromEastmoneyLast30();
 }
