@@ -201,6 +201,7 @@ public class AgNewController {
         }
 
 //        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
+        specialCareDays("-1", "300");
         return RestGeneralResponse.of(qqNodeMap);
     }
 
@@ -254,6 +255,13 @@ public class AgNewController {
             if(StringUtils.isEmpty(days)) {
                 days = "300";
             }
+        }
+
+        String key = "special-care-days" + "#" + days;
+        List<SpecialCarePoJo> cachedRes = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
+        if(cachedRes != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, cachedRes);
+            return RestGeneralResponse.of(cachedRes);
         }
 
         List<String> times = dataCalcMapper.getLatestDates(Integer.parseInt(days));
@@ -329,6 +337,9 @@ public class AgNewController {
                .collect(Collectors.toList()));
         resPoJos2.addAll(resPoJos.stream().filter(f -> !stockCodesT.contains(f.getStockCode())).collect(Collectors.toList()));
 
+
+        myCaffeineCache.put(key, resPoJos2);
+        log.info("myCaffeineCache put, key={}, res={}", key, resPoJos2);
         return RestGeneralResponse.of(resPoJos2);
     }
 
@@ -353,7 +364,16 @@ public class AgNewController {
             }
         }
 
+        String key = "/special-care-days-eastmoney" + "#" + days;
+        List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
         List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectExistedBuyDataFromEastmoney(days);
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
