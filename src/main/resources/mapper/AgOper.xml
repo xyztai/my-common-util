@@ -984,12 +984,16 @@
                 -- ten.`date` , ten.stockCode , ten.`last`,
                 -- , rank() over (partition by ten.stockCode order by clac_expma_10/clac_expma_5 desc) rank_, clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
                 from t_eastmoney_node ten
-                where ten.`date` BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 365+30 DAY), '%Y-%m-%d') and DATE_FORMAT(NOW(), '%Y-%m-%d')
+                where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 365+30 DAY), '%Y-%m-%d')
+                or ten.`date` like '9999%'
             )
             , tmp_calc_days as (
-                select distinct t1.date end_date, DATE_FORMAT(DATE_SUB(STR_TO_DATE(t1.date, '%Y-%m-%d'), INTERVAL 365 DAY), '%Y-%m-%d') start_date
+                select distinct t1.date end_date
+                      , case when t1.`date` like '9999%' then DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 365 DAY), '%Y-%m-%d')
+                             else DATE_FORMAT(DATE_SUB(STR_TO_DATE(t1.date, '%Y-%m-%d'), INTERVAL 365 DAY), '%Y-%m-%d')
+                             end start_date
                 from tmp_all t1
-                where t1.date BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')  and DATE_FORMAT(NOW(), '%Y-%m-%d')
+                where t1.date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
             )
             select concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.rank_, '-', round(t1.clac_expma_5, 3), '-', round(t1.clac_expma_10, 3) ) stockCode, t1.date, t1.last, t1.ratioB
             from (
