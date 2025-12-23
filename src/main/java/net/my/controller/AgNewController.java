@@ -360,16 +360,34 @@ public class AgNewController {
     @GetMapping("/special-care-days-eastmoney-365/{swing}/{days}")
     public BaseResponse selectExistedBuyDataFromEastmoneyLast365(@PathVariable("swing") String swing, @PathVariable("days") String days) {
         log.info("specialCareDaysEastmoney swing={}, days={}", swing, days);
+        String key = "/special-care-days-eastmoney-365";
+        List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
 
         List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectExistedBuyDataFromEastmoneyLast365();
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
     @GetMapping("/special-care-days-eastmoney-30/{swing}/{days}")
     public BaseResponse selectExistedBuyDataFromEastmoneyLast30(@PathVariable("swing") String swing, @PathVariable("days") String days) {
         log.info("specialCareDaysEastmoney swing={}, days={}", swing, days);
+        String key = "/special-care-days-eastmoney-30";
+        List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
 
         List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectExistedBuyDataFromEastmoneyLast30();
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
