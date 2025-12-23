@@ -851,7 +851,9 @@
         where id = #{id}
     </update>
 
-
+    <delete id="delEastMoneyBuy99999">
+        delete from t_eastmoney_node_buy where `date` like '99999%'
+    </delete>
 
     <insert id="saveEastmoneyNodeBuys">
         <![CDATA[

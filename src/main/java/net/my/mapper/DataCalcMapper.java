@@ -95,4 +95,5 @@ public interface DataCalcMapper {
     int deleteExpect99999();
     List<SpecialCarePoJo> selectExistedBuyDataFromEastmoneyLast365();
     List<SpecialCarePoJo> selectExistedBuyDataFromEastmoneyLast30();
+    int delEastMoneyBuy99999();
 }

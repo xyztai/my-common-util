@@ -167,6 +167,8 @@ public class AgNew300UsingEastmoneyController {
         // 更新expma字段
         log.info("阶段2-99999数据-开始更新expma字段");
         updateExpma();
+        log.info("删除 delEastMoneyBuy99999");
+        dataCalcMapper.delEastMoneyBuy99999();
         // 更新buy表
         List<String> needCalcBuys = dataCalcMapper.getNeedCalcDates("2025-06-01", "20");
         if(!CollectionUtils.isEmpty(needCalcBuys)) {
