@@ -960,20 +960,20 @@
         with tmp_all as (
             select ten.`date` , ten.stockCode , ten.`last` , rank() over (partition by ten.stockCode order by clac_expma_10/clac_expma_5 desc) rank_, clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
             from t_eastmoney_node ten
-            where ten.`date` BETWEEN DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 YEAR), '%Y-%m-%d') and DATE_FORMAT(NOW(), '%Y-%m-%d')
+            where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 YEAR), '%Y-%m-%d')
         )
            , tmp_today as (
             select *
             from tmp_all t1
             where t1.rank_ < 10
-              and `date` = (select max(`date` ) from t_eastmoney_node ten2 where ten2.`date` not like '9999%')
+              and `date` > (select max(`date` ) from t_eastmoney_node ten2 where ten2.`date` not like '9999%')
         )
-        select concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.rank_, '-', round(t1.clac_expma_5, 3), '-', round(t1.clac_expma_10, 3) ) stockCode, t1.date, t1.last, t1.ratioB
+        select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', ''), '-', t1.rank_, '-', round(t1.clac_expma_5, 3), '-', round(t1.clac_expma_10, 3) ) stockCode, t1.date, t1.last, t1.ratioB
         from tmp_all t1, t_hs300 t3, tmp_today t5
         where t1.rank_ <= 10
           and t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
           and t1.stockCode = t5.stockCode
-        order by t1.stockCode, t1.date desc
+        order by 1 desc
         ]]>
     </select>
 
