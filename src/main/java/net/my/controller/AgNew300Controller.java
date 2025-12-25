@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import net.my.cache.MyCaffeineCache;
 import net.my.mapper.DataCalcMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,10 +44,6 @@ public class AgNew300Controller {
 //    public static final String URL_FORMAT_QFQ
 //    = "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get?_var=kline_dayqfq&param=sz000001,day,,,2000,qfq";
 
-
-
-    @Autowired
-    private MyCaffeineCache myCaffeineCache;
 
     @Autowired
     private ApplicationContext applicationContext;

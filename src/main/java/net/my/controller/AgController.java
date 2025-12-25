@@ -788,62 +788,55 @@ public class AgController {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHH");
         String formattedDate = dateFormat.format(date);
         String key = formattedDate + "-" + "全部" + "-" + change + "-" + change2 + "-" + change3;
-        List<AgOper> res = (List<AgOper>) myCaffeineCache.get(key);
-        if(res != null) {
-            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
-            // return RestGeneralResponse.of(cacheRes);
-        } else {
-            time = "9999-99-01";
-            List<AgClosePriceBO> agClosePriceBOList = dataCalcMapper.getExpectCP(time, change);
-            if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
-                agClosePriceBOList.forEach(
-                        f -> {
-                            dataCalcMapper.insertCP(f);
-                        }
-                );
-                calc(time);
-            }
+        List<AgOper> res = null;
 
-            time = "9999-99-02";
-            /*if(change.compareTo(0D) > 0) {
-                change = 1D;
-            } else if(change.compareTo(0D) < 0) {
-                change = -1D;
-            } else {
-                change = 0D;
-            }*/
-            agClosePriceBOList = dataCalcMapper.getExpectCP(time, change2);
-            if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
-                agClosePriceBOList.forEach(
-                        f -> {
-                            dataCalcMapper.insertCP(f);
-                        }
-                );
-                calc(time);
-            }
-
-            time = "9999-99-03";
-            agClosePriceBOList = dataCalcMapper.getExpectCP(time, change3);
-            if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
-                agClosePriceBOList.forEach(
-                        f -> {
-                            dataCalcMapper.insertCP(f);
-                        }
-                );
-                calc(time);
-            }
-
-            res = getHardOper2();
-
-            // 测试结束，就删除掉
-            Stream.of("9999-99-01", "9999-99-02", "9999-99-03").forEach(t -> {
-                dataCalcMapper.deleteCP(t);
-                dataCalcMapper.deleteDataCalc(t);
-            });
-
-            myCaffeineCache.put(key, res);
-            log.info("myCaffeineCache put, key={}, res={}", key, res);
+        time = "9999-99-01";
+        List<AgClosePriceBO> agClosePriceBOList = dataCalcMapper.getExpectCP(time, change);
+        if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
+            agClosePriceBOList.forEach(
+                    f -> {
+                        dataCalcMapper.insertCP(f);
+                    }
+            );
+            calc(time);
         }
+
+        time = "9999-99-02";
+        /*if(change.compareTo(0D) > 0) {
+            change = 1D;
+        } else if(change.compareTo(0D) < 0) {
+            change = -1D;
+        } else {
+            change = 0D;
+        }*/
+        agClosePriceBOList = dataCalcMapper.getExpectCP(time, change2);
+        if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
+            agClosePriceBOList.forEach(
+                    f -> {
+                        dataCalcMapper.insertCP(f);
+                    }
+            );
+            calc(time);
+        }
+
+        time = "9999-99-03";
+        agClosePriceBOList = dataCalcMapper.getExpectCP(time, change3);
+        if(!CollectionUtils.isEmpty(agClosePriceBOList)) {
+            agClosePriceBOList.forEach(
+                    f -> {
+                        dataCalcMapper.insertCP(f);
+                    }
+            );
+            calc(time);
+        }
+
+        res = getHardOper2();
+
+        // 测试结束，就删除掉
+        Stream.of("9999-99-01", "9999-99-02", "9999-99-03").forEach(t -> {
+            dataCalcMapper.deleteCP(t);
+            dataCalcMapper.deleteDataCalc(t);
+        });
 
 //        if(!CollectionUtils.isEmpty(res) && !"全部".equals(name)) {
 //            res = res.stream().filter(f -> name.equals(f.getName())).collect(Collectors.toList());

@@ -6,7 +6,6 @@ import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import net.my.cache.MyCaffeineCache;
 import net.my.mapper.DataCalcMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,11 +36,6 @@ public class AgNew300UsingEastmoneyController {
     public static final String EASTMONEY_URL_BEGIN_FORMAT_QFQ =
             "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=101&fqt=1&beg=%s&end=20500101&fields1=f1&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61";
 
-
-
-
-    @Autowired
-    private MyCaffeineCache myCaffeineCache;
 
     @Autowired
     private ApplicationContext applicationContext;

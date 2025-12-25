@@ -201,7 +201,7 @@ public class AgNewController {
         }
 
 //        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
-        specialCareDays("-1", "300");
+        getSpecialCareDays("-1", "300");
         return RestGeneralResponse.of(qqNodeMap);
     }
 
@@ -236,8 +236,7 @@ public class AgNewController {
 //                .collect(Collectors.toList()));
     }
 
-    @GetMapping("/special-care-days/{swing}/{days}")
-    public BaseResponse specialCareDays(@PathVariable("swing") String swing, @PathVariable("days") String days) {
+    private List<SpecialCarePoJo> getSpecialCareDays(String swing, String days) {
         log.info("special-care-days swing={}, days={}", swing, days);
         if(StringUtils.isEmpty(swing)) {
             swing = "-1";
@@ -255,13 +254,6 @@ public class AgNewController {
             if(StringUtils.isEmpty(days)) {
                 days = "300";
             }
-        }
-
-        String key = "special-care-days" + "#" + days;
-        List<SpecialCarePoJo> cachedRes = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
-        if(cachedRes != null) {
-            log.info("myCaffeineCache get, key={}, cacheRes={}", key, cachedRes);
-            return RestGeneralResponse.of(cachedRes);
         }
 
         List<String> times = dataCalcMapper.getLatestDates(Integer.parseInt(days));
@@ -334,9 +326,41 @@ public class AgNewController {
 
         Set<String> stockCodesT = resPoJos.stream().filter(f -> f.getDate().startsWith("T+1")).map(SpecialCarePoJo::getStockCode).collect(Collectors.toSet());
         resPoJos2.addAll(resPoJos.stream().filter(f -> stockCodesT.contains(f.getStockCode())).sorted(Comparator.comparing(SpecialCarePoJo::getStockCode).thenComparing(SpecialCarePoJo::getDate, Comparator.reverseOrder()))
-               .collect(Collectors.toList()));
+                .collect(Collectors.toList()));
         resPoJos2.addAll(resPoJos.stream().filter(f -> !stockCodesT.contains(f.getStockCode())).collect(Collectors.toList()));
 
+        return resPoJos2;
+    }
+
+    @GetMapping("/special-care-days/{swing}/{days}")
+    public BaseResponse specialCareDays(@PathVariable("swing") String swing, @PathVariable("days") String days) {
+        log.info("special-care-days swing={}, days={}", swing, days);
+        if(StringUtils.isEmpty(swing)) {
+            swing = "-1";
+        } else {
+            swing = swing.trim();
+            if(StringUtils.isEmpty(swing)) {
+                swing = "-1";
+            }
+        }
+
+        if(StringUtils.isEmpty(days)) {
+            days = "300";
+        } else {
+            days = days.trim();
+            if(StringUtils.isEmpty(days)) {
+                days = "300";
+            }
+        }
+
+        String key = "special-care-days" + "#" + days;
+        List<SpecialCarePoJo> cachedRes = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
+        if(cachedRes != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, cachedRes);
+            return RestGeneralResponse.of(cachedRes);
+        }
+
+        List<SpecialCarePoJo> resPoJos2 = getSpecialCareDays(swing, days);
 
         myCaffeineCache.put(key, resPoJos2);
         log.info("myCaffeineCache put, key={}, res={}", key, resPoJos2);
@@ -422,6 +446,14 @@ public class AgNewController {
 //                        .divide(new BigDecimal(step + 1))
 //        )
 //                .doubleValue();
+    }
+
+
+
+    @GetMapping("/invalidateAll")
+    void invalidateAll() {
+        log.info("invalidateAll...");
+        myCaffeineCache.invalidateAll();
     }
 
 
