@@ -1023,8 +1023,7 @@
                 from (
                     select t.`date` , t.stockCode , t.chg, t.volume , t.`open` , t.`last`, t.high , t.low
                           , lag(t.`date`, 5) over (partition by t.stockCode order by `date` desc) date_next
-                          , least(t.low
-                              , lag(t.low , 1) over (partition by t.stockCode order by `date` desc)
+                          , least(lag(t.low , 1) over (partition by t.stockCode order by `date` desc)
                               , lag(t.low , 2) over (partition by t.stockCode order by `date` desc)
                               , lag(t.low , 3) over (partition by t.stockCode order by `date` desc)
                               , lag(t.low , 4) over (partition by t.stockCode order by `date` desc)
