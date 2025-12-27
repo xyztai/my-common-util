@@ -838,6 +838,7 @@
         `low` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -7), ',', 1) ,
         `volume` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -6), ',', 1) ,
         `amount` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -5), ',', 1) ,
+        `chg` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -3), ',', 1) ,
         -- SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -4), ',', 1),
         -- SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -3), ',', 1),
         -- SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -2), ',', 1),
