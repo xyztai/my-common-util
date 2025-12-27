@@ -98,5 +98,5 @@ public interface DataCalcMapper {
     int delEastMoneyBuy99999();
 
 
-    List<SpecialCarePoJo> selectVolumnRise();
+    List<SpecialCarePoJo2> selectVolumnRise();
 }

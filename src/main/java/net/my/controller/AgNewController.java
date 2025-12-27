@@ -457,13 +457,13 @@ public class AgNewController {
     public BaseResponse selectVolumnRise(@PathVariable("swing") String swing, @PathVariable("days") String days) {
         log.info("selectVolumnRise swing={}, days={}", swing, days);
         String key = "selectVolumnRise";
-        List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectVolumnRise();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = dataCalcMapper.selectVolumnRise();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
