@@ -1,0 +1,27 @@
+
+select * from (
+	select t.`date` , t.stockCode , t.chg, t.volume , t.`last`, t.next_low, t.next_high_2
+	      , (t.next_high_2/t.`last` - 1)*100 high_gain_2
+	      , (t.next_high_3/t.`last` - 1)*100 high_gain_3
+	      , (t.next_high_4/t.`last` - 1)*100 high_gain_4
+	      , (t.next_high_5/t.`last` - 1)*100 high_gain_5
+	from (
+		select t.`date` , t.stockCode , t.chg, t.volume , t.`open` , t.`last`
+		      , lag(t.low , 1) over (partition by t.stockCode order by `date` desc) next_low
+		      , lag(t.high, 2) over (partition by t.stockCode order by `date` desc) next_high_2
+		      , lag(t.high, 3) over (partition by t.stockCode order by `date` desc) next_high_3
+		      , lag(t.high, 4) over (partition by t.stockCode order by `date` desc) next_high_4
+		      , lag(t.high, 5) over (partition by t.stockCode order by `date` desc) next_high_5
+		      , lead(t.volume) over (partition by t.stockCode order by `date` desc) pre_volume
+		from t_eastmoney_node t
+		where t.`date` > '2025-01-01'
+		-- and t.stockCode like '%600803'
+		and t.`date` not like '9999%'
+		and t.stockCode not like '%.688%'
+	) t
+	where t.volume >= 3 * pre_volume
+	and t.chg >= 1 and t.chg < 4
+	and t.`open` < t.`last`
+) t
+where t.high_gain_2 < 0.5 and  t.high_gain_3 < 0.5 and  t.high_gain_4 < 0.5 and  t.high_gain_5 < 0.5
+order by 1 desc;
