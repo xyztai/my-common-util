@@ -453,6 +453,24 @@ public class AgNewController {
 //                .doubleValue();
     }
 
+    @GetMapping("/selectVolumnRise/{swing}/{days}")
+    public BaseResponse selectVolumnRise(@PathVariable("swing") String swing, @PathVariable("days") String days) {
+        log.info("selectVolumnRise swing={}, days={}", swing, days);
+        String key = "selectVolumnRise";
+        List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectVolumnRise();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688")).collect(Collectors.toList());
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
 
 
     @GetMapping("/invalidateAll")

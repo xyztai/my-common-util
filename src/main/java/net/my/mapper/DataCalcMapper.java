@@ -96,4 +96,7 @@ public interface DataCalcMapper {
     List<SpecialCarePoJo> selectExistedBuyDataFromEastmoneyLast365();
     List<SpecialCarePoJo> selectExistedBuyDataFromEastmoneyLast30();
     int delEastMoneyBuy99999();
+
+
+    List<SpecialCarePoJo> selectVolumnRise();
 }

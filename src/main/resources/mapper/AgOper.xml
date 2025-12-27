@@ -1012,4 +1012,39 @@
             order by t1.end_date desc
         ]]>
     </select>
+
+    <select id="selectVolumnRise" resultType="net.my.pojo.SpecialCarePoJo">
+        <![CDATA[
+            select concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.`date`, '-', t1.chg ) stockCode, t1.date, t1.last
+                  , case when t1.end_buy_date = 1 then concat('可以Buy-', round(t1.to_buy, 3)) else concat('放弃-', round(t1.to_buy, 3)) end ratioB
+            from (
+                select t.`date` , t.stockCode , t.chg, t.volume , t.`last`, t.to_buy,
+                       DATE_FORMAT(DATE_ADD(STR_TO_DATE(t.`date`, '%Y-%m-%d'), INTERVAL 14 DAY), '%Y-%m-%d') > DATE_FORMAT(SYSDATE(), '%Y-%m-%d') end_buy_date
+                from (
+                    select t.`date` , t.stockCode , t.chg, t.volume , t.`open` , t.`last`, t.high , t.low
+                          , lag(t.`date`, 5) over (partition by t.stockCode order by `date` desc) date_next
+                          , least(t.low
+                              , lag(t.low , 1) over (partition by t.stockCode order by `date` desc)
+                              , lag(t.low , 2) over (partition by t.stockCode order by `date` desc)
+                              , lag(t.low , 3) over (partition by t.stockCode order by `date` desc)
+                              , lag(t.low , 4) over (partition by t.stockCode order by `date` desc)
+                              , lag(t.low , 5) over (partition by t.stockCode order by `date` desc)) to_buy -- T~T+5，共6个交易日的 low，T+6时B
+                          , lead(t.volume) over (partition by t.stockCode order by `date` desc) pre_volume
+                    from t_eastmoney_node t
+                    where t.`date` > '2025-01-01'
+                    -- and t.stockCode like '%600803'
+                    and t.`date` not like '9999%'
+                    and t.stockCode not like '%.688%'
+                ) t
+                where t.volume >= 3 * pre_volume
+                and t.chg >= 5
+                and t.high / t.`last` < 1.01
+                and t.`open` / t.low < 1.01
+                and date_next is not null
+            ) t1, t_hs300 t3
+            where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
+            -- where t.high_gain_3 < 0.5 and  t.high_gain_4 < 0.5        and  t.high_gain_5 < 0.5 and t.high_gain_6 < 0.5 and  t.high_gain_7 < 0.5       and  t.high_gain_8 < 0.5 and t.high_gain_9 < 0.5 and  t.high_gain_10 < 0.5       and  t.high_gain_11 < 0.5 and t.high_gain_12 < 0.5 and  t.high_gain_13 < 0.5
+            order by 2 desc
+        ]]>
+    </select>
 </mapper>
