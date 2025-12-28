@@ -1071,6 +1071,7 @@
                                 -- and t.stockCode like '%600803'
                                 and t.`date` not like '9999%'
                                 and t.stockCode not like '%.688%'
+                                and t.stockCode not like '%.300%'
                           ) t
                      where t.volume >= 3 * pre_volume
                        and t.chg >= 3

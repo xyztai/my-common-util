@@ -361,7 +361,7 @@ public class AgNewController {
         }
 
         List<SpecialCarePoJo> resPoJos2 = getSpecialCareDays(swing, days);
-        resPoJos2 = resPoJos2.stream().filter(f -> !f.getStockCode().contains("-688")).collect(Collectors.toList());
+        resPoJos2 = resPoJos2.stream().filter(f -> !f.getStockCode().contains("-688") && !f.getStockCode().contains("-300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, resPoJos2);
         log.info("myCaffeineCache put, key={}, res={}", key, resPoJos2);
@@ -397,7 +397,7 @@ public class AgNewController {
         }
 
         List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectExistedBuyDataFromEastmoney(days);
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688")).collect(Collectors.toList());
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
@@ -415,7 +415,7 @@ public class AgNewController {
         }
 
         List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectExistedBuyDataFromEastmoneyLast365();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688")).collect(Collectors.toList());
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
@@ -433,7 +433,7 @@ public class AgNewController {
         }
 
         List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectExistedBuyDataFromEastmoneyLast30();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688")).collect(Collectors.toList());
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
@@ -464,7 +464,7 @@ public class AgNewController {
         }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = dataCalcMapper.selectVolumnRise();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688")).collect(Collectors.toList());
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
