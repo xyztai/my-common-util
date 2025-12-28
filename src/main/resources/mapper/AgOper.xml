@@ -1016,7 +1016,7 @@
     <select id="selectVolumnRiseDeleted" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
         select concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.`date`, '-', t1.chg ) stockCode, t1.date, t1.last
-             , case when t1.end_buy_date = 1 then concat('可以Buy-', round(t1.to_buy, 3)) else concat('放弃-', round(t1.to_buy, 3)) end ratioB
+             , case when t1.end_buy_date = 1 then concat('慎重-Buy-', round(t1.to_buy, 3)) else concat('历史-', round(t1.to_buy, 3)) end ratioB
         from (
                  select t.`date` , t.stockCode , t.chg, t.volume , t.`last`, t.to_buy,
                         DATE_FORMAT(DATE_ADD(STR_TO_DATE(t.`date`, '%Y-%m-%d'), INTERVAL 14 DAY), '%Y-%m-%d') > DATE_FORMAT(SYSDATE(), '%Y-%m-%d') end_buy_date
@@ -1050,7 +1050,7 @@
     <select id="selectVolumnRise" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
             select concat('3-', t3.stockCode, '-', t3.stockName, '-', t1.`date`, '-', t1.chg ) stockCode, t1.date, t1.last
-                 , case when t1.end_buy_date = 1 then concat('可以Buy-', round(t1.to_buy, 3)) else concat('放弃-', round(t1.to_buy, 3)) end ratioB
+                 , case when t1.end_buy_date = 1 then concat('慎重-Buy-', round(t1.to_buy, 3)) else concat('历史-', round(t1.to_buy, 3)) end ratioB
             from (
                      select t.`date` , t.stockCode , t.chg, t.volume , t.`last`, t.to_buy,
                             DATE_FORMAT(DATE_ADD(STR_TO_DATE(t.`date`, '%Y-%m-%d'), INTERVAL 15 DAY), '%Y-%m-%d') >= DATE_FORMAT(SYSDATE(), '%Y-%m-%d') end_buy_date
