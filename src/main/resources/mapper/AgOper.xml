@@ -905,18 +905,11 @@
 
     <select id="selectExistedBuyDataFromEastmoney" resultType="net.my.pojo.SpecialCarePoJo">
         <![CDATA[
-        with tmp_days as (
-            select distinct ten.`date`
-            from t_eastmoney_node ten
-            where ten.`date` > '2020-01-01'
-            order by 1 DESC
-            limit ${days}
-            )
-        select concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', '') ,round(t1.ratioB, 3), '-', t1.rank_, '/', t1.rank_limit_, '-', round(t1.clac_expma_5, 3), '-', round(t1.clac_expma_10, 3) ) stockCode, t1.date, t1.last, t1.ratioB
-        from t_eastmoney_node_buy t1, tmp_days t2, t_hs300 t3
-        where t1.`date` = t2.`date`
-          and t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
-        order by 2 desc, 1
+            select concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', ''), '-', t1.rank_, '/', t1.rank_limit_, '-', round(t1.clac_expma_5, 3), '-', round(t1.clac_expma_10, 3) ) stockCode, t1.date, round(t1.last, 3) last, round(t1.ratioB, 3) ratioB
+            from t_eastmoney_node_buy t1, t_hs300 t3
+            where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
+            order by 2 desc, 1
+            limit 300
         ]]>
     </select>
     
@@ -956,26 +949,75 @@
         where `date` like '99999%'
     </delete>
 
-
-
     <select id="selectExistedBuyDataFromEastmoneyLast365" resultType="net.my.pojo.SpecialCarePoJo">
         <![CDATA[
         with tmp_all as (
-            select ten.`date` , ten.stockCode , ten.`last` , rank() over (partition by ten.stockCode order by clac_expma_10/clac_expma_5 desc) rank_, clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
+            select ten.`date` , ten.stockCode , round(ten.`last`, 3) last
+                   , rank() over (partition by ten.stockCode order by clac_expma_10/clac_expma_5 desc) rank_
+                   , round(clac_expma_10/clac_expma_5, 3) ratioB
+                   , round(clac_expma_5, 2) clac_expma_5
+                   , round(clac_expma_10, 2) clac_expma_10
             from t_eastmoney_node ten
             where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 YEAR), '%Y-%m-%d')
         )
-           , tmp_today as (
-            select *
+        , tmp_stock_code as (
+            select DISTINCT stockCode
             from tmp_all t1
             where t1.rank_ <= 5
-              and `date` > (select max(`date` ) from t_eastmoney_node ten2 where ten2.`date` not like '9999%')
+            and t1.`date` like '9999%'
         )
-        select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', ''), '-', t1.rank_, '-', round(t1.clac_expma_5, 3), '-', round(t1.clac_expma_10, 3) ) stockCode, t1.date, t1.last, t1.ratioB
-        from tmp_all t1, t_hs300 t3, tmp_today t5
-        where t1.rank_ <= 5
-          and t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
-          and t1.stockCode = t5.stockCode
+        , tmp_rank_99999 as (
+        	select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
+        			, rank() over (partition by stockCode order by rank_ ) rank_2
+        	from tmp_all t, tmp_stock_code t1
+        	where t.rank_ <= 5 * 2
+        	and (t.`date` = '99999+0.01' or t.`date` not like '99999%')
+        	and t.stockCode = t1.stockCode
+        	union
+        	select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
+        			, rank() over (partition by stockCode order by rank_ ) rank_2
+        	from tmp_all t, tmp_stock_code t1
+        	where t.rank_ <= 5 * 2
+        	and (t.`date` = '99999-0.00' or t.`date` not like '99999%')
+        	and t.stockCode = t1.stockCode
+        	union
+        	select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
+        			, rank() over (partition by stockCode order by rank_ ) rank_2
+        	from tmp_all t, tmp_stock_code t1
+        	where t.rank_ <= 5 * 2
+        	and (t.`date` = '99999-0.01' or t.`date` not like '99999%')
+        	and t.stockCode = t1.stockCode
+        	union
+        	select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
+        			, rank() over (partition by stockCode order by rank_ ) rank_2
+        	from tmp_all t, tmp_stock_code t1
+        	where t.rank_ <= 5 * 2
+        	and (t.`date` = '99999-0.02' or t.`date` not like '99999%')
+        	and t.stockCode = t1.stockCode
+        	union
+        	select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
+        			, rank() over (partition by stockCode order by rank_ ) rank_2
+        	from tmp_all t, tmp_stock_code t1
+        	where t.rank_ <= 5 * 2
+        	and (t.`date` = '99999-0.03' or t.`date` not like '99999%')
+        	and t.stockCode = t1.stockCode
+        )
+        , tmp_all_but_99999 as (
+       		select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
+        			, rank() over (partition by stockCode order by rank_ ) rank_2
+        	from tmp_all t, tmp_stock_code t1
+        	where t.rank_ <= 5 * 2
+        	and t.`date` not like '99999%'
+        	and t.stockCode = t1.stockCode
+        )
+        , tmp_consider_99999 as (
+	        select * from tmp_all_but_99999 where rank_2 <= 5
+	        union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 5 )
+        )
+        select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', ''), '-', t1.rank_2, '-', t1.clac_expma_5, '-', t1.clac_expma_10 ) stockCode
+               , t1.date, t1.last, t1.ratioB
+        from tmp_consider_99999 t1, t_hs300 t3
+        where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
         order by 1 desc
         ]]>
     </select>
@@ -998,7 +1040,8 @@
                 from tmp_all t1
                 where t1.date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
             )
-            select concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.rank_, '-', round(t1.clac_expma_5, 3), '-', round(t1.clac_expma_10, 3) ) stockCode, t1.date, t1.last, t1.ratioB
+            select concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.rank_, '-', round(t1.clac_expma_5, 2), '-', round(t1.clac_expma_10, 2) ) stockCode
+                  , t1.date, round(t1.last, 3) last, round(t1.ratioB, 3) ratioB
             from (
                 select t1.end_date, t2.`date` , t2.stockCode , t2.`last`
                        , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_

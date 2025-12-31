@@ -368,35 +368,22 @@ public class AgNewController {
         return RestGeneralResponse.of(resPoJos2);
     }
 
-    @GetMapping("/special-care-days-eastmoney/{swing}/{days}")
-    public BaseResponse specialCareDaysEastmoney(@PathVariable("swing") String swing, @PathVariable("days") String days) {
-        log.info("specialCareDaysEastmoney swing={}, days={}", swing, days);
-        if(StringUtils.isEmpty(swing)) {
-            swing = "-1";
-        } else {
-            swing = swing.trim();
-            if(StringUtils.isEmpty(swing)) {
-                swing = "-1";
-            }
-        }
+    /**
+     * 1、根据 t_eastmoney_node_buy 表获取最近的300条记录
+     * @return
+     */
+    @GetMapping("/special-care-days-eastmoney")
+    public BaseResponse specialCareDaysEastmoney() {
+        log.info("specialCareDaysEastmoney");
 
-        if(StringUtils.isEmpty(days)) {
-            days = "300";
-        } else {
-            days = days.trim();
-            if(StringUtils.isEmpty(days)) {
-                days = "300";
-            }
-        }
-
-        String key = "/special-care-days-eastmoney" + "#" + days;
+        String key = "special-care-days-eastmoney";
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectExistedBuyDataFromEastmoney(days);
+        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectExistedBuyDataFromEastmoney();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
@@ -404,10 +391,14 @@ public class AgNewController {
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
-    @GetMapping("/special-care-days-eastmoney-365/{swing}/{days}")
-    public BaseResponse selectExistedBuyDataFromEastmoneyLast365(@PathVariable("swing") String swing, @PathVariable("days") String days) {
-        log.info("specialCareDaysEastmoney swing={}, days={}", swing, days);
-        String key = "/special-care-days-eastmoney-365";
+    /**
+     * 根据最近一年的数据，判断能否进入TOP5
+     * @return
+     */
+    @GetMapping("/special-care-days-eastmoney-365-top5")
+    public BaseResponse selectExistedBuyDataFromEastmoneyLast365() {
+        log.info("selectExistedBuyDataFromEastmoneyLast365");
+        String key = "special-care-days-eastmoney-365";
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
@@ -422,10 +413,14 @@ public class AgNewController {
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
-    @GetMapping("/special-care-days-eastmoney-30/{swing}/{days}")
-    public BaseResponse selectExistedBuyDataFromEastmoneyLast30(@PathVariable("swing") String swing, @PathVariable("days") String days) {
-        log.info("specialCareDaysEastmoney swing={}, days={}", swing, days);
-        String key = "/special-care-days-eastmoney-30";
+    /**
+     * 根据top3查看最近30天的情况
+     * @return
+     */
+    @GetMapping("/special-care-days-eastmoney-30-top3")
+    public BaseResponse selectExistedBuyDataFromEastmoneyLast30() {
+        log.info("specialCareDaysEastmoney");
+        String key = "special-care-days-eastmoney-30";
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
