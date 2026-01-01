@@ -72,7 +72,7 @@ public class AgNewEastmoneyETFController {
      * 2、根据top3查看最近30天的情况
      * @return
      */
-    @GetMapping("/special-care-days-eastmoney-30-top10")
+    @GetMapping("/special-care-days-eastmoney-60-top10")
     public BaseResponse queryEastmoneyLast30() {
         log.info("specialCareDaysEastmoney");
         String key = "etf#" + "special-care-days-eastmoney-30";
@@ -82,7 +82,7 @@ public class AgNewEastmoneyETFController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyLast30();
+        List<SpecialCarePoJo> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyLast60();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);

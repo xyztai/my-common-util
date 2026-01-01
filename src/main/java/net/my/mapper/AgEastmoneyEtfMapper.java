@@ -19,6 +19,6 @@ public interface AgEastmoneyEtfMapper {
     EastmoneyNode getEtfMaxEastMoneyNodeHasExpma(@Param("stockCode") String stockCode);
     int updateEtfExpmaEastmoney(EastmoneyNode node);
     List<SpecialCarePoJo> queryEtfEastmoneyToday();
-    List<SpecialCarePoJo> queryEtfEastmoneyLast30();
+    List<SpecialCarePoJo> queryEtfEastmoneyLast60();
     List<SpecialCarePoJo2> queryEtfEastmoneyVolSuddenlyRised();
 }
