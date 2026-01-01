@@ -1,5 +1,6 @@
 package net.my.config;
 
+import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import net.my.controller.*;
 import net.my.mapper.DataCalcMapper;
@@ -31,13 +32,14 @@ public class ScheduledTasks {
     @Autowired
     private AgNewQQ300Controller agNewQQ300Controller;
 
-   @Autowired
+    @Autowired
     private AgNewEastmoneyStockController agNewEastmoneyStockController;
 
     @Autowired
     private AgNewEastmoneyETFController agNewEastmoneyETFController;
 
 
+    public static Integer taskState = 0; // 为0说明是没人在用，可以执行，如果为1，则不能执行
 
 
 //    /**
@@ -117,6 +119,12 @@ public class ScheduledTasks {
                         (formattedTime.compareTo("16:01:00") > 0 && formattedTime.compareTo("16:55:00") < 0)
         ) {
             log.info("time to execGetHistoryData");
+            if(taskState != 0) {
+                log.info("taskState={},放弃本次执行", taskState);
+                return;
+            }
+            taskState = 1;
+            
             agNewEastmoneyStockController.getHistoryData();
             agNewEastmoneyETFController.getHistoryData();
 //            agNewQQController.getHistoryData(5);
@@ -128,5 +136,6 @@ public class ScheduledTasks {
             log.info("not time to execGetHistoryData");
         }
         log.info("execGetHistoryData end");
+        taskState = 0;
     }
 }

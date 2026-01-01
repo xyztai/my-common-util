@@ -7,6 +7,7 @@ import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
+import net.my.config.ScheduledTasks;
 import net.my.mapper.AgEastmoneyEtfMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -166,13 +167,23 @@ public class AgNewEastmoneyETFController {
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
-
     @ApiOperation(value = "获取历史的cp数据", notes = "访问互联网接口获取数据")
-    @ApiImplicitParam(name = "days", value = "制定历史上最近N天的数据", required = true, dataType = "String")
     @GetMapping("/historyAll")
     @Transactional
+    public BaseResponse getHistoryDataOuter() {
+        if (ScheduledTasks.taskState != 0) {
+            log.info("taskState={},放弃本次执行", ScheduledTasks.taskState);
+            return BaseResponse.OK;
+        }
+        ScheduledTasks.taskState = 1;
+
+        BaseResponse response = getHistoryData();
+        ScheduledTasks.taskState = 0;
+        return response;
+    }
+
+    @Transactional
     public BaseResponse getHistoryData() {
-        List<AgClosePriceDTO> agClosePriceDTOs = new ArrayList<>();
         List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
         Map<String, EastmoneyNode> eastmoneyNodeMap = new LinkedHashMap<>();
         List<HsStockPoJo> etfList = agEastmoneyEtfMapper.getEtfList();
