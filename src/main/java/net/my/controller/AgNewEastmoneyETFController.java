@@ -50,7 +50,7 @@ public class AgNewEastmoneyETFController {
      * 1、根据最近一年的数据，判断今天能否进入TOP3
      * @return
      */
-    @GetMapping("/special-care-days-eastmoney-1-top3")
+    @GetMapping("/special-care-days-eastmoney-1-top10")
     public BaseResponse queryEastmoneyToday() {
         log.info("queryEastmoneyToday");
         String key = "etf#" + "special-care-days-eastmoney-365";
@@ -72,7 +72,7 @@ public class AgNewEastmoneyETFController {
      * 2、根据top3查看最近30天的情况
      * @return
      */
-    @GetMapping("/special-care-days-eastmoney-30-top3")
+    @GetMapping("/special-care-days-eastmoney-30-top10")
     public BaseResponse queryEastmoneyLast30() {
         log.info("specialCareDaysEastmoney");
         String key = "etf#" + "special-care-days-eastmoney-30";

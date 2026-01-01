@@ -119,42 +119,42 @@
             , tmp_stock_code as (
         select DISTINCT stockCode
         from tmp_all t1
-        where t1.rank_ <= 5
+        where t1.rank_ <= 10
           and t1.`date` like '9999%'
             )
             , tmp_rank_99999 as (
         select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
-        where t.rank_ <= 5 * 2
+        where t.rank_ <= 10 * 2
           and (t.`date` = '99999+0.01' or t.`date` not like '99999%')
           and t.stockCode = t1.stockCode
         union
         select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
-        where t.rank_ <= 5 * 2
+        where t.rank_ <= 10 * 2
           and (t.`date` = '99999-0.00' or t.`date` not like '99999%')
           and t.stockCode = t1.stockCode
         union
         select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
-        where t.rank_ <= 5 * 2
+        where t.rank_ <= 10 * 2
           and (t.`date` = '99999-0.01' or t.`date` not like '99999%')
           and t.stockCode = t1.stockCode
         union
         select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
-        where t.rank_ <= 5 * 2
+        where t.rank_ <= 10 * 2
           and (t.`date` = '99999-0.02' or t.`date` not like '99999%')
           and t.stockCode = t1.stockCode
         union
         select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
-        where t.rank_ <= 5 * 2
+        where t.rank_ <= 10 * 2
           and (t.`date` = '99999-0.03' or t.`date` not like '99999%')
           and t.stockCode = t1.stockCode
             )
@@ -162,13 +162,13 @@
         select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
-        where t.rank_ <= 5 * 2
+        where t.rank_ <= 10 * 2
           and t.`date` not like '99999%'
           and t.stockCode = t1.stockCode
             )
             , tmp_consider_99999 as (
-        select * from tmp_all_but_99999 where rank_2 <= 5
-        union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 3 )
+        select * from tmp_all_but_99999 where rank_2 <= 10
+        union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 10 )
             )
         select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', ''), '-', t1.rank_2, '-', t1.clac_expma_5, '-', t1.clac_expma_10 ) stockCode
                       , t1.date, t1.last, t1.ratioB
@@ -205,7 +205,7 @@
             from tmp_calc_days t1, tmp_all t2
             where t2.`date` BETWEEN t1.start_date and t1.end_date
             ) t1, t_hs300 t3
-        where t1.rank_ <= 3
+        where t1.rank_ <= 10
           and t1.end_date = t1.`date`
           and t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
         order by t1.end_date desc
@@ -238,10 +238,10 @@
                             and t.stockCode not like '%.688%'
                             and t.stockCode not like '%.300%'
                       ) t
-                 where t.volume >= 3 * pre_volume
-                   and t.chg >= 3
-                   and t.high / t.`last` < 1.01
-                   and t.`open` / t.low < 1.01
+                 where t.volume >= 2 * pre_volume
+                   and t.chg >= 2
+                   -- and t.high / t.`last` < 1.01
+                   -- and t.`open` / t.low < 1.01
                    -- and date_exists is not null
                    and (chg_next_1 >= 0 or (chg_next_1 < 0 and vol_next_1 <= volume*0.618))
                    and (chg_next_2 >= 0 or (chg_next_2 < 0 and vol_next_2 <= volume*0.618))
