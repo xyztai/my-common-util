@@ -62,7 +62,10 @@ public class AgNewEastmoneyETFController {
         }
 
         List<SpecialCarePoJo> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyToday();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("3_688")
+                        && !f.getStockCode().startsWith("3_689")
+                        && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
             SpecialCarePoJo empty = new SpecialCarePoJo();
             empty.setDate("--");
@@ -92,7 +95,10 @@ public class AgNewEastmoneyETFController {
         }
 
         List<SpecialCarePoJo> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyLast60();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("3_688")
+                        && !f.getStockCode().startsWith("3_689")
+                        && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
             SpecialCarePoJo empty = new SpecialCarePoJo();
             empty.setDate("--");
@@ -122,7 +128,10 @@ public class AgNewEastmoneyETFController {
         }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyVolSuddenlyRised();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("3_688")
+                        && !f.getStockCode().startsWith("3_689")
+                        && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
             SpecialCarePoJo2 empty = new SpecialCarePoJo2();
             empty.setDate("--");
@@ -152,7 +161,10 @@ public class AgNewEastmoneyETFController {
         }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyLatestInfo();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("3_688")
+                        && !f.getStockCode().startsWith("3_689")
+                        && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
             SpecialCarePoJo2 empty = new SpecialCarePoJo2();
             empty.setDate("--");
