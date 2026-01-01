@@ -1,6 +1,5 @@
 package net.my.mapper;
 
-import net.my.controller.AgNewController;
 import net.my.pojo.*;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;

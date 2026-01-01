@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/ag-new-hs300")
 @Slf4j
 @Api(value = "ag", description = "ag接口")
-public class AgNew300Controller {
+public class AgNewQQ300Controller {
     /**
      * 通过下面的3个接口，获取得到沪深300的列表，其中 f13 = 0 表示深圳；f13 = 1 表示上海
      *

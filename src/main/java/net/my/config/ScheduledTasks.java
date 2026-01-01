@@ -1,10 +1,7 @@
 package net.my.config;
 
 import lombok.extern.slf4j.Slf4j;
-import net.my.controller.AgController;
-import net.my.controller.AgNew300Controller;
-import net.my.controller.AgNew300UsingEastmoneyController;
-import net.my.controller.AgNewController;
+import net.my.controller.*;
 import net.my.mapper.DataCalcMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -29,72 +26,78 @@ public class ScheduledTasks {
     private AgController agController;
 
     @Autowired
-    private AgNewController agNewController;
+    private AgNewQQController agNewQQController;
 
     @Autowired
-    private AgNew300Controller agNew300Controller;
+    private AgNewQQ300Controller agNewQQ300Controller;
+
+   @Autowired
+    private AgNewEastmoneyStockController agNewEastmoneyStockController;
 
     @Autowired
-    private AgNew300UsingEastmoneyController agNew300UsingEastmoneyController;
+    private AgNewEastmoneyETFController agNewEastmoneyETFController;
 
-    /**
-     * 更新历史参数，以及历史预算数据
-     */
-    @Scheduled(cron = "0 0 */12 * * ?")
-    @Transactional
-    public void execHistoryExpect() {
-        log.info("execHistoryExpect begin");
-        agController.genDailyParaAndHistoryExpect();
-        log.info("execHistoryExpect end");
-    }
 
-    /**
-     * 更新当前使用的参数数据
-     */
-    @Scheduled(initialDelay = 1000 * 5, fixedRate = 1000 * 3600 * 3)
-    @Transactional
-    public void execUpdatePara() {
-        log.info("execUpdatePara begin");
-        agController.updatePara();
-        log.info("execUpdatePara end");
-    }
+
+
+//    /**
+//     * 更新历史参数，以及历史预算数据
+//     */
+//    @Scheduled(cron = "0 0 */12 * * ?")
+//    @Transactional
+//    public void execHistoryExpect() {
+//        log.info("execHistoryExpect begin");
+//        agController.genDailyParaAndHistoryExpect();
+//        log.info("execHistoryExpect end");
+//    }
+
+//    /**
+//     * 更新当前使用的参数数据
+//     */
+//    @Scheduled(initialDelay = 1000 * 5, fixedRate = 1000 * 3600 * 3)
+//    @Transactional
+//    public void execUpdatePara() {
+//        log.info("execUpdatePara begin");
+//        agController.updatePara();
+//        log.info("execUpdatePara end");
+//    }
+
+//    /**
+//     * 自动获取/更新历史上5天的cp数据
+//     */
+//    @Scheduled(cron = "0 */33 * * * ?")
+//    @Transactional
+//    public void execGetHistoryData() {
+//        log.info("execGetHistoryData begin");
+//        // 设置时区为北京
+//        LocalDateTime now = LocalDateTime.now();
+//        ZoneId beijngZoneId = ZoneId.of("Asia/Shanghai");
+//        ZonedDateTime beijingTime = now.atZone(beijngZoneId);
+//        // 输出北京时间
+//        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+//        String formattedTime = beijingTime.format(formatter);
+//        log.info("time: {}", formattedTime);
+//        if(
+//                        (formattedTime.compareTo("03:01:00") > 0 && formattedTime.compareTo("03:55:00") < 0) ||
+//                        (formattedTime.compareTo("06:01:00") > 0 && formattedTime.compareTo("06:55:00") < 0) ||
+//                        (formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:55:00") < 0) ||
+//                        (formattedTime.compareTo("18:01:00") > 0 && formattedTime.compareTo("18:55:00") < 0)
+//        ) {
+//            log.info("time to execGetHistoryData");
+////            agNewQQController.getHistoryData(5);
+//            agController.getHistoryData(5);
+////            agController.getIndustryHistoryData(5);
+//        } else {
+//            log.info("not time to execGetHistoryData");
+//        }
+//        log.info("execGetHistoryData end");
+//    }
 
     /**
      * 自动获取/更新历史上5天的cp数据
      */
-    @Scheduled(cron = "0 */33 * * * ?")
-    @Transactional
-    public void execGetHistoryData() {
-        log.info("execGetHistoryData begin");
-        // 设置时区为北京
-        LocalDateTime now = LocalDateTime.now();
-        ZoneId beijngZoneId = ZoneId.of("Asia/Shanghai");
-        ZonedDateTime beijingTime = now.atZone(beijngZoneId);
-        // 输出北京时间
-        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-        String formattedTime = beijingTime.format(formatter);
-        log.info("time: {}", formattedTime);
-        if(
-                        (formattedTime.compareTo("03:01:00") > 0 && formattedTime.compareTo("03:55:00") < 0) ||
-                        (formattedTime.compareTo("06:01:00") > 0 && formattedTime.compareTo("06:55:00") < 0) ||
-                        (formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:55:00") < 0) ||
-                        (formattedTime.compareTo("18:01:00") > 0 && formattedTime.compareTo("18:55:00") < 0)
-        ) {
-            log.info("time to execGetHistoryData");
-//            agNewController.getHistoryData(5);
-            agController.getHistoryData(5);
-//            agController.getIndustryHistoryData(5);
-        } else {
-            log.info("not time to execGetHistoryData");
-        }
-        log.info("execGetHistoryData end");
-    }
-
-    /**
-     * 自动获取/更新历史上5天的cp数据
-     */
-    @Scheduled(cron = "0 */13 * * * ?")
+    @Scheduled(cron = "0 */23 * * * ?")
     @Transactional
     public void execGetHistoryDataNew() {
         log.info("execGetHistoryData begin");
@@ -114,9 +117,11 @@ public class ScheduledTasks {
                         (formattedTime.compareTo("16:01:00") > 0 && formattedTime.compareTo("16:55:00") < 0)
         ) {
             log.info("time to execGetHistoryData");
-            agNewController.getHistoryData(5);
-            agNew300Controller.getHistoryData(5);
-            agNew300UsingEastmoneyController.getHistoryData();
+            agNewEastmoneyStockController.getHistoryData();
+            agNewEastmoneyETFController.getHistoryData();
+//            agNewQQController.getHistoryData(5);
+//            agNewQQ300Controller.getHistoryData(5);  // QQ 的更新hs300 的
+//            agNew300UsingEastmoneyController.getHistoryData();
 //            agController.getHistoryData(5);
 //            agController.getIndustryHistoryData(5);
         } else {

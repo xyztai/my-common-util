@@ -112,6 +112,28 @@ public class AgNewEastmoneyETFController {
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
+    /**
+     * 4、查询每个stock的最近的数据
+     * @return
+     */
+    @GetMapping("/eastmoney-latest-info")
+    public BaseResponse queryEastmoneyLatestInfo() {
+        log.info("queryEastmoneyLatestInfo");
+        String key = "etf#" + "queryEastmoneyLatestInfo";
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyLatestInfo();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
 
     @ApiOperation(value = "获取历史的cp数据", notes = "访问互联网接口获取数据")
     @ApiImplicitParam(name = "days", value = "制定历史上最近N天的数据", required = true, dataType = "String")

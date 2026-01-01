@@ -251,4 +251,19 @@
         ]]>
     </select>
 
+    <select id="queryEastmoneyLatestInfo" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+        select concat('3-', t3.stockCode, '-', t3.stockName, '-', t1.`date`, '-', t1.chg, '-', round(clac_expma_10, 3), '/', round(clac_expma_5, 3)) stockCode, t1.date, t1.last
+             , round(clac_expma_10/clac_expma_5, 3) ratioB
+        from (
+                 select t.*, rank() over (partition by t.stockCode order by t.date desc) rank_
+                 from t_eastmoney_node t
+                 where t.`date` > '2025-01-01' and t.date not like '99999%'
+             ) t1, t_hs300 t3
+        where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
+          and t1.rank_ = 1
+        order by 2, 1
+        ]]>
+    </select>
+
 </mapper>

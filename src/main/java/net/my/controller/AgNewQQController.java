@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/ag-new")
 @Slf4j
 @Api(value = "ag", description = "ag接口")
-public class AgNewController {
+public class AgNewQQController {
 
     static Map<String, String> PROXY_FINANCE_QQ = new LinkedHashMap<>();
     public static final String PROXY_FINANCE_QQ_URL_FORMAT = "https://proxy.finance.qq.com/cgi/cgi-bin/stockinfoquery/kline/app/get?code=%s&ktype=day&limit=%d";

@@ -21,4 +21,5 @@ public interface AgEastmoneyEtfMapper {
     List<SpecialCarePoJo> queryEtfEastmoneyToday();
     List<SpecialCarePoJo> queryEtfEastmoneyLast60();
     List<SpecialCarePoJo2> queryEtfEastmoneyVolSuddenlyRised();
+    List<SpecialCarePoJo2> queryEtfEastmoneyLatestInfo();
 }

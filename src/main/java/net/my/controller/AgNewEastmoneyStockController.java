@@ -77,7 +77,7 @@ public class AgNewEastmoneyStockController {
     @GetMapping("/special-care-days-eastmoney-1-top3")
     public BaseResponse queryEastmoneyToday() {
         log.info("queryEastmoneyToday");
-        String key = "special-care-days-eastmoney-365";
+        String key = "stock#" + "special-care-days-eastmoney-365";
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
@@ -99,7 +99,7 @@ public class AgNewEastmoneyStockController {
     @GetMapping("/special-care-days-eastmoney-30-top3")
     public BaseResponse queryEastmoneyLast30() {
         log.info("specialCareDaysEastmoney");
-        String key = "special-care-days-eastmoney-30";
+        String key = "stock#" + "special-care-days-eastmoney-30";
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
@@ -122,7 +122,7 @@ public class AgNewEastmoneyStockController {
     @GetMapping("/volumn-suddenly-rised")
     public BaseResponse queryEastmoneyVolSuddenlyRised() {
         log.info("queryEastmoneyVolSuddenlyRised");
-        String key = "queryEastmoneyVolSuddenlyRised";
+        String key = "stock#" + "queryEastmoneyVolSuddenlyRised";
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
@@ -130,6 +130,28 @@ public class AgNewEastmoneyStockController {
         }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryEastmoneyVolSuddenlyRised();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+    /**
+     * 4、查询每个stock的最近的数据
+     * @return
+     */
+    @GetMapping("/eastmoney-latest-info")
+    public BaseResponse queryEastmoneyLatestInfo() {
+        log.info("queryEastmoneyLatestInfo");
+        String key = "stock#" + "queryEastmoneyLatestInfo";
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryEastmoneyLatestInfo();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
