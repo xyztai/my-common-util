@@ -392,12 +392,12 @@ public class AgNewController {
     }
 
     /**
-     * 根据最近一年的数据，判断能否进入TOP5
+     * 根据最近一年的数据，判断今天能否进入TOP5
      * @return
      */
-    @GetMapping("/special-care-days-eastmoney-365-top5")
-    public BaseResponse queryEastmoneyLast365() {
-        log.info("queryEastmoneyLast365");
+    @GetMapping("/special-care-days-eastmoney-1-top3")
+    public BaseResponse queryEastmoneyToday() {
+        log.info("queryEastmoneyToday");
         String key = "special-care-days-eastmoney-365";
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
         if(res != null) {
@@ -405,7 +405,7 @@ public class AgNewController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.queryEastmoneyLast365();
+        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.queryEastmoneyToday();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);

@@ -949,7 +949,7 @@
         where `date` like '99999%'
     </delete>
 
-    <select id="queryEastmoneyLast365" resultType="net.my.pojo.SpecialCarePoJo">
+    <select id="queryEastmoneyToday" resultType="net.my.pojo.SpecialCarePoJo">
         <![CDATA[
         with tmp_all as (
             select ten.`date` , ten.stockCode , round(ten.`last`, 3) last
@@ -1012,7 +1012,7 @@
         )
         , tmp_consider_99999 as (
 	        select * from tmp_all_but_99999 where rank_2 <= 5
-	        union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 5 )
+	        union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 3 )
         )
         select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', ''), '-', t1.rank_2, '-', t1.clac_expma_5, '-', t1.clac_expma_10 ) stockCode
                , t1.date, t1.last, t1.ratioB

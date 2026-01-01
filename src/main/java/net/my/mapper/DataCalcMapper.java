@@ -96,7 +96,7 @@ public interface DataCalcMapper {
 
 
     List<SpecialCarePoJo> queryEastmoneyExistedBuyData();
-    List<SpecialCarePoJo> queryEastmoneyLast365();
+    List<SpecialCarePoJo> queryEastmoneyToday();
     List<SpecialCarePoJo> queryEastmoneyLast30();
     List<SpecialCarePoJo2> queryEastmoneyVolSuddenlyRised();
 }
