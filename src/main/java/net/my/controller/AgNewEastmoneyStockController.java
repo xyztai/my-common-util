@@ -7,9 +7,10 @@ import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
-import net.my.mapper.AgEastmoneyEtfMapper;
+import net.my.mapper.AgEastmoneyStockMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -23,10 +24,10 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/ag-eastmoney-etf")
+@RequestMapping("/ag-eastmoney-stock")
 @Slf4j
 @Api(value = "ag", description = "ag接口")
-public class AgNewEastmoneyETFController {
+public class AgNewEastmoneyStockController {
 
     // demo: "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.600276&klt=101&fqt=1&beg=0&end=20500101&fields1=f1&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61";
     // fqt=1 表示前复权
@@ -37,30 +38,53 @@ public class AgNewEastmoneyETFController {
             "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=101&fqt=1&beg=%s&end=20500101&fields1=f1&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61";
 
     @Autowired
-    private AgEastmoneyEtfMapper agEastmoneyEtfMapper;
+    private MyCaffeineCache myCaffeineCache;
+
+    @Autowired
+    private AgEastmoneyStockMapper agEastmoneyStockMapper;
 
     @Autowired
     private RestTemplate restTemplate;
 
-    @Autowired
-    private MyCaffeineCache myCaffeineCache;
 
+//    /**
+//     * 1、根据 t_eastmoney_node_buy 表获取最近的300条记录
+//     * @return
+//     */
+//    @GetMapping("/special-care-days-eastmoney")
+//    public BaseResponse specialCareDaysEastmoney() {
+//        log.info("specialCareDaysEastmoney");
+//
+//        String key = "special-care-days-eastmoney";
+//        List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
+//        if(res != null) {
+//            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+//            return RestGeneralResponse.of(res);
+//        }
+//
+//        List<SpecialCarePoJo> buyDataFromEastmoneys = agEastmoneyStockMapper.queryEastmoneyExistedBuyData();
+//        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
+//
+//        myCaffeineCache.put(key, buyDataFromEastmoneys);
+//        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+//        return RestGeneralResponse.of(buyDataFromEastmoneys);
+//    }
 
     /**
-     * 1、根据最近一年的数据，判断今天能否进入 TOP10
+     * 1、根据最近一年的数据，判断今天能否进入TOP3
      * @return
      */
-    @GetMapping("/special-care-days-eastmoney-1-top10")
+    @GetMapping("/special-care-days-eastmoney-1-top3")
     public BaseResponse queryEastmoneyToday() {
         log.info("queryEastmoneyToday");
-        String key = "etf#" + "special-care-days-eastmoney-365";
+        String key = "special-care-days-eastmoney-365";
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyToday();
+        List<SpecialCarePoJo> buyDataFromEastmoneys = agEastmoneyStockMapper.queryEastmoneyToday();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
@@ -69,26 +93,27 @@ public class AgNewEastmoneyETFController {
     }
 
     /**
-     * 2、根据 TOP10 查看最近60天的情况
+     * 2、根据top3查看最近30天的情况
      * @return
      */
-    @GetMapping("/special-care-days-eastmoney-60-top10")
+    @GetMapping("/special-care-days-eastmoney-30-top3")
     public BaseResponse queryEastmoneyLast30() {
         log.info("specialCareDaysEastmoney");
-        String key = "etf#" + "special-care-days-eastmoney-30";
+        String key = "special-care-days-eastmoney-30";
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyLast60();
+        List<SpecialCarePoJo> buyDataFromEastmoneys = agEastmoneyStockMapper.queryEastmoneyLast30();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
+
 
     /**
      * 3、找到成交量放大3倍及以上的stock
@@ -97,21 +122,20 @@ public class AgNewEastmoneyETFController {
     @GetMapping("/volumn-suddenly-rised")
     public BaseResponse queryEastmoneyVolSuddenlyRised() {
         log.info("queryEastmoneyVolSuddenlyRised");
-        String key = "etf#" + "queryEastmoneyVolSuddenlyRised";
+        String key = "queryEastmoneyVolSuddenlyRised";
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyVolSuddenlyRised();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryEastmoneyVolSuddenlyRised();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
-
 
     @ApiOperation(value = "获取历史的cp数据", notes = "访问互联网接口获取数据")
     @ApiImplicitParam(name = "days", value = "制定历史上最近N天的数据", required = true, dataType = "String")
@@ -121,21 +145,21 @@ public class AgNewEastmoneyETFController {
         List<AgClosePriceDTO> agClosePriceDTOs = new ArrayList<>();
         List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
         Map<String, EastmoneyNode> eastmoneyNodeMap = new LinkedHashMap<>();
-        List<HsStockPoJo> etfList = agEastmoneyEtfMapper.getEtfList();
+        List<HsStockPoJo> hs300List = agEastmoneyStockMapper.getHs300List();
 
-        if(CollectionUtils.isEmpty(etfList)) {
+        if(CollectionUtils.isEmpty(hs300List)) {
             return BaseResponse.OK;
         }
 
-        Map<String, String> etfMap = new LinkedHashMap<>();
-        for(HsStockPoJo po : etfList) {
-            String key = po.getStockName() + "-" + po.getStockCode();
+        Map<String, String> hs300Map = new LinkedHashMap<>();
+        for(HsStockPoJo po : hs300List) {
+            String key = "3_" + po.getStockName() + "-" + po.getStockCode();
             String value = 0 == po.getStockType() ? "0." + po.getStockCode() : "1." + po.getStockCode();
-            etfMap.put(key, value);
+            hs300Map.put(key, value);
         }
 
 
-        for(Map.Entry<String, String> entry : etfMap.entrySet()) {
+        for(Map.Entry<String, String> entry : hs300Map.entrySet()) {
             String zqdm = entry.getValue();
 //            if(!zqdm.equals("0.000001")) {
 //                continue;
@@ -143,7 +167,7 @@ public class AgNewEastmoneyETFController {
             
             String url = String.format(EASTMONEY_URL_FORMAT_QFQ, zqdm);
 
-            EastmoneyNode existsNode = agEastmoneyEtfMapper.getEtfMaxEastMoneyNode(zqdm);
+            EastmoneyNode existsNode = agEastmoneyStockMapper.getMaxEastMoneyNode(zqdm);
             if(existsNode != null) {
                 url = String.format(EASTMONEY_URL_BEGIN_FORMAT_QFQ, zqdm, existsNode.getDate().replaceAll("-", ""));
             }
@@ -168,7 +192,7 @@ public class AgNewEastmoneyETFController {
 
             try {
                 log.info("res={}", res);
-                EtfEastmoneyRes eastmoneyRes = JSON.parseObject(res, EtfEastmoneyRes.class);
+                EastmoneyStockRes eastmoneyRes = JSON.parseObject(res, EastmoneyStockRes.class);
                 log.info("eastmoneyRes={}", JSON.toJSONString(eastmoneyRes));
 
 //                break;
@@ -205,51 +229,62 @@ public class AgNewEastmoneyETFController {
         while(startNum < eastmoneyNodeList.size()) {
             List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
             log.info("tmpNodes.size={}", tmpNodes.size());
-            agEastmoneyEtfMapper.saveEtfEastMoneyDatas(tmpNodes);
+            agEastmoneyStockMapper.saveEastMoneyDatas(tmpNodes);
             startNum += stepNum;
         }
 
         log.info("阶段1-非99999数据-开始更新基础字段");
         // 更新基础字段
-        agEastmoneyEtfMapper.updateEtfEastMoneyDatas();
+        agEastmoneyStockMapper.updateEastMoneyDatas();
         // 更新expma字段
         log.info("阶段1-非99999数据-开始更新expma字段");
         updateExpma();
         // 删除 预期数据
-        log.info("阶段2-99999数据-deleteEtfExpect99999");
-        agEastmoneyEtfMapper.deleteEtfExpect99999();
+        log.info("阶段2-99999数据-deleteExpect99999");
+        agEastmoneyStockMapper.deleteExpect99999();
         // 开始插入 预期数据
-        log.info("阶段2-99999数据-insertEtfExpect99999");
-        agEastmoneyEtfMapper.insertEtfExpect99999();
+        log.info("阶段2-99999数据-insertExpect2099");
+        agEastmoneyStockMapper.insertExpect99999();
         log.info("阶段2-99999数据-开始更新基础字段");
         // 更新基础字段
-        agEastmoneyEtfMapper.updateEtfEastMoneyDatas();
+        agEastmoneyStockMapper.updateEastMoneyDatas();
         // 更新expma字段
         log.info("阶段2-99999数据-开始更新expma字段");
         updateExpma();
+//        log.info("删除 delEastMoneyBuy99999");
+//        agEastmoneyStockMapper.delEastMoneyBuy99999();
+//        // 更新buy表
+//        List<String> needCalcBuys = agEastmoneyStockMapper.getNeedCalcDates("2025-06-01", "20");
+//        if(!CollectionUtils.isEmpty(needCalcBuys)) {
+//            for(String currDate : needCalcBuys) {
+//                log.info("calcBuy currDate={}", currDate);
+//                agEastmoneyStockMapper.saveEastmoneyNodeBuys(currDate);
+//            }
+//        }
 
+//        qqNodeMap.values().forEach(qq -> dataCalcMapper.saveQqNode(qq));
         return RestGeneralResponse.of(eastmoneyNodeMap);
     }
 
     private void updateExpma() {
-        List<HsStockPoJo> etfList = agEastmoneyEtfMapper.getEtfList();
-        if(CollectionUtils.isEmpty(etfList)) {
+        List<HsStockPoJo> hs300List = agEastmoneyStockMapper.getHs300List();
+        if(CollectionUtils.isEmpty(hs300List)) {
             return;
         }
 
         List<String> zqdms = new ArrayList<>();
-        etfList.forEach(po -> zqdms.add(0 == po.getStockType() ? "0." + po.getStockCode() : "1." + po.getStockCode()));
+        hs300List.forEach(po -> zqdms.add(0 == po.getStockType() ? "0." + po.getStockCode() : "1." + po.getStockCode()));
 
         for(String zqdm : zqdms) {
 //            String zqdm = "0.000001";
-            List<EastmoneyNode> needUpdateExpmas = agEastmoneyEtfMapper.getEtfEastMoneyNodes(zqdm);
+            List<EastmoneyNode> needUpdateExpmas = agEastmoneyStockMapper.getEastMoneyNodes(zqdm);
             if(CollectionUtils.isEmpty(needUpdateExpmas)) {
                 continue;
             }
 
             log.info("needUpdateExpmas={}", JSON.toJSONString(needUpdateExpmas));
             needUpdateExpmas = needUpdateExpmas.stream().sorted(Comparator.comparing(EastmoneyNode::getDate)).collect(Collectors.toList());
-            EastmoneyNode existsNode = agEastmoneyEtfMapper.getEtfMaxEastMoneyNodeHasExpma(zqdm);
+            EastmoneyNode existsNode = agEastmoneyStockMapper.getMaxEastMoneyNodeHasExpma(zqdm);
 
             if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
                 for(int i = 0; i < needUpdateExpmas.size(); i++) {
@@ -273,19 +308,19 @@ public class AgNewEastmoneyETFController {
                         currNode.setExpma10(calcExpma(10.0, lastNode.getExpma10(), currNode.getLast()));
                     }
                     log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
-                    agEastmoneyEtfMapper.updateEtfExpmaEastmoney(currNode);
+                    agEastmoneyStockMapper.updateExpmaEastmoney(currNode);
                 }
 
                 needUpdateExpmas = needUpdateExpmas.stream().filter(f -> f.getDate().startsWith("99999")).collect(Collectors.toList());
                 if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
-                    existsNode = agEastmoneyEtfMapper.getEtfMaxEastMoneyNodeHasExpma(zqdm);
+                    existsNode = agEastmoneyStockMapper.getMaxEastMoneyNodeHasExpma(zqdm);
                     if(existsNode != null) {
                         for(int i = 0; i < needUpdateExpmas.size(); i++) {
                             EastmoneyNode currNode = needUpdateExpmas.get(i);
                             currNode.setExpma5(calcExpma(5.0, existsNode.getExpma5(), currNode.getLast()));
                             currNode.setExpma10(calcExpma(10.0, existsNode.getExpma10(), currNode.getLast()));
                             log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
-                            agEastmoneyEtfMapper.updateEtfExpmaEastmoney(currNode);
+                            agEastmoneyStockMapper.updateExpmaEastmoney(currNode);
                         }
                     }
                 }
@@ -293,18 +328,19 @@ public class AgNewEastmoneyETFController {
         }
     }
 
+
     private double calcExpma(double step, double lastValue, double cp) {
         return (cp - lastValue) * 2.0 / (step + 1) + lastValue;
     }
 
 
     @Data
-    public class EtfEastmoneyRes {
-        private EtfEastmoneyPOJO data;
+    public class EastmoneyStockRes {
+        private EastmoneyStockPOJO data;
     }
 
     @Data
-    public static class EtfEastmoneyPOJO {
+    public static class EastmoneyStockPOJO {
         /**
          * [
          *                     "2023-04-28", // 日期
