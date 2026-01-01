@@ -903,7 +903,7 @@
 
 
 
-    <select id="selectExistedBuyDataFromEastmoney" resultType="net.my.pojo.SpecialCarePoJo">
+    <select id="queryEastmoneyExistedBuyData" resultType="net.my.pojo.SpecialCarePoJo">
         <![CDATA[
             select concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', ''), '-', t1.rank_, '/', t1.rank_limit_, '-', round(t1.clac_expma_5, 3), '-', round(t1.clac_expma_10, 3) ) stockCode, t1.date, round(t1.last, 3) last, round(t1.ratioB, 3) ratioB
             from t_eastmoney_node_buy t1, t_hs300 t3
@@ -949,7 +949,7 @@
         where `date` like '99999%'
     </delete>
 
-    <select id="selectExistedBuyDataFromEastmoneyLast365" resultType="net.my.pojo.SpecialCarePoJo">
+    <select id="queryEastmoneyLast365" resultType="net.my.pojo.SpecialCarePoJo">
         <![CDATA[
         with tmp_all as (
             select ten.`date` , ten.stockCode , round(ten.`last`, 3) last
@@ -1022,7 +1022,7 @@
         ]]>
     </select>
 
-    <select id="selectExistedBuyDataFromEastmoneyLast30" resultType="net.my.pojo.SpecialCarePoJo">
+    <select id="queryEastmoneyLast30" resultType="net.my.pojo.SpecialCarePoJo">
         <![CDATA[
             with tmp_all as (
                 select ten.*
@@ -1056,7 +1056,7 @@
         ]]>
     </select>
 
-    <select id="selectVolumnRiseDeleted" resultType="net.my.pojo.SpecialCarePoJo2">
+    <select id="queryEastmoneyVolSuddenlyRisedDeleted" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
         select concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.`date`, '-', t1.chg ) stockCode, t1.date, t1.last
              , case when t1.end_buy_date = 1 then concat('慎重-Buy-', round(t1.to_buy, 3)) else concat('历史-', round(t1.to_buy, 3)) end ratioB
@@ -1090,7 +1090,7 @@
         ]]>
     </select>
 
-    <select id="selectVolumnRise" resultType="net.my.pojo.SpecialCarePoJo2">
+    <select id="queryEastmoneyVolSuddenlyRised" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
             select concat('3-', t3.stockCode, '-', t3.stockName, '-', t1.`date`, '-', t1.chg ) stockCode, t1.date, t1.last
                  , case when t1.end_buy_date = 1 then concat('慎重-Buy-', round(t1.to_buy, 3)) else concat('历史-', round(t1.to_buy, 3)) end ratioB

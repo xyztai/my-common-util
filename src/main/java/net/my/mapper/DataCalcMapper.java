@@ -90,13 +90,13 @@ public interface DataCalcMapper {
     int saveEastmoneyNodeBuys(@Param("currDate") String currDate);
     List<String> getNeedCalcDates(@Param("startDate") String startDate, @Param("limitCnt") String limitCnt);
     List<String> getLatestDatesFromEastmoney(@Param("days") String days);
-    List<SpecialCarePoJo> selectExistedBuyDataFromEastmoney();
     int insertExpect99999();
     int deleteExpect99999();
-    List<SpecialCarePoJo> selectExistedBuyDataFromEastmoneyLast365();
-    List<SpecialCarePoJo> selectExistedBuyDataFromEastmoneyLast30();
     int delEastMoneyBuy99999();
 
 
-    List<SpecialCarePoJo2> selectVolumnRise();
+    List<SpecialCarePoJo> queryEastmoneyExistedBuyData();
+    List<SpecialCarePoJo> queryEastmoneyLast365();
+    List<SpecialCarePoJo> queryEastmoneyLast30();
+    List<SpecialCarePoJo2> queryEastmoneyVolSuddenlyRised();
 }

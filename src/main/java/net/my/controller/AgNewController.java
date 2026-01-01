@@ -383,7 +383,7 @@ public class AgNewController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectExistedBuyDataFromEastmoney();
+        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.queryEastmoneyExistedBuyData();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
@@ -396,8 +396,8 @@ public class AgNewController {
      * @return
      */
     @GetMapping("/special-care-days-eastmoney-365-top5")
-    public BaseResponse selectExistedBuyDataFromEastmoneyLast365() {
-        log.info("selectExistedBuyDataFromEastmoneyLast365");
+    public BaseResponse queryEastmoneyLast365() {
+        log.info("queryEastmoneyLast365");
         String key = "special-care-days-eastmoney-365";
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
         if(res != null) {
@@ -405,7 +405,7 @@ public class AgNewController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectExistedBuyDataFromEastmoneyLast365();
+        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.queryEastmoneyLast365();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
@@ -418,7 +418,7 @@ public class AgNewController {
      * @return
      */
     @GetMapping("/special-care-days-eastmoney-30-top3")
-    public BaseResponse selectExistedBuyDataFromEastmoneyLast30() {
+    public BaseResponse queryEastmoneyLast30() {
         log.info("specialCareDaysEastmoney");
         String key = "special-care-days-eastmoney-30";
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
@@ -427,7 +427,7 @@ public class AgNewController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.selectExistedBuyDataFromEastmoneyLast30();
+        List<SpecialCarePoJo> buyDataFromEastmoneys = dataCalcMapper.queryEastmoneyLast30();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
@@ -437,28 +437,24 @@ public class AgNewController {
 
     private double calcExpma(double step, double lastValue, double cp) {
         return (cp - lastValue) * 2.0 / (step + 1) + lastValue;
-        // round((t.close_price - t3.`expma_5`)*2.0/(5.0+1) + t3.`expma_5`, 6)
-//        BigDecimal bigDecimalLastValue = BigDecimal.valueOf(lastValue);
-//        BigDecimal bigDecimalCp = BigDecimal.valueOf(cp);
-//        return bigDecimalLastValue.add(
-//                (bigDecimalCp.subtract(bigDecimalLastValue))
-//                        .multiply(new BigDecimal(2.0))
-//                        .divide(new BigDecimal(step + 1))
-//        )
-//                .doubleValue();
     }
 
-    @GetMapping("/selectVolumnRise/{swing}/{days}")
-    public BaseResponse selectVolumnRise(@PathVariable("swing") String swing, @PathVariable("days") String days) {
-        log.info("selectVolumnRise swing={}, days={}", swing, days);
-        String key = "selectVolumnRise";
+
+    /**
+     * 找到成交量放大3倍及以上的stock
+     * @return
+     */
+    @GetMapping("/volumn-suddenly-rised")
+    public BaseResponse queryEastmoneyVolSuddenlyRised() {
+        log.info("queryEastmoneyVolSuddenlyRised");
+        String key = "queryEastmoneyVolSuddenlyRised";
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = dataCalcMapper.selectVolumnRise();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = dataCalcMapper.queryEastmoneyVolSuddenlyRised();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("3_688") && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
@@ -467,7 +463,9 @@ public class AgNewController {
     }
 
 
-
+    /**
+     * 清空缓存
+     */
     @GetMapping("/invalidateAll")
     void invalidateAll() {
         log.info("invalidateAll...");
@@ -481,6 +479,7 @@ public class AgNewController {
         private String message;
         private QqData data;
     }
+
 
     @Data
     public class QqData{
