@@ -750,7 +750,7 @@
         order by ratioB, ratioS
     </select>
 
-    <select id="getHs300List" resultType="net.my.pojo.Hs300PO">
+    <select id="getHs300List" resultType="net.my.pojo.HsStockPoJo">
         select stockCode, stockType, stockName
         from t_hs300
         order by 1
@@ -1046,7 +1046,7 @@
                 select t1.end_date, t2.`date` , t2.stockCode , t2.`last`
                        , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_
                        , clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
-                from tmp_calc_days t1, t_eastmoney_node t2
+                from tmp_calc_days t1, tmp_all t2
                 where t2.`date` BETWEEN t1.start_date and t1.end_date
             ) t1, t_hs300 t3
             where t1.rank_ <= 3

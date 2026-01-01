@@ -68,14 +68,14 @@ public class AgNew300Controller {
         List<AgClosePriceDTO> agClosePriceDTOs = new ArrayList<>();
         Map<String, QqNode> qqNodeMap = new LinkedHashMap<>();
         List<QqNode> qqNodeList = new ArrayList<>();
-        List<Hs300PO> hs300List = dataCalcMapper.getHs300List();
+        List<HsStockPoJo> hs300List = dataCalcMapper.getHs300List();
 
         if(CollectionUtils.isEmpty(hs300List)) {
             return BaseResponse.OK;
         }
 
         Map<String, String> hs300Map = new LinkedHashMap<>();
-        for(Hs300PO po : hs300List) {
+        for(HsStockPoJo po : hs300List) {
             String key = "3_" + po.getStockName() + "-" + po.getStockCode();
             String value = 0 == po.getStockType() ? "sz" + po.getStockCode() : "sh" + po.getStockCode();
             hs300Map.put(key, value);
@@ -108,8 +108,8 @@ public class AgNew300Controller {
                 res = res.substring(0, res.indexOf(",\"qt\"")) + "}}}";
                 log.info("res={}", res);
                 Hs300Res qqRes = JSON.parseObject(res, Hs300Res.class);
-//                List<Hs300POJO> pojos = qqRes.getData().get(zqdm).get("qfqday");
-//                List<QqNode> tmpNodes = pojos.stream().map(Hs300POJO::toVo).sorted(Comparator.comparing(QqNode::getDate)).collect(Collectors.toList());
+//                List<HsStockPoJoJO> pojos = qqRes.getData().get(zqdm).get("qfqday");
+//                List<QqNode> tmpNodes = pojos.stream().map(HsStockPoJoJO::toVo).sorted(Comparator.comparing(QqNode::getDate)).collect(Collectors.toList());
 
                 List<List<Object>> pojos = qqRes.getData().get(zqdm).get("qfqday");
                 if(pojos == null) {
@@ -119,7 +119,7 @@ public class AgNew300Controller {
                     continue;
                 }
                 List<QqNode> tmpNodes = pojos.stream()
-                        .map(Hs300POJO::toVo2)
+                        .map(HsStockPoJoJO::toVo2)
                         .sorted(Comparator.comparing(QqNode::getDate))
                         .collect(Collectors.toList());
                 tmpNodes.forEach(f -> f.setStockCode(entry.getKey()));
@@ -203,7 +203,7 @@ public class AgNew300Controller {
     }
 
     @Data
-    public static class Hs300POJO{
+    public static class HsStockPoJoJO{
         /**
          * [
          *                     "2023-04-28", // 日期

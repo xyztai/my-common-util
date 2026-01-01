@@ -73,13 +73,13 @@ public interface DataCalcMapper {
     int insertSpecialData(SpecialCarePoJo pojo);
 
     // hs300 数据
-    List<Hs300PO> getHs300List();
+    List<HsStockPoJo> getHs300List();
 
     // hs300 参数
     List<Hs300Para> getHistoryParas();
 
     // 从东财获取所有的历史数据
-    List<Hs300PO> getHs300FromEastmoneyList();
+    List<HsStockPoJo> getHs300FromEastmoneyList();
 
     int saveEastMoneyDatas(List<EastmoneyNode> eastmoneyNodes);
     EastmoneyNode getMaxEastMoneyNode(@Param("stockCode") String stockCode);

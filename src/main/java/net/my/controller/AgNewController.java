@@ -392,7 +392,7 @@ public class AgNewController {
     }
 
     /**
-     * 根据最近一年的数据，判断今天能否进入TOP5
+     * 2、根据最近一年的数据，判断今天能否进入TOP3
      * @return
      */
     @GetMapping("/special-care-days-eastmoney-1-top3")
@@ -414,7 +414,7 @@ public class AgNewController {
     }
 
     /**
-     * 根据top3查看最近30天的情况
+     * 3、根据top3查看最近30天的情况
      * @return
      */
     @GetMapping("/special-care-days-eastmoney-30-top3")
@@ -441,7 +441,7 @@ public class AgNewController {
 
 
     /**
-     * 找到成交量放大3倍及以上的stock
+     * 4、找到成交量放大3倍及以上的stock
      * @return
      */
     @GetMapping("/volumn-suddenly-rised")

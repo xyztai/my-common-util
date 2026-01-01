@@ -7,7 +7,7 @@ import lombok.Data;
  * @create 2025-12-15 12:34
  */
 @Data
-public class Hs300PO {
+public class HsStockPoJo {
     private String stockCode;
     private Integer stockType;
     private String stockName;
