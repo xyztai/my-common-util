@@ -254,8 +254,8 @@
 
     <select id="queryEtfEastmoneyLatestInfo" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(t1.last, '<br/>(', t1.chg, ')')
-             , concat(round(clac_expma_5, 3), '<br/>', round(clac_expma_10, 3)) ratioB
+        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(t1.last, '\n(', t1.chg, ')') last
+             , concat(round(clac_expma_5, 3), '\n', round(clac_expma_10, 3)) ratioB
         from (
                  select t.*, rank() over (partition by t.stockCode order by t.date desc) rank_
                  from t_eastmoney_node_etf t
