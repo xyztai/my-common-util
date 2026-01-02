@@ -170,8 +170,8 @@
         select * from tmp_all_but_99999 where rank_2 <= 10
         union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 10 )
             )
-        select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', ''), '-', t1.rank_2, '/10') stockCode
-                      , t1.date, t1.last, concat(t1.clac_expma_10, '/', t1.clac_expma_5) ratioB
+        select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', ''), '-', t1.rank_2, '/10' ) stockCode
+                      , t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from tmp_consider_99999 t1, t_etf t3
         where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
         order by 1 desc
@@ -197,9 +197,9 @@
             where t1.date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 60 DAY), '%Y-%m-%d')
         )
         select concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.rank_, '/10' ) stockCode
-             , t1.date, round(t1.last, 3) last, concat(round(t1.clac_expma_10, 3), '/', round(t1.clac_expma_5, 3)) ratioB
+             , t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from (
-            select t1.end_date, t2.`date` , t2.stockCode , t2.`last`
+            select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
                 , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_
             -- , count(1) over (partition by end_date, stockCode) count_
                 , clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
@@ -215,8 +215,8 @@
 
     <select id="queryEtfEastmoneyVolSuddenlyRised" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        select concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.`date`, '-', t1.chg ) stockCode, t1.date, t1.last
-             , case when t1.end_buy_date = 1 then concat('慎重-Buy-', round(t1.to_buy, 3)) else concat('历史-', round(t1.to_buy, 3)) end ratioB
+        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
+             , case when t1.end_buy_date = 1 then concat('慎重\n', round(t1.to_buy, 3)) else concat('历史\n', round(t1.to_buy, 3)) end ratioB
         from (
                  select t.`date` , t.stockCode , t.chg, t.volume , t.`last`, t.to_buy,
                         DATE_FORMAT(DATE_ADD(STR_TO_DATE(t.`date`, '%Y-%m-%d'), INTERVAL 15 DAY), '%Y-%m-%d') >= DATE_FORMAT(SYSDATE(), '%Y-%m-%d') end_buy_date
@@ -254,7 +254,7 @@
 
     <select id="queryEtfEastmoneyLatestInfo" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(t1.last, '\n(', t1.chg, ')') last
+        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
              , concat(round(clac_expma_5, 3), '\n', round(clac_expma_10, 3)) ratioB
         from (
                  select t.*, rank() over (partition by t.stockCode order by t.date desc) rank_

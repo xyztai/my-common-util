@@ -111,8 +111,8 @@
             select ten.`date` , ten.stockCode , round(ten.`last`, 3) last
            , rank() over (partition by ten.stockCode order by clac_expma_10/clac_expma_5 desc) rank_
            , round(clac_expma_10/clac_expma_5, 3) ratioB
-           , round(clac_expma_5, 2) clac_expma_5
-           , round(clac_expma_10, 2) clac_expma_10
+           , round(clac_expma_5, 3) clac_expma_5
+           , round(clac_expma_10, 3) clac_expma_10
         from t_eastmoney_node ten
         where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 YEAR), '%Y-%m-%d')
             )
@@ -170,8 +170,8 @@
         select * from tmp_all_but_99999 where rank_2 <= 5
         union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 3 )
             )
-        select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', ''), '-', t1.rank_2, '-', t1.clac_expma_5, '-', t1.clac_expma_10 ) stockCode
-                      , t1.date, t1.last, t1.ratioB
+        select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', ''), '-', t1.rank_2, '/3' ) stockCode
+                      , t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from tmp_consider_99999 t1, t_hs300 t3
         where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
         order by 1 desc
@@ -196,10 +196,10 @@
             from tmp_all t1
             where t1.date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
         )
-        select concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.rank_, '-', round(t1.clac_expma_5, 2), '-', round(t1.clac_expma_10, 2) ) stockCode
-             , t1.date, round(t1.last, 3) last, round(t1.ratioB, 3) ratioB
+        select concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.rank_, '/3' ) stockCode
+             , t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from (
-            select t1.end_date, t2.`date` , t2.stockCode , t2.`last`
+            select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
                 , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_
                 , clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
             from tmp_calc_days t1, tmp_all t2
@@ -214,8 +214,8 @@
 
     <select id="queryEastmoneyVolSuddenlyRised" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        select concat('3-', t3.stockCode, '-', t3.stockName, '-', t1.`date`, '-', t1.chg ) stockCode, t1.date, t1.last
-             , case when t1.end_buy_date = 1 then concat('慎重-Buy-', round(t1.to_buy, 3)) else concat('历史-', round(t1.to_buy, 3)) end ratioB
+        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
+             , case when t1.end_buy_date = 1 then concat('慎重\n', round(t1.to_buy, 3)) else concat('历史\n', round(t1.to_buy, 3)) end ratioB
         from (
                  select t.`date` , t.stockCode , t.chg, t.volume , t.`last`, t.to_buy,
                         DATE_FORMAT(DATE_ADD(STR_TO_DATE(t.`date`, '%Y-%m-%d'), INTERVAL 15 DAY), '%Y-%m-%d') >= DATE_FORMAT(SYSDATE(), '%Y-%m-%d') end_buy_date
@@ -253,8 +253,8 @@
 
     <select id="queryEastmoneyLatestInfo" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        select concat('3-', t3.stockCode, '-', t3.stockName, '-', t1.`date`, '-', t1.chg, '-', round(clac_expma_10, 3), '/', round(clac_expma_5, 3)) stockCode, t1.date, t1.last
-             , round(clac_expma_10/clac_expma_5, 3) ratioB
+        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
+             , concat(round(clac_expma_5, 3), '\n', round(clac_expma_10, 3)) ratioB
         from (
                  select t.*, rank() over (partition by t.stockCode order by t.date desc) rank_
                  from t_eastmoney_node t
@@ -265,5 +265,4 @@
         order by 2, 1
         ]]>
     </select>
-
 </mapper>
