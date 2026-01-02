@@ -174,7 +174,7 @@
                       , t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from tmp_consider_99999 t1, t_hs300 t3
         where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
-        order by 1 desc
+        order by 2 desc
         ]]>
     </select>
 
