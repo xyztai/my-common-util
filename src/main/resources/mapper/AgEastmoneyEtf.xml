@@ -108,7 +108,7 @@
     <select id="queryEtfEastmoneyToday" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
         with tmp_all as (
-            select ten.`date` , ten.stockCode , round(ten.`last`, 3) last
+            select ten.`date` , ten.stockCode , round(ten.`last`, 3) last, ten.chg
            , rank() over (partition by ten.stockCode order by clac_expma_10/clac_expma_5 desc) rank_
            , round(clac_expma_10/clac_expma_5, 3) ratioB
            , round(clac_expma_5, 3) clac_expma_5
@@ -123,35 +123,35 @@
           and t1.`date` like '9999%'
             )
             , tmp_rank_99999 as (
-        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
+        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
         where t.rank_ <= 10 * 2
           and (t.`date` = '99999+0.01' or t.`date` not like '99999%')
           and t.stockCode = t1.stockCode
         union
-        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
+        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
         where t.rank_ <= 10 * 2
           and (t.`date` = '99999-0.00' or t.`date` not like '99999%')
           and t.stockCode = t1.stockCode
         union
-        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
+        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
         where t.rank_ <= 10 * 2
           and (t.`date` = '99999-0.01' or t.`date` not like '99999%')
           and t.stockCode = t1.stockCode
         union
-        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
+        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
         where t.rank_ <= 10 * 2
           and (t.`date` = '99999-0.02' or t.`date` not like '99999%')
           and t.stockCode = t1.stockCode
         union
-        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
+        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
         where t.rank_ <= 10 * 2
@@ -159,7 +159,7 @@
           and t.stockCode = t1.stockCode
             )
             , tmp_all_but_99999 as (
-        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10
+        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
         where t.rank_ <= 10 * 2
