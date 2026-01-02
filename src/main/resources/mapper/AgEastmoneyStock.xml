@@ -170,7 +170,7 @@
         select * from tmp_all_but_99999 where rank_2 <= 5
         union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 3 )
             )
-        select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', replace(t1.date, '-', ''), '-', t1.rank_2, '/3' ) stockCode
+        select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.rank_2, '/3' ) stockCode
                       , t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from tmp_consider_99999 t1, t_hs300 t3
         where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
