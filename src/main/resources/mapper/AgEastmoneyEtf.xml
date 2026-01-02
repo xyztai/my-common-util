@@ -207,6 +207,16 @@
                 , clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
             from tmp_calc_days t1, tmp_all t2
             where t2.`date` BETWEEN t1.start_date and t1.end_date
+            and t1.end_date not like '9999%' -- 非9999开头
+            union
+            select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
+                , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_
+            -- , count(1) over (partition by end_date, stockCode) count_
+                , clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
+            from tmp_calc_days t1, tmp_all t2
+            where t2.`date` BETWEEN t1.start_date and t1.end_date
+            and ( t2.`date` = t1.end_date or t2.`date` not like '9999%' )
+            and t1.end_date like '9999%' -- 9999开头的
             ) t1, t_etf t3
         where t1.rank_ <= 10
           and t1.end_date = t1.`date`
