@@ -1,6 +1,5 @@
 package net.my.config;
 
-import io.swagger.models.auth.In;
 import lombok.extern.slf4j.Slf4j;
 import net.my.controller.*;
 import net.my.mapper.DataCalcMapper;
@@ -99,7 +98,7 @@ public class ScheduledTasks {
     /**
      * 自动获取/更新历史上5天的cp数据
      */
-    @Scheduled(cron = "0 */23 * * * ?")
+    @Scheduled(cron = "0 33 * * * ?")
     @Transactional
     public void execGetHistoryDataNew() {
         log.info("execGetHistoryData begin");
@@ -113,10 +112,10 @@ public class ScheduledTasks {
         String formattedTime = beijingTime.format(formatter);
         log.info("time: {}", formattedTime);
         if(
-                        (formattedTime.compareTo("02:01:00") > 0 && formattedTime.compareTo("02:55:00") < 0) ||
-                        (formattedTime.compareTo("05:01:00") > 0 && formattedTime.compareTo("05:55:00") < 0) ||
-                        (formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:55:00") < 0) ||
-                        (formattedTime.compareTo("16:01:00") > 0 && formattedTime.compareTo("16:55:00") < 0)
+                        (formattedTime.compareTo("03:01:00") > 0 && formattedTime.compareTo("03:55:00") < 0) ||  // 这里3点，对应北京时间16点
+//                        (formattedTime.compareTo("05:01:00") > 0 && formattedTime.compareTo("05:55:00") < 0) ||
+                        (formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:55:00") < 0)
+//                                || (formattedTime.compareTo("16:01:00") > 0 && formattedTime.compareTo("16:55:00") < 0)
         ) {
             log.info("time to execGetHistoryData");
             if(taskState != 0) {
@@ -124,9 +123,23 @@ public class ScheduledTasks {
                 return;
             }
             taskState = 1;
-            
+            // 获取得到历史数据
             agNewEastmoneyStockController.getHistoryData();
             agNewEastmoneyETFController.getHistoryData();
+
+            // 清空缓存
+            agNewQQController.invalidateAll();
+            // 计算缓存
+            agNewEastmoneyStockController.queryEastmoneyToday();
+            agNewEastmoneyStockController.queryEastmoneyLast30();
+            agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRised();
+            agNewEastmoneyStockController.queryEastmoneyLatestInfo();
+
+            agNewEastmoneyETFController.queryEastmoneyToday();
+            agNewEastmoneyETFController.queryEastmoneyLast60();
+            agNewEastmoneyETFController.queryEastmoneyVolSuddenlyRised();
+            agNewEastmoneyETFController.queryEastmoneyLatestInfo();
+
 //            agNewQQController.getHistoryData(5);
 //            agNewQQ300Controller.getHistoryData(5);  // QQ 的更新hs300 的
 //            agNew300UsingEastmoneyController.getHistoryData();

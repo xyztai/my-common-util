@@ -85,7 +85,7 @@ public class AgNewEastmoneyETFController {
      * @return
      */
     @GetMapping("/special-care-days-eastmoney-60-top10")
-    public BaseResponse queryEastmoneyLast30() {
+    public BaseResponse queryEastmoneyLast60() {
         log.info("specialCareDaysEastmoney");
         String key = "etf#" + "special-care-days-eastmoney-30";
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);

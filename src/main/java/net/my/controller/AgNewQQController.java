@@ -377,7 +377,7 @@ public class AgNewQQController {
      * 清空缓存
      */
     @GetMapping("/invalidateAll")
-    void invalidateAll() {
+    public void invalidateAll() {
         log.info("invalidateAll...");
         myCaffeineCache.invalidateAll();
     }
