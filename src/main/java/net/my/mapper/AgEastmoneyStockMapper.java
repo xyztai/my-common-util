@@ -18,8 +18,8 @@ public interface AgEastmoneyStockMapper {
     List<EastmoneyNode> getEastMoneyNodes(@Param("stockCode") String stockCode);
     EastmoneyNode getMaxEastMoneyNodeHasExpma(@Param("stockCode") String stockCode);
     int updateExpmaEastmoney(EastmoneyNode node);
-    List<SpecialCarePoJo> queryEastmoneyToday();
-    List<SpecialCarePoJo> queryEastmoneyLast30();
+    List<SpecialCarePoJo2> queryEastmoneyToday();
+    List<SpecialCarePoJo2> queryEastmoneyLast30();
     List<SpecialCarePoJo2> queryEastmoneyVolSuddenlyRised();
     List<SpecialCarePoJo2> queryEastmoneyLatestInfo();
 }

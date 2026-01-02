@@ -105,7 +105,7 @@
         where id = #{id}
     </update>
 
-    <select id="queryEastmoneyToday" resultType="net.my.pojo.SpecialCarePoJo">
+    <select id="queryEastmoneyToday" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
         with tmp_all as (
             select ten.`date` , ten.stockCode , round(ten.`last`, 3) last
@@ -178,7 +178,7 @@
         ]]>
     </select>
 
-    <select id="queryEastmoneyLast30" resultType="net.my.pojo.SpecialCarePoJo">
+    <select id="queryEastmoneyLast30" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
         with tmp_all as (
             select ten.*

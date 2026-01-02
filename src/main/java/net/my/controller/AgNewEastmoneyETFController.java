@@ -61,17 +61,17 @@ public class AgNewEastmoneyETFController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyToday();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyToday();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("3_688")
                         && !f.getStockCode().startsWith("3_689")
                         && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
-            SpecialCarePoJo empty = new SpecialCarePoJo();
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
             empty.setDate("--");
             empty.setStockCode("--");
-            empty.setRatioB(0.00D);
-            empty.setLast(0.00D);
+            empty.setRatioB("--");
+            empty.setLast("--");
             buyDataFromEastmoneys = Arrays.asList(empty);
         }
 
@@ -94,17 +94,17 @@ public class AgNewEastmoneyETFController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyLast60();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyLast60();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("3_688")
                         && !f.getStockCode().startsWith("3_689")
                         && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
-            SpecialCarePoJo empty = new SpecialCarePoJo();
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
             empty.setDate("--");
             empty.setStockCode("--");
-            empty.setRatioB(0.00D);
-            empty.setLast(0.00D);
+            empty.setRatioB("--");
+            empty.setLast("--");
             buyDataFromEastmoneys = Arrays.asList(empty);
         }
 
@@ -137,7 +137,7 @@ public class AgNewEastmoneyETFController {
             empty.setDate("--");
             empty.setStockCode("--");
             empty.setRatioB("--");
-            empty.setLast(0.00D);
+            empty.setLast("--");
             buyDataFromEastmoneys = Arrays.asList(empty);
         }
 
@@ -170,7 +170,7 @@ public class AgNewEastmoneyETFController {
             empty.setDate("--");
             empty.setStockCode("--");
             empty.setRatioB("--");
-            empty.setLast(0.00D);
+            empty.setLast("--");
             buyDataFromEastmoneys = Arrays.asList(empty);
         }
 
