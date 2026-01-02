@@ -170,7 +170,7 @@
         select * from tmp_all_but_99999 where rank_2 <= 10
         union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 10 )
             )
-        select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.rank_2, '/10' ) stockCode
+        select distinct concat('3_', t3.stockCode, '-', t3.stockName, '-', case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_2, '/10' ) stockCode
                       , t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from tmp_consider_99999 t1, t_etf t3
         where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
@@ -196,7 +196,7 @@
             from tmp_all t1
             where t1.date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 60 DAY), '%Y-%m-%d')
         )
-        select concat('3_', t3.stockCode, '-', t3.stockName, '-', t1.rank_, '/10' ) stockCode
+        select concat('3_', t3.stockCode, '-', t3.stockName, '-', case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_, '/10' ) stockCode
              , t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from (
             select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
