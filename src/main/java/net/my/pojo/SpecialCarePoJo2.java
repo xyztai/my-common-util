@@ -7,6 +7,6 @@ import lombok.Data;
 public class SpecialCarePoJo2 {
     private String stockCode;
     private String date;
-    private Double last;
+    private String last;
     private String ratioB;
 }
