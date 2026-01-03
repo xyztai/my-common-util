@@ -289,21 +289,27 @@ public class AgNewEastmoneyETFController {
         log.info("阶段1-非99999数据-开始更新基础字段");
         // 更新基础字段
         agEastmoneyEtfMapper.updateEtfEastMoneyDatas();
+
         // 更新expma字段
-        log.info("阶段1-非99999数据-开始更新expma字段");
+        log.info("阶段1-非99999数据-开始更新expma字段 start");
         updateExpma();
+        log.info("阶段1-非99999数据-开始更新expma字段 end");
+
         // 删除 预期数据
         log.info("阶段2-99999数据-deleteEtfExpect99999");
         agEastmoneyEtfMapper.deleteEtfExpect99999();
         // 开始插入 预期数据
         log.info("阶段2-99999数据-insertEtfExpect99999");
         agEastmoneyEtfMapper.insertEtfExpect99999();
-        log.info("阶段2-99999数据-开始更新基础字段");
+
         // 更新基础字段
+        log.info("阶段2-99999数据-开始更新基础字段");
         agEastmoneyEtfMapper.updateEtfEastMoneyDatas();
+
         // 更新expma字段
-        log.info("阶段2-99999数据-开始更新expma字段");
+        log.info("阶段2-99999数据-开始更新expma字段 start");
         updateExpma();
+        log.info("阶段2-99999数据-开始更新expma字段 end");
 
         return RestGeneralResponse.of(eastmoneyNodeMap);
     }

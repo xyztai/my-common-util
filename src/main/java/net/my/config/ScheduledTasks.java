@@ -124,21 +124,49 @@ public class ScheduledTasks {
             }
             taskState = 1;
             // 获取得到历史数据
+            log.info("task 获取stock的历史数据 start");
             agNewEastmoneyStockController.getHistoryData();
+            log.info("task 获取stock的历史数据 end");
+            log.info("task 获取etf的历史数据 start");
             agNewEastmoneyETFController.getHistoryData();
+            log.info("task 获取etf的历史数据 end");
 
             // 清空缓存
+            log.info("task 清空缓存");
             agNewQQController.invalidateAll();
             // 计算缓存
+            log.info("task stock queryEastmoneyToday start");
             agNewEastmoneyStockController.queryEastmoneyToday();
-            agNewEastmoneyStockController.queryEastmoneyLast30();
-            agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRised();
-            agNewEastmoneyStockController.queryEastmoneyLatestInfo();
+            log.info("task stock queryEastmoneyToday end");
 
+            log.info("task stock queryEastmoneyLast30 start");
+            agNewEastmoneyStockController.queryEastmoneyLast30();
+            log.info("task stock queryEastmoneyLast30 end");
+
+            log.info("task stock queryEastmoneyVolSuddenlyRised start");
+            agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRised();
+            log.info("task stock queryEastmoneyVolSuddenlyRised end");
+
+            log.info("task stock queryEastmoneyLatestInfo start");
+            agNewEastmoneyStockController.queryEastmoneyLatestInfo();
+            log.info("task stock queryEastmoneyLatestInfo end");
+
+
+            log.info("task etf queryEastmoneyToday start");
             agNewEastmoneyETFController.queryEastmoneyToday();
+            log.info("task etf queryEastmoneyToday end");
+
+            log.info("task etf queryEastmoneyLast60 start");
             agNewEastmoneyETFController.queryEastmoneyLast60();
+            log.info("task etf queryEastmoneyLast60 end");
+
+            log.info("task etf queryEastmoneyVolSuddenlyRised start");
             agNewEastmoneyETFController.queryEastmoneyVolSuddenlyRised();
+            log.info("task etf queryEastmoneyVolSuddenlyRised end");
+
+            log.info("task etf queryEastmoneyLatestInfo start");
             agNewEastmoneyETFController.queryEastmoneyLatestInfo();
+            log.info("task etf queryEastmoneyLatestInfo end");
 
 //            agNewQQController.getHistoryData(5);
 //            agNewQQ300Controller.getHistoryData(5);  // QQ 的更新hs300 的

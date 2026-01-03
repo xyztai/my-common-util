@@ -314,21 +314,27 @@ public class AgNewEastmoneyStockController {
         log.info("阶段1-非99999数据-开始更新基础字段");
         // 更新基础字段
         agEastmoneyStockMapper.updateEastMoneyDatas();
+
         // 更新expma字段
-        log.info("阶段1-非99999数据-开始更新expma字段");
+        log.info("阶段1-非99999数据-开始更新expma字段 start");
         updateExpma();
+        log.info("阶段1-非99999数据-开始更新expma字段 end");
+
         // 删除 预期数据
         log.info("阶段2-99999数据-deleteExpect99999");
         agEastmoneyStockMapper.deleteExpect99999();
         // 开始插入 预期数据
         log.info("阶段2-99999数据-insertExpect2099");
         agEastmoneyStockMapper.insertExpect99999();
-        log.info("阶段2-99999数据-开始更新基础字段");
+
         // 更新基础字段
+        log.info("阶段2-99999数据-开始更新基础字段");
         agEastmoneyStockMapper.updateEastMoneyDatas();
+
         // 更新expma字段
-        log.info("阶段2-99999数据-开始更新expma字段");
+        log.info("阶段2-99999数据-开始更新expma字段 start");
         updateExpma();
+        log.info("阶段2-99999数据-开始更新expma字段 end");
 //        log.info("删除 delEastMoneyBuy99999");
 //        agEastmoneyStockMapper.delEastMoneyBuy99999();
 //        // 更新buy表
