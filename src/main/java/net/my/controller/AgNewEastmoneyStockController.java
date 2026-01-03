@@ -381,11 +381,13 @@ public class AgNewEastmoneyStockController {
             EastmoneyNode existsNode = allMaxEastMoneyNodeHasExpma.stream().filter(f -> zqdm.equals(f.getStockCode())).findAny().orElse(null);
 
             if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
+                List<EastmoneyNode> toUpdateItems = new ArrayList<>();
                 for(int i = 0; i < needUpdateExpmas.size(); i++) {
                     EastmoneyNode currNode = needUpdateExpmas.get(i);
                     log.info("existsNode={}", JSON.toJSONString(existsNode));
                     log.info("currNode={}", JSON.toJSONString(currNode));
                     if(currNode.getDate().startsWith("99999")) {
+                        log.info("currNode.getDate()={}, skip", currNode.getDate());
                         continue;
                     }
                     if(0 == i) {
@@ -402,7 +404,8 @@ public class AgNewEastmoneyStockController {
                         currNode.setExpma10(calcExpma(10.0, lastNode.getExpma10(), currNode.getLast()));
                     }
                     log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
-                    agEastmoneyStockMapper.updateExpmaEastmoney(currNode);
+//                    agEastmoneyStockMapper.updateExpmaEastmoney(currNode);
+                    toUpdateItems.add(currNode);
                 }
 
                 needUpdateExpmas = needUpdateExpmas.stream().filter(f -> f.getDate().startsWith("99999")).collect(Collectors.toList());
@@ -416,9 +419,15 @@ public class AgNewEastmoneyStockController {
                             currNode.setExpma5(calcExpma(5.0, existsNode.getExpma5(), currNode.getLast()));
                             currNode.setExpma10(calcExpma(10.0, existsNode.getExpma10(), currNode.getLast()));
                             log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
-                            agEastmoneyStockMapper.updateExpmaEastmoney(currNode);
+//                            agEastmoneyStockMapper.updateExpmaEastmoney(currNode);
+                            toUpdateItems.add(currNode);
                         }
                     }
+                }
+
+                if(!CollectionUtils.isEmpty(toUpdateItems)) {
+                    log.info("toUpdateItems={}", JSON.toJSON(toUpdateItems));
+                    agEastmoneyStockMapper.batchUpdateExpmaEastmoney(toUpdateItems);
                 }
             }
         }

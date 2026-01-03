@@ -345,11 +345,13 @@ public class AgNewEastmoneyETFController {
             EastmoneyNode existsNode = allMaxEastMoneyNodeHasExpma.stream().filter(f -> zqdm.equals(f.getStockCode())).findAny().orElse(null);
 
             if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
+                List<EastmoneyNode> toUpdateItems = new ArrayList<>();
                 for(int i = 0; i < needUpdateExpmas.size(); i++) {
                     EastmoneyNode currNode = needUpdateExpmas.get(i);
                     log.info("existsNode={}", JSON.toJSONString(existsNode));
                     log.info("currNode={}", JSON.toJSONString(currNode));
                     if(currNode.getDate().startsWith("99999")) {
+                        log.info("currNode.getDate()={}, skip", currNode.getDate());
                         continue;
                     }
                     if(0 == i) {
@@ -366,7 +368,8 @@ public class AgNewEastmoneyETFController {
                         currNode.setExpma10(calcExpma(10.0, lastNode.getExpma10(), currNode.getLast()));
                     }
                     log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
-                    agEastmoneyEtfMapper.updateEtfExpmaEastmoney(currNode);
+//                    agEastmoneyEtfMapper.updateEtfExpmaEastmoney(currNode);
+                    toUpdateItems.add(currNode);
                 }
 
                 needUpdateExpmas = needUpdateExpmas.stream().filter(f -> f.getDate().startsWith("99999")).collect(Collectors.toList());
@@ -380,9 +383,15 @@ public class AgNewEastmoneyETFController {
                             currNode.setExpma5(calcExpma(5.0, existsNode.getExpma5(), currNode.getLast()));
                             currNode.setExpma10(calcExpma(10.0, existsNode.getExpma10(), currNode.getLast()));
                             log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
-                            agEastmoneyEtfMapper.updateEtfExpmaEastmoney(currNode);
+//                            agEastmoneyEtfMapper.updateEtfExpmaEastmoney(currNode);
+                            toUpdateItems.add(currNode);
                         }
                     }
+                }
+
+                if(!CollectionUtils.isEmpty(toUpdateItems)) {
+                    log.info("toUpdateItems={}", JSON.toJSON(toUpdateItems));
+                    agEastmoneyEtfMapper.batchUpdateEtfExpmaEastmoney(toUpdateItems);
                 }
             }
         }

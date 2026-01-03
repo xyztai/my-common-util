@@ -122,6 +122,14 @@
         where id = #{id}
     </update>
 
+    <update id="batchUpdateEtfExpmaEastmoney" parameterType="java.util.List">
+        <foreach collection="list" item="item" separator=";">
+            update t_eastmoney_node_etf
+            set clac_expma_5 = #{item.expma5}, clac_expma_10=#{item.expma10}
+            where id = #{item.id}
+        </foreach>
+    </update>
+
     <select id="queryEtfEastmoneyToday" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
         with tmp_all as (
