@@ -15,7 +15,9 @@ public interface AgEastmoneyEtfMapper {
     int updateEtfEastMoneyDatas();
     int deleteEtfExpect99999();
     int insertEtfExpect99999();
+    List<EastmoneyNode> getEtfAllNeedUpdateEastMoneyNodes();
     List<EastmoneyNode> getEtfEastMoneyNodes(@Param("stockCode") String stockCode);
+    List<EastmoneyNode> getEtfAllMaxEastMoneyNodeHasExpma();
     EastmoneyNode getEtfMaxEastMoneyNodeHasExpma(@Param("stockCode") String stockCode);
     int updateEtfExpmaEastmoney(EastmoneyNode node);
     List<SpecialCarePoJo2> queryEtfEastmoneyToday();

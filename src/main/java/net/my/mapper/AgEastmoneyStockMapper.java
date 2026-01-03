@@ -15,7 +15,9 @@ public interface AgEastmoneyStockMapper {
     int updateEastMoneyDatas();
     int deleteExpect99999();
     int insertExpect99999();
+    List<EastmoneyNode> getAllNeedUpdateEastMoneyNodes();
     List<EastmoneyNode> getEastMoneyNodes(@Param("stockCode") String stockCode);
+    List<EastmoneyNode> getAllMaxEastMoneyNodeHasExpma();
     EastmoneyNode getMaxEastMoneyNodeHasExpma(@Param("stockCode") String stockCode);
     int updateExpmaEastmoney(EastmoneyNode node);
     List<SpecialCarePoJo2> queryEastmoneyToday();

@@ -320,19 +320,29 @@ public class AgNewEastmoneyETFController {
             return;
         }
 
+        // 直接全量查出来
+        List<EastmoneyNode> needUpdateExpmasAll = agEastmoneyEtfMapper.getEtfAllNeedUpdateEastMoneyNodes();
+        if(CollectionUtils.isEmpty(needUpdateExpmasAll)) {
+            log.info("needUpdateExpmasAll empty, return directly");
+            return;
+        }
+        List<EastmoneyNode> allMaxEastMoneyNodeHasExpma = agEastmoneyEtfMapper.getEtfAllMaxEastMoneyNodeHasExpma();
+
         List<String> zqdms = new ArrayList<>();
         etfList.forEach(po -> zqdms.add(0 == po.getStockType() ? "0." + po.getStockCode() : "1." + po.getStockCode()));
 
         for(String zqdm : zqdms) {
 //            String zqdm = "0.000001";
-            List<EastmoneyNode> needUpdateExpmas = agEastmoneyEtfMapper.getEtfEastMoneyNodes(zqdm);
+//            List<EastmoneyNode> needUpdateExpmas = agEastmoneyEtfMapper.getEtfEastMoneyNodes(zqdm);
+            List<EastmoneyNode> needUpdateExpmas = needUpdateExpmasAll.stream().filter(f -> zqdm.equals(f.getStockCode())).collect(Collectors.toList());
             if(CollectionUtils.isEmpty(needUpdateExpmas)) {
                 continue;
             }
 
             needUpdateExpmas = needUpdateExpmas.stream().sorted(Comparator.comparing(EastmoneyNode::getDate)).collect(Collectors.toList());
             log.info("needUpdateExpmas={}", JSON.toJSONString(needUpdateExpmas));
-            EastmoneyNode existsNode = agEastmoneyEtfMapper.getEtfMaxEastMoneyNodeHasExpma(zqdm);
+//            EastmoneyNode existsNode = agEastmoneyEtfMapper.getEtfMaxEastMoneyNodeHasExpma(zqdm);
+            EastmoneyNode existsNode = allMaxEastMoneyNodeHasExpma.stream().filter(f -> zqdm.equals(f.getStockCode())).findAny().orElse(null);
 
             if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
                 for(int i = 0; i < needUpdateExpmas.size(); i++) {
@@ -361,7 +371,9 @@ public class AgNewEastmoneyETFController {
 
                 needUpdateExpmas = needUpdateExpmas.stream().filter(f -> f.getDate().startsWith("99999")).collect(Collectors.toList());
                 if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
-                    existsNode = agEastmoneyEtfMapper.getEtfMaxEastMoneyNodeHasExpma(zqdm);
+//                    existsNode = agEastmoneyEtfMapper.getEtfMaxEastMoneyNodeHasExpma(zqdm);
+                    allMaxEastMoneyNodeHasExpma = agEastmoneyEtfMapper.getEtfAllMaxEastMoneyNodeHasExpma();
+                    existsNode = allMaxEastMoneyNodeHasExpma.stream().filter(f -> zqdm.equals(f.getStockCode())).findAny().orElse(null);
                     if(existsNode != null) {
                         for(int i = 0; i < needUpdateExpmas.size(); i++) {
                             EastmoneyNode currNode = needUpdateExpmas.get(i);

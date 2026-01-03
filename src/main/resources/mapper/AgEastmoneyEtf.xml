@@ -81,11 +81,29 @@
         ]]>
     </insert>
 
+    <select id="getEtfAllNeedUpdateEastMoneyNodes" resultType="net.my.pojo.EastmoneyNode">
+        select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
+        from t_eastmoney_node_etf
+        where clac_expma_5 is null
+    </select>
+
     <select id="getEtfEastMoneyNodes" resultType="net.my.pojo.EastmoneyNode">
         select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
         from t_eastmoney_node_etf
         where stockCode = #{stockCode}
           and clac_expma_5 is null
+    </select>
+
+    <select id="getEtfAllMaxEastMoneyNodeHasExpma" resultType="net.my.pojo.EastmoneyNode">
+        select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, expma5, expma10
+        from (
+            select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
+            , rank() over (partition by stockCode order by `date` desc) rank_
+            from t_eastmoney_node_etf
+            where clac_expma_5 is not null
+            and `date` not like '99999%'
+        ) tt
+        where tt.rank_ = 1
     </select>
 
     <select id="getEtfMaxEastMoneyNodeHasExpma" resultType="net.my.pojo.EastmoneyNode">
