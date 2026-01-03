@@ -118,65 +118,72 @@ public class ScheduledTasks {
 //                                || (formattedTime.compareTo("16:01:00") > 0 && formattedTime.compareTo("16:55:00") < 0)
         ) {
             log.info("time to execGetHistoryData");
-            if(taskState != 0) {
-                log.info("taskState={},放弃本次执行", taskState);
-                return;
-            }
-            taskState = 1;
-            // 获取得到历史数据
-            log.info("task 获取stock的历史数据 start");
-            agNewEastmoneyStockController.getHistoryData();
-            log.info("task 获取stock的历史数据 end");
-            log.info("task 获取etf的历史数据 start");
-            agNewEastmoneyETFController.getHistoryData();
-            log.info("task 获取etf的历史数据 end");
+            triggerOnce();
+        } else {
+            log.info("not time to execGetHistoryData");
+        }
+        log.info("execGetHistoryData end");
+    }
 
-            // 清空缓存
-            log.info("task 清空缓存");
-            agNewQQController.invalidateAll();
-            // 计算缓存
-            log.info("task stock queryEastmoneyToday start");
-            agNewEastmoneyStockController.queryEastmoneyToday();
-            log.info("task stock queryEastmoneyToday end");
+    public void triggerOnce() {
+        if(taskState != 0) {
+            log.info("taskState={},放弃本次执行", taskState);
+            return;
+        }
+        taskState = 1;
 
-            log.info("task stock queryEastmoneyLast30 start");
-            agNewEastmoneyStockController.queryEastmoneyLast30();
-            log.info("task stock queryEastmoneyLast30 end");
+        // 获取得到历史数据
+        log.info("task 获取stock的历史数据 start");
+        agNewEastmoneyStockController.getHistoryData();
+        log.info("task 获取stock的历史数据 end");
+        log.info("task 获取etf的历史数据 start");
+        agNewEastmoneyETFController.getHistoryData();
+        log.info("task 获取etf的历史数据 end");
 
-            log.info("task stock queryEastmoneyVolSuddenlyRised start");
-            agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRised();
-            log.info("task stock queryEastmoneyVolSuddenlyRised end");
+        // 清空缓存
+        log.info("task 清空缓存");
+        agNewQQController.invalidateAll();
+        // 计算缓存
+        log.info("task stock queryEastmoneyToday start");
+        agNewEastmoneyStockController.queryEastmoneyToday();
+        log.info("task stock queryEastmoneyToday end");
 
-            log.info("task stock queryEastmoneyLatestInfo start");
-            agNewEastmoneyStockController.queryEastmoneyLatestInfo();
-            log.info("task stock queryEastmoneyLatestInfo end");
+        log.info("task stock queryEastmoneyLast30 start");
+        agNewEastmoneyStockController.queryEastmoneyLast30();
+        log.info("task stock queryEastmoneyLast30 end");
+
+        log.info("task stock queryEastmoneyVolSuddenlyRised start");
+        agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRised();
+        log.info("task stock queryEastmoneyVolSuddenlyRised end");
+
+        log.info("task stock queryEastmoneyLatestInfo start");
+        agNewEastmoneyStockController.queryEastmoneyLatestInfo();
+        log.info("task stock queryEastmoneyLatestInfo end");
 
 
-            log.info("task etf queryEastmoneyToday start");
-            agNewEastmoneyETFController.queryEastmoneyToday();
-            log.info("task etf queryEastmoneyToday end");
+        log.info("task etf queryEastmoneyToday start");
+        agNewEastmoneyETFController.queryEastmoneyToday();
+        log.info("task etf queryEastmoneyToday end");
 
-            log.info("task etf queryEastmoneyLast60 start");
-            agNewEastmoneyETFController.queryEastmoneyLast60();
-            log.info("task etf queryEastmoneyLast60 end");
+        log.info("task etf queryEastmoneyLast60 start");
+        agNewEastmoneyETFController.queryEastmoneyLast60();
+        log.info("task etf queryEastmoneyLast60 end");
 
-            log.info("task etf queryEastmoneyVolSuddenlyRised start");
-            agNewEastmoneyETFController.queryEastmoneyVolSuddenlyRised();
-            log.info("task etf queryEastmoneyVolSuddenlyRised end");
+        log.info("task etf queryEastmoneyVolSuddenlyRised start");
+        agNewEastmoneyETFController.queryEastmoneyVolSuddenlyRised();
+        log.info("task etf queryEastmoneyVolSuddenlyRised end");
 
-            log.info("task etf queryEastmoneyLatestInfo start");
-            agNewEastmoneyETFController.queryEastmoneyLatestInfo();
-            log.info("task etf queryEastmoneyLatestInfo end");
+        log.info("task etf queryEastmoneyLatestInfo start");
+        agNewEastmoneyETFController.queryEastmoneyLatestInfo();
+        log.info("task etf queryEastmoneyLatestInfo end");
 
 //            agNewQQController.getHistoryData(5);
 //            agNewQQ300Controller.getHistoryData(5);  // QQ 的更新hs300 的
 //            agNew300UsingEastmoneyController.getHistoryData();
 //            agController.getHistoryData(5);
 //            agController.getIndustryHistoryData(5);
-        } else {
-            log.info("not time to execGetHistoryData");
-        }
-        log.info("execGetHistoryData end");
+
         taskState = 0;
+
     }
 }

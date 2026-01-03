@@ -21,7 +21,7 @@ public class AgTaskController {
     @GetMapping("/trigger")
     public BaseResponse trigger() {
         log.info("trigger start");
-        scheduledTasks.execGetHistoryDataNew();
+        scheduledTasks.triggerOnce();
         log.info("trigger end");
         return RestGeneralResponse.OK;
     }
