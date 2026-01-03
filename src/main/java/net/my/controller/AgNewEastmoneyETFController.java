@@ -326,16 +326,20 @@ public class AgNewEastmoneyETFController {
             log.info("needUpdateExpmasAll empty, return directly");
             return;
         }
+        // 全量查出数据
         List<EastmoneyNode> allMaxEastMoneyNodeHasExpma = agEastmoneyEtfMapper.getEtfAllMaxEastMoneyNodeHasExpma();
 
         List<String> zqdms = new ArrayList<>();
         etfList.forEach(po -> zqdms.add(0 == po.getStockType() ? "0." + po.getStockCode() : "1." + po.getStockCode()));
 
+        // 1、计算非99999的数据
         for(String zqdm : zqdms) {
 //            String zqdm = "0.000001";
 //            List<EastmoneyNode> needUpdateExpmas = agEastmoneyEtfMapper.getEtfEastMoneyNodes(zqdm);
-            List<EastmoneyNode> needUpdateExpmas = needUpdateExpmasAll.stream().filter(f -> zqdm.equals(f.getStockCode())).collect(Collectors.toList());
+            List<EastmoneyNode> needUpdateExpmas = needUpdateExpmasAll.stream()
+                    .filter(f -> zqdm.equals(f.getStockCode()) && !f.getDate().startsWith("99999")).collect(Collectors.toList());
             if(CollectionUtils.isEmpty(needUpdateExpmas)) {
+                log.info("zqdm={}, 不存在需要处理的非99999的数据");
                 continue;
             }
 
@@ -372,20 +376,42 @@ public class AgNewEastmoneyETFController {
                     toUpdateItems.add(currNode);
                 }
 
-                needUpdateExpmas = needUpdateExpmas.stream().filter(f -> f.getDate().startsWith("99999")).collect(Collectors.toList());
-                if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
-//                    existsNode = agEastmoneyEtfMapper.getEtfMaxEastMoneyNodeHasExpma(zqdm);
-                    allMaxEastMoneyNodeHasExpma = agEastmoneyEtfMapper.getEtfAllMaxEastMoneyNodeHasExpma();
-                    existsNode = allMaxEastMoneyNodeHasExpma.stream().filter(f -> zqdm.equals(f.getStockCode())).findAny().orElse(null);
-                    if(existsNode != null) {
-                        for(int i = 0; i < needUpdateExpmas.size(); i++) {
-                            EastmoneyNode currNode = needUpdateExpmas.get(i);
-                            currNode.setExpma5(calcExpma(5.0, existsNode.getExpma5(), currNode.getLast()));
-                            currNode.setExpma10(calcExpma(10.0, existsNode.getExpma10(), currNode.getLast()));
-                            log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
+                if(!CollectionUtils.isEmpty(toUpdateItems)) {
+                    log.info("toUpdateItems={}", JSON.toJSON(toUpdateItems));
+                    agEastmoneyEtfMapper.batchUpdateEtfExpmaEastmoney(toUpdateItems);
+                }
+            }
+        }
+
+        // 2、计算99999的数据
+        allMaxEastMoneyNodeHasExpma = agEastmoneyEtfMapper.getEtfAllMaxEastMoneyNodeHasExpma();
+        for(String zqdm : zqdms) {
+//            String zqdm = "0.000001";
+//            List<EastmoneyNode> needUpdateExpmas = agEastmoneyEtfMapper.getEtfEastMoneyNodes(zqdm);
+            List<EastmoneyNode> needUpdateExpmas = needUpdateExpmasAll.stream()
+                    .filter(f -> zqdm.equals(f.getStockCode()) && f.getDate().startsWith("99999")).collect(Collectors.toList());
+            if(CollectionUtils.isEmpty(needUpdateExpmas)) {
+                log.info("zqdm={}, 不存在需要处理的99999的数据");
+                continue;
+            }
+
+            needUpdateExpmas = needUpdateExpmas.stream().sorted(Comparator.comparing(EastmoneyNode::getDate)).collect(Collectors.toList());
+            log.info("needUpdateExpmas={}", JSON.toJSONString(needUpdateExpmas));
+//            EastmoneyNode existsNode = agEastmoneyEtfMapper.getEtfMaxEastMoneyNodeHasExpma(zqdm);
+            EastmoneyNode existsNode = allMaxEastMoneyNodeHasExpma.stream().filter(f -> zqdm.equals(f.getStockCode())).findAny().orElse(null);
+
+            if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
+                List<EastmoneyNode> toUpdateItems = new ArrayList<>();
+
+//                existsNode = agEastmoneyEtfMapper.getEtfMaxEastMoneyNodeHasExpma(zqdm);
+                if(existsNode != null) {
+                    for(int i = 0; i < needUpdateExpmas.size(); i++) {
+                        EastmoneyNode currNode = needUpdateExpmas.get(i);
+                        currNode.setExpma5(calcExpma(5.0, existsNode.getExpma5(), currNode.getLast()));
+                        currNode.setExpma10(calcExpma(10.0, existsNode.getExpma10(), currNode.getLast()));
+                        log.info("updateExpmaEastmoney currNode={}", JSON.toJSON(currNode));
 //                            agEastmoneyEtfMapper.updateEtfExpmaEastmoney(currNode);
-                            toUpdateItems.add(currNode);
-                        }
+                        toUpdateItems.add(currNode);
                     }
                 }
 
