@@ -197,7 +197,7 @@
             )
         select distinct t1.date
                       , concat('3_', t3.stockCode, '-', t3.stockName, '-', case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_2, '/10' ) stockCode
-                      , concat(round(t1.last, 3), '\n(', t1.chg, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
+                      , concat(round(t1.last, 3), '\n(', case when t1.date like '99999%' then replace(t1.date, '99999', '') else t1.chg end, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from tmp_consider_99999 t1, t_etf t3
         where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
         order by 1 desc, 2
@@ -224,7 +224,7 @@
         )
         select t1.date
              , concat('3_', t3.stockCode, '-', t3.stockName, '-', case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_, '/10' ) stockCode
-             , concat(round(t1.last, 3), '\n(', t1.chg, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
+             , concat(round(t1.last, 3), '\n(', case when t1.date like '99999%' then replace(t1.date, '99999', '') else t1.chg end, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from (
             select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
                 , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_
