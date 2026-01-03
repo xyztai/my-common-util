@@ -7,9 +7,9 @@
     <select id="getHs300List" resultType="net.my.pojo.HsStockPoJo">
         select stockCode, stockType, stockName
         from t_hs300
-        where stockCode not like '300%'
-        and stockCode not like '688%'
-        and stockCode not like '689%'
+        -- where stockCode not like '300%'
+        -- and stockCode not like '688%'
+        -- and stockCode not like '689%'
         order by 1
     </select>
 
