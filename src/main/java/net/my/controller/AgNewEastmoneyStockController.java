@@ -324,7 +324,7 @@ public class AgNewEastmoneyStockController {
         log.info("阶段2-99999数据-deleteExpect99999");
         agEastmoneyStockMapper.deleteExpect99999();
         // 开始插入 预期数据
-        log.info("阶段2-99999数据-insertExpect2099");
+        log.info("阶段2-99999数据-insertExpect99999");
         agEastmoneyStockMapper.insertExpect99999();
 
         // 更新基础字段
