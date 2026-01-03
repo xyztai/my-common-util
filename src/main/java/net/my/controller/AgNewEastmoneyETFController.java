@@ -330,8 +330,8 @@ public class AgNewEastmoneyETFController {
                 continue;
             }
 
-            log.info("needUpdateExpmas={}", JSON.toJSONString(needUpdateExpmas));
             needUpdateExpmas = needUpdateExpmas.stream().sorted(Comparator.comparing(EastmoneyNode::getDate)).collect(Collectors.toList());
+            log.info("needUpdateExpmas={}", JSON.toJSONString(needUpdateExpmas));
             EastmoneyNode existsNode = agEastmoneyEtfMapper.getEtfMaxEastMoneyNodeHasExpma(zqdm);
 
             if(!CollectionUtils.isEmpty(needUpdateExpmas)) {

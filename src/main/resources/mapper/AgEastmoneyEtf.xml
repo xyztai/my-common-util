@@ -86,7 +86,6 @@
         from t_eastmoney_node_etf
         where stockCode = #{stockCode}
           and clac_expma_5 is null
-        order by date
     </select>
 
     <select id="getEtfMaxEastMoneyNodeHasExpma" resultType="net.my.pojo.EastmoneyNode">

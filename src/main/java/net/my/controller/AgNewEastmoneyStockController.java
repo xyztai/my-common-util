@@ -366,8 +366,8 @@ public class AgNewEastmoneyStockController {
                 continue;
             }
 
-            log.info("needUpdateExpmas={}", JSON.toJSONString(needUpdateExpmas));
             needUpdateExpmas = needUpdateExpmas.stream().sorted(Comparator.comparing(EastmoneyNode::getDate)).collect(Collectors.toList());
+            log.info("needUpdateExpmas={}", JSON.toJSONString(needUpdateExpmas));
             EastmoneyNode existsNode = agEastmoneyStockMapper.getMaxEastMoneyNodeHasExpma(zqdm);
 
             if(!CollectionUtils.isEmpty(needUpdateExpmas)) {
