@@ -304,8 +304,8 @@
                                , t.`open` , t.`last`, t.high , t.low
                                , t.`last` to_buy
                                -- , lag(t.`date`, 2) over (partition by t.stockCode order by `date` desc) date_exists
-                               , least(lag(t.low , 1) over (partition by t.stockCode order by `date` desc)
-                              -- , lag(t.low , 2) over (partition by t.stockCode order by `date` desc)) to_buy -- T~T+2，共3个交易日的 low，T+3时B
+                               -- , least(lag(t.low , 1) over (partition by t.stockCode order by `date` desc)
+                               --  lag(t.low , 2) over (partition by t.stockCode order by `date` desc)) to_buy -- T~T+2，共3个交易日的 low，T+3时B
                                , lag(t.volume, 1) over (partition by t.stockCode order by `date` desc) vol_next_1
                               , lag(t.chg, 1) over (partition by t.stockCode order by `date` desc) chg_next_1
                               , lag(t.volume, 2) over (partition by t.stockCode order by `date` desc) vol_next_2
