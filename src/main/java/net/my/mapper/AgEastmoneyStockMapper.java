@@ -24,5 +24,6 @@ public interface AgEastmoneyStockMapper {
     List<SpecialCarePoJo2> queryEastmoneyToday();
     List<SpecialCarePoJo2> queryEastmoneyLast30();
     List<SpecialCarePoJo2> queryEastmoneyVolSuddenlyRised();
+    List<SpecialCarePoJo2> queryEastmoneyVolSuddenlyRisedToday();
     List<SpecialCarePoJo2> queryEastmoneyLatestInfo();
 }
