@@ -156,11 +156,21 @@ public class ScheduledTasks {
         agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRised();
         log.info("task stock queryEastmoneyVolSuddenlyRised end");
 
+        log.info("task stock queryEastmoneyVolSuddenlyRisedToday start");
+        agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRisedToday();
+        log.info("task stock queryEastmoneyVolSuddenlyRisedToday end");
+
+        log.info("task stock quer9Zhuan start");
+        agNewEastmoneyStockController.quer9Zhuan();
+        log.info("task stock quer9Zhuan end");
+
         log.info("task stock queryEastmoneyLatestInfo start");
         agNewEastmoneyStockController.queryEastmoneyLatestInfo();
         log.info("task stock queryEastmoneyLatestInfo end");
 
 
+
+        // 查询 ETF
         log.info("task etf queryEastmoneyToday start");
         agNewEastmoneyETFController.queryEastmoneyToday();
         log.info("task etf queryEastmoneyToday end");
