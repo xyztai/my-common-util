@@ -321,7 +321,7 @@
         ]]>
     </select>
 
-    <select id="quer9Zhuan" resultType="net.my.pojo.SpecialCarePoJo2">
+    <select id="query9Zhuan" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
         select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t9.date, concat(round(t9.last, 3), '\n(', t9.chg, ')') last
              , concat(_direction, '_', _9_zhuan) ratioB

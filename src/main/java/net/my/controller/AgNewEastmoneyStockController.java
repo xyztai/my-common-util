@@ -207,13 +207,13 @@ public class AgNewEastmoneyStockController {
 
 
     /**
-     * 5、quer9Zhuan
+     * 5、query9Zhuan
      * @return
      */
-    @GetMapping("/quer9Zhuan")
-    public BaseResponse quer9Zhuan() {
-        log.info("quer9Zhuan");
-        String key = "stock#" + "quer9Zhuan";
+    @GetMapping("/query9Zhuan")
+    public BaseResponse query9Zhuan() {
+        log.info("query9Zhuan");
+        String key = "stock#" + "query9Zhuan";
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
