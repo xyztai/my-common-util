@@ -220,7 +220,7 @@ public class AgNewEastmoneyStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.quer9Zhuan();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.query9Zhuan();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("3_688")
                         && !f.getStockCode().startsWith("3_689")
