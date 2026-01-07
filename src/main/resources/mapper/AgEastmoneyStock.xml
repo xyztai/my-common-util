@@ -321,6 +321,54 @@
         ]]>
     </select>
 
+    <select id="quer9Zhuan" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t9.date, concat(round(t9.last, 3), '\n(', t9.chg, ')') last
+             , concat(_direction, '_', _9_zhuan) ratioB
+        from (
+            select t3.`date`, t3.stockCode , t3.`last`, t3.chg
+                   , case when pre_tag_6 != pre_tag_7 then '07'
+                          when pre_tag_6 = pre_tag_7 and pre_tag_7 != pre_tag_8 then '08'
+                          when pre_tag_6 = pre_tag_7 and pre_tag_7 = pre_tag_8 and pre_tag_8 != pre_tag_9 then '09'
+                          when pre_tag_6 = pre_tag_7 and pre_tag_7 = pre_tag_8 and pre_tag_8 = pre_tag_9 and pre_tag_9 != pre_tag_10 then '10'
+                          when pre_tag_6 = pre_tag_7 and pre_tag_7 = pre_tag_8 and pre_tag_8 = pre_tag_9 and pre_tag_9 = pre_tag_10 then '11'
+                     else '00' end _9_zhuan
+                   , case when tag_ = 1 then 'S' else 'B' end _direction -- 方向：1-S；0-B
+            from (
+                select t2.`date` , t2.stockCode , t2.`last`, t2.chg, t2.pre_last_4
+                       , t2.tag_
+                       , lead(t2.tag_, 1) over (partition by t2.stockCode order by t2.`date` desc) pre_tag_1
+                       , lead(t2.tag_, 2) over (partition by t2.stockCode order by t2.`date` desc) pre_tag_2
+                       , lead(t2.tag_, 3) over (partition by t2.stockCode order by t2.`date` desc) pre_tag_3
+                       , lead(t2.tag_, 4) over (partition by t2.stockCode order by t2.`date` desc) pre_tag_4
+                       , lead(t2.tag_, 5) over (partition by t2.stockCode order by t2.`date` desc) pre_tag_5
+                       , lead(t2.tag_, 6) over (partition by t2.stockCode order by t2.`date` desc) pre_tag_6
+                       , lead(t2.tag_, 7) over (partition by t2.stockCode order by t2.`date` desc) pre_tag_7
+                       , lead(t2.tag_, 8) over (partition by t2.stockCode order by t2.`date` desc) pre_tag_8
+                       , lead(t2.tag_, 9) over (partition by t2.stockCode order by t2.`date` desc) pre_tag_9
+                       , lead(t2.tag_, 10) over (partition by t2.stockCode order by t2.`date` desc) pre_tag_10
+                from (
+                    select t1.`date` , t1.stockCode , t1.`last`, t1.chg, t1.pre_last_4
+                           , case when t1.pre_last_4 < t1.`last` then 1 else 0 end tag_
+                    from (
+                        select ten.`date` , ten.stockCode , ten.`last`, ten.chg
+                               , lead(ten.`last`, 4) over (partition by ten.stockCode order by ten.`date` desc) pre_last_4
+                        from t_eastmoney_node ten
+                        where ten.`date` not like '9999%'
+                        and ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -1 YEAR), '%Y-%m-%d')
+                        -- and ten.stockCode = '1.600795'
+                    ) t1
+                ) t2
+            ) t3
+            where (
+                    (tag_ + pre_tag_1 + pre_tag_2 + pre_tag_3 + pre_tag_4 + pre_tag_5 + pre_tag_6 = 0)
+                     or (tag_ + pre_tag_1 + pre_tag_2 + pre_tag_3 + pre_tag_4 + pre_tag_5 + pre_tag_6 = 7)
+                  )
+        ) t9, t_hs300 t3
+        order by 2 desc, _direction, _9_zhuan desc, 2
+        ]]>
+    </select>
+
     <select id="queryEastmoneyLatestInfo" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
         select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
