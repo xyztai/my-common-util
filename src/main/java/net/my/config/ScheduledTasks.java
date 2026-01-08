@@ -125,7 +125,7 @@ public class ScheduledTasks {
         log.info("execGetHistoryData end");
     }
 
-    @Scheduled(initialDelay = 5000)
+    @Scheduled(initialDelay = 5000, fixedDelay = 7 * 24 * 3600 * 1000)
     public void executeOnceTask() {
         log.info("Task executed once after 5 seconds");
         log.info("triggerOnce start...");
