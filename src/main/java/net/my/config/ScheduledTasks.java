@@ -125,6 +125,14 @@ public class ScheduledTasks {
         log.info("execGetHistoryData end");
     }
 
+    @Scheduled(initialDelay = 5000)
+    public void executeOnceTask() {
+        log.info("Task executed once after 5 seconds");
+        log.info("triggerOnce start...");
+        triggerOnce();
+        log.info("triggerOnce end...");
+    }
+
     public void triggerOnce() {
         if(taskState != 0) {
             log.info("taskState={},放弃本次执行", taskState);
