@@ -160,9 +160,9 @@ public class ScheduledTasks {
         agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRisedToday();
         log.info("task stock queryEastmoneyVolSuddenlyRisedToday end");
 
-        log.info("task stock quer9Zhuan start");
-//        agNewEastmoneyStockController.query9Zhuan();
-        log.info("task stock quer9Zhuan end");
+        log.info("task stock query9ZhuanB start");
+        agNewEastmoneyStockController.query9ZhuanB();
+        log.info("task stock query9ZhuanB end");
 
         log.info("task stock queryEastmoneyLatestInfo start");
         agNewEastmoneyStockController.queryEastmoneyLatestInfo();

@@ -207,20 +207,20 @@ public class AgNewEastmoneyStockController {
 
 
     /**
-     * 5、query9Zhuan
+     * 5、query9ZhuanB
      * @return
      */
-    @GetMapping("/query9Zhuan")
-    public BaseResponse query9Zhuan() {
-        log.info("query9Zhuan");
-        String key = "stock#" + "query9Zhuan";
+    @GetMapping("/query9ZhuanB")
+    public BaseResponse query9ZhuanB() {
+        log.info("query9ZhuanB");
+        String key = "stock#" + "query9ZhuanB";
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.query9Zhuan();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.query9ZhuanB();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("3_688")
                         && !f.getStockCode().startsWith("3_689")
