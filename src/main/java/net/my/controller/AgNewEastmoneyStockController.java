@@ -210,7 +210,7 @@ public class AgNewEastmoneyStockController {
      * 5、query9ZhuanB
      * @return
      */
-    @GetMapping("/query9Zhuan")
+    @GetMapping("/query9ZhuanB")
     public BaseResponse query9ZhuanB() {
         log.info("query9ZhuanB");
         String key = "stock#" + "query9ZhuanB";
@@ -239,8 +239,42 @@ public class AgNewEastmoneyStockController {
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
+
     /**
-     * 6、查询每个stock的最近的数据
+     * 6、query9ZhuanS
+     * @return
+     */
+    @GetMapping("/query9ZhuanS")
+    public BaseResponse query9ZhuanS() {
+        log.info("query9ZhuanB");
+        String key = "stock#" + "query9ZhuanS";
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.query9ZhuanS();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("3_688")
+                        && !f.getStockCode().startsWith("3_689")
+                        && !f.getStockCode().startsWith("3_300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+    /**
+     * 7、查询每个stock的最近的数据
      * @return
      */
     @GetMapping("/eastmoney-latest-info")
