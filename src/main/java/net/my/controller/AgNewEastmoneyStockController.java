@@ -210,7 +210,7 @@ public class AgNewEastmoneyStockController {
      * 5、query9ZhuanB
      * @return
      */
-    @GetMapping("/query9ZhuanB")
+    @GetMapping("/query9Zhuan")
     public BaseResponse query9ZhuanB() {
         log.info("query9ZhuanB");
         String key = "stock#" + "query9ZhuanB";
