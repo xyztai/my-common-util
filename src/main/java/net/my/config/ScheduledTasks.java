@@ -129,7 +129,7 @@ public class ScheduledTasks {
     public void executeOnceTask() {
         log.info("Task executed once after 5 seconds");
         log.info("triggerOnce start...");
-        triggerOnce();
+        execCalc();
         log.info("triggerOnce end...");
     }
 
@@ -148,6 +148,11 @@ public class ScheduledTasks {
         agNewEastmoneyETFController.getHistoryData();
         log.info("task 获取etf的历史数据 end");
 
+        execCalc();
+        taskState = 0;
+    }
+
+    void execCalc() {
         // 清空缓存
         log.info("task 清空缓存");
         agNewQQController.invalidateAll();
@@ -216,8 +221,5 @@ public class ScheduledTasks {
 //            agNew300UsingEastmoneyController.getHistoryData();
 //            agController.getHistoryData(5);
 //            agController.getIndustryHistoryData(5);
-
-        taskState = 0;
-
     }
 }
