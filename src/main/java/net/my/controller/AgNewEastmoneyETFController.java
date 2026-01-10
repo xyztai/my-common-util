@@ -207,6 +207,11 @@ public class AgNewEastmoneyETFController {
             empty.setRatioB("--");
             empty.setLast("--");
             buyDataFromEastmoneys = Arrays.asList(empty);
+        } else {
+            String methodName = key;
+            agEastmoneyEtfMapper.delEtfEastMoneyTmpCalc(methodName);
+            List<EastmoneyTmpCalc> calcs = buyDataFromEastmoneys.stream().map(f -> f.toPO(methodName)).collect(Collectors.toList());
+            agEastmoneyEtfMapper.saveEtfEastMoneyTmpCalc(calcs);
         }
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);

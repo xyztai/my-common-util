@@ -28,4 +28,7 @@ public interface AgEastmoneyEtfMapper {
     List<SpecialCarePoJo2> queryEtf9ZhuanB();
     List<SpecialCarePoJo2> queryEtf9ZhuanS();
     List<SpecialCarePoJo2> queryEtfEastmoneyLatestInfo();
+
+    int delEtfEastMoneyTmpCalc(@Param("methodName") String methodName);
+    int saveEtfEastMoneyTmpCalc(List<EastmoneyTmpCalc> eastmoneyNodes);
 }
