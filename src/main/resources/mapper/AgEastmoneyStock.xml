@@ -351,7 +351,7 @@
                                 case    when pre_tag_25 = 0 then '00' -- '07'
                                         when pre_tag_26 = 0 then '00' -- '08'
                                         when pre_tag_27 = 0 then '09'
-                                else '99' end
+                                else '00' end
                         else '00' end
                  else '00' end _9_zhuan
                 , 'B' _direction
@@ -456,19 +456,19 @@
         from (
             select t3.`date`, t3.stockCode , t3.`last`, t3.chg, chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
                 , case  when pre_tag_7 = 0 then '07'
-            when pre_tag_8 = 0 then '00' -- '08'
-            when pre_tag_9 = 0 then '00' -- '09'
-            when pre_tag_10 + pre_tag_11 + pre_tag_12 + pre_tag_13 + pre_tag_14 + pre_tag_15 = 6 then
-            case    when pre_tag_16 = 0 then '07'
-            when pre_tag_17 = 0 then '00' -- '08'
-            when pre_tag_18 = 0 then '00' -- '09'
-            when pre_tag_19 + pre_tag_20 + pre_tag_21 + pre_tag_22 + pre_tag_23 + pre_tag_24 = 6 then
-            case    when pre_tag_25 = 0 then '07'
-            when pre_tag_26 = 0 then '00' -- '08'
-            when pre_tag_27 = 0 then '00' -- '09'
-            else '00' end
-            else '00' end
-            else '00' end _9_zhuan
+                        when pre_tag_8 = 0 then '00' -- '08'
+                        when pre_tag_9 = 0 then '00' -- '09'
+                        when pre_tag_10 + pre_tag_11 + pre_tag_12 + pre_tag_13 + pre_tag_14 + pre_tag_15 = 6 then
+                        case    when pre_tag_16 = 0 then '07'
+                                when pre_tag_17 = 0 then '00' -- '08'
+                                when pre_tag_18 = 0 then '00' -- '09'
+                                when pre_tag_19 + pre_tag_20 + pre_tag_21 + pre_tag_22 + pre_tag_23 + pre_tag_24 = 6 then
+                                case    when pre_tag_25 = 0 then '07'
+                                        when pre_tag_26 = 0 then '00' -- '08'
+                                        when pre_tag_27 = 0 then '00' -- '09'
+                                else '00' end
+                        else '00' end
+                else '00' end _9_zhuan
                 , 'S' _direction
             from (
             select t2.`date` , t2.stockCode , t2.`last`, t2.chg, t2.pre_last_4, chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
