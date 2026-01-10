@@ -199,7 +199,7 @@
         union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 3 )
             )
         select distinct t1.date
-                      , concat('3_', t3.stockCode, '-', t3.stockName, '-', case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_2, '/3' ) stockCode
+                      , concat(t3.stockCode, '-', t3.stockName, '-', case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_2, '/3' ) stockCode
                       , concat(round(t1.last, 3), '\n(', case when t1.date like '99999%' then replace(replace(t1.date, '0.0', ''), '99999', '') else t1.chg end, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from tmp_consider_99999 t1, t_hs300 t3
         where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
@@ -226,7 +226,7 @@
             where t1.date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
         )
         select t1.date
-             , concat('3_', t3.stockCode, '-', t3.stockName, '-', case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_, '/3' ) stockCode
+             , concat(t3.stockCode, '-', t3.stockName, '-', case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_, '/3' ) stockCode
              , concat(round(t1.last, 3), '\n(', case when t1.date like '99999%' then replace(replace(t1.date, '0.0', ''), '99999', '') else t1.chg end, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from (
             select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
@@ -253,7 +253,7 @@
 
     <select id="queryEastmoneyVolSuddenlyRised" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
+        select concat(t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
              , case when t1.end_buy_date = 1 then concat('慎重\n', round(t1.to_buy, 3)) else concat('历史\n', round(t1.to_buy, 3)) end ratioB
         from (
                  select t.`date` , t.stockCode , t.chg, t.volume , t.`last`, t.to_buy,
@@ -292,7 +292,7 @@
 
     <select id="queryEastmoneyVolSuddenlyRisedToday" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
+        select concat(t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
              , concat(case when t1.end_buy_date = 1 then '慎重\n' else '历史\n' end, t1.clac_expma_5, t1.clac_expma_10) ratioB
              -- , case when t1.end_buy_date = 1 then concat('慎重\n', round(t1.to_buy, 3)) else concat('历史\n', round(t1.to_buy, 3)) end ratioB
         from (
@@ -323,7 +323,7 @@
 
     <select id="query9ZhuanB" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t9.date, concat(round(t9.last, 3), '\n(', t9.chg, ')') last
+        select concat(t3.stockCode, '-', t3.stockName) stockCode, t9.date, concat(round(t9.last, 3), '\n(', t9.chg, ')') last
              , concat(_direction, '_', _9_zhuan) ratioB
         from (
             select t3.`date`, t3.stockCode , t3.`last`, t3.chg
@@ -405,7 +405,7 @@
 
     <select id="query9ZhuanS" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t9.date, concat(round(t9.last, 3), '\n(', t9.chg, ')') last
+        select concat(t3.stockCode, '-', t3.stockName) stockCode, t9.date, concat(round(t9.last, 3), '\n(', t9.chg, ')') last
              , concat(_direction, '_', _9_zhuan) ratioB
         from (
             select t3.`date`, t3.stockCode , t3.`last`, t3.chg
@@ -487,7 +487,7 @@
 
     <select id="queryEastmoneyLatestInfo" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        select concat('3_', t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
+        select concat(t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
              , concat(round(clac_expma_5, 3), '\n', round(clac_expma_10, 3)) ratioB
         from (
                  select t.*, rank() over (partition by t.stockCode order by t.date desc) rank_
