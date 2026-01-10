@@ -1,0 +1,28 @@
+
+
+select count(1)
+     , sum(case when chg_next_1 < 0 then 1 else 0 end) cnt_next_1
+     , round(sum(case when chg_next_1 < 0 then 1 else 0 end)/count(1), 2) cnt_next_1_ratio
+     , sum(case when chg_next_1 < 0 and chg_next_2 < 0 then 1 else 0 end) cnt_next_2
+     , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 then 1 else 0 end)/count(1), 2) cnt_next_2_ratio
+     , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 then 1 else 0 end) cnt_next_3
+     , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 then 1 else 0 end)/count(1), 2) cnt_next_3_ratio
+     , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 then 1 else 0 end) cnt_next_4
+     , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 then 1 else 0 end)/count(1), 2) cnt_next_4_ratio
+     , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 then 1 else 0 end) cnt_next_5
+     , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 then 1 else 0 end)/count(1), 2) cnt_next_5_ratio
+     , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 then 1 else 0 end) cnt_next_6
+     , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 then 1 else 0 end)/count(1), 2) cnt_next_6_ratio
+     , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 then 1 else 0 end)/count(1), 2) cnt_next_7
+     , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 then 1 else 0 end) cnt_next_7_ratio
+     , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 and chg_next_8 < 0 then 1 else 0 end) cnt_next_8
+     , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 and chg_next_8 < 0 then 1 else 0 end)/count(1), 2) cnt_next_8_ratio
+     , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 and chg_next_8 < 0 and chg_next_9 < 0 then 1 else 0 end) cnt_next_9
+     , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 and chg_next_8 < 0 and chg_next_9 < 0 then 1 else 0 end)/count(1), 2) cnt_next_9_ratio
+     , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 and chg_next_8 < 0 and chg_next_9 < 0 and chg_next_10 < 0 then 1 else 0 end) cnt_next_10
+     , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 and chg_next_8 < 0 and chg_next_9 < 0 and chg_next_10 < 0 then 1 else 0 end)/count(1), 2) cnt_next_10_ratio
+from (
+     -- sql
+) tt;
+
+2026-01-10:
