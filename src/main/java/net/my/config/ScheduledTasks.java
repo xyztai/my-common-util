@@ -3,16 +3,20 @@ package net.my.config;
 import lombok.extern.slf4j.Slf4j;
 import net.my.controller.*;
 import net.my.mapper.DataCalcMapper;
+import net.my.pojo.EastmoneyWinRatioPOJO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+import java.util.List;
 
 @Slf4j
 @Component
@@ -36,6 +40,10 @@ public class ScheduledTasks {
 
     @Autowired
     private AgNewEastmoneyETFController agNewEastmoneyETFController;
+
+    @Autowired
+    private net.my.mapper.AgEastmoneyWinRatioMapper agEastmoneyWinRatioMapper;
+
 
 
     public static Integer taskState = 0; // 为0说明是没人在用，可以执行，如果为1，则不能执行
@@ -221,5 +229,29 @@ public class ScheduledTasks {
 //            agNew300UsingEastmoneyController.getHistoryData();
 //            agController.getHistoryData(5);
 //            agController.getIndustryHistoryData(5);
+
+        // 计算ratio
+        List<EastmoneyWinRatioPOJO> allRatio = new ArrayList<>();
+        List<EastmoneyWinRatioPOJO> B_09_STOCK = agEastmoneyWinRatioMapper.query9ZhuanB_Copy();
+        if(!CollectionUtils.isEmpty(B_09_STOCK)) {
+            allRatio.addAll(B_09_STOCK);
+        }
+        List<EastmoneyWinRatioPOJO> S_07_STOCK = agEastmoneyWinRatioMapper.query9ZhuanS_Copy();
+        if(!CollectionUtils.isEmpty(S_07_STOCK)) {
+            allRatio.addAll(S_07_STOCK);
+        }
+        List<EastmoneyWinRatioPOJO> B_09_ETF = agEastmoneyWinRatioMapper.queryEtf9ZhuanB_Copy();
+        if(!CollectionUtils.isEmpty(B_09_ETF)) {
+            allRatio.addAll(B_09_ETF);
+        }
+        List<EastmoneyWinRatioPOJO> S_07_ETF = agEastmoneyWinRatioMapper.queryEtf9ZhuanS_Copy();
+        if(!CollectionUtils.isEmpty(S_07_ETF)) {
+            allRatio.addAll(S_07_ETF);
+        }
+        if(!CollectionUtils.isEmpty(allRatio)) {
+            agEastmoneyWinRatioMapper.delWinRatio();
+            // 将数据插入表中
+            agEastmoneyWinRatioMapper.saveWinRatio(allRatio);
+        }
     }
 }
