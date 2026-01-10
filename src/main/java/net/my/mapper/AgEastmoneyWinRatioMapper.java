@@ -1,6 +1,7 @@
 package net.my.mapper;
 
 import net.my.pojo.EastmoneyWinRatioPOJO;
+import net.my.pojo.SpecialCarePoJo2;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -14,5 +15,5 @@ public interface AgEastmoneyWinRatioMapper {
 
     int delWinRatio();
     int saveWinRatio(List<EastmoneyWinRatioPOJO> winRatios);
-//    List<EastmoneyWinRatioPOJO> queryWinRatios();
+    List<SpecialCarePoJo2> queryWinRatios();
 }

@@ -2,13 +2,13 @@ package net.my.controller;
 
 import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
 import net.my.config.ScheduledTasks;
 import net.my.mapper.AgEastmoneyEtfMapper;
+import net.my.mapper.AgEastmoneyWinRatioMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,6 +45,9 @@ public class AgNewEastmoneyETFController {
 
     @Autowired
     private MyCaffeineCache myCaffeineCache;
+
+    @Autowired
+    private AgEastmoneyWinRatioMapper agEastmoneyWinRatioMapper;
 
 
     /**
@@ -253,8 +256,42 @@ public class AgNewEastmoneyETFController {
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
+
     /**
-     * 7、查询每个stock的最近的数据
+     * 7、queryWinRatios
+     * @return
+     */
+    @GetMapping("/queryWinRatios")
+    public BaseResponse queryWinRatios() {
+        log.info("queryWinRatios");
+        String key = "etf#" + "queryWinRatios";
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyWinRatioMapper.queryWinRatios();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("688")
+                        && !f.getStockCode().startsWith("689")
+                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+    /**
+     * 8、查询每个stock的最近的数据
      * @return
      */
     @GetMapping("/eastmoney-latest-info")

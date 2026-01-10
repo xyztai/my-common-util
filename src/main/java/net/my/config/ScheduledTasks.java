@@ -109,7 +109,8 @@ public class ScheduledTasks {
     @Scheduled(cron = "0 7 * * * ?")
     @Transactional
     public void execGetHistoryDataNew() {
-        log.info("execGetHistoryData begin");
+        long startTime = System.currentTimeMillis();
+        log.info("execGetHistoryDataNew begin");
         // 设置时区为北京
         LocalDateTime now = LocalDateTime.now();
         ZoneId beijngZoneId = ZoneId.of("Asia/Shanghai");
@@ -130,15 +131,18 @@ public class ScheduledTasks {
         } else {
             log.info("not time to execGetHistoryData");
         }
-        log.info("execGetHistoryData end");
+        log.info("execGetHistoryDataNew end");
+        log.info("execGetHistoryDataNew Time-Consuming: {} ms", System.currentTimeMillis() - startTime);
     }
 
     @Scheduled(initialDelay = 5000, fixedDelay = 7 * 24 * 3600 * 1000)
     public void executeOnceTask() {
+        long startTime = System.currentTimeMillis();
         log.info("Task executed once after 5 seconds");
-        log.info("triggerOnce start...");
+        log.info("executeOnceTask start...");
         execCalc();
-        log.info("triggerOnce end...");
+        log.info("executeOnceTask end...");
+        log.info("executeOnceTask Time-Consuming: {} ms", System.currentTimeMillis() - startTime);
     }
 
     public void triggerOnce() {
@@ -189,6 +193,10 @@ public class ScheduledTasks {
         agNewEastmoneyStockController.query9ZhuanS();
         log.info("task stock query9ZhuanS end");
 
+        log.info("task stock queryWinRatios start");
+        agNewEastmoneyStockController.queryWinRatios();
+        log.info("task stock queryWinRatios end");
+
         log.info("task stock queryEastmoneyLatestInfo start");
         agNewEastmoneyStockController.queryEastmoneyLatestInfo();
         log.info("task stock queryEastmoneyLatestInfo end");
@@ -219,6 +227,10 @@ public class ScheduledTasks {
         log.info("task etf queryEtf9ZhuanS start");
         agNewEastmoneyETFController.queryEtf9ZhuanS();
         log.info("task etf queryEtf9ZhuanS end");
+
+        log.info("task etf queryWinRatios start");
+        agNewEastmoneyETFController.queryWinRatios();
+        log.info("task etf queryWinRatios end");
 
         log.info("task etf queryEastmoneyLatestInfo start");
         agNewEastmoneyETFController.queryEastmoneyLatestInfo();
