@@ -325,7 +325,8 @@
         <![CDATA[
         select concat(t3.stockCode, '-', t3.stockName) stockCode, t9.date
              , concat(round(t9.last, 3), '\n(', t9.chg, ')'
-            , case when chg_next_2 is null and chg_next_1 is not null then concat('\n(', round(chg_next_1, 1), ')')
+            , case when chg_next_1 is null then concat('\n(', '--', ')')
+                   when chg_next_2 is null and chg_next_1 is not null then concat('\n(', round(chg_next_1, 1), ')')
                    when chg_next_3 is null and chg_next_2 is not null then concat('\n(', round(chg_next_2, 1), ')')
                    when chg_next_4 is null and chg_next_3 is not null then concat('\n(', round(chg_next_3, 1), ')')
                    when chg_next_5 is null and chg_next_4 is not null then concat('\n(', round(chg_next_4, 1), ')')
