@@ -599,16 +599,16 @@ from (
         <select id="queryWinRatios" resultType="net.my.pojo.SpecialCarePoJo2">
             <![CDATA[
             select t1.method_name stockCode, t1.date, concat('总', '\n', t1.cnt, '') last
-                 , concat('1:', t1.cnt_next_1, '#', t1.cnt_next_1_ratio
-                          , '\n2:', t1.cnt_next_2, '#', t1.cnt_next_2_ratio
-                          , '\n3:', t1.cnt_next_3, '#', t1.cnt_next_3_ratio
-                          , '\n4:', t1.cnt_next_4, '#', t1.cnt_next_4_ratio
-                          , '\n5:', t1.cnt_next_5, '#', t1.cnt_next_5_ratio
-                          , '\n6:', t1.cnt_next_6, '#', t1.cnt_next_6_ratio
-                          , '\n7:', t1.cnt_next_7, '#', t1.cnt_next_7_ratio
-                          , '\n8:', t1.cnt_next_8, '#', t1.cnt_next_8_ratio
-                          , '\n9:', t1.cnt_next_9, '#', t1.cnt_next_9_ratio
-                          , '\n10:', t1.cnt_next_10, '#', t1.cnt_next_10_ratio
+                 , concat('1:', t1.cnt_next_1, '#'\n, t1.cnt_next_1_ratio
+                          , '\n2:', t1.cnt_next_2, '#\n', t1.cnt_next_2_ratio
+                          , '\n3:', t1.cnt_next_3, '#\n', t1.cnt_next_3_ratio
+                          , '\n4:', t1.cnt_next_4, '#\n', t1.cnt_next_4_ratio
+                          , '\n5:', t1.cnt_next_5, '#\n', t1.cnt_next_5_ratio
+                          , '\n6:', t1.cnt_next_6, '#\n', t1.cnt_next_6_ratio
+                          , '\n7:', t1.cnt_next_7, '#\n', t1.cnt_next_7_ratio
+                          , '\n8:', t1.cnt_next_8, '#\n', t1.cnt_next_8_ratio
+                          , '\n9:', t1.cnt_next_9, '#\n', t1.cnt_next_9_ratio
+                          , '\n10:', t1.cnt_next_10, '#\n', t1.cnt_next_10_ratio
                  ) ratioB
             from t_eastmoney_win_ratio t1
             order by 2 desc, SUBSTRING(method_name, 5)
