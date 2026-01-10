@@ -466,7 +466,7 @@
             case    when pre_tag_25 = 0 then '07'
             when pre_tag_26 = 0 then '00' -- '08'
             when pre_tag_27 = 0 then '00' -- '09'
-            else '99' end
+            else '00' end
             else '00' end
             else '00' end _9_zhuan
                 , 'S' _direction
