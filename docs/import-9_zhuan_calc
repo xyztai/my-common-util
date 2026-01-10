@@ -13,8 +13,8 @@ select count(1)
      , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 then 1 else 0 end)/count(1), 2) cnt_next_5_ratio
      , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 then 1 else 0 end) cnt_next_6
      , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 then 1 else 0 end)/count(1), 2) cnt_next_6_ratio
-     , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 then 1 else 0 end)/count(1), 2) cnt_next_7
-     , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 then 1 else 0 end) cnt_next_7_ratio
+     , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 then 1 else 0 end) cnt_next_7
+     , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 then 1 else 0 end)/count(1), 2) cnt_next_7_ratio
      , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 and chg_next_8 < 0 then 1 else 0 end) cnt_next_8
      , round(sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 and chg_next_8 < 0 then 1 else 0 end)/count(1), 2) cnt_next_8_ratio
      , sum(case when chg_next_1 < 0 and chg_next_2 < 0 and chg_next_3 < 0 and chg_next_4 < 0 and chg_next_5 < 0 and chg_next_6 < 0 and chg_next_7 < 0 and chg_next_8 < 0 and chg_next_9 < 0 then 1 else 0 end) cnt_next_9
@@ -26,3 +26,10 @@ from (
 ) tt;
 
 2026-01-10:
+etf:
+B:5	2	0.40	1	0.20	0	0.00	0	0.00	0	0.00	0	0.00	0	0.00	0	0.00	0	0.00	0	0.00
+S:25	17	0.68	4	0.16	0	0.00	0	0.00	0	0.00	0	0.00	0	0.00	0	0.00	0	0.00	0	0.00
+
+stock:
+B:95	46	0.48	29	0.31	17	0.18	12	0.13	10	0.11	10	0.11	8	0.08	7	0.07	5	0.05	5	0.05
+S:332	137	0.41	81	0.24	49	0.15	36	0.11	29	0.09	22	0.07	19	0.06	15	0.05	12	0.04	5	0.02
