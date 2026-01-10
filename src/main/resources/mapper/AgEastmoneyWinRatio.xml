@@ -599,7 +599,7 @@ from (
         <select id="queryWinRatios" resultType="net.my.pojo.SpecialCarePoJo2">
             <![CDATA[
             select t1.method_name stockCode, t1.date, concat('总', '\n', t1.cnt, '') last
-                 , concat('1:', t1.cnt_next_1, '#'\n, t1.cnt_next_1_ratio
+                 , concat('1:', t1.cnt_next_1, '#\n', t1.cnt_next_1_ratio
                           , '\n2:', t1.cnt_next_2, '#\n', t1.cnt_next_2_ratio
                           , '\n3:', t1.cnt_next_3, '#\n', t1.cnt_next_3_ratio
                           , '\n4:', t1.cnt_next_4, '#\n', t1.cnt_next_4_ratio
