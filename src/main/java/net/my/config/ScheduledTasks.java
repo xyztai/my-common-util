@@ -5,6 +5,7 @@ import net.my.controller.*;
 import net.my.mapper.DataCalcMapper;
 import net.my.pojo.EastmoneyWinRatioPOJO;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +45,8 @@ public class ScheduledTasks {
     @Autowired
     private net.my.mapper.AgEastmoneyWinRatioMapper agEastmoneyWinRatioMapper;
 
-
+    @Value("${executeOnceTaskEnable}")
+    private Boolean executeOnceTaskEnable;
 
     public static Integer taskState = 0; // 为0说明是没人在用，可以执行，如果为1，则不能执行
 
@@ -140,7 +142,11 @@ public class ScheduledTasks {
         long startTime = System.currentTimeMillis();
         log.info("Task executed once after 5 seconds");
         log.info("executeOnceTask start...");
-        execCalc();
+        if(!executeOnceTaskEnable) {
+            log.info("executeOnceTask skip");
+        } else {
+            execCalc();
+        }
         log.info("executeOnceTask end...");
         log.info("executeOnceTask Time-Consuming: {} ms", System.currentTimeMillis() - startTime);
     }
