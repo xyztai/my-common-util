@@ -251,44 +251,51 @@ public class AgNewEastmoneyStockController {
         }
         List<String> dates = res.stream().map(SpecialCarePoJo2::getDate).sorted().collect(Collectors.toList());
         String maxDate = dates.get(dates.size() - 1);
+
         List<String> codes = res.stream()
                 .filter(f -> maxDate.equals(f.getDate()))
-                .map(m -> m.getStockCode().substring(0, 6)).collect(Collectors.toList());
+                .map(m -> m.getStockCode().substring(0, 6)).sorted().distinct().collect(Collectors.toList());
         List<SpecialCarePoJo2> res2 = new ArrayList<>();
-        int cnt = codes.size()/4;
-        for(int i = 0; i < cnt + 1; i++) {
+        for(int i = 0; i < codes.size(); i++) {
             SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-            if(i * 4 < codes.size()) {
-                tmp.setDate(codes.get(i * 4));
-            } else {
-                continue;
-            }
-
-            if(i * 4 + 1 < codes.size()) {
-                tmp.setStockCode(codes.get(i * 4 + 1));
-            }
-            else {
-                res2.add(tmp);
-                continue;
-            }
-
-            if(i * 4 + 2 < codes.size()) {
-                tmp.setLast(codes.get(i * 4 + 2));
-            }
-            else {
-                res2.add(tmp);
-                continue;
-            }
-
-            if(i * 4 + 3 < codes.size()) {
-                tmp.setRatioB(codes.get(i * 4 + 3));
-            }
-            else {
-                res2.add(tmp);
-                continue;
-            }
+            tmp.setDate(codes.get(i));
             res2.add(tmp);
         }
+
+//        int cnt = codes.size()/4;
+//        for(int i = 0; i < cnt + 1; i++) {
+//            SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+//            if(i * 4 < codes.size()) {
+//                tmp.setDate(codes.get(i * 4));
+//            } else {
+//                continue;
+//            }
+//
+//            if(i * 4 + 1 < codes.size()) {
+//                tmp.setStockCode(codes.get(i * 4 + 1));
+//            }
+//            else {
+//                res2.add(tmp);
+//                continue;
+//            }
+//
+//            if(i * 4 + 2 < codes.size()) {
+//                tmp.setLast(codes.get(i * 4 + 2));
+//            }
+//            else {
+//                res2.add(tmp);
+//                continue;
+//            }
+//
+//            if(i * 4 + 3 < codes.size()) {
+//                tmp.setRatioB(codes.get(i * 4 + 3));
+//            }
+//            else {
+//                res2.add(tmp);
+//                continue;
+//            }
+//            res2.add(tmp);
+//        }
         return RestGeneralResponse.of(res2);
     }
 
