@@ -242,6 +242,51 @@ public class AgNewEastmoneyStockController {
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
+    @GetMapping("/query9ZhuanSCodes")
+    public BaseResponse query9ZhuanSCodes() {
+        String key = "stock#" + "query9ZhuanS";
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(CollectionUtils.isEmpty(res)) {
+            return RestGeneralResponse.OK;
+        }
+        List<String> codes = res.stream().map(m -> m.getStockCode().substring(0, 6)).collect(Collectors.toList());
+        List<SpecialCarePoJo2> res2 = new ArrayList<>();
+        int cnt = codes.size()/4;
+        for(int i = 0; i < cnt + 1; i++) {
+            SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+            if(i * 4 < codes.size()) {
+                tmp.setDate(codes.get(i * 4));
+            } else {
+                continue;
+            }
+
+            if(i * 4 + 1 < codes.size()) {
+                tmp.setStockCode(codes.get(i * 4 + 1));
+            }
+            else {
+                res2.add(tmp);
+                continue;
+            }
+
+            if(i * 4 + 2 < codes.size()) {
+                tmp.setLast(codes.get(i * 4 + 2));
+            }
+            else {
+                res2.add(tmp);
+                continue;
+            }
+
+            if(i * 4 + 3 < codes.size()) {
+                tmp.setRatioB(codes.get(i * 4 + 3));
+            }
+            else {
+                res2.add(tmp);
+                continue;
+            }
+            res2.add(tmp);
+        }
+        return RestGeneralResponse.of(res2);
+    }
 
     /**
      * 6、query9ZhuanS
