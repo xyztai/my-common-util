@@ -249,7 +249,11 @@ public class AgNewEastmoneyStockController {
         if(CollectionUtils.isEmpty(res)) {
             return RestGeneralResponse.OK;
         }
-        List<String> codes = res.stream().map(m -> m.getStockCode().substring(0, 6)).collect(Collectors.toList());
+        List<String> dates = res.stream().map(SpecialCarePoJo2::getDate).sorted().collect(Collectors.toList());
+        String maxDate = dates.get(dates.size() - 1);
+        List<String> codes = res.stream()
+                .filter(f -> maxDate.equals(f.getDate()))
+                .map(m -> m.getStockCode().substring(0, 6)).collect(Collectors.toList());
         List<SpecialCarePoJo2> res2 = new ArrayList<>();
         int cnt = codes.size()/4;
         for(int i = 0; i < cnt + 1; i++) {
