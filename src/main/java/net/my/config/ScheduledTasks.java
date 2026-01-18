@@ -2,6 +2,7 @@ package net.my.config;
 
 import lombok.extern.slf4j.Slf4j;
 import net.my.controller.*;
+import net.my.mapper.AgEastmoneyEChartsMapper;
 import net.my.mapper.DataCalcMapper;
 import net.my.pojo.EastmoneyWinRatioPOJO;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,6 +42,9 @@ public class ScheduledTasks {
 
     @Autowired
     private AgNewEastmoneyETFController agNewEastmoneyETFController;
+
+    @Autowired
+    private AgEastmoneyEChartsMapper agEastmoneyEChartsMapper;
 
     @Autowired
     private AgNewEastmoneyEChartsController agNewEastmoneyEChartsController;
@@ -240,6 +244,8 @@ public class ScheduledTasks {
 
 
         // 查询图标数据
+        String beginDate = agEastmoneyEChartsMapper.getBeginDate();
+        agEastmoneyEChartsMapper.saveEcharts9Zhuan(beginDate);
         log.info("task echarts b69 start");
         agNewEastmoneyEChartsController.b69();
         log.info("task echarts b69 end");
