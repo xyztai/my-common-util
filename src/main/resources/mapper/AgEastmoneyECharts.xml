@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.my.mapper.AgEastmoneyEChartsMapper">
+
+    <select id="b69" resultType="net.my.pojo.EchartsPoJo">
+        <![CDATA[
+            select `_date` name
+                   , sum(case when `_9_zhuan` = '06' then 1 else 0 end) value1
+                   , sum(case when `_9_zhuan` = '07' then 1 else 0 end) value2
+                   , sum(case when `_9_zhuan` = '08' then 1 else 0 end) value3
+                   , sum(case when `_9_zhuan` = '09' then 1 else 0 end) value4
+            from t_eastmoney_node_9_zhuan
+            where `_date` > '2025-01-01'
+            and `_direction` = 'S'
+            group by `_date`
+            order by 1 desc
+            limit 22
+        ]]>
+    </select>
+
+</mapper>

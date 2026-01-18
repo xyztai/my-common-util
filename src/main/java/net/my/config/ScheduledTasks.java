@@ -43,6 +43,9 @@ public class ScheduledTasks {
     private AgNewEastmoneyETFController agNewEastmoneyETFController;
 
     @Autowired
+    private AgNewEastmoneyEChartsController agNewEastmoneyEChartsController;
+
+    @Autowired
     private net.my.mapper.AgEastmoneyWinRatioMapper agEastmoneyWinRatioMapper;
 
     @Value("${executeOnceTaskEnable}")
@@ -233,6 +236,13 @@ public class ScheduledTasks {
         log.info("task etf queryEastmoneyLatestInfo start");
         agNewEastmoneyETFController.queryEastmoneyLatestInfo();
         log.info("task etf queryEastmoneyLatestInfo end");
+
+
+
+        // 查询图标数据
+        log.info("task echarts b69 start");
+        agNewEastmoneyEChartsController.b69();
+        log.info("task echarts b69 end");
 
 //            agNewQQController.getHistoryData(5);
 //            agNewQQ300Controller.getHistoryData(5);  // QQ 的更新hs300 的
