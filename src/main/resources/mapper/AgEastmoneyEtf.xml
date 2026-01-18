@@ -255,20 +255,23 @@
         select concat(t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
              , case when t1.end_buy_date = 1 then concat('慎重\n', round(t1.to_buy, 3)) else concat('历史\n', round(t1.to_buy, 3)) end ratioB
         from (
-                 select t.`date` , t.stockCode , t.chg, t.volume , t.`last`, t.to_buy,
-                        DATE_FORMAT(DATE_ADD(STR_TO_DATE(t.`date`, '%Y-%m-%d'), INTERVAL 15 DAY), '%Y-%m-%d') >= DATE_FORMAT(SYSDATE(), '%Y-%m-%d') end_buy_date
+                 select t.`date` , t.stockCode , t.chg, t.to_buy, t.volume, t.`open` , t.`last`, t.high , t.low
+                        , DATE_FORMAT(DATE_ADD(STR_TO_DATE(t.`date`, '%Y-%m-%d'), INTERVAL 15 DAY), '%Y-%m-%d') >= DATE_FORMAT(SYSDATE(), '%Y-%m-%d') end_buy_date
                  from (
-                          select t.`date` , t.stockCode , t.chg
+                          select t.`date`
+                               , t.stockCode
+                               , t.chg
+                               , round(t.`last`*(1+t.chg*0.618), 3) to_buy
                                , t.volume
                                , lead(t.volume) over (partition by t.stockCode order by `date` desc) pre_volume
-                              , t.`open` , t.`last`, t.high , t.low
+                               , t.`open` , t.`last`, t.high , t.low
                                -- , lag(t.`date`, 2) over (partition by t.stockCode order by `date` desc) date_exists
-                               , least(lag(t.low , 1) over (partition by t.stockCode order by `date` desc)
-                              , lag(t.low , 2) over (partition by t.stockCode order by `date` desc)) to_buy -- T~T+2，共3个交易日的 low，T+3时B
-                               , lag(t.volume, 1) over (partition by t.stockCode order by `date` desc) vol_next_1
-                              , lag(t.chg, 1) over (partition by t.stockCode order by `date` desc) chg_next_1
-                              , lag(t.volume, 2) over (partition by t.stockCode order by `date` desc) vol_next_2
-                              , lag(t.chg, 2) over (partition by t.stockCode order by `date` desc) chg_next_2
+                               -- , least(lag(t.low , 1) over (partition by t.stockCode order by `date` desc)
+                               --       , lag(t.low , 2) over (partition by t.stockCode order by `date` desc)) to_buy -- T~T+2，共3个交易日的 low，T+3时B
+                               -- , lag(t.volume, 1) over (partition by t.stockCode order by `date` desc) vol_next_1
+                               -- , lag(t.chg, 1) over (partition by t.stockCode order by `date` desc) chg_next_1
+                               -- , lag(t.volume, 2) over (partition by t.stockCode order by `date` desc) vol_next_2
+                               -- , lag(t.chg, 2) over (partition by t.stockCode order by `date` desc) chg_next_2
                           from t_eastmoney_node_etf t
                           where t.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -1 YEAR), '%Y-%m-%d')
                             -- and t.stockCode like '%600803'
@@ -278,42 +281,8 @@
                       ) t
                  where t.volume >= 2 * pre_volume
                    and t.chg >= 2
-                   -- and t.high / t.`last` < 1.01
-                   -- and t.`open` / t.low < 1.01
-                   -- and date_exists is not null
-                   and (chg_next_1 >= 0 or (chg_next_1 < 0 and vol_next_1 <= volume*0.618))
-                   and (chg_next_2 >= 0 or (chg_next_2 < 0 and vol_next_2 <= volume*0.618))
-             ) t1, t_etf t3
-        where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
-        order by 2 desc
-        ]]>
-    </select>
-
-    <select id="queryEastmoneyVolSuddenlyRisedToday" resultType="net.my.pojo.SpecialCarePoJo2">
-        <![CDATA[
-        select concat(t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
-             , concat(case when t1.end_buy_date = 1 then '慎重\n' else '历史\n' end, t1.clac_expma_5, t1.clac_expma_10) ratioB
-             -- , case when t1.end_buy_date = 1 then concat('慎重\n', round(t1.to_buy, 3)) else concat('历史\n', round(t1.to_buy, 3)) end ratioB
-        from (
-                 select t.`date` , t.stockCode , t.chg, t.volume , t.`last`, t.to_buy, round(t.clac_expma_5, 3) clac_expma_5 , round(t.clac_expma_10, 3) clac_expma_10
-                        , DATE_FORMAT(DATE_ADD(STR_TO_DATE(t.`date`, '%Y-%m-%d'), INTERVAL 15 DAY), '%Y-%m-%d') >= DATE_FORMAT(SYSDATE(), '%Y-%m-%d') end_buy_date
-                 from (
-                          select t.`date` , t.stockCode , t.chg
-                               , t.volume
-                               , lead(t.volume) over (partition by t.stockCode order by `date` desc) pre_volume
-                               , t.`open` , t.`last`, t.high , t.low
-                               , t.`last` to_buy
-                               , t.clac_expma_5 , t.clac_expma_10
-                          from t_eastmoney_node_etf t
-                          where t.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -1 YEAR), '%Y-%m-%d')
-                            and t.`date` not like '9999%'
-                            and t.stockCode not like '%.68%'
-                            and t.stockCode not like '%.30%'
-                      ) t
-                 where t.volume >= 2 * pre_volume
-                   and t.chg >= 2
-                   -- and t.high / t.`last` < 1.01
-                   -- and t.`open` / t.low < 1.01
+                   and t.high / t.`last` < 1.01
+                   and t.`open` / t.low < 1.01
                    -- and date_exists is not null
                    -- and (chg_next_1 >= 0 or (chg_next_1 < 0 and vol_next_1 <= volume*0.618))
                    -- and (chg_next_2 >= 0 or (chg_next_2 < 0 and vol_next_2 <= volume*0.618))
