@@ -195,9 +195,9 @@ public class ScheduledTasks {
         agNewEastmoneyStockController.query9ZhuanS();
         log.info("task stock query9ZhuanS end");
 
-        log.info("task stock queryWinRatios start");
-        agNewEastmoneyStockController.queryWinRatios();
-        log.info("task stock queryWinRatios end");
+//        log.info("task stock queryWinRatios start");
+//        agNewEastmoneyStockController.queryWinRatios();
+//        log.info("task stock queryWinRatios end");
 
         log.info("task stock queryEastmoneyLatestInfo start");
         agNewEastmoneyStockController.queryEastmoneyLatestInfo();
@@ -226,9 +226,9 @@ public class ScheduledTasks {
         agNewEastmoneyETFController.queryEtf9ZhuanS();
         log.info("task etf queryEtf9ZhuanS end");
 
-        log.info("task etf queryWinRatios start");
-        agNewEastmoneyETFController.queryWinRatios();
-        log.info("task etf queryWinRatios end");
+//        log.info("task etf queryWinRatios start");
+//        agNewEastmoneyETFController.queryWinRatios();
+//        log.info("task etf queryWinRatios end");
 
         log.info("task etf queryEastmoneyLatestInfo start");
         agNewEastmoneyETFController.queryEastmoneyLatestInfo();
