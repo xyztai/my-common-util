@@ -261,9 +261,10 @@
                           select t.`date`
                                , t.stockCode
                                , t.chg
-                               , round(t.`last`*(1+t.chg*0.618), 3) to_buy
+                               , round(t.`last`*(1+t.chg*0.618*0.01), 3) to_buy
                                , t.volume
-                               , lead(t.volume) over (partition by t.stockCode order by `date` desc) pre_volume
+                               , least(lead(t.volume) over (partition by t.stockCode order by `date` desc)
+                                       , lead(t.volume, 2) over (partition by t.stockCode order by `date` desc)) pre_volume
                                , t.`open` , t.`last`, t.high , t.low
                                -- , lag(t.`date`, 2) over (partition by t.stockCode order by `date` desc) date_exists
                                -- , least(lag(t.low , 1) over (partition by t.stockCode order by `date` desc)

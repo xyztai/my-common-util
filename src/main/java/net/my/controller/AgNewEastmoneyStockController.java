@@ -318,8 +318,12 @@ public class AgNewEastmoneyStockController {
         List<SpecialCarePoJo2> res1 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key1);
         String key2 = "stock#" + "query9ZhuanB";
         List<SpecialCarePoJo2> res2 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key2);
+        String key5 = "stock#" + "queryEastmoneyVolSuddenlyRised";
+        List<SpecialCarePoJo2> res5 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key5);
 
-        if(CollectionUtils.isEmpty(res1) && CollectionUtils.isEmpty(res2)) {
+        if(CollectionUtils.isEmpty(res1)
+                && CollectionUtils.isEmpty(res2)
+                && CollectionUtils.isEmpty(res5)) {
             return RestGeneralResponse.OK;
         }
 
@@ -365,6 +369,20 @@ public class AgNewEastmoneyStockController {
                 tmp.setStockCode(codes.get(i).getStockCode().substring(0, 6));
 //                tmp.setLast("No." + i);
                 tmp.setRatioB("B9");
+                res3.add(tmp);
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(res5)){
+            List<SpecialCarePoJo2> codes = res5.stream()
+                    .filter(f -> f.getRatioB().startsWith("慎重"))
+                    .collect(Collectors.toList());
+            for(int i = 0; i < codes.size(); i++) {
+                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+//                tmp.setDate(codes.get(i).getDate());
+                tmp.setStockCode(codes.get(i).getStockCode().substring(0, 6));
+//                tmp.setLast("No." + i);
+                tmp.setRatioB("vol*3");
                 res3.add(tmp);
             }
         }
