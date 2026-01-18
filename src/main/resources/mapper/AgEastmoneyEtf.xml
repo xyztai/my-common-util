@@ -273,8 +273,8 @@
                           where t.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -1 YEAR), '%Y-%m-%d')
                             -- and t.stockCode like '%600803'
                             and t.`date` not like '9999%'
-                            and t.stockCode not like '%.688%'
-                            and t.stockCode not like '%.300%'
+                            and t.stockCode not like '%.68%'
+                            and t.stockCode not like '%.30%'
                       ) t
                  where t.volume >= 2 * pre_volume
                    and t.chg >= 2
@@ -307,8 +307,8 @@
                           from t_eastmoney_node_etf t
                           where t.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -1 YEAR), '%Y-%m-%d')
                             and t.`date` not like '9999%'
-                            and t.stockCode not like '%.688%'
-                            and t.stockCode not like '%.300%'
+                            and t.stockCode not like '%.68%'
+                            and t.stockCode not like '%.30%'
                       ) t
                  where t.volume >= 2 * pre_volume
                    and t.chg >= 2
@@ -418,12 +418,10 @@
                 , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
             from t_eastmoney_node_etf ten
             where ten.`date` not like '9999%'
-            and ten.`stockCode` not like '0.300%'
-            and ten.`stockCode` not like '0.688%'
-            and ten.`stockCode` not like '0.689%'
-            and ten.`stockCode` not like '1.300%'
-            and ten.`stockCode` not like '1.688%'
-            and ten.`stockCode` not like '1.689%'
+            and ten.`stockCode` not like '0.30%'
+            and ten.`stockCode` not like '0.68%'
+            and ten.`stockCode` not like '1.30%'
+            and ten.`stockCode` not like '1.68%'
             and ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d')
             -- and ten.stockCode = '1.600795'
             ) t1
@@ -533,12 +531,10 @@
                 , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
             from t_eastmoney_node_etf ten
             where ten.`date` not like '9999%'
-            and ten.`stockCode` not like '0.300%'
-            and ten.`stockCode` not like '0.688%'
-            and ten.`stockCode` not like '0.689%'
-            and ten.`stockCode` not like '1.300%'
-            and ten.`stockCode` not like '1.688%'
-            and ten.`stockCode` not like '1.689%'
+            and ten.`stockCode` not like '0.30%'
+            and ten.`stockCode` not like '0.68%'
+            and ten.`stockCode` not like '1.30%'
+            and ten.`stockCode` not like '1.68%'
             and ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d')
             -- and ten.stockCode = '1.600795'
             ) t1
