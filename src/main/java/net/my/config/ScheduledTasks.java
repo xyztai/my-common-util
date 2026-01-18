@@ -245,7 +245,8 @@ public class ScheduledTasks {
 
         // 查询图标数据
         String beginDate = agEastmoneyEChartsMapper.getBeginDate();
-        agEastmoneyEChartsMapper.saveEcharts9Zhuan(beginDate);
+        agEastmoneyEChartsMapper.saveEcharts9ZhuanS(beginDate);
+        agEastmoneyEChartsMapper.saveEcharts9ZhuanB(beginDate);
         log.info("task echarts b69 start");
         agNewEastmoneyEChartsController.b69();
         log.info("task echarts b69 end");
