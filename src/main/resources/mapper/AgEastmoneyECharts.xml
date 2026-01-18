@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="net.my.mapper.AgEastmoneyEChartsMapper">
 
-    <select id="b69" resultType="net.my.pojo.EchartsPoJo">
+    <select id="s69" resultType="net.my.pojo.EchartsPoJo">
         <![CDATA[
             select `_date` name
                    , sum(case when `_9_zhuan` = '06' then 1 else 0 end) value1

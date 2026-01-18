@@ -36,17 +36,17 @@ public class AgNewEastmoneyEChartsController {
      * 1、查询数据
      * @return
      */
-    @GetMapping("/b69")
-    public BaseResponse b69() {
-        log.info("b69");
-        String key = "echarts#" + "b69";
+    @GetMapping("/s69")
+    public BaseResponse s69() {
+        log.info("s69");
+        String key = "echarts#" + "s69";
         List<EchartsPoJo> res = (List<EchartsPoJo>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
             return RestGeneralResponse.of(res);
         }
 
-        List<EchartsPoJo> buyDataFromEastmoneys = agEastmoneyEChartsMapper.b69();
+        List<EchartsPoJo> buyDataFromEastmoneys = agEastmoneyEChartsMapper.s69();
         if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
             EchartsPoJo empty = new EchartsPoJo();
             empty.setName("--");

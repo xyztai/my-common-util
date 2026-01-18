@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface AgEastmoneyEChartsMapper {
     // 从东财获取etf的数据
-    List<EchartsPoJo> b69();
+    List<EchartsPoJo> s69();
     String getBeginDate();
     int saveEcharts9ZhuanS(@Param("beginDate") String beginDate);
     int saveEcharts9ZhuanB(@Param("beginDate") String beginDate);

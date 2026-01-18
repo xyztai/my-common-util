@@ -247,9 +247,9 @@ public class ScheduledTasks {
         String beginDate = agEastmoneyEChartsMapper.getBeginDate();
         agEastmoneyEChartsMapper.saveEcharts9ZhuanS(beginDate);
         agEastmoneyEChartsMapper.saveEcharts9ZhuanB(beginDate);
-        log.info("task echarts b69 start");
-        agNewEastmoneyEChartsController.b69();
-        log.info("task echarts b69 end");
+        log.info("task echarts s69 start");
+        agNewEastmoneyEChartsController.s69();
+        log.info("task echarts s69 end");
 
 //            agNewQQController.getHistoryData(5);
 //            agNewQQ300Controller.getHistoryData(5);  // QQ 的更新hs300 的
