@@ -242,19 +242,27 @@ public class ScheduledTasks {
 
         // 计算ratio
         List<EastmoneyWinRatioPOJO> allRatio = new ArrayList<>();
+        log.info("task etf query9ZhuanB_Copy start");
         List<EastmoneyWinRatioPOJO> B_09_STOCK = agEastmoneyWinRatioMapper.query9ZhuanB_Copy();
+        log.info("task etf query9ZhuanB_Copy end");
         if(!CollectionUtils.isEmpty(B_09_STOCK)) {
             allRatio.addAll(B_09_STOCK);
         }
+        log.info("task etf query9ZhuanS_Copy start");
         List<EastmoneyWinRatioPOJO> S_07_STOCK = agEastmoneyWinRatioMapper.query9ZhuanS_Copy();
+        log.info("task etf query9ZhuanS_Copy end");
         if(!CollectionUtils.isEmpty(S_07_STOCK)) {
             allRatio.addAll(S_07_STOCK);
         }
+        log.info("task etf queryEtf9ZhuanB_Copy start");
         List<EastmoneyWinRatioPOJO> B_09_ETF = agEastmoneyWinRatioMapper.queryEtf9ZhuanB_Copy();
+        log.info("task etf queryEtf9ZhuanB_Copy end");
         if(!CollectionUtils.isEmpty(B_09_ETF)) {
             allRatio.addAll(B_09_ETF);
         }
+        log.info("task etf queryEtf9ZhuanS_Copy start");
         List<EastmoneyWinRatioPOJO> S_07_ETF = agEastmoneyWinRatioMapper.queryEtf9ZhuanS_Copy();
+        log.info("task etf queryEtf9ZhuanS_Copy end");
         if(!CollectionUtils.isEmpty(S_07_ETF)) {
             allRatio.addAll(S_07_ETF);
         }
