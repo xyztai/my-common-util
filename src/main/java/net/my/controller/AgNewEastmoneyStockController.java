@@ -242,70 +242,13 @@ public class AgNewEastmoneyStockController {
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
-    @GetMapping("/query9ZhuanSCodes")
-    public BaseResponse query9ZhuanSCodes() {
-        String key = "stock#" + "query9ZhuanS";
-        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
-        if(CollectionUtils.isEmpty(res)) {
-            return RestGeneralResponse.OK;
-        }
-        List<String> dates = res.stream().map(SpecialCarePoJo2::getDate).sorted().collect(Collectors.toList());
-        String maxDate = dates.get(dates.size() - 1);
-
-        List<String> codes = res.stream()
-                .filter(f -> maxDate.equals(f.getDate()))
-                .map(m -> m.getStockCode().substring(0, 6)).sorted().distinct().collect(Collectors.toList());
-        List<SpecialCarePoJo2> res2 = new ArrayList<>();
-        for(int i = 0; i < codes.size(); i++) {
-            SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-            tmp.setDate(codes.get(i));
-            res2.add(tmp);
-        }
-
-//        int cnt = codes.size()/4;
-//        for(int i = 0; i < cnt + 1; i++) {
-//            SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-//            if(i * 4 < codes.size()) {
-//                tmp.setDate(codes.get(i * 4));
-//            } else {
-//                continue;
-//            }
-//
-//            if(i * 4 + 1 < codes.size()) {
-//                tmp.setStockCode(codes.get(i * 4 + 1));
-//            }
-//            else {
-//                res2.add(tmp);
-//                continue;
-//            }
-//
-//            if(i * 4 + 2 < codes.size()) {
-//                tmp.setLast(codes.get(i * 4 + 2));
-//            }
-//            else {
-//                res2.add(tmp);
-//                continue;
-//            }
-//
-//            if(i * 4 + 3 < codes.size()) {
-//                tmp.setRatioB(codes.get(i * 4 + 3));
-//            }
-//            else {
-//                res2.add(tmp);
-//                continue;
-//            }
-//            res2.add(tmp);
-//        }
-        return RestGeneralResponse.of(res2);
-    }
-
     /**
      * 6、query9ZhuanS
      * @return
      */
     @GetMapping("/query9ZhuanS")
     public BaseResponse query9ZhuanS() {
-        log.info("query9ZhuanB");
+        log.info("query9ZhuanS");
         String key = "stock#" + "query9ZhuanS";
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
@@ -397,6 +340,95 @@ public class AgNewEastmoneyStockController {
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+    /**
+     * 9、方便截屏
+     * @return
+     */
+    @GetMapping("/query9ZhuanCodes")
+    public BaseResponse query9ZhuanCodes() {
+        String key1 = "stock#" + "query9ZhuanS";
+        List<SpecialCarePoJo2> res1 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key1);
+        String key2 = "stock#" + "query9ZhuanB";
+        List<SpecialCarePoJo2> res2 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key2);
+
+        if(CollectionUtils.isEmpty(res1) && CollectionUtils.isEmpty(res2)) {
+            return RestGeneralResponse.OK;
+        }
+
+        List<SpecialCarePoJo2> res3 = new ArrayList<>();
+        if(!CollectionUtils.isEmpty(res1)){
+            List<String> dates = res1.stream().map(SpecialCarePoJo2::getDate).sorted().collect(Collectors.toList());
+            String maxDate = dates.get(dates.size() - 1);
+
+            List<String> codes = res1.stream()
+                    .filter(f -> maxDate.equals(f.getDate()))
+                    .map(m -> m.getStockCode().substring(0, 6)).sorted().distinct().collect(Collectors.toList());
+            for(int i = 0; i < codes.size(); i++) {
+                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+                tmp.setDate(codes.get(i));
+                tmp.setRatioB("S6-S9");
+                res2.add(tmp);
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(res2)){
+            List<String> dates = res2.stream().map(SpecialCarePoJo2::getDate).sorted(Comparator.reverseOrder()).distinct().collect(Collectors.toList());
+
+            List<String> targetDates = dates;
+            if(dates.size() > 5) {
+                targetDates = dates.subList(0, 5);
+            }
+
+            List<String> finalTargetDates = targetDates;
+            List<String> codes = res2.stream()
+                    .filter(f -> finalTargetDates.contains(f.getDate()) && f.getRatioB().startsWith("B_09"))
+                    .map(m -> m.getStockCode().substring(0, 6)).sorted().distinct().collect(Collectors.toList());
+            for(int i = 0; i < codes.size(); i++) {
+                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+                tmp.setDate(codes.get(i));
+                tmp.setRatioB("B_09U");
+                res2.add(tmp);
+            }
+        }
+
+
+//        int cnt = codes.size()/4;
+//        for(int i = 0; i < cnt + 1; i++) {
+//            SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+//            if(i * 4 < codes.size()) {
+//                tmp.setDate(codes.get(i * 4));
+//            } else {
+//                continue;
+//            }
+//
+//            if(i * 4 + 1 < codes.size()) {
+//                tmp.setStockCode(codes.get(i * 4 + 1));
+//            }
+//            else {
+//                res2.add(tmp);
+//                continue;
+//            }
+//
+//            if(i * 4 + 2 < codes.size()) {
+//                tmp.setLast(codes.get(i * 4 + 2));
+//            }
+//            else {
+//                res2.add(tmp);
+//                continue;
+//            }
+//
+//            if(i * 4 + 3 < codes.size()) {
+//                tmp.setRatioB(codes.get(i * 4 + 3));
+//            }
+//            else {
+//                res2.add(tmp);
+//                continue;
+//            }
+//            res2.add(tmp);
+//        }
+        return RestGeneralResponse.of(res2);
     }
 
     @ApiOperation(value = "获取历史的cp数据", notes = "访问互联网接口获取数据")
