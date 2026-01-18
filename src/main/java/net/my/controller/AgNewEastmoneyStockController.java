@@ -359,17 +359,25 @@ public class AgNewEastmoneyStockController {
 
         List<SpecialCarePoJo2> res3 = new ArrayList<>();
         if(!CollectionUtils.isEmpty(res1)){
-            List<String> dates = res1.stream().map(SpecialCarePoJo2::getDate).sorted().collect(Collectors.toList());
-            String maxDate = dates.get(dates.size() - 1);
+            List<String> dates = res1.stream().map(SpecialCarePoJo2::getDate).sorted(Comparator.reverseOrder()).distinct().collect(Collectors.toList());
 
-            List<String> codes = res1.stream()
-                    .filter(f -> maxDate.equals(f.getDate()))
-                    .map(m -> m.getStockCode().substring(0, 6)).sorted().distinct().collect(Collectors.toList());
+            List<String> targetDates = dates;
+            if(dates.size() > 1) {
+                targetDates = dates.subList(0, 1);
+            }
+
+            List<String> finalTargetDates = targetDates;
+            List<SpecialCarePoJo2> codes = res1.stream()
+                    .filter(f -> finalTargetDates.contains(f.getDate()))
+                    .collect(Collectors.toList());
             for(int i = 0; i < codes.size(); i++) {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-                tmp.setDate(codes.get(i));
-                tmp.setRatioB("S6-S9");
-                res2.add(tmp);
+//                tmp.setDate(codes.get(i).getDate());
+                tmp.setStockCode(codes.get(i).getStockCode().substring(0, 6));
+//                tmp.setLast("No." + i);
+//                tmp.setRatioB(codes.get(i).getRatioB());
+                tmp.setRatioB("S69");
+                res3.add(tmp);
             }
         }
 
@@ -382,14 +390,16 @@ public class AgNewEastmoneyStockController {
             }
 
             List<String> finalTargetDates = targetDates;
-            List<String> codes = res2.stream()
+            List<SpecialCarePoJo2> codes = res2.stream()
                     .filter(f -> finalTargetDates.contains(f.getDate()) && f.getRatioB().startsWith("B_09"))
-                    .map(m -> m.getStockCode().substring(0, 6)).sorted().distinct().collect(Collectors.toList());
+                    .collect(Collectors.toList());
             for(int i = 0; i < codes.size(); i++) {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-                tmp.setDate(codes.get(i));
-                tmp.setRatioB("B_09U");
-                res2.add(tmp);
+//                tmp.setDate(codes.get(i).getDate());
+                tmp.setStockCode(codes.get(i).getStockCode().substring(0, 6));
+//                tmp.setLast("No." + i);
+                tmp.setRatioB("B9");
+                res3.add(tmp);
             }
         }
 
@@ -428,7 +438,7 @@ public class AgNewEastmoneyStockController {
 //            }
 //            res2.add(tmp);
 //        }
-        return RestGeneralResponse.of(res2);
+        return RestGeneralResponse.of(res3);
     }
 
     @ApiOperation(value = "获取历史的cp数据", notes = "访问互联网接口获取数据")
