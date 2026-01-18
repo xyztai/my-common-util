@@ -7,9 +7,8 @@
     <select id="getHs300List" resultType="net.my.pojo.HsStockPoJo">
         select stockCode, stockType, stockName
         from t_hs300
-        -- where stockCode not like '300%'
-        -- and stockCode not like '688%'
-        -- and stockCode not like '689%'
+        -- where stockCode not like '30%'
+        -- and stockCode not like '68%'
         order by 1
     </select>
 
@@ -274,8 +273,8 @@
                           where t.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -1 YEAR), '%Y-%m-%d')
                             -- and t.stockCode like '%600803'
                             and t.`date` not like '9999%'
-                            and t.stockCode not like '%.688%'
-                            and t.stockCode not like '%.300%'
+                            and t.stockCode not like '%.68%'
+                            and t.stockCode not like '%.30%'
                       ) t
                  where t.volume >= 3 * pre_volume
                    and t.chg >= 3
@@ -308,8 +307,8 @@
                           from t_eastmoney_node t
                           where t.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -1 YEAR), '%Y-%m-%d')
                             and t.`date` not like '9999%'
-                            and t.stockCode not like '%.688%'
-                            and t.stockCode not like '%.300%'
+                            and t.stockCode not like '%.68%'
+                            and t.stockCode not like '%.30%'
                       ) t
                  where t.volume >= 3 * pre_volume
                    and t.chg >= 3
@@ -420,11 +419,9 @@
                                         from t_eastmoney_node ten
                                         where ten.`date` not like '9999%'
                                         and ten.`stockCode` not like '0.30%'
-                                        and ten.`stockCode` not like '0.688%'
-                                        and ten.`stockCode` not like '0.689%'
+                                        and ten.`stockCode` not like '0.68%'
                                         and ten.`stockCode` not like '1.30%'
-                                        and ten.`stockCode` not like '1.688%'
-                                        and ten.`stockCode` not like '1.689%'
+                                        and ten.`stockCode` not like '1.68%'
                                         and ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d')
                                         -- and ten.stockCode = '1.600795'
                                 ) t1
@@ -538,11 +535,9 @@
                                         from t_eastmoney_node ten
                                         where ten.`date` not like '9999%'
                                         and ten.`stockCode` not like '0.30%'
-                                        and ten.`stockCode` not like '0.688%'
-                                        and ten.`stockCode` not like '0.689%'
+                                        and ten.`stockCode` not like '0.68%'
                                         and ten.`stockCode` not like '1.30%'
-                                        and ten.`stockCode` not like '1.688%'
-                                        and ten.`stockCode` not like '1.689%'
+                                        and ten.`stockCode` not like '1.68%'
                                         and ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d')
                                         -- and ten.stockCode = '1.600795'
                                 ) t1
