@@ -16,7 +16,7 @@
             and `_direction` = 'S'
             group by `_date`
             order by 1 desc
-            limit 120
+            limit 22
         ]]>
     </select>
 
