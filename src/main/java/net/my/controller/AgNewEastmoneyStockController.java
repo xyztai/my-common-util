@@ -49,6 +49,9 @@ public class AgNewEastmoneyStockController {
     @Autowired
     private AgEastmoneyWinRatioMapper agEastmoneyWinRatioMapper;
 
+    @Autowired
+    private AgNewQQ300Controller agNewQQ300Controller;
+
 
 
 //    /**
