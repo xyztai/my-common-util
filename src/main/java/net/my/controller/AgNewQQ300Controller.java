@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -194,6 +195,75 @@ public class AgNewQQ300Controller {
 //                .doubleValue();
     }
 
+    @GetMapping("/qq/{zqdm}/{days}")
+    public BaseResponse getQQResReplaceEastmoneyOuter(@PathVariable("zqdm") String zqdm
+                                                      , @PathVariable("days") Integer days) {
+        return RestGeneralResponse.of(getQQResReplaceEastmoney(zqdm, days));
+    }
+
+    public List<String> getQQResReplaceEastmoney(String zqdm, Integer days) {
+        List<String> klines = new ArrayList<>();
+        // zqdm 举例，000001 为 sz000001
+        String url = String.format(PROXY_FINANCE_QQ_URL_FORMAT_QFQ, zqdm, days);
+        log.info("url: {}, zqdm: {}, days: {}", url, zqdm, days);
+        String res = "";
+        for(int i = 0; i < 10; i++) {
+            try {
+                Thread.sleep(200);
+                log.info("try num={}, stockCode={}, url={}", i, zqdm, url);
+                res = restTemplate.getForObject(url, String.class);
+                if(!StringUtils.isEmpty(res)) {
+                    break;
+                }
+            } catch (Exception ex) {
+                ;
+            }
+        }
+        if(StringUtils.isEmpty(res)) {
+            return klines;
+        }
+
+        try {
+            res = res.replace("kline_dayqfq=", "");//.replace(",{},", ",");
+            res = res.substring(0, res.indexOf(",\"qt\"")) + "}}}";
+            log.info("res={}", res);
+            Hs300Res qqRes = JSON.parseObject(res, Hs300Res.class);
+//                List<HsStockPoJoJO> pojos = qqRes.getData().get(zqdm).get("qfqday");
+//                List<QqNode> tmpNodes = pojos.stream().map(HsStockPoJoJO::toVo).sorted(Comparator.comparing(QqNode::getDate)).collect(Collectors.toList());
+
+            List<List<Object>> pojos = qqRes.getData().get(zqdm).get("qfqday");
+            if(pojos == null) {
+                pojos = qqRes.getData().get(zqdm).get("day");
+            }
+            if(pojos == null) {
+                return klines;
+            }
+            List<QqNode> tmpNodes = pojos.stream()
+                    .map(HsStockPoJoJO::toVo2)
+                    .sorted(Comparator.comparing(QqNode::getDate))
+                    .collect(Collectors.toList());
+            Double preLast = tmpNodes.get(0).getLast();
+            for(int i = 1; i < tmpNodes.size(); i++) {
+                QqNode node = tmpNodes.get(i);
+                String kline = HsStockPoJoJO.toEastMoneyData(node);
+                // "zhen_fu_ratio" // 振幅=(当天的high-当天的low)/昨天的last*100
+                // "zhang_fu_ratio" // 涨幅=(当天的last-昨天的last)/昨天的last*100
+                // "zhang_fu_zhi" // 涨幅值=当天的last-昨天的last
+                DecimalFormat df = new DecimalFormat("#.000");
+                String zhenFuRatio = df.format((node.getHigh() - node.getLow()) / preLast * 100);
+                String zhangFuRatio = df.format((node.getLast() - preLast) / preLast * 100);
+                String zhangFuZhi = df.format(node.getLast() - preLast);
+                kline.replace("zhen_fu_ratio", zhenFuRatio);
+                kline.replace("zhang_fu_ratio", zhangFuRatio);
+                kline.replace("zhang_fu_zhi", zhangFuZhi);
+                klines.add(kline);
+            }
+            return klines;
+        } catch (Exception ex) {
+            log.error("", ex);
+        }
+        return new ArrayList<>();
+    }
 
     @Data
     public class Hs300Res{
@@ -246,6 +316,51 @@ public class AgNewQQ300Controller {
                     .amount(Double.parseDouble(objects.get(8).toString()))
                     .exchangeRaw(Double.parseDouble(objects.get(7).toString()))
                     .build();
+        }
+
+        public static String toEastMoneyData(QqNode node) {
+            return "" + node.getDate() // date
+                    + "," + node.getOpen() // open
+                    + "," + node.getLast() // last
+                    + "," + node.getHigh() // high
+                    + "," + node.getLow() // low
+                    + "," + node.getVolume() // volume
+                    + "," + node.getAmount() * 10000 // amount
+                    + "," + "zhen_fu_ratio" // 振幅=(当天的high-当天的low)/昨天的last*100
+                    + "," + "zhang_fu_ratio" // 涨幅=(当天的last-昨天的last)/昨天的last*100
+                    + "," + "zhang_fu_zhi" // 涨幅值=当天的last-昨天的last
+                    + "," + node.getExchangeRaw() // 换手
+                    ;
+        }
+
+        public static String toEastMoneyData(List<Object> objects) {
+            // "2026-01-20,11.12,11.16,11.20,11.11,772276,861694177.62,0.81,0.36,0.04,0.40"
+                /*
+                [
+                    "2026-01-20",
+                    "11.12",
+                    "11.16",
+                    "11.20",
+                    "11.11",
+                    "772276.00",
+                    {},
+                    "0.40",
+                    "86169.42",
+                    ""
+                ]
+                 */
+            return "" + objects.get(0).toString() // date
+                      + "," + objects.get(1).toString() // open
+                      + "," + objects.get(2).toString() // last
+                      + "," + objects.get(3).toString() // high
+                      + "," + objects.get(4).toString() // low
+                      + "," + objects.get(5).toString() // volume
+                      + "," + Double.parseDouble(objects.get(8).toString()) * 10000 // amount
+                      + "," + "zhen_fu_ratio" // 振幅=(当天的high-当天的low)/昨天的last*100
+                      + "," + "zhang_fu_ratio" // 涨幅=(当天的last-昨天的last)/昨天的last*100
+                      + "," + "zhang_fu_zhi" // 涨幅值=当天的last-昨天的last
+                      + "," + objects.get(7).toString() // 换手
+                    ;
         }
     }
 }
