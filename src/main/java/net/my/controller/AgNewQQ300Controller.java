@@ -249,13 +249,13 @@ public class AgNewQQ300Controller {
                 // "zhen_fu_ratio" // 振幅=(当天的high-当天的low)/昨天的last*100
                 // "zhang_fu_ratio" // 涨幅=(当天的last-昨天的last)/昨天的last*100
                 // "zhang_fu_zhi" // 涨幅值=当天的last-昨天的last
-                DecimalFormat df = new DecimalFormat("#.000");
+                DecimalFormat df = new DecimalFormat("0.000");
                 String zhenFuRatio = df.format((node.getHigh() - node.getLow()) / preLast * 100);
                 String zhangFuRatio = df.format((node.getLast() - preLast) / preLast * 100);
                 String zhangFuZhi = df.format(node.getLast() - preLast);
-                kline.replace("zhen_fu_ratio", zhenFuRatio);
-                kline.replace("zhang_fu_ratio", zhangFuRatio);
-                kline.replace("zhang_fu_zhi", zhangFuZhi);
+                kline = kline.replace("zhen_fu_ratio", zhenFuRatio);
+                kline = kline.replace("zhang_fu_ratio", zhangFuRatio);
+                kline = kline.replace("zhang_fu_zhi", zhangFuZhi);
                 klines.add(kline);
             }
             return klines;
@@ -319,17 +319,18 @@ public class AgNewQQ300Controller {
         }
 
         public static String toEastMoneyData(QqNode node) {
+            DecimalFormat df = new DecimalFormat("0.00");
             return "" + node.getDate() // date
                     + "," + node.getOpen() // open
                     + "," + node.getLast() // last
                     + "," + node.getHigh() // high
                     + "," + node.getLow() // low
-                    + "," + node.getVolume() // volume
-                    + "," + node.getAmount() * 10000 // amount
+                    + "," + (long)(node.getVolume() * 1L) // volume
+                    + "," + (long)(node.getAmount() * 10000L) // amount
                     + "," + "zhen_fu_ratio" // 振幅=(当天的high-当天的low)/昨天的last*100
                     + "," + "zhang_fu_ratio" // 涨幅=(当天的last-昨天的last)/昨天的last*100
                     + "," + "zhang_fu_zhi" // 涨幅值=当天的last-昨天的last
-                    + "," + node.getExchangeRaw() // 换手
+                    + "," + df.format(node.getExchangeRaw()) // 换手
                     ;
         }
 
