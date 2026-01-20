@@ -249,14 +249,16 @@ public class AgNewQQ300Controller {
                 // "zhen_fu_ratio" // 振幅=(当天的high-当天的low)/昨天的last*100
                 // "zhang_fu_ratio" // 涨幅=(当天的last-昨天的last)/昨天的last*100
                 // "zhang_fu_zhi" // 涨幅值=当天的last-昨天的last
-                DecimalFormat df = new DecimalFormat("0.000");
-                String zhenFuRatio = df.format((node.getHigh() - node.getLow()) / preLast * 100);
-                String zhangFuRatio = df.format((node.getLast() - preLast) / preLast * 100);
-                String zhangFuZhi = df.format(node.getLast() - preLast);
+                DecimalFormat df2 = new DecimalFormat("0.00");
+                DecimalFormat df3 = new DecimalFormat("0.000");
+                String zhenFuRatio = df2.format((node.getHigh() - node.getLow()) / preLast * 100);
+                String zhangFuRatio = df2.format((node.getLast() - preLast) / preLast * 100);
+                String zhangFuZhi = df3.format(node.getLast() - preLast);
                 kline = kline.replace("zhen_fu_ratio", zhenFuRatio);
                 kline = kline.replace("zhang_fu_ratio", zhangFuRatio);
                 kline = kline.replace("zhang_fu_zhi", zhangFuZhi);
                 klines.add(kline);
+                preLast = node.getLast();
             }
             return klines;
         } catch (Exception ex) {
