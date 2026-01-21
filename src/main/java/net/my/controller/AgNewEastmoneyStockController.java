@@ -476,6 +476,7 @@ public class AgNewEastmoneyStockController {
 
             log.info("url: {}, zqdm: {}", url, zqdm);
             String res = "";
+            List<String> resFromQQ = new ArrayList<>();
             for(int i = 0; i < 200; i++) {
                 try {
                     Thread.sleep(200);
@@ -484,27 +485,38 @@ public class AgNewEastmoneyStockController {
                     if(!StringUtils.isEmpty(res)) {
                         break;
                     }
+                    resFromQQ = agNewQQ300Controller.getQQResReplaceEastmoney(zqdm.replace("0.", "sz").replace("1.", "sh"), 10);
+                    if(!CollectionUtils.isEmpty(resFromQQ)) {
+                        log.info("{}:{}", zqdm, JSON.toJSON(resFromQQ));
+                        break;
+                    }
                 } catch (Exception ex) {
                     ;
                 }
             }
-            if(StringUtils.isEmpty(res)) {
+            if(StringUtils.isEmpty(res) && CollectionUtils.isEmpty(resFromQQ)) {
                 continue;
             }
 
             try {
-                log.info("res={}", res);
-                EastmoneyStockRes eastmoneyRes = JSON.parseObject(res, EastmoneyStockRes.class);
-                log.info("eastmoneyRes={}", JSON.toJSONString(eastmoneyRes));
+                List<String> klines = new ArrayList<>();
+                if(!StringUtils.isEmpty(res)) {
+                    log.info("res={}", res);
+                    EastmoneyStockRes eastmoneyRes = JSON.parseObject(res, EastmoneyStockRes.class);
+                    log.info("eastmoneyRes={}", JSON.toJSONString(eastmoneyRes));
 
 //                break;
 
-                // saveEastMoneyDatas
-                if(eastmoneyRes == null || eastmoneyRes.getData() == null || CollectionUtils.isEmpty(eastmoneyRes.getData().getKlines())) {
-                    break ;
+                    // saveEastMoneyDatas
+                    if(eastmoneyRes == null || eastmoneyRes.getData() == null || CollectionUtils.isEmpty(eastmoneyRes.getData().getKlines())) {
+                        break ;
+                    }
+
+                    klines = eastmoneyRes.getData().getKlines();
+                } else {
+                    klines = resFromQQ;
                 }
 
-                List<String> klines = eastmoneyRes.getData().getKlines();
                 List<EastmoneyNode> nodes = new ArrayList<>();
                 for(String item : klines) {
                     String[] xxs = item.split(",");
