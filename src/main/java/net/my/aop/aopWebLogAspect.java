@@ -61,14 +61,16 @@ public class aopWebLogAspect {
     @Around("webLog()")
     public Object doAroud(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
-        BaseResponse result = (BaseResponse) proceedingJoinPoint.proceed();
-        if (result != null) {
+        Object result = (BaseResponse) proceedingJoinPoint.proceed();
+        if (result != null && result instanceof BaseResponse) {
+            BaseResponse resBaseResponse = (BaseResponse)result;
             // 将线程id赋值给返回的traceId
-            result.setTraceId(MDC.get(LogInterceptor.THREAD_ID));
+            resBaseResponse.setTraceId(MDC.get(LogInterceptor.THREAD_ID));
             //打印出参
-            log.info("Response Args: {}", JSON.toJSONString(result));
+            log.info("Response Args: {}", JSON.toJSONString(resBaseResponse));
             // 执行耗时
             log.info("Time-Consuming: {} ms", System.currentTimeMillis() - startTime);
+            return resBaseResponse;
         }
         return result;
     }
