@@ -232,6 +232,7 @@ public class AgNewQQ300Controller {
 //                List<QqNode> tmpNodes = pojos.stream().map(HsStockPoJoJO::toVo).sorted(Comparator.comparing(QqNode::getDate)).collect(Collectors.toList());
 
             List<List<Object>> pojos = qqRes.getData().get(zqdm).get("qfqday");
+            log.info("res2={}", JSON.toJSON(pojos));
             if(pojos == null) {
                 pojos = qqRes.getData().get(zqdm).get("day");
             }
