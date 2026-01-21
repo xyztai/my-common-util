@@ -61,7 +61,7 @@ public class aopWebLogAspect {
     @Around("webLog()")
     public Object doAroud(ProceedingJoinPoint proceedingJoinPoint) throws Throwable {
         long startTime = System.currentTimeMillis();
-        Object result = (BaseResponse) proceedingJoinPoint.proceed();
+        Object result = proceedingJoinPoint.proceed();
         if (result != null && result instanceof BaseResponse) {
             BaseResponse resBaseResponse = (BaseResponse)result;
             // 将线程id赋值给返回的traceId
