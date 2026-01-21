@@ -350,17 +350,17 @@ public class AgNewEastmoneyETFController {
                         break;
                     }
                 } catch (Exception ex) {
-                    ;
+                    log.error("eastmoney error", ex);
                 }
 
                 try {
                     resFromQQ = agNewQQ300Controller.getQQResReplaceEastmoney(zqdm.replace("0.", "sz").replace("1.", "sh"), 10);
                     if(!CollectionUtils.isEmpty(resFromQQ)) {
-                        log.info("{}:{}", zqdm, JSON.toJSON(resFromQQ));
+                        log.info("getQQResReplaceEastmoney res {}:{}", zqdm, JSON.toJSON(resFromQQ));
                         break;
                     }
                 } catch (Exception ex) {
-                    ;
+                    log.error("getQQResReplaceEastmoney error", ex);
                 }
 
                 if(!StringUtils.isEmpty(res) || !CollectionUtils.isEmpty(resFromQQ)) {
