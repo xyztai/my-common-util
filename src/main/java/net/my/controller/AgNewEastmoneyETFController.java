@@ -362,6 +362,10 @@ public class AgNewEastmoneyETFController {
                 } catch (Exception ex) {
                     ;
                 }
+
+                if(!StringUtils.isEmpty(res) || !CollectionUtils.isEmpty(resFromQQ)) {
+                    break;
+                }
             }
             if(StringUtils.isEmpty(res) && CollectionUtils.isEmpty(resFromQQ)) {
                 continue;
