@@ -349,6 +349,11 @@ public class AgNewEastmoneyETFController {
                     if(!StringUtils.isEmpty(res)) {
                         break;
                     }
+                } catch (Exception ex) {
+                    ;
+                }
+
+                try {
                     resFromQQ = agNewQQ300Controller.getQQResReplaceEastmoney(zqdm.replace("0.", "sz").replace("1.", "sh"), 10);
                     if(!CollectionUtils.isEmpty(resFromQQ)) {
                         log.info("{}:{}", zqdm, JSON.toJSON(resFromQQ));
