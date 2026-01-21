@@ -490,7 +490,7 @@ public class AgNewEastmoneyStockController {
                 }
 
                 try {
-                    resFromQQ = agNewQQ300Controller.getQQResReplaceEastmoney(zqdm.replace("0.", "sz").replace("1.", "sh"), 10);
+                    resFromQQ = agNewQQ300Controller.getQQResReplaceEastmoney(zqdm.replace("0.", "sz").replace("1.", "sh"), 30);
                     if(!CollectionUtils.isEmpty(resFromQQ)) {
                         log.info("getQQResReplaceEastmoney res {}:{}", zqdm, JSON.toJSON(resFromQQ));
                         break;
