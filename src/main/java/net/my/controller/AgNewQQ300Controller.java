@@ -261,6 +261,7 @@ public class AgNewQQ300Controller {
                 klines.add(kline);
                 preLast = node.getLast();
             }
+            log.info("res3={}", JSON.toJSON(klines));
             return klines;
         } catch (Exception ex) {
             log.error("", ex);
