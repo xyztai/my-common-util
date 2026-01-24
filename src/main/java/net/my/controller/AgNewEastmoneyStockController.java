@@ -408,6 +408,18 @@ public class AgNewEastmoneyStockController {
             }
         }
 
+        List<SpecialCarePoJo2> res = new ArrayList<>();
+        List<String> stockExists = new ArrayList<>();
+        if(!CollectionUtils.isEmpty(res3)) {
+            for(SpecialCarePoJo2 jo2 : res3) {
+                if(stockExists.contains(jo2.getStockCode())) {
+                    continue;
+                }
+                res.add(jo2);
+                stockExists.add(jo2.getStockCode());
+            }
+        }
+
 //        int cnt = codes.size()/4;
 //        for(int i = 0; i < cnt + 1; i++) {
 //            SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
@@ -442,7 +454,7 @@ public class AgNewEastmoneyStockController {
 //            }
 //            res2.add(tmp);
 //        }
-        return RestGeneralResponse.of(res3);
+        return RestGeneralResponse.of(res);
     }
 
     @ApiOperation(value = "获取历史的cp数据", notes = "访问互联网接口获取数据")
