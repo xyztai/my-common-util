@@ -460,7 +460,7 @@ public class AgNewEastmoneyStockController {
             hs300Map.put(key, value);
         }
 
-
+        boolean useEastmoney = true;
         for(Map.Entry<String, String> entry : hs300Map.entrySet()) {
             String zqdm = entry.getValue();
 //            if(!zqdm.equals("0.000001")) {
@@ -478,25 +478,32 @@ public class AgNewEastmoneyStockController {
             String res = "";
             List<String> resFromQQ = new ArrayList<>();
             for(int i = 0; i < 200; i++) {
-                try {
-                    Thread.sleep(200);
-                    log.info("try num={}, stockCode={}, url={}", i, entry.getKey(), url);
-                    res = restTemplate.getForObject(url, String.class);
-                    if(!StringUtils.isEmpty(res)) {
-                        break;
+                if(useEastmoney) {
+                    try {
+                        Thread.sleep(200);
+                        log.info("try num={}, stockCode={}, url={}", i, entry.getKey(), url);
+                        res = restTemplate.getForObject(url, String.class);
+                        if(!StringUtils.isEmpty(res)) {
+                            break;
+                        }
+                    } catch (Exception ex) {
+                        useEastmoney = false;
+                        log.error("eastmoney error", ex);
                     }
-                } catch (Exception ex) {
-                    log.error("eastmoney error", ex);
                 }
 
-                try {
-                    resFromQQ = agNewQQ300Controller.getQQResReplaceEastmoney(zqdm.replace("0.", "sz").replace("1.", "sh"), 30);
-                    if(!CollectionUtils.isEmpty(resFromQQ)) {
-                        log.info("getQQResReplaceEastmoney res {}:{}", zqdm, JSON.toJSON(resFromQQ));
-                        break;
+                log.info("get data switch to QQ");
+                if(!useEastmoney) {
+                    try {
+                        resFromQQ = agNewQQ300Controller.getQQResReplaceEastmoney(zqdm.replace("0.", "sz").replace("1.", "sh"), 30);
+                        if(!CollectionUtils.isEmpty(resFromQQ)) {
+                            log.info("getQQResReplaceEastmoney res {}:{}", zqdm, JSON.toJSON(resFromQQ));
+                            break;
+                        }
+                    } catch (Exception ex) {
+                        useEastmoney = true;
+                        log.error("getQQResReplaceEastmoney error", ex);
                     }
-                } catch (Exception ex) {
-                    log.error("getQQResReplaceEastmoney error", ex);
                 }
 
                 if(!StringUtils.isEmpty(res) || !CollectionUtils.isEmpty(resFromQQ)) {
