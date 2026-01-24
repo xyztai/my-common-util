@@ -344,7 +344,9 @@ public class AgNewEastmoneyETFController {
             for(int i = 0; i < 200; i++) {
                 if(useEastmoney) {
                     try {
-                        Thread.sleep(200);
+                        int sleepTime = 750 + new Random().nextInt(500) - 250;
+                        log.info("sleepTime={}", sleepTime);
+                        Thread.sleep(sleepTime);
                         log.info("try num={}, stockCode={}, url={}", i, entry.getKey(), url);
                         res = restTemplate.getForObject(url, String.class);
                         if(!StringUtils.isEmpty(res)) {
@@ -359,6 +361,9 @@ public class AgNewEastmoneyETFController {
                 log.info("get data switch to QQ");
                 if(!useEastmoney) {
                     try {
+                        int sleepTime = 750 + new Random().nextInt(500) - 250;
+                        log.info("sleepTime={}", sleepTime);
+                        Thread.sleep(sleepTime);
                         resFromQQ = agNewQQ300Controller.getQQResReplaceEastmoney(zqdm.replace("0.", "sz").replace("1.", "sh"), 30);
                         if(!CollectionUtils.isEmpty(resFromQQ)) {
                             log.info("getQQResReplaceEastmoney res {}:{}", zqdm, JSON.toJSON(resFromQQ));
