@@ -539,4 +539,17 @@
         order by 2, 1
         ]]>
     </select>
+
+    <select id="queryLastest9Zhuan" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+        select distinct concat(t3.stockCode, '-', t3.stockName) stockCode, t1._date date, '' last
+               , '' ratioB
+        from t_eastmoney_node_9_zhuan t1, t_hs300 t3
+        where t1._9_zhuan = '09'
+        and t1._date >= DATE_FORMAT(DATE_ADD(SYSDATE(), INTERVAL -15 DAY), '%Y-%m-%d')
+        and t1._stockCode = concat(t3.stockType , '.', t3.stockCode )
+        order by 1
+        ]]>
+
+    </select>
 </mapper>

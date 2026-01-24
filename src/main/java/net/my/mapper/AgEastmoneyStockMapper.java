@@ -27,4 +27,5 @@ public interface AgEastmoneyStockMapper {
     List<SpecialCarePoJo2> query9ZhuanB();
     List<SpecialCarePoJo2> query9ZhuanS();
     List<SpecialCarePoJo2> queryEastmoneyLatestInfo();
+    List<SpecialCarePoJo2> queryLastest9Zhuan();
 }

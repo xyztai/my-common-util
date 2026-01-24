@@ -390,6 +390,23 @@ public class AgNewEastmoneyStockController {
             }
         }
 
+        String key6 = "stock#" + "queryLastest9Zhuan";
+        List<SpecialCarePoJo2> res6 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key6);
+        if(CollectionUtils.isEmpty(res6)) {
+            res6 = agEastmoneyStockMapper.queryLastest9Zhuan();
+            myCaffeineCache.put(key6, res6);
+        }
+        if(!CollectionUtils.isEmpty(res6)){
+            List<SpecialCarePoJo2> codes = res6;
+            for(int i = 0; i < codes.size(); i++) {
+                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+//                tmp.setDate(codes.get(i).getDate());
+                tmp.setStockCode(codes.get(i).getStockCode().substring(0, 6));
+//                tmp.setLast("No." + i);
+                tmp.setRatioB("最近09");
+                res3.add(tmp);
+            }
+        }
 
 //        int cnt = codes.size()/4;
 //        for(int i = 0; i < cnt + 1; i++) {
