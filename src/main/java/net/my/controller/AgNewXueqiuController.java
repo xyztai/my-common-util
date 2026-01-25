@@ -149,7 +149,7 @@ public class AgNewXueqiuController {
 
     @Data
     public class XueqiuNode{
-        private List<String> klineValues;
+        private List<Double> klineValues;
     }
 
 }
