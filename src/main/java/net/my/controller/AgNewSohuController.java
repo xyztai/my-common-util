@@ -153,4 +153,8 @@ public class AgNewSohuController {
 
         return resMap;
     }
+
+    public String getMaxDate() {
+        return agSohuMapper.getMaxDate();
+    }
 }
