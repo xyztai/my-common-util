@@ -115,9 +115,9 @@ public class AgNewSinaController {
                 List<String> lines = Arrays.asList(res.split("\\R"));
                 for(String line : lines) {
                     String[] entry = line.split("=");
-                    String key = entry[0];
-                    String value = entry[1];
-                    resMap.put(key, value);
+                    String key = entry[0].substring(11);
+                    String value = entry[1].replace("\"", "").replace(";", "");
+                    resMap.put(nameMap.get(key), value);
                 }
                 /*String res = response.getBody();
                 Map<String, Object> soHuRes = JSON.parseObject(res, Map.class);
