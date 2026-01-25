@@ -333,8 +333,10 @@ public class AgNewEastmoneyETFController {
         boolean useEastmoneyStop = false;
         boolean useQqStop = false;
         boolean useXueqiuStop = false;
+        int zqNo = 1;
         for(Map.Entry<String, String> entry : etfMap.entrySet()) {
             String zqdm = entry.getValue();
+            log.info("getHistoryData No.{}, etf:{}", zqNo++, zqdm);
 //            if(!zqdm.equals("0.000001")) {
 //                continue;
 //            }
