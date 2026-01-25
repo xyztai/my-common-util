@@ -334,7 +334,7 @@ public class AgNewQQ300Controller {
                     .volume(Double.parseDouble(values[1])/100)
 //                    .amount(Double.parseDouble(objects.get(7).toString()))
 //                    .exchangeRaw(Double.parseDouble(objects.get(6).toString()))
-                    .amount(Double.parseDouble(values[9]))
+                    .amount(Double.parseDouble(values[9])/10000)
                     .exchangeRaw(Double.parseDouble(values[8]))
                     .build();
         }

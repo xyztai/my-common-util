@@ -1,15 +1,23 @@
 package net.my.util;
 
+import org.springframework.util.StringUtils;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 public class DateTimeUtil {
     public static void main(String[] args) {
         try {
+            System.out.println("xxx " + getDateStrFromTimeStamp(1769097600000L));
+
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
-            long timestamp = 1769470679841L;
+            long timestamp = 1769097600000L;
             Date date = new Date(timestamp);
             System.out.println(sdf.format(date));
 
@@ -35,9 +43,25 @@ public class DateTimeUtil {
 
     public static String getDateStrFromTimeStamp(Long timestamp) {
         try {
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            Date date = new Date(timestamp);
-            return sdf.format(date);
+            // 指定时区（例如：亚洲上海）
+            String zoneIdStr = "Asia/Shanghai";
+
+            // 将时间戳转换为Instant对象
+            Instant instant = Instant.ofEpochMilli(timestamp);
+
+            // 创建指定时区的ZonedDateTime对象
+            ZoneId zoneId = ZoneId.of(zoneIdStr);
+            ZonedDateTime zonedDateTime = ZonedDateTime.ofInstant(instant, zoneId);
+
+            // 格式化输出
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss z");
+            String formattedDate = zonedDateTime.format(formatter);
+
+            if(!StringUtils.isEmpty(formattedDate)) {
+                return formattedDate.substring(0, 10);
+            }
+
+            return "";
         } catch (Exception ex) {
             return "";
         }
