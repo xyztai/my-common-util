@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.my.pojo.BaseResponse;
 import net.my.pojo.QqNode;
+import net.my.pojo.RestGeneralResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
@@ -13,13 +14,17 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @RestController
@@ -33,9 +38,8 @@ public class AgNewXueqiuController {
 
     @GetMapping("/history/{days}")
     @Transactional
-    public BaseResponse test() {
-        getQQResReplaceEastmoney("SZ000001", 5);
-        return BaseResponse.OK;
+    public BaseResponse test(@PathVariable("days") Integer days) {        ;
+        return RestGeneralResponse.of(getQQResReplaceEastmoney("SZ000001", days)); // 默认5天即可
     }
 
     // demo
@@ -50,13 +54,12 @@ public class AgNewXueqiuController {
         long timestamp = now.getTime() + 1000*3600*24*2;
 
         List<String> klines = new ArrayList<>();
-        // zqdm 举例，000001 为 SZ000001
-        String url = String.format(XUE_QIU_URL_FORMAT, zqdm, timestamp, -1 * days);
-        log.info("url: {}, zqdm: {}, days: {}", url, zqdm, days);
-        String res = "";
         try {
             Thread.sleep(200);
-            log.info("try stockCode={}, url={}", zqdm, url);
+
+            // zqdm 举例，000001 为 SZ000001
+            String url = String.format(XUE_QIU_URL_FORMAT, zqdm, timestamp, -1 * days);
+            log.info("url: {}, zqdm: {}, days: {}", url, zqdm, days);
 
             // 创建请求头
             HttpHeaders headers = new HttpHeaders();
@@ -76,10 +79,38 @@ public class AgNewXueqiuController {
 
             log.info("响应状态: " + response.getStatusCode());
             log.info("响应体: " + response.getBody());
-            res = response.getBody();
+            String res = response.getBody();
             XueqiuRes xueqiuRes = JSON.parseObject(res, XueqiuRes.class);
             log.info("xueqiuRes={}", JSON.toJSON(xueqiuRes));
+            List<Object> values = xueqiuRes.getData().getItem();
+            List<QqNode> tmpNodes = values.stream()
+                    .map(f -> AgNewQQ300Controller.HsStockPoJoJO.toVo3(
+                              ("" + f).replace("[", "").replace("]", "").split(",")
+                            )
+                    )
+                    .sorted(Comparator.comparing(QqNode::getDate))
+                    .collect(Collectors.toList());
 
+            Double preLast = tmpNodes.get(0).getLast();
+            for(int i = 1; i < tmpNodes.size(); i++) {
+                QqNode node = tmpNodes.get(i);
+                String kline = AgNewQQ300Controller.HsStockPoJoJO.toEastMoneyData(node);
+                // "zhen_fu_ratio" // 振幅=(当天的high-当天的low)/昨天的last*100
+                // "zhang_fu_ratio" // 涨幅=(当天的last-昨天的last)/昨天的last*100
+                // "zhang_fu_zhi" // 涨幅值=当天的last-昨天的last
+                DecimalFormat df2 = new DecimalFormat("0.00");
+                DecimalFormat df3 = new DecimalFormat("0.000");
+                String zhenFuRatio = df2.format((node.getHigh() - node.getLow()) / preLast * 100);
+                String zhangFuRatio = df2.format((node.getLast() - preLast) / preLast * 100);
+                String zhangFuZhi = df3.format(node.getLast() - preLast);
+                kline = kline.replace("zhen_fu_ratio", zhenFuRatio);
+                kline = kline.replace("zhang_fu_ratio", zhangFuRatio);
+                kline = kline.replace("zhang_fu_zhi", zhangFuZhi);
+                klines.add(kline);
+                preLast = node.getLast();
+            }
+            log.info("res3={}", com.alibaba.fastjson.JSON.toJSON(klines));
+            return klines;
         } catch (Exception ex) {
             log.error("{}", ex);
         }
@@ -144,12 +175,23 @@ public class AgNewXueqiuController {
 
     @Data
     public class XueqiuData{
-        private List<XueqiuNode> item;
+        private List<Object> item;
     }
 
-    @Data
-    public class XueqiuNode{
-        private List<Double> klineValues;
+    public static void main(String[] args) {
+        String res = "{\"data\":{\"symbol\":\"SZ000001\",\"column\":[\"timestamp\",\"volume\",\"open\",\"high\",\"low\",\"close\",\"chg\",\"percent\",\"turnoverrate\",\"amount\",\"volume_post\",\"amount_post\"],\"item\":[[1769097600000,110999429,11.07,11.09,10.98,10.99,-0.08,-0.72,0.57,1.224886435E9,null,null]]},\"error_code\":0,\"error_description\":\"\"}";
+
+        XueqiuRes xueqiuRes = JSON.parseObject(res, XueqiuRes.class);
+        System.out.println("xxxx " + JSON.toJSON(xueqiuRes.getData()));
+        System.out.println("xxxx " + JSON.toJSON(xueqiuRes.getData().getItem()));
+        for(Object obj : xueqiuRes.getData().getItem()) {
+            System.out.println("" + obj);
+            String[] values = ("" + obj).replace("[", "").replace("]", "").split(",");
+            for(String str : values) {
+                System.out.println(str);
+            }
+        }
+
     }
 
 }

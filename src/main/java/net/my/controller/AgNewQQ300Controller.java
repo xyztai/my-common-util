@@ -8,6 +8,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.my.mapper.DataCalcMapper;
 import net.my.pojo.*;
+import net.my.util.DateTimeUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.transaction.annotation.Transactional;
@@ -319,6 +320,22 @@ public class AgNewQQ300Controller {
 //                    .exchangeRaw(Double.parseDouble(objects.get(6).toString()))
                     .amount(Double.parseDouble(objects.get(8).toString()))
                     .exchangeRaw(Double.parseDouble(objects.get(7).toString()))
+                    .build();
+        }
+
+        // [1769097600000,110999429,11.07,11.09,10.98,10.99,-0.08,-0.72,0.57,1.224886435E9,null,null]
+        public static QqNode toVo3(String[] values) {
+            return QqNode.builder()
+                    .date(DateTimeUtil.getDateStrFromTimeStamp(Long.parseLong(values[0])))
+                    .open(Double.parseDouble(values[2]))
+                    .last(Double.parseDouble(values[5]))
+                    .high(Double.parseDouble(values[3]))
+                    .low(Double.parseDouble(values[4]))
+                    .volume(Double.parseDouble(values[1])/100)
+//                    .amount(Double.parseDouble(objects.get(7).toString()))
+//                    .exchangeRaw(Double.parseDouble(objects.get(6).toString()))
+                    .amount(Double.parseDouble(values[9]))
+                    .exchangeRaw(Double.parseDouble(values[8]))
                     .build();
         }
 

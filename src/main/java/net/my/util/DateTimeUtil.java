@@ -32,4 +32,14 @@ public class DateTimeUtil {
             e.printStackTrace();
         }
     }
+
+    public static String getDateStrFromTimeStamp(Long timestamp) {
+        try {
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            Date date = new Date(timestamp);
+            return sdf.format(date);
+        } catch (Exception ex) {
+            return "";
+        }
+    }
 }
