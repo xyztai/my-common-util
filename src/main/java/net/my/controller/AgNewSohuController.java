@@ -60,7 +60,7 @@ public class AgNewSohuController {
         }
 
         List<String> klines = new ArrayList<>();
-        if(CollectionUtils.isEmpty(klines)) {
+        if(CollectionUtils.isEmpty(allCodes)) {
             return klines;
         }
 
@@ -123,6 +123,10 @@ public class AgNewSohuController {
             }
         }
 
+        if(!CollectionUtils.isEmpty(klines)) {
+            log.info("start log klines, size={}", klines.size());
+            klines.forEach(f -> log.info(f));
+        }
         return klines;
     }
 }
