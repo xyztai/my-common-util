@@ -67,20 +67,21 @@ public class AgNewXueqiuController {
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
             // 发送GET请求
-            ResponseEntity<XueqiuRes> response = restTemplate.exchange(
+            ResponseEntity<String> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     entity,
-                    XueqiuRes.class
+                    String.class
             );
 
             log.info("响应状态: " + response.getStatusCode());
             log.info("响应体: " + response.getBody());
-            XueqiuRes xueqiuRes = response.getBody();
+            res = response.getBody();
+            XueqiuRes xueqiuRes = JSON.parseObject(res, XueqiuRes.class);
             log.info("xueqiuRes={}", JSON.toJSON(xueqiuRes));
 
         } catch (Exception ex) {
-            ;
+            log.error("{}", ex);
         }
 
         return null;
