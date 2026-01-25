@@ -373,6 +373,7 @@ public class AgNewEastmoneyETFController {
                         }
                     } catch (Exception ex) {
                         useEastmoneyStop = true;
+                        useQq = true;
                         log.error("eastmoney error", ex);
                     }
                 }
@@ -400,6 +401,7 @@ public class AgNewEastmoneyETFController {
                         }
                     } catch (Exception ex) {
                         useQqStop = true;
+                        useXueqiu = true;
                         log.error("useQq getQQResReplaceEastmoney error", ex);
                     }
                 }
@@ -427,6 +429,7 @@ public class AgNewEastmoneyETFController {
                         }
                     } catch (Exception ex) {
                         useXueqiuStop = true;
+                        useEastmoney = true;
                         log.error("useXueqiu getQQResReplaceEastmoney error", ex);
                     }
                 }
