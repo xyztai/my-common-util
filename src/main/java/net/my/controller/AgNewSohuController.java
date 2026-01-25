@@ -115,6 +115,14 @@ public class AgNewSohuController {
                     Object obj = entry.getValue();
                     List<String> values = JSON.parseArray(obj.toString(), String.class);
                     List<String> targetValues = new ArrayList<>();
+                    if(
+                       (long)Double.parseDouble(values.get(3).replace("+", "").replace("%", "")) * 10000 == 0
+                       && (long)Double.parseDouble(values.get(5)) == 0
+                       && (long)Double.parseDouble(values.get(7)) == 0
+                    ) {
+                        continue;
+                    }
+
                     targetValues.add(values.get(17).substring(0, 10));
                     targetValues.add(values.get(14));
                     targetValues.add(values.get(2));
