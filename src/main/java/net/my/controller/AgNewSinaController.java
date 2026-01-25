@@ -18,10 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 
@@ -114,6 +111,14 @@ public class AgNewSinaController {
 
                 log.info("响应状态: " + response.getStatusCode());
                 log.info("响应体: " + response.getBody());
+                String res = response.getBody();
+                List<String> lines = Arrays.asList(res.split("\\R"));
+                for(String line : lines) {
+                    String[] entry = line.split("=");
+                    String key = entry[0];
+                    String value = entry[1];
+                    resMap.put(key, value);
+                }
                 /*String res = response.getBody();
                 Map<String, Object> soHuRes = JSON.parseObject(res, Map.class);
                 log.info("soHuRes={}", JSON.toJSON(soHuRes));
