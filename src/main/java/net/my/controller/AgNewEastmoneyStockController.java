@@ -492,9 +492,12 @@ public class AgNewEastmoneyStockController {
             hs300Map.put(key, value);
         }
 
-        boolean useEastmoney = false;
+        boolean useEastmoney = true;
         boolean useQq = false;
         boolean useXueqiu = false;
+        boolean useEastmoneyStop = false;
+        boolean useQqStop = false;
+        boolean useXueqiuStop = false;
         for(Map.Entry<String, String> entry : hs300Map.entrySet()) {
             String zqdm = entry.getValue();
 //            if(!zqdm.equals("0.000001")) {
@@ -512,7 +515,7 @@ public class AgNewEastmoneyStockController {
             String res = "";
             List<String> resFromQQ = new ArrayList<>();
             for(int i = 0; i < 3; i++) {
-                if(useEastmoney) {
+                if(useEastmoney && !useEastmoneyStop) {
                     log.info("useWay=useEastmoney");
                     try {
                         int sleepTime = 750 + new Random().nextInt(500) - 250;
@@ -521,17 +524,25 @@ public class AgNewEastmoneyStockController {
                         log.info("try num={}, stockCode={}, url={}", i, entry.getKey(), url);
                         res = restTemplate.getForObject(url, String.class);
                         if(!StringUtils.isEmpty(res)) {
+                            if(!useQqStop) {
+                                useQq = true;
+                                useXueqiu = false;
+                                useEastmoney = false;
+                            } else if(!useXueqiuStop) {
+                                useXueqiu = true;
+                                useEastmoney = false;
+                            } else {
+                                Thread.sleep(sleepTime);
+                            }
                             break;
                         }
                     } catch (Exception ex) {
-                        useEastmoney = false;
-                        useQq = true;
+                        useEastmoneyStop = true;
                         log.error("eastmoney error", ex);
                     }
                 }
 
-                log.info("get data switch to QQ");
-                if(useQq) {
+                if(useQq && !useQqStop) {
                     log.info("useWay=useQq");
                     try {
                         int sleepTime = 750 + new Random().nextInt(500) - 250;
@@ -540,16 +551,25 @@ public class AgNewEastmoneyStockController {
                         resFromQQ = agNewQQ300Controller.getQQResReplaceEastmoney(zqdm.replace("0.", "sz").replace("1.", "sh"), 30);
                         if(!CollectionUtils.isEmpty(resFromQQ)) {
                             log.info("useQq getQQResReplaceEastmoney res {}:{}", zqdm, JSON.toJSON(resFromQQ));
+                            if(!useXueqiuStop) {
+                                useXueqiu = true;
+                                useEastmoney = false;
+                                useQq = false;
+                            } else if(!useEastmoney) {
+                                useEastmoney = true;
+                                useQq = false;
+                            } else {
+                                Thread.sleep(sleepTime);
+                            }
                             break;
                         }
                     } catch (Exception ex) {
-                        useQq = false;
-                        useXueqiu = true;
+                        useQqStop = true;
                         log.error("useQq getQQResReplaceEastmoney error", ex);
                     }
                 }
 
-                if(useXueqiu) {
+                if(useXueqiu && !useXueqiuStop) {
                     log.info("useWay=useXueqiu");
                     try {
                         int sleepTime = 750 + new Random().nextInt(500) - 250;
@@ -558,10 +578,20 @@ public class AgNewEastmoneyStockController {
                         resFromQQ = agNewXueqiuController.getQQResReplaceEastmoney(zqdm.replace("0.", "SZ").replace("1.", "SH"), 30);
                         if(!CollectionUtils.isEmpty(resFromQQ)) {
                             log.info("useXueqiu getQQResReplaceEastmoney res {}:{}", zqdm, JSON.toJSON(resFromQQ));
+                            if(!useEastmoneyStop) {
+                                useEastmoney = true;
+                                useQq = false;
+                                useXueqiu = false;
+                            } else if(!useQqStop) {
+                                useQq = true;
+                                useXueqiu = false;
+                            } else {
+                                Thread.sleep(sleepTime);
+                            }
                             break;
                         }
                     } catch (Exception ex) {
-                        useXueqiu = false;
+                        useXueqiuStop = true;
                         log.error("useXueqiu getQQResReplaceEastmoney error", ex);
                     }
                 }
