@@ -52,6 +52,9 @@ public class AgNewEastmoneyETFController {
     @Autowired
     private AgNewQQ300Controller agNewQQ300Controller;
 
+    @Autowired
+    private AgNewXueqiuController agNewXueqiuController;
+
 
     /**
      * 1、根据最近一年的数据，判断今天能否进入 TOP10
@@ -324,7 +327,9 @@ public class AgNewEastmoneyETFController {
             etfMap.put(key, value);
         }
 
-        boolean useEastmoney = true;
+        boolean useEastmoney = false;
+        boolean useQq = false;
+        boolean useXueqiu = false;
         for(Map.Entry<String, String> entry : etfMap.entrySet()) {
             String zqdm = entry.getValue();
 //            if(!zqdm.equals("0.000001")) {
@@ -341,8 +346,9 @@ public class AgNewEastmoneyETFController {
             log.info("url: {}, zqdm: {}", url, zqdm);
             String res = "";
             List<String> resFromQQ = new ArrayList<>();
-            for(int i = 0; i < 200; i++) {
+            for(int i = 0; i < 3; i++) {
                 if(useEastmoney) {
+                    log.info("useWay=useEastmoney");
                     try {
                         int sleepTime = 750 + new Random().nextInt(500) - 250;
                         log.info("sleepTime={}", sleepTime);
@@ -354,24 +360,43 @@ public class AgNewEastmoneyETFController {
                         }
                     } catch (Exception ex) {
                         useEastmoney = false;
+                        useQq = true;
                         log.error("eastmoney error", ex);
                     }
                 }
 
-                log.info("get data switch to QQ");
-                if(!useEastmoney) {
+                if(useQq) {
+                    log.info("useWay=useQq");
                     try {
                         int sleepTime = 750 + new Random().nextInt(500) - 250;
                         log.info("sleepTime={}", sleepTime);
                         Thread.sleep(sleepTime);
                         resFromQQ = agNewQQ300Controller.getQQResReplaceEastmoney(zqdm.replace("0.", "sz").replace("1.", "sh"), 30);
                         if(!CollectionUtils.isEmpty(resFromQQ)) {
-                            log.info("getQQResReplaceEastmoney res {}:{}", zqdm, JSON.toJSON(resFromQQ));
+                            log.info("useQq getQQResReplaceEastmoney res {}:{}", zqdm, JSON.toJSON(resFromQQ));
                             break;
                         }
                     } catch (Exception ex) {
-                        useEastmoney = true;
-                        log.error("getQQResReplaceEastmoney error", ex);
+                        useQq = false;
+                        useXueqiu = true;
+                        log.error("useQq getQQResReplaceEastmoney error", ex);
+                    }
+                }
+
+                if(useXueqiu) {
+                    log.info("useWay=useXueqiu");
+                    try {
+                        int sleepTime = 750 + new Random().nextInt(500) - 250;
+                        log.info("sleepTime={}", sleepTime);
+                        Thread.sleep(sleepTime);
+                        resFromQQ = agNewXueqiuController.getQQResReplaceEastmoney(zqdm.replace("0.", "SZ").replace("1.", "SH"), 30);
+                        if(!CollectionUtils.isEmpty(resFromQQ)) {
+                            log.info("useXueqiu getQQResReplaceEastmoney res {}:{}", zqdm, JSON.toJSON(resFromQQ));
+                            break;
+                        }
+                    } catch (Exception ex) {
+                        useXueqiu = false;
+                        log.error("useXueqiu getQQResReplaceEastmoney error", ex);
                     }
                 }
 

@@ -208,17 +208,12 @@ public class AgNewQQ300Controller {
         String url = String.format(PROXY_FINANCE_QQ_URL_FORMAT_QFQ, zqdm, days);
         log.info("url: {}, zqdm: {}, days: {}", url, zqdm, days);
         String res = "";
-        for(int i = 0; i < 10; i++) {
-            try {
-                Thread.sleep(200);
-                log.info("try num={}, stockCode={}, url={}", i, zqdm, url);
-                res = restTemplate.getForObject(url, String.class);
-                if(!StringUtils.isEmpty(res)) {
-                    break;
-                }
-            } catch (Exception ex) {
-                ;
-            }
+        try {
+            Thread.sleep(200);
+            log.info("try stockCode={}, url={}", zqdm, url);
+            res = restTemplate.getForObject(url, String.class);
+        } catch (Exception ex) {
+            ;
         }
         if(StringUtils.isEmpty(res)) {
             return klines;
