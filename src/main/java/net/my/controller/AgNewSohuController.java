@@ -120,8 +120,8 @@ public class AgNewSohuController {
                     targetValues.add(values.get(2));
                     targetValues.add(values.get(10));
                     targetValues.add(values.get(11));
-                    targetValues.add(values.get(5));
-                    targetValues.add(Double.parseDouble(values.get(7))*10000 + "");
+                    targetValues.add(String.format("%d", (long)Double.parseDouble(values.get(5))));
+                    targetValues.add(String.format("%d", (long)Double.parseDouble(values.get(7))*10000));
                     targetValues.add("0");
                     targetValues.add(values.get(3).replace("+", "").replace("%", ""));
                     targetValues.add(values.get(4).replace("+", "").replace("%", ""));
