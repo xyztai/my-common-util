@@ -86,7 +86,7 @@ public class AgNewSohuController {
             log.info("sohuCode={}", sohuCode);
 
             try {
-                Thread.sleep(200);
+                Thread.sleep(2000);
                 String url = String.format(SO_HU_URL_FORMAT, sohuCode);
                 log.info("url: {}", url);
 
