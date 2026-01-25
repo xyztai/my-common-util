@@ -375,7 +375,11 @@ public class AgNewEastmoneyETFController {
                         }
                     } catch (Exception ex) {
                         useEastmoneyStop = true;
-                        useQq = true;
+                        if(!useQqStop) {
+                            useQq = true;
+                        } else if(!useXueqiuStop) {
+                            useXueqiu = true;
+                        }
                         log.error("eastmoney error", ex);
                     }
                 }
@@ -393,7 +397,7 @@ public class AgNewEastmoneyETFController {
                                 useXueqiu = true;
                                 useEastmoney = false;
                                 useQq = false;
-                            } else if(!useEastmoney) {
+                            } else if(!useEastmoneyStop) {
                                 useEastmoney = true;
                                 useQq = false;
                             } else {
@@ -403,7 +407,11 @@ public class AgNewEastmoneyETFController {
                         }
                     } catch (Exception ex) {
                         useQqStop = true;
-                        useXueqiu = true;
+                        if(!useXueqiuStop) {
+                            useXueqiu = true;
+                        } else if(!useEastmoneyStop) {
+                            useEastmoney = true;
+                        }
                         log.error("useQq getQQResReplaceEastmoney error", ex);
                     }
                 }
@@ -431,7 +439,11 @@ public class AgNewEastmoneyETFController {
                         }
                     } catch (Exception ex) {
                         useXueqiuStop = true;
-                        useEastmoney = true;
+                        if(!useEastmoneyStop) {
+                            useEastmoney = true;
+                        } else if(!useQqStop) {
+                            useQq = true;
+                        }
                         log.error("useXueqiu getQQResReplaceEastmoney error", ex);
                     }
                 }
