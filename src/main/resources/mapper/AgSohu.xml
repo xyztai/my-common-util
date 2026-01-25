@@ -7,7 +7,8 @@
         <![CDATA[
         select concat(t.stockType, '.', t.stockCode)
         from t_hs300 t
-        order by 1
+        order by 10
+        limit 1
         ]]>
     </select>
 
@@ -15,7 +16,8 @@
         <![CDATA[
         select concat(t.stockType, '.', t.stockCode)
         from t_etf t
-        order by 1
+        order by 10
+        limit 1
         ]]>
     </select>
 

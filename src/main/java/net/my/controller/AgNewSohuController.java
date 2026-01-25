@@ -48,7 +48,7 @@ public class AgNewSohuController {
     public static final String SO_HU_URL_FORMAT =
             "https://hqm.stock.sohu.com/getqjson?code=%s";
 
-    public List<String> getQQResReplaceEastmoney() {
+    public Map<String, String> getQQResReplaceEastmoney() {
         List<String> hsStocks = agSohuMapper.getStocks();
         List<String> hsEtfs = agSohuMapper.getEtfs();
         List<String> allCodes = new ArrayList<>();
@@ -59,9 +59,9 @@ public class AgNewSohuController {
             allCodes.addAll(hsEtfs);
         }
 
-        List<String> klines = new ArrayList<>();
+        Map<String, String> resMap = new HashMap<>();
         if(CollectionUtils.isEmpty(allCodes)) {
-            return klines;
+            return resMap;
         }
 
         Map<String, String> nameMap = new HashMap<>();
@@ -110,23 +110,39 @@ public class AgNewSohuController {
                 String res = response.getBody();
                 Map<String, Object> soHuRes = JSON.parseObject(res, Map.class);
                 log.info("soHuRes={}", JSON.toJSON(soHuRes));
-                List<Object> sohuKlines = soHuRes.values().stream().collect(Collectors.toList());
-                for(Object obj : sohuKlines) {
+                for(Map.Entry<String, Object> entry : soHuRes.entrySet()) {
+                    String key = entry.getKey();
+                    Object obj = entry.getValue();
                     List<String> values = JSON.parseArray(obj.toString(), String.class);
-                    String tmpStr = String.join(",", values);
-                    log.info("tmpStr={}", tmpStr);
-                    klines.add(tmpStr);
+                    List<String> targetValues = new ArrayList<>();
+                    targetValues.add(values.get(17).substring(0, 10));
+                    targetValues.add(values.get(14));
+                    targetValues.add(values.get(2));
+                    targetValues.add(values.get(10));
+                    targetValues.add(values.get(11));
+                    targetValues.add(values.get(5));
+                    targetValues.add(Double.parseDouble(values.get(7))*10000 + "");
+                    targetValues.add("0");
+                    targetValues.add(values.get(3).replace("+", "").replace("%", ""));
+                    targetValues.add(values.get(4).replace("+", "").replace("%", ""));
+                    targetValues.add(values.get(8).replace("+", "").replace("%", ""));
+
+                    resMap.put(nameMap.get(key), String.join(",", targetValues));
                 }
+
             } catch (Exception ex) {
                 log.error("{}", ex);
-                return new ArrayList<>();
+                return new HashMap<>();
             }
         }
 
-        if(!CollectionUtils.isEmpty(klines)) {
-            log.info("start log klines, size={}", klines.size());
-            klines.forEach(f -> log.info(f));
+        if(!CollectionUtils.isEmpty(resMap)) {
+            log.info("start log resMap, size={}", resMap.size());
+            resMap.entrySet().forEach(f -> {
+                log.info("key={}, value={}", f.getKey(), f.getValue());
+            });
         }
-        return klines;
+
+        return resMap;
     }
 }
