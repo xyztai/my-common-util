@@ -496,7 +496,7 @@ public class AgNewEastmoneyStockController {
         }
 
         // 先用sohu查询数据
-        Map<String, String> soHuMap = agNewSohuController.getQQResReplaceEastmoney();
+        Map<String, String> soHuMap = agNewSohuController.getQQResReplaceEastmoney(1);
         if(!CollectionUtils.isEmpty(soHuMap)) {
             for(Map.Entry<String, String> entry : soHuMap.entrySet()) {
                 String item = entry.getValue();

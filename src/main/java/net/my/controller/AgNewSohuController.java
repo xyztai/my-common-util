@@ -40,7 +40,7 @@ public class AgNewSohuController {
     @GetMapping("/history")
     @Transactional
     public BaseResponse test() {
-        return RestGeneralResponse.of(getQQResReplaceEastmoney()); // 只读取最新一天的
+        return RestGeneralResponse.of(getQQResReplaceEastmoney(0)); // 只读取最新一天的
     }
 
     // demo
@@ -48,15 +48,21 @@ public class AgNewSohuController {
     public static final String SO_HU_URL_FORMAT =
             "https://hqm.stock.sohu.com/getqjson?code=%s";
 
-    public Map<String, String> getQQResReplaceEastmoney() {
-        List<String> hsStocks = agSohuMapper.getStocks();
-        List<String> hsEtfs = agSohuMapper.getEtfs();
+    public Map<String, String> getQQResReplaceEastmoney(Integer type) {
         List<String> allCodes = new ArrayList<>();
-        if(!CollectionUtils.isEmpty(hsStocks)) {
-            allCodes.addAll(hsStocks);
+
+        if(type == 0 || type == 1) {
+            List<String> hsStocks = agSohuMapper.getStocks();
+            if(!CollectionUtils.isEmpty(hsStocks)) {
+                allCodes.addAll(hsStocks);
+            }
         }
-        if(!CollectionUtils.isEmpty(hsEtfs)) {
-            allCodes.addAll(hsEtfs);
+
+        if(type == 0 || type == 2) {
+            List<String> hsEtfs = agSohuMapper.getEtfs();
+            if(!CollectionUtils.isEmpty(hsEtfs)) {
+                allCodes.addAll(hsEtfs);
+            }
         }
 
         Map<String, String> resMap = new HashMap<>();
