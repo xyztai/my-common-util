@@ -1,5 +1,6 @@
 package net.my.controller;
 
+import com.alibaba.fastjson2.JSON;
 import io.swagger.annotations.Api;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -66,15 +67,17 @@ public class AgNewXueqiuController {
             HttpEntity<String> entity = new HttpEntity<>(headers);
 
             // 发送GET请求
-            ResponseEntity<String> response = restTemplate.exchange(
+            ResponseEntity<XueqiuRes> response = restTemplate.exchange(
                     url,
                     HttpMethod.GET,
                     entity,
-                    String.class
+                    XueqiuRes.class
             );
 
             log.info("响应状态: " + response.getStatusCode());
             log.info("响应体: " + response.getBody());
+            XueqiuRes xueqiuRes = response.getBody();
+            log.info("xueqiuRes={}", JSON.toJSON(xueqiuRes));
 
         } catch (Exception ex) {
             ;
@@ -132,16 +135,20 @@ public class AgNewXueqiuController {
     }
 
     @Data
-    public class QqRes{
-        private Integer code;
-        private String message;
-        private QqData data;
+    public class XueqiuRes{
+        private Integer error_code;
+        private String error_description;
+        private XueqiuData data;
     }
 
+    @Data
+    public class XueqiuData{
+        private List<XueqiuNode> item;
+    }
 
     @Data
-    public class QqData{
-        private List<QqNode> nodes;
+    public class XueqiuNode{
+        private List<String> klineValues;
     }
 
 }
