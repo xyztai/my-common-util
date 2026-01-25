@@ -515,7 +515,7 @@ public class AgNewEastmoneyStockController {
         for(Map.Entry<String, String> entry : hs300Map.entrySet()) {
             if(!CollectionUtils.isEmpty(eastmoneyNodeList)) {
                 log.info("已经由sohu获得数据, eastmoneyNodeList size={}", eastmoneyNodeList.size());
-                String maxDate = agNewSohuController.getMaxDate();
+                String maxDate = agNewSohuController.getMaxDateFromStock();
                 eastmoneyNodeList = eastmoneyNodeList.stream()
                         .filter(f -> f.getDate().compareTo(maxDate) > 0)
                         .collect(Collectors.toList());

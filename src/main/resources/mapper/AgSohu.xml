@@ -19,10 +19,19 @@
         ]]>
     </select>
 
-    <select id="getMaxDate" resultType="java.lang.String">
+    <select id="getMaxDateFromStock" resultType="java.lang.String">
         <![CDATA[
         select max(`date`)
         from t_eastmoney_node ten
+        where ten.`date` >= '2026-01-01'
+        and ten.`date` not like '9999%'
+        ]]>
+    </select>
+
+    <select id="getMaxDateFromEtf" resultType="java.lang.String">
+        <![CDATA[
+        select max(`date`)
+        from t_eastmoney_node_etf ten
         where ten.`date` >= '2026-01-01'
         and ten.`date` not like '9999%'
         ]]>

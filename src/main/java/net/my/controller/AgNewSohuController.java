@@ -160,7 +160,11 @@ public class AgNewSohuController {
         return resMap;
     }
 
-    public String getMaxDate() {
-        return agSohuMapper.getMaxDate();
+    public String getMaxDateFromStock() {
+        return agSohuMapper.getMaxDateFromStock();
+    }
+
+    public String getMaxDateFromEtf() {
+        return agSohuMapper.getMaxDateFromEtf();
     }
 }

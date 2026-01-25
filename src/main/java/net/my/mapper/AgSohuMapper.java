@@ -8,5 +8,6 @@ import java.util.List;
 public interface AgSohuMapper {
     List<String> getStocks();
     List<String> getEtfs();
-    String getMaxDate();
+    String getMaxDateFromStock();
+    String getMaxDateFromEtf();
 }

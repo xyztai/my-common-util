@@ -350,7 +350,7 @@ public class AgNewEastmoneyETFController {
         for(Map.Entry<String, String> entry : etfMap.entrySet()) {
             if(!CollectionUtils.isEmpty(eastmoneyNodeList)) {
                 log.info("已经由sohu获得数据, eastmoneyNodeList size={}", eastmoneyNodeList.size());
-                String maxDate = agNewSohuController.getMaxDate();
+                String maxDate = agNewSohuController.getMaxDateFromEtf();
                 eastmoneyNodeList = eastmoneyNodeList.stream()
                         .filter(f -> f.getDate().compareTo(maxDate) > 0)
                         .collect(Collectors.toList());
