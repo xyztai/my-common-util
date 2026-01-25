@@ -47,7 +47,6 @@ public class AgNewXueqiuController {
     public static final String XUE_QIU_URL_FORMAT =
             "https://stock.xueqiu.com/v5/stock/chart/kline.json"
                     +"?symbol=%s&begin=%d&period=day&type=before&count=%d&indicator=kline";
-//            "https://proxy.finance.qq.com/cgi/cgi-bin/stockinfoquery/kline/app/get?code=%s&ktype=day&limit=%d";
 
     public List<String> getQQResReplaceEastmoney(String zqdm, Integer days) {
         Date now = new Date();

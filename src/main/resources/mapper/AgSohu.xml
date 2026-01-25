@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.my.mapper.AgSohuMapper">
+    <select id="getStocks" resultType="java.lang.String">
+        <![CDATA[
+        select concat(t.stockType, '.', t.stockCode)
+        from t_hs300 t
+        order by 1
+        ]]>
+    </select>
+
+    <select id="getEtfs" resultType="java.lang.String">
+        <![CDATA[
+        select concat(t.stockType, '.', t.stockCode)
+        from t_etf t
+        order by 1
+        ]]>
+    </select>
+
+</mapper>
