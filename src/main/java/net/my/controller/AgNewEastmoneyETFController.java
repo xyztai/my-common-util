@@ -58,6 +58,9 @@ public class AgNewEastmoneyETFController {
     @Autowired
     private AgNewSohuController agNewSohuController;
 
+    @Autowired
+    private AgNewSinaController agNewSinaController;
+
 
     /**
      * 1、根据最近一年的数据，判断今天能否进入 TOP10
@@ -330,13 +333,27 @@ public class AgNewEastmoneyETFController {
             etfMap.put(key, value);
         }
 
-        // 先用sohu查询数据
-        Map<String, String> soHuMap = agNewSohuController.getQQResReplaceEastmoney(2);
-        if(!CollectionUtils.isEmpty(soHuMap)) {
-            for(Map.Entry<String, String> entry : soHuMap.entrySet()) {
-                String item = entry.getValue();
-                String[] xxs = item.split(",");
-                eastmoneyNodeList.add(EastmoneyNode.builder().date(xxs[0]).stockCode(entry.getKey()).infoRaw(item).build());
+        // 先sina数据
+        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            Map<String, String> sinaMap = agNewSinaController.getQQResReplaceEastmoney(2);
+            if (!CollectionUtils.isEmpty(sinaMap)) {
+                for (Map.Entry<String, String> entry : sinaMap.entrySet()) {
+                    String item = entry.getValue();
+                    String[] xxs = item.split(",");
+                    eastmoneyNodeList.add(EastmoneyNode.builder().date(xxs[0]).stockCode(entry.getKey()).infoRaw(item).build());
+                }
+            }
+        }
+
+        // 后sohu数据
+        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            Map<String, String> soHuMap = agNewSohuController.getQQResReplaceEastmoney(2);
+            if(!CollectionUtils.isEmpty(soHuMap)) {
+                for(Map.Entry<String, String> entry : soHuMap.entrySet()) {
+                    String item = entry.getValue();
+                    String[] xxs = item.split(",");
+                    eastmoneyNodeList.add(EastmoneyNode.builder().date(xxs[0]).stockCode(entry.getKey()).infoRaw(item).build());
+                }
             }
         }
 
@@ -349,12 +366,12 @@ public class AgNewEastmoneyETFController {
         int zqNo = 1;
         for(Map.Entry<String, String> entry : etfMap.entrySet()) {
             if(!CollectionUtils.isEmpty(eastmoneyNodeList)) {
-                log.info("已经由sohu获得数据, eastmoneyNodeList size={}", eastmoneyNodeList.size());
+                log.info("已经由sina/sohu获得数据, eastmoneyNodeList size={}", eastmoneyNodeList.size());
                 String maxDate = agNewSohuController.getMaxDateFromEtf();
                 eastmoneyNodeList = eastmoneyNodeList.stream()
                         .filter(f -> f.getDate().compareTo(maxDate) > 0)
                         .collect(Collectors.toList());
-                log.info("已经由sohu获得数据, 待插入数据 eastmoneyNodeList size={}", eastmoneyNodeList.size());
+                log.info("已经由sina/sohu获得数据, 待插入数据 eastmoneyNodeList size={}", eastmoneyNodeList.size());
                 break;
             }
 

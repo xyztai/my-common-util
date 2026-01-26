@@ -58,6 +58,9 @@ public class AgNewEastmoneyStockController {
     @Autowired
     private AgNewSohuController agNewSohuController;
 
+    @Autowired
+    private AgNewSinaController agNewSinaController;
+
 
 
 //    /**
@@ -495,13 +498,27 @@ public class AgNewEastmoneyStockController {
             hs300Map.put(key, value);
         }
 
-        // 先用sohu查询数据
-        Map<String, String> soHuMap = agNewSohuController.getQQResReplaceEastmoney(1);
-        if(!CollectionUtils.isEmpty(soHuMap)) {
-            for(Map.Entry<String, String> entry : soHuMap.entrySet()) {
-                String item = entry.getValue();
-                String[] xxs = item.split(",");
-                eastmoneyNodeList.add(EastmoneyNode.builder().date(xxs[0]).stockCode(entry.getKey()).infoRaw(item).build());
+        // 先sina数据
+        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            Map<String, String> sinaMap = agNewSinaController.getQQResReplaceEastmoney(1);
+            if (!CollectionUtils.isEmpty(sinaMap)) {
+                for (Map.Entry<String, String> entry : sinaMap.entrySet()) {
+                    String item = entry.getValue();
+                    String[] xxs = item.split(",");
+                    eastmoneyNodeList.add(EastmoneyNode.builder().date(xxs[0]).stockCode(entry.getKey()).infoRaw(item).build());
+                }
+            }
+        }
+
+        // 后sohu数据
+        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            Map<String, String> soHuMap = agNewSohuController.getQQResReplaceEastmoney(1);
+            if(!CollectionUtils.isEmpty(soHuMap)) {
+                for(Map.Entry<String, String> entry : soHuMap.entrySet()) {
+                    String item = entry.getValue();
+                    String[] xxs = item.split(",");
+                    eastmoneyNodeList.add(EastmoneyNode.builder().date(xxs[0]).stockCode(entry.getKey()).infoRaw(item).build());
+                }
             }
         }
 
@@ -514,12 +531,12 @@ public class AgNewEastmoneyStockController {
         int zqNo = 1;
         for(Map.Entry<String, String> entry : hs300Map.entrySet()) {
             if(!CollectionUtils.isEmpty(eastmoneyNodeList)) {
-                log.info("已经由sohu获得数据, eastmoneyNodeList size={}", eastmoneyNodeList.size());
+                log.info("已经由sina/sohu获得数据, eastmoneyNodeList size={}", eastmoneyNodeList.size());
                 String maxDate = agNewSohuController.getMaxDateFromStock();
                 eastmoneyNodeList = eastmoneyNodeList.stream()
                         .filter(f -> f.getDate().compareTo(maxDate) > 0)
                         .collect(Collectors.toList());
-                log.info("已经由sohu获得数据, 待插入数据 eastmoneyNodeList size={}", eastmoneyNodeList.size());
+                log.info("已经由sina/sohu获得数据, 待插入数据 eastmoneyNodeList size={}", eastmoneyNodeList.size());
                 break;
             }
 
