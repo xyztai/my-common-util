@@ -18,6 +18,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -122,11 +124,11 @@ public class AgNewSinaController {
                     String[] fields = value.split(",");
                     resMap.put(nameMap.get(key),
                             fields[30] + "," + fields[1] + "," + fields[3] + "," + fields[4] + "," + fields[5]
-                            + "," + (long)(Double.parseDouble(fields[8])/100)
+                            + "," + new BigDecimal(Double.parseDouble(fields[8])/100).setScale(0, RoundingMode.HALF_UP)
                             + "," + fields[9]
-                            + "," + new DecimalFormat("#.00").format((Double.parseDouble(fields[4]) - Double.parseDouble(fields[5]))/Double.parseDouble(fields[2]) * 100)
-                            + "," + new DecimalFormat("#.00").format(Double.parseDouble(fields[3])/Double.parseDouble(fields[2]) * 100 - 100)
-                            + "," + new DecimalFormat("#.000").format((Double.parseDouble(fields[3]) - Double.parseDouble(fields[2])))
+                            + "," + new BigDecimal((Double.parseDouble(fields[4]) - Double.parseDouble(fields[5]))/Double.parseDouble(fields[2]) * 100).setScale(2, RoundingMode.HALF_UP)
+                            + "," + new BigDecimal(Double.parseDouble(fields[3])/Double.parseDouble(fields[2]) * 100 - 100).setScale(2, RoundingMode.HALF_UP)
+                            + "," + new BigDecimal(Double.parseDouble(fields[3]) - Double.parseDouble(fields[2])).setScale(3, RoundingMode.HALF_UP)
                             + "," + "0"
                     );
                 }
