@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -117,7 +118,17 @@ public class AgNewSinaController {
                     String[] entry = line.split("=");
                     String key = entry[0].substring(11);
                     String value = entry[1].replace("\"", "").replace(";", "");
-                    resMap.put(nameMap.get(key), value);
+//                    30,1,3,4,5,8/100,9,round((4-5)/2*100,2),round(3/2*100 -100,2),3-2,0
+                    String[] fields = value.split(",");
+                    resMap.put(nameMap.get(key),
+                            fields[30] + "," + fields[1] + "," + fields[3] + "," + fields[4] + "," + fields[5]
+                            + "," + (long)(Double.parseDouble(fields[8])/100)
+                            + "," + fields[9]
+                            + "," + new DecimalFormat("#.00").format((Double.parseDouble(fields[4]) - Double.parseDouble(fields[5]))/Double.parseDouble(fields[2]) * 100)
+                            + "," + new DecimalFormat("#.00").format(Double.parseDouble(fields[3])/Double.parseDouble(fields[2]) * 100 - 100)
+                            + "," + (Double.parseDouble(fields[3]) - Double.parseDouble(fields[2]))
+                            + "," + "0"
+                    );
                 }
                 /*String res = response.getBody();
                 Map<String, Object> soHuRes = JSON.parseObject(res, Map.class);
