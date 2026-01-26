@@ -48,6 +48,14 @@ public class AgNewSinaController {
     public static final String SINA_URL_FORMAT =
             "https://w.sinajs.cn/list=%s";
 
+    // demo
+    // A,fjjs,0.0400,0.0615,-0.1003,3.1110,264.4417,23575.6,23575.6,23575.6,
+    // todo... 换手率=成交量/流通股本，流通股本为结果的第9个，即[8]，其实意义不大，因为成交量就能看出来了，所以也不用计算了
+    // https://w.sinajs.cn/rn=7522129656&list=sz001337_i,sz002679_i
+    public static final String SINA_I_URL_FORMAT =
+            "https://w.sinajs.cn/rn=7522129656&list=%s";
+
+
     public Map<String, String> getQQResReplaceEastmoney(Integer type) {
         List<String> allCodes = new ArrayList<>();
 
@@ -122,6 +130,10 @@ public class AgNewSinaController {
                     String value = entry[1].replace("\"", "").replace(";", "");
 //                    30,1,3,4,5,8/100,9,round((4-5)/2*100,2),round(3/2*100 -100,2),3-2,0
                     String[] fields = value.split(",");
+                    if(Double.parseDouble(fields[8]) == 0 || Double.parseDouble(fields[9]) == 0) {
+                        continue;
+                    }
+
                     resMap.put(nameMap.get(key),
                             fields[30] + "," + fields[1] + "," + fields[3] + "," + fields[4] + "," + fields[5]
                             + "," + new BigDecimal(Double.parseDouble(fields[8])/100).setScale(0, RoundingMode.HALF_UP)
