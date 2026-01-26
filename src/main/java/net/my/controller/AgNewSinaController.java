@@ -126,7 +126,7 @@ public class AgNewSinaController {
                             + "," + fields[9]
                             + "," + new DecimalFormat("#.00").format((Double.parseDouble(fields[4]) - Double.parseDouble(fields[5]))/Double.parseDouble(fields[2]) * 100)
                             + "," + new DecimalFormat("#.00").format(Double.parseDouble(fields[3])/Double.parseDouble(fields[2]) * 100 - 100)
-                            + "," + (Double.parseDouble(fields[3]) - Double.parseDouble(fields[2]))
+                            + "," + new DecimalFormat("#.000").format((Double.parseDouble(fields[3]) - Double.parseDouble(fields[2])))
                             + "," + "0"
                     );
                 }
