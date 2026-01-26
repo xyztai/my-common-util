@@ -86,7 +86,7 @@ public class AgNewSinaController {
         List<String> allCodesCn = nameMap.keySet().stream().sorted().collect(Collectors.toList());
         List<String> targetSohuCodes = new ArrayList<>();
         int startNum = 0;
-        int stepNum = 100;
+        int stepNum = 300;
         while(startNum < allCodesCn.size()) {
             List<String> tmpNodes = allCodesCn.stream().skip(startNum).limit(stepNum)
                     .collect(Collectors.toList());
