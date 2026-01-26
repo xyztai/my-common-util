@@ -7,6 +7,7 @@
         <![CDATA[
         select concat(t.stockType, '.', t.stockCode)
         from t_hs300 t
+        where stockCode = '000001'
         order by 1
         ]]>
     </select>
@@ -15,6 +16,7 @@
         <![CDATA[
         select concat(t.stockType, '.', t.stockCode)
         from t_etf t
+        where stockCode = '000001'
         order by 1
         ]]>
     </select>
