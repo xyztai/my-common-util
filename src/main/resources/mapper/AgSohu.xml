@@ -7,7 +7,7 @@
         <![CDATA[
         select concat(t.stockType, '.', t.stockCode)
         from t_hs300 t
-        where stockCode = '000001'
+        where stockCode = '601212'
         order by 1
         ]]>
     </select>
