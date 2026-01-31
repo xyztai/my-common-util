@@ -550,6 +550,44 @@
         and t1._stockCode = concat(t3.stockType , '.', t3.stockCode )
         order by 1
         ]]>
+    </select>
 
+    <select id="queryLastest90Days" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+            with tmp_ as(
+                select t.stockCode, t3.stockName , t.`date` , t.volume, t.last
+                       , rank() over(partition by t.stockCode order by case when t.zf_ratio < 10 then t.volume else 99999999999 end) vol_min_rank
+                       , rank() over(partition by t.stockCode order by t.volume desc) vol_max_rank
+                from (
+                    select ten.stockCode
+                           , ten.`date`
+                           , ten.chg
+                           , round((GREATEST(ten.`last`/(1+ten.chg/100), ten.high) / least(ten.`last`/(1+ten.chg/100), ten.low) - 1) * 100) zf_ratio
+                           , ten.`last`
+                           , ten.high
+                           , ten.low
+                           , ten.volume
+                    from t_eastmoney_node ten
+                    where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
+                    and DATE not like '9999%'
+                    and ten.stockCode not like '0.68%'
+                    and ten.stockCode not like '0.30%'
+                    and ten.stockCode not like '1.68%'
+                    and ten.stockCode not like '1.30%'
+                    and ten.last < 80
+                ) t , t_hs300 t3
+                where t.stockCode = concat(t3.stockType , '.', t3.stockCode)
+            )
+            select concat(t1.stockCode, '-', t1.stockName) stockCode, t2.date
+                   , concat(t2.`date`,'\n', t1.date) last
+                   , concat(round(t2.`volume`/10000),'\n', round(t1.volume/10000), '\n', round(t2.volume/t1.volume,1)) ratioB
+                   -- , round(t2.volume/t1.volume,1) highest_ratio
+            from (select stockCode, stockName , `date` , volume from tmp_ where vol_min_rank = 1) t1,
+                 (select stockCode, stockName , `date` , volume, last from tmp_ where vol_max_rank = 1) t2
+            where t1.stockCode = t2.stockCode
+            -- and t2.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+            and t2.volume >= 9.8 * t1.volume
+            order by t2.date desc
+        ]]>
     </select>
 </mapper>

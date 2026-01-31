@@ -210,6 +210,10 @@ public class ScheduledTasks {
         agNewEastmoneyStockController.queryEastmoneyLatestInfo();
         log.info("task stock queryEastmoneyLatestInfo end");
 
+        log.info("task stock queryLastest90Days start");
+        agNewEastmoneyStockController.queryLastest90Days();
+        log.info("task stock queryLastest90Days end");
+
 
 
         // 查询 ETF

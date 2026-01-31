@@ -466,6 +466,39 @@ public class AgNewEastmoneyStockController {
         return RestGeneralResponse.of(res);
     }
 
+    /**
+     * 10、近3个月的，成交量暴涨10倍的
+     * @return
+     */
+    @GetMapping("/eastmoney-90-days")
+    public BaseResponse queryLastest90Days() {
+        log.info("queryLastest90Days");
+        String key = "stock#" + "queryLastest90Days";
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryLastest90Days();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("688")
+                        && !f.getStockCode().startsWith("689")
+                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
     @ApiOperation(value = "获取历史的cp数据", notes = "访问互联网接口获取数据")
     @GetMapping("/historyAll")
     @Transactional
