@@ -578,7 +578,7 @@
                 ) t , t_hs300 t3
                 where t.stockCode = concat(t3.stockType , '.', t3.stockCode)
             )
-            select concat(t1.stockCode, '\n', t1.stockName) stockCode, concat(t2.`date`,'\n', t1.date) date
+            select substring(t1.stockCode, 3) stockCode, concat(t2.`date`,'\n', t1.date,'\n', t1.stockName) date
                    , concat(t2.`last`,'\n', round(t2.volume/t1.volume,1)) last
                    , concat(round(t2.`volume`/10000),'\n', round(t1.volume/10000) ) ratioB
                    -- , round(t2.volume/t1.volume,1) highest_ratio
