@@ -19,6 +19,7 @@ import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
 
 @Slf4j
 @Component
@@ -182,68 +183,180 @@ public class ScheduledTasks {
         log.info("task 清空缓存");
         agNewQQController.invalidateAll();
         // 计算缓存
-        log.info("task stock queryEastmoneyToday start");
-        agNewEastmoneyStockController.queryEastmoneyToday();
-        log.info("task stock queryEastmoneyToday end");
+        CompletableFuture<Void> task11 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock queryEastmoneyToday start");
+                agNewEastmoneyStockController.queryEastmoneyToday();
+                log.info("task stock queryEastmoneyToday end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
 
-        log.info("task stock queryEastmoneyLast30 start");
-        agNewEastmoneyStockController.queryEastmoneyLast30();
-        log.info("task stock queryEastmoneyLast30 end");
+        CompletableFuture<Void> task12 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock queryEastmoneyLast30 start");
+                agNewEastmoneyStockController.queryEastmoneyLast30();
+                log.info("task stock queryEastmoneyLast30 end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
 
-        log.info("task stock queryEastmoneyVolSuddenlyRised start");
-        agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRised();
-        log.info("task stock queryEastmoneyVolSuddenlyRised end");
+        CompletableFuture<Void> task13 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock queryEastmoneyVolSuddenlyRised start");
+                agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRised();
+                log.info("task stock queryEastmoneyVolSuddenlyRised end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
 
-        log.info("task stock query9ZhuanB start");
-        agNewEastmoneyStockController.query9ZhuanB();
-        log.info("task stock query9ZhuanB end");
+        CompletableFuture<Void> task14 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock query9ZhuanB start");
+                agNewEastmoneyStockController.query9ZhuanB();
+                log.info("task stock query9ZhuanB end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
 
-        log.info("task stock query9ZhuanS start");
-        agNewEastmoneyStockController.query9ZhuanS();
-        log.info("task stock query9ZhuanS end");
+        CompletableFuture<Void> task15 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock query9ZhuanS start");
+                agNewEastmoneyStockController.query9ZhuanS();
+                log.info("task stock query9ZhuanS end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        CompletableFuture<Void> task16 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock queryEastmoneyLatestInfo start");
+                agNewEastmoneyStockController.queryEastmoneyLatestInfo();
+                log.info("task stock queryEastmoneyLatestInfo end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        CompletableFuture<Void> task17 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock queryLastest90Days start");
+                agNewEastmoneyStockController.queryLastest90Days();
+                log.info("task stock queryLastest90Days end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        // 等待所有任务完成
+        CompletableFuture<Void> allTasks = CompletableFuture.allOf(
+                task11
+                , task12
+                , task13
+                , task14
+                , task15
+                , task16
+                , task17
+        );
+
+        // 当所有任务完成后执行
+        allTasks.thenRun(() -> {
+            System.out.println("Stock-所有任务已完成");
+        }).join();
+
+
+
+
+        // 查询 ETF
+        CompletableFuture<Void> task21 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task etf queryEastmoneyToday start");
+                agNewEastmoneyETFController.queryEastmoneyToday();
+                log.info("task etf queryEastmoneyToday end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        CompletableFuture<Void> task22 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task etf queryEastmoneyLast60 start");
+                agNewEastmoneyETFController.queryEastmoneyLast60();
+                log.info("task etf queryEastmoneyLast60 end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        CompletableFuture<Void> task23 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task etf queryEastmoneyVolSuddenlyRised start");
+                agNewEastmoneyETFController.queryEastmoneyVolSuddenlyRised();
+                log.info("task etf queryEastmoneyVolSuddenlyRised end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        CompletableFuture<Void> task24 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task etf queryEtf9ZhuanB start");
+                agNewEastmoneyETFController.queryEtf9ZhuanB();
+                log.info("task etf queryEtf9ZhuanB end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        CompletableFuture<Void> task25 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task etf queryEtf9ZhuanS start");
+                agNewEastmoneyETFController.queryEtf9ZhuanS();
+                log.info("task etf queryEtf9ZhuanS end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        CompletableFuture<Void> task26 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task etf queryEastmoneyLatestInfo start");
+                agNewEastmoneyETFController.queryEastmoneyLatestInfo();
+                log.info("task etf queryEastmoneyLatestInfo end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        allTasks = CompletableFuture.allOf(
+                task21
+                , task22
+                , task23
+                , task24
+                , task25
+                , task26
+        );
+
+        // 当所有任务完成后执行
+        allTasks.thenRun(() -> {
+            System.out.println("ETF-所有任务已完成");
+        }).join();
+
+
+
 
 //        log.info("task stock queryWinRatios start");
 //        agNewEastmoneyStockController.queryWinRatios();
 //        log.info("task stock queryWinRatios end");
 
-        log.info("task stock queryEastmoneyLatestInfo start");
-        agNewEastmoneyStockController.queryEastmoneyLatestInfo();
-        log.info("task stock queryEastmoneyLatestInfo end");
-
-        log.info("task stock queryLastest90Days start");
-        agNewEastmoneyStockController.queryLastest90Days();
-        log.info("task stock queryLastest90Days end");
-
-
-
-        // 查询 ETF
-        log.info("task etf queryEastmoneyToday start");
-        agNewEastmoneyETFController.queryEastmoneyToday();
-        log.info("task etf queryEastmoneyToday end");
-
-        log.info("task etf queryEastmoneyLast60 start");
-        agNewEastmoneyETFController.queryEastmoneyLast60();
-        log.info("task etf queryEastmoneyLast60 end");
-
-        log.info("task etf queryEastmoneyVolSuddenlyRised start");
-        agNewEastmoneyETFController.queryEastmoneyVolSuddenlyRised();
-        log.info("task etf queryEastmoneyVolSuddenlyRised end");
-
-        log.info("task etf queryEtf9ZhuanB start");
-        agNewEastmoneyETFController.queryEtf9ZhuanB();
-        log.info("task etf queryEtf9ZhuanB end");
-
-        log.info("task etf queryEtf9ZhuanS start");
-        agNewEastmoneyETFController.queryEtf9ZhuanS();
-        log.info("task etf queryEtf9ZhuanS end");
-
 //        log.info("task etf queryWinRatios start");
 //        agNewEastmoneyETFController.queryWinRatios();
 //        log.info("task etf queryWinRatios end");
-
-        log.info("task etf queryEastmoneyLatestInfo start");
-        agNewEastmoneyETFController.queryEastmoneyLatestInfo();
-        log.info("task etf queryEastmoneyLatestInfo end");
 
 
 
@@ -251,15 +364,45 @@ public class ScheduledTasks {
         log.info("echarts stock getBeginDate start");
         String beginDate = agEastmoneyEChartsMapper.getBeginDate();
         log.info("echarts stock getBeginDate end");
-        log.info("echarts stock saveEcharts9ZhuanS start");
-        agEastmoneyEChartsMapper.saveEcharts9ZhuanS(beginDate);
-        log.info("echarts stock saveEcharts9ZhuanS end");
-        log.info("echarts stock saveEcharts9ZhuanB start");
-        agEastmoneyEChartsMapper.saveEcharts9ZhuanB(beginDate);
-        log.info("echarts stock saveEcharts9ZhuanB end");
+
+        CompletableFuture<Void> task31 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("echarts stock saveEcharts9ZhuanS start");
+                agEastmoneyEChartsMapper.saveEcharts9ZhuanS(beginDate);
+                log.info("echarts stock saveEcharts9ZhuanS end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        CompletableFuture<Void> task32 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("echarts stock saveEcharts9ZhuanB start");
+                agEastmoneyEChartsMapper.saveEcharts9ZhuanB(beginDate);
+                log.info("echarts stock saveEcharts9ZhuanB end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        });
+
+        allTasks = CompletableFuture.allOf(
+                task31
+                , task32
+        );
+
+        // 当所有任务完成后执行
+        allTasks.thenRun(() -> {
+            System.out.println("echarts-所有任务已完成");
+        }).join();
+
         log.info("task echarts s69 start");
         agNewEastmoneyEChartsController.s69();
         log.info("task echarts s69 end");
+
+
+
+
+
 
 //            agNewQQController.getHistoryData(5);
 //            agNewQQ300Controller.getHistoryData(5);  // QQ 的更新hs300 的
