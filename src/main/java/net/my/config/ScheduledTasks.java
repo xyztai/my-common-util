@@ -20,6 +20,8 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 @Slf4j
 @Component
@@ -182,6 +184,8 @@ public class ScheduledTasks {
         // 清空缓存
         log.info("task 清空缓存");
         agNewQQController.invalidateAll();
+
+        ExecutorService executor = Executors.newFixedThreadPool(10);
         // 计算缓存
         CompletableFuture<Void> task11 = CompletableFuture.runAsync(() -> {
             try {
@@ -191,7 +195,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         CompletableFuture<Void> task12 = CompletableFuture.runAsync(() -> {
             try {
@@ -201,7 +205,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         CompletableFuture<Void> task13 = CompletableFuture.runAsync(() -> {
             try {
@@ -211,7 +215,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         CompletableFuture<Void> task14 = CompletableFuture.runAsync(() -> {
             try {
@@ -221,7 +225,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         CompletableFuture<Void> task15 = CompletableFuture.runAsync(() -> {
             try {
@@ -231,7 +235,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         CompletableFuture<Void> task16 = CompletableFuture.runAsync(() -> {
             try {
@@ -241,7 +245,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         CompletableFuture<Void> task17 = CompletableFuture.runAsync(() -> {
             try {
@@ -251,7 +255,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         // 等待所有任务完成
         CompletableFuture<Void> allTasks = CompletableFuture.allOf(
@@ -281,7 +285,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         CompletableFuture<Void> task22 = CompletableFuture.runAsync(() -> {
             try {
@@ -291,7 +295,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         CompletableFuture<Void> task23 = CompletableFuture.runAsync(() -> {
             try {
@@ -301,7 +305,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         CompletableFuture<Void> task24 = CompletableFuture.runAsync(() -> {
             try {
@@ -311,7 +315,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         CompletableFuture<Void> task25 = CompletableFuture.runAsync(() -> {
             try {
@@ -321,7 +325,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         CompletableFuture<Void> task26 = CompletableFuture.runAsync(() -> {
             try {
@@ -331,7 +335,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         allTasks = CompletableFuture.allOf(
                 task21
@@ -373,7 +377,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         CompletableFuture<Void> task32 = CompletableFuture.runAsync(() -> {
             try {
@@ -383,7 +387,7 @@ public class ScheduledTasks {
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
-        });
+        }, executor);
 
         allTasks = CompletableFuture.allOf(
                 task31
