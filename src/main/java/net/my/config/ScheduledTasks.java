@@ -185,7 +185,7 @@ public class ScheduledTasks {
         log.info("task 清空缓存");
         agNewQQController.invalidateAll();
 
-        ExecutorService executor = Executors.newFixedThreadPool(10);
+        ExecutorService executor = Executors.newFixedThreadPool(20);
         // 计算缓存
         CompletableFuture<Void> task11 = CompletableFuture.runAsync(() -> {
             try {
@@ -257,23 +257,6 @@ public class ScheduledTasks {
             }
         }, executor);
 
-        // 等待所有任务完成
-        CompletableFuture<Void> allTasks = CompletableFuture.allOf(
-                task11
-                , task12
-                , task13
-                , task14
-                , task15
-                , task16
-                , task17
-        );
-
-        // 当所有任务完成后执行
-        allTasks.thenRun(() -> {
-            System.out.println("Stock-所有任务已完成");
-        }).join();
-
-
 
 
         // 查询 ETF
@@ -337,21 +320,6 @@ public class ScheduledTasks {
             }
         }, executor);
 
-        allTasks = CompletableFuture.allOf(
-                task21
-                , task22
-                , task23
-                , task24
-                , task25
-                , task26
-        );
-
-        // 当所有任务完成后执行
-        allTasks.thenRun(() -> {
-            System.out.println("ETF-所有任务已完成");
-        }).join();
-
-
 
 
 //        log.info("task stock queryWinRatios start");
@@ -389,14 +357,31 @@ public class ScheduledTasks {
             }
         }, executor);
 
-        allTasks = CompletableFuture.allOf(
-                task31
+
+        // 等待所有任务完成
+        CompletableFuture<Void> allTasks = CompletableFuture.allOf(
+                task11
+                , task12
+                , task13
+                , task14
+                , task15
+                , task16
+                , task17
+
+                , task21
+                , task22
+                , task23
+                , task24
+                , task25
+                , task26
+
+                , task31
                 , task32
         );
 
         // 当所有任务完成后执行
         allTasks.thenRun(() -> {
-            System.out.println("echarts-所有任务已完成");
+            System.out.println("所有任务已完成");
         }).join();
 
         log.info("task echarts s69 start");
