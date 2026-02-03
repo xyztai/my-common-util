@@ -185,7 +185,7 @@ public class ScheduledTasks {
         log.info("task 清空缓存");
         agNewQQController.invalidateAll();
 
-        ExecutorService executor = Executors.newFixedThreadPool(20);
+        ExecutorService executor = Executors.newFixedThreadPool(2);
         // 计算缓存
         CompletableFuture<Void> task11 = CompletableFuture.runAsync(() -> {
             try {
