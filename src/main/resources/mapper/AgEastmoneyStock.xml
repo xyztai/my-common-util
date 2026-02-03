@@ -586,7 +586,7 @@
                  (select stockCode, stockName , `date` , volume, last from tmp_ where vol_max_rank = 1) t2
             where t1.stockCode = t2.stockCode
             -- and t2.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
-            and t2.volume >= 9.8 * t1.volume
+            and t2.volume > 9 * t1.volume
             order by t2.date desc
         ]]>
     </select>
