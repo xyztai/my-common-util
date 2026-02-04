@@ -10,4 +10,8 @@ public class EchartsPoJo {
     private Integer value2;
     private Integer value3;
     private Integer value4;
+    private Integer value5;
+    private Integer value6;
+    private Integer value7;
+    private Integer value8;
 }
