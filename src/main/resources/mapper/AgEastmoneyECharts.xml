@@ -19,7 +19,7 @@
             where `_date` > '2025-01-01'
             group by `_date`
             order by 1 desc
-            limit 22
+            limit 66
         ]]>
     </select>
 
