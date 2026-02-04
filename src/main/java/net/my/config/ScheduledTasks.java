@@ -119,7 +119,6 @@ public class ScheduledTasks {
      * 自动获取/更新历史上5天的cp数据
      */
     @Scheduled(cron = "0 7 * * * ?")
-    @Transactional
     public void execGetHistoryDataNew() {
         long startTime = System.currentTimeMillis();
         log.info("execGetHistoryDataNew begin");
@@ -185,7 +184,7 @@ public class ScheduledTasks {
         log.info("task 清空缓存");
         agNewQQController.invalidateAll();
 
-        ExecutorService executor = Executors.newFixedThreadPool(2);
+        ExecutorService executor = Executors.newFixedThreadPool(5);
         // 计算缓存
         CompletableFuture<Void> task11 = CompletableFuture.runAsync(() -> {
             try {
