@@ -1,5 +1,73 @@
 
 
+            with tmp_ as(
+                select t.stockCode, t3.stockName , t.`date` , t.volume, t.last
+                       , rank() over(partition by t.stockCode order by case when t.zf_ratio < 10 then t.volume else 99999999999 end) vol_min_rank
+                       , rank() over(partition by t.stockCode order by t.volume desc) vol_max_rank
+                from (
+                    select ten.stockCode
+                           , ten.`date`
+                           , ten.chg
+                           , round((GREATEST(ten.`last`/(1+ten.chg/100), ten.high) / least(ten.`last`/(1+ten.chg/100), ten.low) - 1) * 100) zf_ratio
+                           , ten.`last`
+                           , ten.high
+                           , ten.low
+                           , ten.volume
+                    from t_eastmoney_node ten
+                    where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
+                    and DATE not like '9999%'
+                    and ten.stockCode not like '0.68%'
+                    and ten.stockCode not like '0.30%'
+                    and ten.stockCode not like '1.68%'
+                    and ten.stockCode not like '1.30%'
+                    and ten.last < 80
+                ) t , t_hs300 t3
+                where t.stockCode = concat(t3.stockType , '.', t3.stockCode)
+            )
+            , tmp_stocks as (
+	            select distinct t1.stockCode
+	            from (select stockCode, stockName , `date` , volume from tmp_ where vol_min_rank = 1) t1,
+	                 (select stockCode, stockName , `date` , volume, last from tmp_ where vol_max_rank = 1) t2
+	            where t1.stockCode = t2.stockCode
+	            -- and t2.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+	            and t2.volume > 9 * t1.volume
+            )
+            , tmp_avg60 as (
+	            select stockCode
+	                   , avg(case when date_rn <= 5 then LAST else null end) avg_5
+	                   , avg(case when date_rn <= 10 then LAST else null end) avg_10
+	                   , avg(case when date_rn <= 20 then LAST else null end) avg_20
+	                   , avg(case when date_rn <= 60 then LAST else null end) avg_60
+	                   , max(tt.`date` ) date
+	            from (
+		            select ten.*, t3.stockName , rank() over (partition by ten.stockCode order by ten.`date` desc) date_rn
+		            from t_eastmoney_node ten, tmp_stocks t2, t_hs300 t3
+		            where ten.stockCode = t2.stockCode
+		            and ten.`date` >=  DATE_FORMAT(DATE_SUB(STR_TO_DATE('2026-02-22', '%Y-%m-%d'), INTERVAL 120 DAY), '%Y-%m-%d')
+		            and ten.`date` <= '2026-02-22'
+		            and ten.`date` not like '9999%'
+		            and ten.stockCode = concat(t3.stockType , '.', t3.stockCode)
+		        ) tt
+		        -- where date_rn <= 60
+		        group by stockCode
+           )
+           select t3.stockCode
+                  , concat(ten.`date`, '\n',  t3.stockName) date
+                  , ten.`last`
+                  , concat(round(avg.avg_5, 3),'\n', round(avg.avg_10, 3),'\n', round(avg.avg_20, 3),'\n', round(avg.avg_60, 3) ) ratioB
+           from tmp_avg60 avg, t_eastmoney_node ten, t_hs300 t3
+           where ten.stockCode = concat(t3.stockType , '.', t3.stockCode)
+           and avg.stockCode = ten.stockCode
+           and ten.`date` = avg.`date`
+           and ten.`low` * 0.98 < avg.avg_60
+           and ten.`low` * 1.02 > avg.avg_60
+           and avg.avg_60 * 1.02 < least(avg.avg_5, avg.avg_10, avg.avg_20)
+           and ten.`last` < 60
+           order by 1
+           
+
+
+
 select min(date), max(date) from t_eastmoney_node;
 
 select SUBSTRING(`date` , 1, 4), count(1)
