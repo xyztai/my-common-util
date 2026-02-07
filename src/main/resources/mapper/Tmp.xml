@@ -24,7 +24,7 @@
         <![CDATA[
             replace into t_eastmoney_node_avg(`_date`,`_stockCode`,`last`,`avg_5`,`avg_10`,`avg_20`,`avg_60`)
             with tmp_ as(
-                select t.stockCode, t3.stockName , t.`date` , t.volume, t.last
+                select t.stockCode, t.`date` , t.volume, t.last
                        , rank() over(partition by t.stockCode order by case when t.zf_ratio < 10 then t.volume else 99999999999 end) vol_min_rank
                        , rank() over(partition by t.stockCode order by t.volume desc) vol_max_rank
                 from (
@@ -44,8 +44,7 @@
                     and ten.stockCode not like '1.68%'
                     and ten.stockCode not like '1.30%'
                     and ten.last < 80
-                ) t , t_hs300 t3
-                where t.stockCode = concat(t3.stockType , '.', t3.stockCode)
+                ) t
             )
             , tmp_stocks as (
 	            select distinct t1.stockCode
