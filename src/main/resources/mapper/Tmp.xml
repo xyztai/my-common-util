@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.my.mapper.TmpMapper">
+
+    <select id="getDates">
+        <![CDATA[
+            select distinct ten.`date`
+            from t_eastmoney_node ten
+            where ten.`date` > #{calcDate}
+            and ten.`date` not like '9999%'
+            and ten.stockCode not like '0.68%'
+            and ten.stockCode not like '0.30%'
+            and ten.stockCode not like '1.68%'
+            and ten.stockCode not like '1.30%'
+            and ten.last < 80
+            order by 1
+        ]]>
+    </select>
+    
+    <insert id="calcAvg">
+        <![CDATA[
+            replace into t_eastmoney_node_avg(`_date`,`_stockCode`,`last`,`avg_5`,`avg_10`,`avg_20`,`avg_60`)
+            with tmp_ as(
+                select t.stockCode, t3.stockName , t.`date` , t.volume, t.last
+                       , rank() over(partition by t.stockCode order by case when t.zf_ratio < 10 then t.volume else 99999999999 end) vol_min_rank
+                       , rank() over(partition by t.stockCode order by t.volume desc) vol_max_rank
+                from (
+                    select ten.stockCode
+                           , ten.`date`
+                           , ten.chg
+                           , round((GREATEST(ten.`last`/(1+ten.chg/100), ten.high) / least(ten.`last`/(1+ten.chg/100), ten.low) - 1) * 100) zf_ratio
+                           , ten.`last`
+                           , ten.high
+                           , ten.low
+                           , ten.volume
+                    from t_eastmoney_node ten
+                    where ten.`date` >= DATE_FORMAT(DATE_SUB(STR_TO_DATE(#{calcDate}, '%Y-%m-%d'), INTERVAL 90 DAY), '%Y-%m-%d')
+                    and DATE not like '9999%'
+                    and ten.stockCode not like '0.68%'
+                    and ten.stockCode not like '0.30%'
+                    and ten.stockCode not like '1.68%'
+                    and ten.stockCode not like '1.30%'
+                    and ten.last < 80
+                ) t , t_hs300 t3
+                where t.stockCode = concat(t3.stockType , '.', t3.stockCode)
+            )
+            , tmp_stocks as (
+	            select distinct t1.stockCode
+	            from (select stockCode, stockName , `date` , volume from tmp_ where vol_min_rank = 1) t1,
+	                 (select stockCode, stockName , `date` , volume, last from tmp_ where vol_max_rank = 1) t2
+	            where t1.stockCode = t2.stockCode
+	            and t2.volume > 9 * t1.volume
+            )
+            , tmp_avg60 as (
+	            select stockCode
+	                   , avg(case when date_rn <= 5 then LAST else null end) avg_5
+	                   , avg(case when date_rn <= 10 then LAST else null end) avg_10
+	                   , avg(case when date_rn <= 20 then LAST else null end) avg_20
+	                   , avg(case when date_rn <= 60 then LAST else null end) avg_60
+	                   , max(tt.`date` ) date
+	                   , max(case when date_rn > 60 then `date` else null end) min_date
+	            from (
+		            select ten.* , rank() over (partition by ten.stockCode order by ten.`date` desc) date_rn
+		            from t_eastmoney_node ten, tmp_stocks t2
+		            where ten.stockCode = t2.stockCode
+		            and ten.`date` >=  DATE_FORMAT(DATE_SUB(STR_TO_DATE(#{calcDate}, '%Y-%m-%d'), INTERVAL 120 DAY), '%Y-%m-%d')
+		            and ten.`date` <= #{calcDate}
+		            and ten.`date` not like '9999%'
+		        ) tt
+		        -- where date_rn <= 60
+		        group by stockCode
+           )
+           -- replace into t_eastmoney_node_avg(`date`,`stockCode`,`last`,`avg_5``avg_10`,`avg_20`,`avg_60`)
+           select ten.`date`, ten.`stockCode`, ten.`last`
+                  , round(avg.avg_5, 3)
+                  , round(avg.avg_10, 3)
+                  , round(avg.avg_20, 3)
+                  , round(avg.avg_60, 3)
+           from tmp_avg60 avg, t_eastmoney_node ten
+           where avg.stockCode = ten.stockCode
+           and avg.min_date is not null
+           and ten.`date` = avg.`date`
+           -- and ten.`last` * 1.02 > avg.avg_60
+           -- and ten.`low` * 1.01 > avg.avg_60
+           -- and ten.`last` * 0.98 < avg.avg_60
+           -- and avg.avg_60 * 1.02 < least(avg.avg_5, avg.avg_10, avg.avg_20)
+           and ten.`last` * 1.02 > avg.avg_20
+           and ten.`last` * 0.98 < avg.avg_20
+           and ten.`low` * 1.01 > avg.avg_20
+           and avg.avg_20 * 1.02 < least(avg.avg_5, avg.avg_10)
+           and ten.`last` < 60
+           order by 1
+        ]]>
+    </insert>
+
+</mapper>
