@@ -15,6 +15,7 @@
             and ten.stockCode not like '1.68%'
             and ten.stockCode not like '1.30%'
             and ten.last < 80
+            and not exists (select 1 from t_eastmoney_node_avg t1 where t._date = ten.`date`)
             order by 1
         ]]>
     </select>
