@@ -27,7 +27,7 @@ public class TmpController {
         List<String> dates = tmpMapper.getDates(calcDate);
         if(!CollectionUtils.isEmpty(dates)) {
             for(String d : dates) {
-                log.info("calc calcD={}", calcDate);
+                log.info("calc calcD={}", d);
                 tmpMapper.calcAvg(d);
             }
         }
