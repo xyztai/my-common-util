@@ -21,7 +21,7 @@ public class TmpController {
     @Autowired
     private TmpMapper tmpMapper;
 
-    @GetMapping("/calc/calcDate")
+    @GetMapping("/calc/{calcDate}")
     public BaseResponse calc(@PathVariable("calcDate") String calcDate) {
         log.info("calc start");
         List<String> dates = tmpMapper.getDates(calcDate);
