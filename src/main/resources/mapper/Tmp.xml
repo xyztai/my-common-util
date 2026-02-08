@@ -83,9 +83,16 @@
            where avg.stockCode = ten.stockCode
            and avg.min_date is not null
            and ten.`date` = avg.`date`
-           and ten.`last` between avg.avg_60 * 0.985 and avg.avg_60 * 1.015
-           and ten.`low` between avg.avg_60 * 0.995 and avg.avg_60 * 1.005
-           and avg.avg_60 * 1.02 < least(avg.avg_5, avg.avg_10, avg.avg_20)
+           and (
+               (ten.`last` between avg.avg_60 * 0.975 and avg.avg_60 * 1.025
+		           and ten.`low` between avg.avg_60 * 0.99 and avg.avg_60 * 1.01
+		           and avg.avg_60 < least(avg.avg_5, avg.avg_10, avg.avg_20)
+		        ) or
+		        (ten.`last` between avg.avg_20 * 0.975 and avg.avg_20 * 1.025
+		           and ten.`low` between avg.avg_20 * 0.99 and avg.avg_20 * 1.01
+		           and avg.avg_20 < least(avg.avg_5, avg.avg_10)
+		        )
+		    )
            -- and ten.`last` * 1.02 > avg.avg_20
            -- and ten.`last` * 0.98 < avg.avg_20
            -- and ten.`low` * 1.01 > avg.avg_20
