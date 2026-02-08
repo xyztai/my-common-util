@@ -593,14 +593,19 @@
 
     <select id="queryAvg60" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-           select t3.stockCode
-                  , concat(tena.`_date`, '\n',  t3.stockName) date
-                  , tena.`last`
-                  , concat(round(tena.avg_5, 3),'\n', round(tena.avg_10, 3),'\n', round(tena.avg_20, 3),'\n', round(tena.avg_60, 3) ) ratioB
-           from t_eastmoney_node_avg tena, t_hs300 t3
-           where tena._stockCode = concat(t3.stockType , '.', t3.stockCode)
-           order by tena._date desc
-           limit 500
+            select stockCode, date, last, ratioB
+            from (
+                       select t3.stockCode
+                              , concat(tena.`_date`, '\n',  t3.stockName) date
+                              , tena.`last`
+                              , concat(round(tena.avg_5, 3),'\n', round(tena.avg_10, 3),'\n', round(tena.avg_20, 3),'\n', round(tena.avg_60, 3) ) ratioB
+                              , dense_rank() over (order by tena._date desc) _date_rn
+                       from t_eastmoney_node_avg tena, t_hs300 t3
+                       where tena._stockCode = concat(t3.stockType , '.', t3.stockCode)
+                       and tena._date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+            ) tt
+            where tt._date_rn <= 3
+            order by `date` desc
         ]]>
     </select>
 </mapper>
