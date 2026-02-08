@@ -44,6 +44,9 @@ public class ScheduledTasks {
     private AgNewEastmoneyStockController agNewEastmoneyStockController;
 
     @Autowired
+    private TmpController tmpController;
+
+    @Autowired
     private AgNewEastmoneyETFController agNewEastmoneyETFController;
 
     @Autowired
@@ -256,6 +259,16 @@ public class ScheduledTasks {
             }
         }, executor);
 
+        CompletableFuture<Void> task18 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock calcAvg start");
+                tmpController.calcAvg(null);
+                log.info("task stock calcAvg end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
 
 
         // 查询 ETF
@@ -366,6 +379,7 @@ public class ScheduledTasks {
                 , task15
                 , task16
                 , task17
+                , task18
 
                 , task21
                 , task22
