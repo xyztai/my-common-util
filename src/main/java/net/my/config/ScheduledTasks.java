@@ -184,10 +184,12 @@ public class ScheduledTasks {
 
     void execCalc() {
 
+        // 1、先计算9倍成交量的数据
         log.info("task stock calcVolMulti9OneDay start");
         tmpController.calcVolMulti9OneDay(null);
         log.info("task stock calcVolMulti9OneDay end");
 
+        // 2、再计算均值
         log.info("task stock calcAvg start");
         tmpController.calcAvg(null);
         log.info("task stock calcAvg end");
@@ -196,6 +198,7 @@ public class ScheduledTasks {
         log.info("task 清空缓存");
         agNewQQController.invalidateAll();
 
+        // 开始进行查询缓存
         ExecutorService executor = Executors.newFixedThreadPool(5);
         // 计算缓存
         CompletableFuture<Void> task11 = CompletableFuture.runAsync(() -> {
