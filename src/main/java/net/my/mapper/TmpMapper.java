@@ -9,4 +9,6 @@ import java.util.List;
 public interface TmpMapper {
     List<String> getDates(@Param("calcDate") String calcDate);
     void calcAvg(@Param("calcDate") String calcDate);
+    List<String> getDatesVolMulti9(@Param("calcDate") String calcDate);
+    void calcVolMulti9(@Param("calcDate") String calcDate);
 }

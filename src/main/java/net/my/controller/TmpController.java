@@ -54,4 +54,34 @@ public class TmpController {
             tmpMapper.calcAvg(calcDate);
         }
     }
+
+    @GetMapping("/calcVolMulti9/{calcDate}")
+    public BaseResponse calcVolMulti9(@PathVariable("calcDate") String calcDate) {
+        log.info("calcVolMulti9 start");
+        List<String> dates = tmpMapper.getDatesVolMulti9(calcDate);
+        if(!CollectionUtils.isEmpty(dates)) {
+            for(String d : dates) {
+                log.info("calcVolMulti9 calcD={}", d);
+                calcVolMulti9OneDay(d);
+            }
+        }
+        log.info("calcVolMulti9 end");
+        return RestGeneralResponse.OK;
+    }
+
+    public void calcVolMulti9OneDay(String calcDate){
+        if(StringUtils.isEmpty(calcDate)) {
+            Date date = new Date(); // 当前日期
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTime(date);
+            calendar.add(Calendar.DATE, 2); // 加上2天
+            date = calendar.getTime(); // 获取新的日期
+
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd"); // 定义日期格式
+            String dateString = sdf.format(date); // 转换为字符串
+            tmpMapper.calcVolMulti9(dateString);
+        } else {
+            tmpMapper.calcVolMulti9(calcDate);
+        }
+    }
 }
