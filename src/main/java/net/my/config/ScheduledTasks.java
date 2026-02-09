@@ -183,6 +183,15 @@ public class ScheduledTasks {
     }
 
     void execCalc() {
+
+        log.info("task stock calcVolMulti9OneDay start");
+        tmpController.calcVolMulti9OneDay(null);
+        log.info("task stock calcVolMulti9OneDay end");
+
+        log.info("task stock calcAvg start");
+        tmpController.calcAvg(null);
+        log.info("task stock calcAvg end");
+
         // 清空缓存
         log.info("task 清空缓存");
         agNewQQController.invalidateAll();
@@ -254,16 +263,6 @@ public class ScheduledTasks {
                 log.info("task stock queryLastest90Days start");
                 agNewEastmoneyStockController.queryLastest90Days();
                 log.info("task stock queryLastest90Days end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
-        CompletableFuture<Void> task18 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task stock calcAvg start");
-                tmpController.calcAvg(null);
-                log.info("task stock calcAvg end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
@@ -379,7 +378,6 @@ public class ScheduledTasks {
                 , task15
                 , task16
                 , task17
-                , task18
 
                 , task21
                 , task22

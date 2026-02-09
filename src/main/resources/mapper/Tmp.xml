@@ -97,34 +97,35 @@
         replace into t_eastmoney_node_9_vol(`_stockCode`,`_date`,`min_vol_date`,`min_vol`,`min_chg`,`max_vol_date`,`max_vol`,`max_chg`)
             with tmp_ as(
                 select t.stockCode, t.`date` , t.volume, t.last, t.chg
-                       , rank() over(partition by t.stockCode order by case when t.zf_ratio < 10 then t.volume else 99999999999 end, t.date desc) vol_min_rank
-                       , rank() over(partition by t.stockCode order by case when t.chg < 3 then 0 else t.volume end desc, t.date desc) vol_max_rank
+                    , rank() over(partition by t.stockCode order by case when t.zf_ratio < 10 then t.volume else 99999999999 end, t.date desc) vol_min_rank
+                    , rank() over(partition by t.stockCode order by case when t.chg < 3 then 0 else t.volume end desc, t.date desc) vol_max_rank
                 from (
-                    select ten.stockCode
-                           , ten.`date`
-                           , ten.chg
-                           , round((GREATEST(ten.`last`/(1+ten.chg/100), ten.high) / least(ten.`last`/(1+ten.chg/100), ten.low) - 1) * 100) zf_ratio
-                           , ten.`last`
-                           , ten.high
-                           , ten.low
-                           , ten.volume
-                    from t_eastmoney_node ten
-                    where ten.`date` >= DATE_FORMAT(DATE_SUB(STR_TO_DATE(#{calcDate} , '%Y-%m-%d'), INTERVAL 90 DAY), '%Y-%m-%d')
-        and ten.`date` <= #{calcDate}
-        and DATE not like '9999%'
-        and ten.stockCode not like '0.68%'
-        and ten.stockCode not like '0.30%'
-        and ten.stockCode not like '1.68%'
-        and ten.stockCode not like '1.30%'
-        and ten.last < 80
-        ) t
+                        select ten.stockCode
+                        , ten.`date`
+                        , ten.chg
+                        , round((GREATEST(ten.`last`/(1+ten.chg/100), ten.high) / least(ten.`last`/(1+ten.chg/100), ten.low) - 1) * 100) zf_ratio
+                        , ten.`last`
+                        , ten.high
+                        , ten.low
+                        , ten.volume
+                        from t_eastmoney_node ten
+                        where ten.`date` >= DATE_FORMAT(DATE_SUB(STR_TO_DATE(#{calcDate} , '%Y-%m-%d'), INTERVAL 90 DAY), '%Y-%m-%d')
+                        and ten.`date` <= #{calcDate}
+                        and DATE not like '9999%'
+                        and ten.stockCode not like '0.68%'
+                        and ten.stockCode not like '0.30%'
+                        and ten.stockCode not like '1.68%'
+                        and ten.stockCode not like '1.30%'
+                        and ten.last < 80
+                ) t
         )
         select t1.stockCode
-             , #{calcDate}
+             , t3.max_date
              , t1.date min_vol_date, t1.volume min_vol, t1.chg min_chg
              , t2.date max_vol_date, t2.volume max_vol, t2.chg max_chg
         from (select stockCode, `date` , chg, volume from tmp_ where vol_min_rank = 1) t1,
-             (select stockCode, `date` , chg, volume, last from tmp_ where vol_max_rank = 1) t2
+             (select stockCode, `date` , chg, volume, last from tmp_ where vol_max_rank = 1) t2,
+             (select max(`date`) max_date from tmp_ ) t3
         where t1.stockCode = t2.stockCode
           and t2.volume > 9 * t1.volume
         ]]>
