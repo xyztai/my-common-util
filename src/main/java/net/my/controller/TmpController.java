@@ -85,8 +85,8 @@ public class TmpController {
         }
     }
 
-    @GetMapping("/calcAvgWinRatio/{calcDate}")
-    public BaseResponse calcAvgWinRatio(@PathVariable("calcDate") String calcDate) {
+    @GetMapping("/calcAvgWinRatio")
+    public BaseResponse calcAvgWinRatio() {
         log.info("calcAvgWinRatio start");
         List<String> dates = tmpMapper.getDatesAvgWinRatioAll();
         if(!CollectionUtils.isEmpty(dates)) {

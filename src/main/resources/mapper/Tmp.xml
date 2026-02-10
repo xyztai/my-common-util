@@ -178,7 +178,8 @@
                        , rank() over (partition by tena._stockCode order by tn.`date`) rn_date
                 from tmp_node tn
                 join (select * from t_eastmoney_node_avg t1, tmp_avg t2 where t1._date = t2.calc_date) tena
-                on tn.stockCode = tena.`_stockCode` and (tn.date = tena._date or tn.date_pre_1 = tena._date or tn.date_pre_2 = tena._date or tn.date_pre_3 = tena._date or tn.date_pre_4 = tena._date or tn.date_pre_5 = tena._date)
+                -- on tn.stockCode = tena.`_stockCode` and (tn.date = tena._date or tn.date_pre_1 = tena._date or tn.date_pre_2 = tena._date or tn.date_pre_3 = tena._date or tn.date_pre_4 = tena._date or tn.date_pre_5 = tena._date)
+                on tn.stockCode = tena.`_stockCode` and (tn.date = tena._date or tn.date_pre_1 = tena._date /*or tn.date_pre_2 = tena._date or tn.date_pre_3 = tena._date or tn.date_pre_4 = tena._date or tn.date_pre_5 = tena._date*/)
             )
             select min(_date) `_date`
                  , sum(case when rn_last = 1 then 1 else 0 end) cnt_lose
