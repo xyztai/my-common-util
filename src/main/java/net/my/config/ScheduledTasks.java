@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.my.controller.*;
 import net.my.mapper.AgEastmoneyEChartsMapper;
 import net.my.mapper.DataCalcMapper;
+import net.my.mapper.TmpMapper;
 import net.my.pojo.EastmoneyWinRatioPOJO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,6 +43,9 @@ public class ScheduledTasks {
 
     @Autowired
     private AgNewEastmoneyStockController agNewEastmoneyStockController;
+
+    @Autowired
+    private TmpMapper tmpMapper;
 
     @Autowired
     private TmpController tmpController;
@@ -193,6 +197,17 @@ public class ScheduledTasks {
         log.info("task stock calcAvg start");
         tmpController.calcAvg(null);
         log.info("task stock calcAvg end");
+
+        // 3、再计算均值的胜率
+        log.info("task stock calcAvgWinRatioOneDay start");
+        List<String> datesAvgWinRatio = tmpMapper.getDatesAvgWinRatioDefault();
+        if(!CollectionUtils.isEmpty(datesAvgWinRatio)) {
+            for(String d : datesAvgWinRatio) {
+                log.info("datesAvgWinRatio calcD={}", d);
+                tmpController.calcAvgWinRatioOneDay(d);
+            }
+        }
+        log.info("task stock calcAvgWinRatioOneDay end");
 
         // 清空缓存
         log.info("task 清空缓存");

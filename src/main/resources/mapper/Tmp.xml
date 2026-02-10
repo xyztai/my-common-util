@@ -131,4 +131,62 @@
         ]]>
     </insert>
 
+    <select id="getDatesAvgWinRatioAll" resultType="string">
+        <![CDATA[
+            select distinct ten.`_date`
+            from t_eastmoney_node_9_vol ten
+            where not exists (select 1 from t_eastmoney_node_avg_statis t2 where t2._date = ten.`_date` )
+            order by 1 desc
+        ]]>
+    </select>
+
+    <select id="getDatesAvgWinRatioDefault" resultType="string">
+        <![CDATA[
+        select distinct ten.`_date`
+        from t_eastmoney_node_9_vol ten
+        order by 1 desc
+        limit 10
+        ]]>
+    </select>
+
+    <insert id="calcAvgWinRatio">
+        <![CDATA[
+            replace into t_eastmoney_node_avg_statis(_date, cnt_lose, cnt_win, cnt_all)
+            with tmp_avg as (
+                select max(_date) calc_date from t_eastmoney_node_avg where _date <= #{calcDate}
+            )
+            , tmp_node as (
+                select ten.*
+                       , LAG(ten.`date`, 1) over(partition by ten.stockCode order by ten.`date` ) date_pre_1
+                       , LAG(ten.`date`, 2) over(partition by ten.stockCode order by ten.`date` ) date_pre_2
+                       , LAG(ten.`date`, 3) over(partition by ten.stockCode order by ten.`date` ) date_pre_3
+                       , LAG(ten.`date`, 4) over(partition by ten.stockCode order by ten.`date` ) date_pre_4
+                       , LAG(ten.`date`, 5) over(partition by ten.stockCode order by ten.`date` ) date_pre_5
+                from t_eastmoney_node ten, tmp_avg ta
+                where ten.`date` >= ta.calc_date
+                and ten.`date` <= DATE_FORMAT(DATE_ADD(STR_TO_DATE(ta.calc_date , '%Y-%m-%d'), INTERVAL 30 DAY), '%Y-%m-%d')
+                and ten.`date` not like '9999%'
+                and ten.stockCode not like '0.68%'
+                and ten.stockCode not like '0.30%'
+                and ten.stockCode not like '1.68%'
+                and ten.stockCode not like '1.30%'
+                and ten.last < 80
+            )
+            , tmp_ans as (
+                select tena.*, tn.last target_last, tn.date target_date
+                       , rank() over (partition by tena._stockCode order by tn.last desc, tn.`date`) rn_last
+                       , rank() over (partition by tena._stockCode order by tn.`date`) rn_date
+                from tmp_node tn
+                join (select * from t_eastmoney_node_avg t1, tmp_avg t2 where t1._date = t2.calc_date) tena
+                on tn.stockCode = tena.`_stockCode` and (tn.date = tena._date or tn.date_pre_1 = tena._date or tn.date_pre_2 = tena._date or tn.date_pre_3 = tena._date or tn.date_pre_4 = tena._date or tn.date_pre_5 = tena._date)
+            )
+            select min(_date) `_date`
+                 , sum(case when rn_last = 1 then 1 else 0 end) cnt_lose
+                 , sum(case when rn_last != 1 then 1 else 0 end) cnt_win
+                 , count(1) cnt_all
+            from tmp_ans
+            where rn_date = 1
+        ]]>
+    </insert>
+
 </mapper>

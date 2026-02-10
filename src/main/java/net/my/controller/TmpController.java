@@ -84,4 +84,26 @@ public class TmpController {
             tmpMapper.calcVolMulti9(calcDate);
         }
     }
+
+    @GetMapping("/calcAvgWinRatio/{calcDate}")
+    public BaseResponse calcAvgWinRatio(@PathVariable("calcDate") String calcDate) {
+        log.info("calcAvgWinRatio start");
+        List<String> dates = tmpMapper.getDatesAvgWinRatioAll();
+        if(!CollectionUtils.isEmpty(dates)) {
+            for(String d : dates) {
+                log.info("calcVolMulti9 calcD={}", d);
+                calcAvgWinRatioOneDay(d);
+            }
+        }
+        log.info("calcAvgWinRatio end");
+        return RestGeneralResponse.OK;
+    }
+
+    public void calcAvgWinRatioOneDay(String calcDate){
+        if(StringUtils.isEmpty(calcDate)) {
+           return;
+        } else {
+            tmpMapper.calcAvgWinRatio(calcDate);
+        }
+    }
 }

@@ -11,4 +11,7 @@ public interface TmpMapper {
     void calcAvg(@Param("calcDate") String calcDate);
     List<String> getDatesVolMulti9(@Param("calcDate") String calcDate);
     void calcVolMulti9(@Param("calcDate") String calcDate);
+    List<String> getDatesAvgWinRatioAll();
+    List<String> getDatesAvgWinRatioDefault();
+    void calcAvgWinRatio(@Param("calcDate") String calcDate);
 }
