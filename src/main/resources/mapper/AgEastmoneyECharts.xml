@@ -15,7 +15,8 @@
                  , sum(case when `_direction` = 'B' and `_9_zhuan` = '07' then 1 else 0 end) value6
                  , sum(case when `_direction` = 'B' and `_9_zhuan` = '08' then 1 else 0 end) value7
                  , sum(case when `_direction` = 'B' and `_9_zhuan` = '09' then 1 else 0 end) value8
-                 , round(cnt_win/cnt_all * 100) value9
+                 , case when round(cnt_win/cnt_all * 100) <= 80 then 0 else round(cnt_win/cnt_all * 100) end value9
+                 -- , round(cnt_win/cnt_all * 100), cnt_all
             from t_eastmoney_node_9_zhuan t1, t_eastmoney_node_avg_statis tenas
             where t1.`_date` > '2025-01-01'
               and t1.`_date` = tenas .`_date`
