@@ -58,7 +58,7 @@
                  , t2.value10 value12
             from tmp_ans t
                , (select max(value10) value10 from tmp_ans where rank_ <= 250 * 0.2) t1
-               , (select max(value10) value10 from tmp_ans where rank_ >= 250 * 0.8) t2
+               , (select min(value10) value10 from tmp_ans where rank_ >= 250 * 0.8) t2
             order by 1
         ]]>
     </select>
