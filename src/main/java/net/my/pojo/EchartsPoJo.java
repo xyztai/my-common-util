@@ -15,4 +15,7 @@ public class EchartsPoJo {
     private Integer value7;
     private Integer value8;
     private Integer value9;
+    private Integer value10;
+    private Integer value11;
+    private Integer value12;
 }

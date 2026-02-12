@@ -59,6 +59,9 @@ public class AgNewEastmoneyEChartsController {
             empty.setValue7(0);
             empty.setValue8(0);
             empty.setValue9(0);
+            empty.setValue10(0);
+            empty.setValue11(0);
+            empty.setValue12(0);
             buyDataFromEastmoneys = Arrays.asList(empty);
         }
         buyDataFromEastmoneys = buyDataFromEastmoneys
