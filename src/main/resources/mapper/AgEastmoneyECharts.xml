@@ -16,7 +16,8 @@
                      , sum(case when `_direction` = 'B' and `_9_zhuan` = '07' then 1 else 0 end) value6
                      , sum(case when `_direction` = 'B' and `_9_zhuan` = '08' then 1 else 0 end) value7
                      , sum(case when `_direction` = 'B' and `_9_zhuan` = '09' then 1 else 0 end) value8
-                     , case when round(cnt_win/cnt_all * 100) <= 75 then 0 else round(cnt_win/cnt_all * 100) end value9
+                     , round(cnt_win/cnt_all * 100) value9
+                     -- , case when round(cnt_win/cnt_all * 100) <= 75 then 0 else round(cnt_win/cnt_all * 100) end value9
                      , sum(case when `_direction` = 'S' and `_9_zhuan` in ('06', '07', '08', '09') then 1
                                 when `_direction` = 'B' and `_9_zhuan` in ('06', '07', '08', '09') then -1
                                 else 0 end) value10
