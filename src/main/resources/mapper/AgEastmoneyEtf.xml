@@ -568,7 +568,7 @@
                      , temin.stockName sn_min
                 from tmp_etf te
                    , (select stockCode, stockName, `date`, volume, `last`  from tmp_etf where rank_min = 0 and chg < 9 and chg > -9) temin
-                where te.volume > temin.volume * 10
+                where te.volume > temin.volume * 5
                   -- and te.volume < temin.volume * 50
                   and trim(te.stockCode) = trim(temin.stockCode)
                   and te.`date` > temin.`date`
