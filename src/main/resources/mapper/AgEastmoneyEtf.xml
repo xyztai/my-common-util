@@ -540,6 +540,49 @@
         ]]>
     </select>
 
+    <select id="queryEtfLastest90Days" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+            with tmp_etf as (
+                select rank() over (partition by tene.stockCode order by tene.volume) - 1 rank_min
+                       , rank() over (partition by tene.stockCode order by tene.volume desc) - 1 rank_max
+                       , tene.*, te.stockName
+                from t_eastmoney_node_etf tene, t_etf te
+                where tene .stockCode = concat(te.stockType, '.', te.stockCode )
+                  -- and tene.date = '2026-02-13'
+                  -- and tene.stockCode = '0.159206'
+                  and `date` not like '9999%'
+                  and `date` > DATE_FORMAT(DATE_ADD(NOW(), INTERVAL -90 DAY), '%Y-%m-%d')
+                  and `date` < DATE_FORMAT(NOW(), '%Y-%m-%d')
+            )
+            , tmp_ans as (
+                select te.date
+                     , te.stockCode
+                     , te.`last`
+                     , temin.`last` last_min
+                     , round(te.`last`/temin.`last`*100) - 100 win_chg
+                     , round(te.volume/temin.volume, 0) vol_multi
+                     , te.chg
+                     , temin.date date_min
+                     , temin.volume vol_min
+                     , temin.stockCode sc_min
+                     , temin.stockName sn_min
+                from tmp_etf te
+                   , (select stockCode, stockName, `date`, volume, `last`  from tmp_etf where rank_min = 0 and chg < 9 and chg > -9) temin
+                where te.volume > temin.volume * 10
+                  -- and te.volume < temin.volume * 50
+                  and trim(te.stockCode) = trim(temin.stockCode)
+                  and te.`date` > temin.`date`
+            )
+            select concat(ta.stockCode, '\n',  t3.stockName) stockCode
+                   , concat(ta.date, '\n',  ta.date_min) date
+                   , concat(ta.last, '\n',  ta.last_min) last
+                   , concat('period-chg', ta.win_chg, '\nperiod-vol',  ta.vol_multi) ratioB
+            from tmp_ans ta, t_etf t3
+            where ta.stockCode = concat(t3.stockType , '.', t3.stockCode)
+            order by ta.date desc, t3.stockName
+        ]]>
+    </select>
+
     <delete id="delEtfEastMoneyTmpCalc">
         delete from t_eastmoney_tmp_calc
         where methodName = #{methodName}

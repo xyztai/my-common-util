@@ -349,6 +349,16 @@ public class ScheduledTasks {
             }
         }, executor);
 
+        CompletableFuture<Void> task27 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task etf queryEtfLastest90Days start");
+                agNewEastmoneyETFController.queryEtfLastest90Days();
+                log.info("task etf queryEtfLastest90Days end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
 
 
 //        log.info("task stock queryWinRatios start");
@@ -403,6 +413,7 @@ public class ScheduledTasks {
                 , task24
                 , task25
                 , task26
+                , task27
 
                 , task31
                 , task32
