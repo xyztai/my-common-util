@@ -576,7 +576,7 @@
             select concat(ta.stockCode, '\n',  t3.stockName) stockCode
                    , concat(ta.date, '\n',  ta.date_min) date
                    , concat(ta.last, '\n',  ta.last_min) last
-                   , concat('period-chg', ta.win_chg, '\nperiod-vol',  ta.vol_multi) ratioB
+                   , concat('p-chg:', ta.win_chg, '\np-vol:',  ta.vol_multi) ratioB
             from tmp_ans ta, t_etf t3
             where ta.stockCode = concat(t3.stockType , '.', t3.stockCode)
             order by ta.date desc, t3.stockName
