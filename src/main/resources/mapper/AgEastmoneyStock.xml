@@ -552,12 +552,13 @@
         ]]>
     </select>
 
-    <select id="queryLastest90Days" resultType="net.my.pojo.SpecialCarePoJo2">
+    <select id="query9VolInLastest90Days" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
             with tmp_ as(
                 select t.stockCode, t3.stockName , t.`date` , t.volume, t.last
                        , rank() over(partition by t.stockCode order by case when t.zf_ratio < 10 then t.volume else 99999999999 end) vol_min_rank
                        , rank() over(partition by t.stockCode order by t.volume desc) vol_max_rank
+                       , dense_rank() over(order by t.date desc) date_rn
                 from (
                     select ten.stockCode
                            , ten.`date`
@@ -577,15 +578,16 @@
                     and ten.last < 80
                 ) t , t_hs300 t3
                 where t.stockCode = concat(t3.stockType , '.', t3.stockCode)
-            )
+            ) -- select distinct `date`, date_rn from tmp_ where date_rn = 10
             select substring(t1.stockCode, 3) stockCode, concat(t2.`date`,'\n', t1.date,'\n', t1.stockName) date
                    , concat(t2.`last`,'\n', round(t2.volume/t1.volume,1)) last
                    , concat(round(t2.`volume`/10000),'\n', round(t1.volume/10000) ) ratioB
                    -- , round(t2.volume/t1.volume,1) highest_ratio
             from (select stockCode, stockName , `date` , volume from tmp_ where vol_min_rank = 1) t1,
-                 (select stockCode, stockName , `date` , volume, last from tmp_ where vol_max_rank = 1) t2
+                 (select stockCode, stockName , `date` , volume, last from tmp_ where vol_max_rank = 1) t2,
+                 (select distinct `date` from tmp_ where date_rn = 10) t3
             where t1.stockCode = t2.stockCode
-            -- and t2.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+            and t2.`date` >= t3.date -- DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 15 DAY), '%Y-%m-%d')
             and t2.volume > 9 * t1.volume
             order by t2.date desc
         ]]>

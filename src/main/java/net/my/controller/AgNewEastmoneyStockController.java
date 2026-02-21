@@ -467,20 +467,20 @@ public class AgNewEastmoneyStockController {
     }
 
     /**
-     * 10、近3个月的，成交量暴涨10倍的
+     * 10、近3个月的，成交量暴涨9倍的
      * @return
      */
-    @GetMapping("/eastmoney-90-days")
-    public BaseResponse queryLastest90Days() {
-        log.info("queryLastest90Days");
-        String key = "stock#" + "queryLastest90Days";
+    @GetMapping("/eastmoney-9-vol-in-90-days")
+    public BaseResponse query9VolInLastest90Days() {
+        log.info("query9VolInLastest90Days");
+        String key = "stock#" + "query9VolInLastest90Days";
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryLastest90Days();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.query9VolInLastest90Days();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
