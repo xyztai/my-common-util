@@ -109,110 +109,41 @@ public class AgNewEastmoneyStockController {
             }
         }
 
-        key0 = KEY_1;
-        res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
-        if(!CollectionUtils.isEmpty(res0)){
-            res0.forEach(f -> f.setRatioB("top3-next"));
-            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            for(SpecialCarePoJo2 poJo2 : res0) {
-                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-                tmp.setDate("");
-                tmp.setLast("");
-                tmp.setRatioB(poJo2.getRatioB());
-                tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
-                if(!stockExists.contains(tmp.getStockCode())) {
-                    res.add(tmp);
-                    stockExists.add(tmp.getStockCode());
+        for(String kk : Arrays.asList(KEY_1, KEY_11, KEY_3, KEY_5, KEY_6, KEY_10)) {
+            res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
+            if(!CollectionUtils.isEmpty(res0)){
+                switch (kk) {
+                    case KEY_1:
+                        res0.forEach(f -> f.setRatioB("top3-next"));
+                        break;
+                    case KEY_3:
+                        res0.forEach(f -> f.setRatioB("vol*3"));
+                        break;
+                    case KEY_5:
+                        res0.forEach(f -> f.setRatioB("s69"));
+                        break;
+                    case KEY_6:
+                        res0.forEach(f -> f.setRatioB("b69"));
+                        break;
+                    case KEY_10:
+                        res0.forEach(f -> f.setRatioB("vol*9"));
+                        break;
+                    case KEY_11:
+                        res0.forEach(f -> f.setRatioB("avg60"));
+                        break;
                 }
-            }
-        }
 
-        key0 = KEY_3;
-        res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
-        if(!CollectionUtils.isEmpty(res0)){
-            res0.forEach(f -> f.setRatioB("vol*3"));
-            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            for(SpecialCarePoJo2 poJo2 : res0) {
-                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-                tmp.setDate("");
-                tmp.setLast("");
-                tmp.setRatioB(poJo2.getRatioB());
-                tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
-                if(!stockExists.contains(tmp.getStockCode())) {
-                    res.add(tmp);
-                    stockExists.add(tmp.getStockCode());
-                }
-            }
-        }
-
-        key0 = KEY_5;
-        res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
-        if(!CollectionUtils.isEmpty(res0)){
-            res0.forEach(f -> f.setRatioB("s69"));
-            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            for(SpecialCarePoJo2 poJo2 : res0) {
-                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-                tmp.setDate("");
-                tmp.setLast("");
-                tmp.setRatioB(poJo2.getRatioB());
-                tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
-                if(!stockExists.contains(tmp.getStockCode())) {
-                    res.add(tmp);
-                    stockExists.add(tmp.getStockCode());
-                }
-            }
-        }
-
-        key0 = KEY_6;
-        res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
-        if(!CollectionUtils.isEmpty(res0)){
-            res0.forEach(f -> f.setRatioB("b69"));
-            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            for(SpecialCarePoJo2 poJo2 : res0) {
-                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-                tmp.setDate("");
-                tmp.setLast("");
-                tmp.setRatioB(poJo2.getRatioB());
-                tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
-                if(!stockExists.contains(tmp.getStockCode())) {
-                    res.add(tmp);
-                    stockExists.add(tmp.getStockCode());
-                }
-            }
-        }
-
-        key0 = KEY_10;
-        res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
-        if(!CollectionUtils.isEmpty(res0)){
-            res0.forEach(f -> f.setRatioB("vol*9"));
-            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            for(SpecialCarePoJo2 poJo2 : res0) {
-                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-                tmp.setDate("");
-                tmp.setLast("");
-                tmp.setRatioB(poJo2.getRatioB());
-                tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
-                if(!stockExists.contains(tmp.getStockCode())) {
-                    res.add(tmp);
-                    stockExists.add(tmp.getStockCode());
-                }
-            }
-        }
-
-        key0 = KEY_11;
-        res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
-        if(!CollectionUtils.isEmpty(res0)){
-            res0.forEach(f -> f.setRatioB("avg60"));
-            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            for(SpecialCarePoJo2 poJo2 : res0) {
-                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-                tmp.setDate("");
-                tmp.setLast("");
-                tmp.setRatioB(poJo2.getRatioB());
-                tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
-                if(!stockExists.contains(tmp.getStockCode())) {
-                    res.add(tmp);
-                    stockExists.add(tmp.getStockCode());
+                res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
+                for(SpecialCarePoJo2 poJo2 : res0) {
+                    SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+                    tmp.setDate("");
+                    tmp.setLast("");
+                    tmp.setRatioB(poJo2.getRatioB());
+                    tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
+                    if(!stockExists.contains(tmp.getStockCode())) {
+                        res.add(tmp);
+                        stockExists.add(tmp.getStockCode());
+                    }
                 }
             }
         }
