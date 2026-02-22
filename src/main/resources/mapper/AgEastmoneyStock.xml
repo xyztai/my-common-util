@@ -544,10 +544,17 @@
         <![CDATA[
         select distinct concat(t3.stockCode, '-', t3.stockName) stockCode, t1._date date, '' last
                , '' ratioB
-        from t_eastmoney_node_9_zhuan t1, t_hs300 t3
-        where t1._9_zhuan = '09'
-        and t1._date >= DATE_FORMAT(DATE_ADD(SYSDATE(), INTERVAL -5 DAY), '%Y-%m-%d')
+        from (
+            select tenz.*
+            	   , dense_rank() over(order by tenz._date desc) date_rn
+            from t_eastmoney_node_9_zhuan tenz, t_eastmoney_node_9_vol tenv
+            where tenz._date = tenv._date
+            and tenz._date > DATE_FORMAT(DATE_ADD(SYSDATE(), INTERVAL -90 DAY), '%Y-%m-%d')
+            and tenz._stockCode = tenv._stockCode
+        ) t1, t_hs300 t3
+        where date_rn <= 5
         and t1._stockCode = concat(t3.stockType , '.', t3.stockCode )
+        and (t1._direction = 'S' or t1._9_zhuan = '09')
         order by 1
         ]]>
     </select>
