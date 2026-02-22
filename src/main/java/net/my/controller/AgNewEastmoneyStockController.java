@@ -96,7 +96,16 @@ public class AgNewEastmoneyStockController {
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("近5_9v"));
             res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            res.addAll(res0);
+            for(SpecialCarePoJo2 poJo2 : res0) {
+                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+                tmp.setDate("");
+                tmp.setLast("");
+                tmp.setStockCode(tmp.getStockCode().substring(0, 6));
+                if(!stockExists.contains(tmp.getStockCode())) {
+                    res.add(tmp);
+                    stockExists.add(tmp.getStockCode());
+                }
+            }
         }
 
         key0 = KEY_1;
@@ -104,7 +113,16 @@ public class AgNewEastmoneyStockController {
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("top3-next"));
             res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            res.addAll(res0);
+            for(SpecialCarePoJo2 poJo2 : res0) {
+                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+                tmp.setDate("");
+                tmp.setLast("");
+                tmp.setStockCode(tmp.getStockCode().substring(0, 6));
+                if(!stockExists.contains(tmp.getStockCode())) {
+                    res.add(tmp);
+                    stockExists.add(tmp.getStockCode());
+                }
+            }
         }
 
         key0 = KEY_3;
@@ -112,7 +130,16 @@ public class AgNewEastmoneyStockController {
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("vol*3"));
             res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            res.addAll(res0);
+            for(SpecialCarePoJo2 poJo2 : res0) {
+                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+                tmp.setDate("");
+                tmp.setLast("");
+                tmp.setStockCode(tmp.getStockCode().substring(0, 6));
+                if(!stockExists.contains(tmp.getStockCode())) {
+                    res.add(tmp);
+                    stockExists.add(tmp.getStockCode());
+                }
+            }
         }
 
         key0 = KEY_5;
@@ -120,7 +147,16 @@ public class AgNewEastmoneyStockController {
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("s69"));
             res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            res.addAll(res0);
+            for(SpecialCarePoJo2 poJo2 : res0) {
+                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+                tmp.setDate("");
+                tmp.setLast("");
+                tmp.setStockCode(tmp.getStockCode().substring(0, 6));
+                if(!stockExists.contains(tmp.getStockCode())) {
+                    res.add(tmp);
+                    stockExists.add(tmp.getStockCode());
+                }
+            }
         }
 
         key0 = KEY_6;
@@ -128,7 +164,16 @@ public class AgNewEastmoneyStockController {
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("b69"));
             res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            res.addAll(res0);
+            for(SpecialCarePoJo2 poJo2 : res0) {
+                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+                tmp.setDate("");
+                tmp.setLast("");
+                tmp.setStockCode(tmp.getStockCode().substring(0, 6));
+                if(!stockExists.contains(tmp.getStockCode())) {
+                    res.add(tmp);
+                    stockExists.add(tmp.getStockCode());
+                }
+            }
         }
 
         key0 = KEY_10;
@@ -136,7 +181,16 @@ public class AgNewEastmoneyStockController {
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("vol*9"));
             res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            res.addAll(res0);
+            for(SpecialCarePoJo2 poJo2 : res0) {
+                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+                tmp.setDate("");
+                tmp.setLast("");
+                tmp.setStockCode(tmp.getStockCode().substring(0, 6));
+                if(!stockExists.contains(tmp.getStockCode())) {
+                    res.add(tmp);
+                    stockExists.add(tmp.getStockCode());
+                }
+            }
         }
 
         key0 = KEY_11;
@@ -144,7 +198,16 @@ public class AgNewEastmoneyStockController {
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("avg60"));
             res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
-            res.addAll(res0);
+            for(SpecialCarePoJo2 poJo2 : res0) {
+                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
+                tmp.setDate("");
+                tmp.setLast("");
+                tmp.setStockCode(tmp.getStockCode().substring(0, 6));
+                if(!stockExists.contains(tmp.getStockCode())) {
+                    res.add(tmp);
+                    stockExists.add(tmp.getStockCode());
+                }
+            }
         }
 
         return RestGeneralResponse.of(res);
