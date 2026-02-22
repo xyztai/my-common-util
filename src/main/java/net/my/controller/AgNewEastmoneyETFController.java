@@ -61,6 +61,19 @@ public class AgNewEastmoneyETFController {
     @Autowired
     private AgNewSinaController agNewSinaController;
 
+    // 1、根据最近一年的数据，判断今天能否进入 TOP10
+    private static final String KEY_1 = "etf#" + "special-care-days-eastmoney-365";
+    // 2、根据 TOP10 查看最近60天的情况
+    private static final String KEY_2 = "etf#" + "special-care-days-eastmoney-30";
+    // 3、找到成交量放大2倍及以上的stock
+    private static final String KEY_3 = "etf#" + "queryEastmoneyVolSuddenlyRised";
+    // 5、queryEtf9ZhuanS
+    private static final String KEY_5 = "etf#" + "queryEtf9ZhuanS";
+    // 6、queryEtf9ZhuanB
+    private static final String KEY_6 = "etf#" + "queryEtf9ZhuanB";
+    // 10、近3个月的，成交量暴涨10倍的
+    private static final String KEY_10 = "etf#" + "queryEtfLastest90Days";
+
 
     /**
      * 1、根据最近一年的数据，判断今天能否进入 TOP10
@@ -69,7 +82,7 @@ public class AgNewEastmoneyETFController {
     @GetMapping("/special-care-days-eastmoney-1-top10")
     public BaseResponse queryEastmoneyToday() {
         log.info("queryEastmoneyToday");
-        String key = "etf#" + "special-care-days-eastmoney-365";
+        String key = KEY_1;
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
@@ -102,7 +115,7 @@ public class AgNewEastmoneyETFController {
     @GetMapping("/special-care-days-eastmoney-60-top10")
     public BaseResponse queryEastmoneyLast60() {
         log.info("specialCareDaysEastmoney");
-        String key = "etf#" + "special-care-days-eastmoney-30";
+        String key = KEY_2;
         List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
@@ -135,7 +148,7 @@ public class AgNewEastmoneyETFController {
     @GetMapping("/volumn-suddenly-rised")
     public BaseResponse queryEastmoneyVolSuddenlyRised() {
         log.info("queryEastmoneyVolSuddenlyRised");
-        String key = "etf#" + "queryEastmoneyVolSuddenlyRised";
+        String key = KEY_3;
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
@@ -163,13 +176,47 @@ public class AgNewEastmoneyETFController {
 
 
     /**
-     * 5、queryEtf9ZhuanB
+     * 5、queryEtf9ZhuanS
+     * @return
+     */
+    @GetMapping("/queryEtf9ZhuanS")
+    public BaseResponse queryEtf9ZhuanS() {
+        log.info("queryEtf9ZhuanS");
+        String key = KEY_5;
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtf9ZhuanS();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("688")
+                        && !f.getStockCode().startsWith("689")
+                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+
+    /**
+     * 6、queryEtf9ZhuanB
      * @return
      */
     @GetMapping("/queryEtf9ZhuanB")
     public BaseResponse queryEtf9ZhuanB() {
         log.info("queryEtf9ZhuanB");
-        String key = "etf#" + "queryEtf9ZhuanB";
+        String key = KEY_6;
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
@@ -193,40 +240,6 @@ public class AgNewEastmoneyETFController {
             agEastmoneyEtfMapper.delEtfEastMoneyTmpCalc(methodName);
             List<EastmoneyTmpCalc> calcs = buyDataFromEastmoneys.stream().map(f -> f.toPO(methodName)).collect(Collectors.toList());
             agEastmoneyEtfMapper.saveEtfEastMoneyTmpCalc(calcs);
-        }
-
-        myCaffeineCache.put(key, buyDataFromEastmoneys);
-        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
-        return RestGeneralResponse.of(buyDataFromEastmoneys);
-    }
-
-
-    /**
-     * 6、queryEtf9ZhuanS
-     * @return
-     */
-    @GetMapping("/queryEtf9ZhuanS")
-    public BaseResponse queryEtf9ZhuanS() {
-        log.info("queryEtf9ZhuanS");
-        String key = "etf#" + "queryEtf9ZhuanS";
-        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
-        if(res != null) {
-            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
-            return RestGeneralResponse.of(res);
-        }
-
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtf9ZhuanS();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
-                .filter(f -> !f.getStockCode().startsWith("688")
-                        && !f.getStockCode().startsWith("689")
-                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
-            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
-            empty.setDate("--");
-            empty.setStockCode("--");
-            empty.setRatioB("--");
-            empty.setLast("--");
-            buyDataFromEastmoneys = Arrays.asList(empty);
         }
 
         myCaffeineCache.put(key, buyDataFromEastmoneys);
@@ -269,20 +282,20 @@ public class AgNewEastmoneyETFController {
 //    }
 
     /**
-     * 8、查询每个stock的最近的数据
+     * 10、近3个月的，成交量暴涨10倍的
      * @return
      */
-    @GetMapping("/eastmoney-latest-info")
-    public BaseResponse queryEastmoneyLatestInfo() {
-        log.info("queryEastmoneyLatestInfo");
-        String key = "etf#" + "queryEastmoneyLatestInfo";
+    @GetMapping("/etf-90-days")
+    public BaseResponse queryEtfLastest90Days() {
+        log.info("queryEtfLastest90Days");
+        String key = KEY_10;
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyLatestInfo();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfLastest90Days();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -302,20 +315,20 @@ public class AgNewEastmoneyETFController {
     }
 
     /**
-     * 10、近3个月的，成交量暴涨10倍的
+     * 99、查询每个stock的最近的数据
      * @return
      */
-    @GetMapping("/etf-90-days")
-    public BaseResponse queryEtfLastest90Days() {
-        log.info("queryEtfLastest90Days");
-        String key = "etf#" + "queryEtfLastest90Days";
+    @GetMapping("/eastmoney-latest-info")
+    public BaseResponse queryEastmoneyLatestInfo() {
+        log.info("queryEastmoneyLatestInfo");
+        String key = "etf#" + "queryEastmoneyLatestInfo";
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfLastest90Days();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyLatestInfo();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
