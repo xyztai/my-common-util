@@ -94,7 +94,7 @@ public class AgNewEastmoneyStockController {
             myCaffeineCache.put(key0, res0);
         }
         if(!CollectionUtils.isEmpty(res0)){
-            res0.forEach(f -> f.setRatioB("近5_9v"));
+            res0.forEach(f -> f.setRatioB("*近5_9v"));
             res0 = res0.stream()
                     .filter(f -> f.getDate().compareTo(limitDate) >= 0)
                     .sorted(Comparator.comparing(SpecialCarePoJo2::getDate).reversed())
@@ -125,7 +125,7 @@ public class AgNewEastmoneyStockController {
                     tmp.setLast("");
                     switch (kk) {
                         case KEY_1:
-                            tmp.setRatioB("top3");
+                            tmp.setRatioB("*top3");
                             break;
                         case KEY_3:
                             tmp.setRatioB("vol*3");
@@ -140,7 +140,7 @@ public class AgNewEastmoneyStockController {
                             tmp.setRatioB("vol*9");
                             break;
                         case KEY_11:
-                            tmp.setRatioB("avg60");
+                            tmp.setRatioB("*avg60");
                             break;
                     }
                     tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
