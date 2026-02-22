@@ -100,6 +100,7 @@ public class AgNewEastmoneyStockController {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
                 tmp.setLast("");
+                tmp.setRatioB(poJo2.getRatioB());
                 tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
                 if(!stockExists.contains(tmp.getStockCode())) {
                     res.add(tmp);
@@ -117,6 +118,7 @@ public class AgNewEastmoneyStockController {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
                 tmp.setLast("");
+                tmp.setRatioB(poJo2.getRatioB());
                 tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
                 if(!stockExists.contains(tmp.getStockCode())) {
                     res.add(tmp);
@@ -134,6 +136,7 @@ public class AgNewEastmoneyStockController {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
                 tmp.setLast("");
+                tmp.setRatioB(poJo2.getRatioB());
                 tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
                 if(!stockExists.contains(tmp.getStockCode())) {
                     res.add(tmp);
@@ -151,6 +154,7 @@ public class AgNewEastmoneyStockController {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
                 tmp.setLast("");
+                tmp.setRatioB(poJo2.getRatioB());
                 tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
                 if(!stockExists.contains(tmp.getStockCode())) {
                     res.add(tmp);
@@ -168,6 +172,7 @@ public class AgNewEastmoneyStockController {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
                 tmp.setLast("");
+                tmp.setRatioB(poJo2.getRatioB());
                 tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
                 if(!stockExists.contains(tmp.getStockCode())) {
                     res.add(tmp);
@@ -185,6 +190,7 @@ public class AgNewEastmoneyStockController {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
                 tmp.setLast("");
+                tmp.setRatioB(poJo2.getRatioB());
                 tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
                 if(!stockExists.contains(tmp.getStockCode())) {
                     res.add(tmp);
@@ -202,6 +208,7 @@ public class AgNewEastmoneyStockController {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
                 tmp.setLast("");
+                tmp.setRatioB(poJo2.getRatioB());
                 tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
                 if(!stockExists.contains(tmp.getStockCode())) {
                     res.add(tmp);
