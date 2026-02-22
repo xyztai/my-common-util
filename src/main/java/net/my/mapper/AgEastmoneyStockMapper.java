@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface AgEastmoneyStockMapper {
+    String getLimitDate();
     // hs300 数据
     List<HsStockPoJo> getHs300List();
     EastmoneyNode getMaxEastMoneyNode(@Param("stockCode") String stockCode);
@@ -23,11 +24,11 @@ public interface AgEastmoneyStockMapper {
     int batchUpdateExpmaEastmoney(List<EastmoneyNode> node);
     List<SpecialCarePoJo2> queryEastmoneyToday();
     List<SpecialCarePoJo2> queryEastmoneyLast30();
-    List<SpecialCarePoJo2> queryEastmoneyVolSuddenlyRised();
+    List<SpecialCarePoJo2> queryEastmoneyVolSuddenlyRisedTriple();
     List<SpecialCarePoJo2> query9ZhuanB();
     List<SpecialCarePoJo2> query9ZhuanS();
     List<SpecialCarePoJo2> queryEastmoneyLatestInfo();
-    List<SpecialCarePoJo2> queryLastest9Zhuan();
+    List<SpecialCarePoJo2> queryLastest9Zhuan9Vol();
     List<SpecialCarePoJo2> query9VolInLastest90Days();
     List<SpecialCarePoJo2> queryAvg60();
 }

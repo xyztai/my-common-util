@@ -238,9 +238,9 @@ public class ScheduledTasks {
 
         CompletableFuture<Void> task13 = CompletableFuture.runAsync(() -> {
             try {
-                log.info("task stock queryEastmoneyVolSuddenlyRised start");
-                agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRised();
-                log.info("task stock queryEastmoneyVolSuddenlyRised end");
+                log.info("task stock queryEastmoneyVolSuddenlyRisedTriple start");
+                agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRisedTriple();
+                log.info("task stock queryEastmoneyVolSuddenlyRisedTriple end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }

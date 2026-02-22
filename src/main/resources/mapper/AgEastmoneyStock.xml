@@ -4,6 +4,14 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="net.my.mapper.AgEastmoneyStockMapper">
 
+    <select id="getLimitDate" resultType="java.lang.String">
+        select distinct date
+        from t_eastmoney_node
+        where `date` not like '99999%'
+        order by date desc
+        limit 1 offset 5
+    </select>
+
     <select id="getHs300List" resultType="net.my.pojo.HsStockPoJo">
         select stockCode, stockType, stockName
         from t_hs300
@@ -250,7 +258,7 @@
         ]]>
     </select>
 
-    <select id="queryEastmoneyVolSuddenlyRised" resultType="net.my.pojo.SpecialCarePoJo2">
+    <select id="queryEastmoneyVolSuddenlyRisedTriple" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
         select concat(t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
              , case when t1.end_buy_date = 1 then concat('慎重\n', round(t1.to_buy, 3)) else concat('历史\n', round(t1.to_buy, 3)) end ratioB
@@ -540,7 +548,7 @@
         ]]>
     </select>
 
-    <select id="queryLastest9Zhuan" resultType="net.my.pojo.SpecialCarePoJo2">
+    <select id="queryLastest9Zhuan9Vol" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
         select distinct concat(t3.stockCode, '-', t3.stockName) stockCode, t1._date date, '' last
                , '' ratioB
