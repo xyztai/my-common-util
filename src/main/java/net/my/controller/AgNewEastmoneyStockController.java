@@ -95,7 +95,7 @@ public class AgNewEastmoneyStockController {
         }
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("近5_9v"));
-            res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
+            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
             for(SpecialCarePoJo2 poJo2 : res0) {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
@@ -112,7 +112,7 @@ public class AgNewEastmoneyStockController {
         res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("top3-next"));
-            res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
+            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
             for(SpecialCarePoJo2 poJo2 : res0) {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
@@ -129,7 +129,7 @@ public class AgNewEastmoneyStockController {
         res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("vol*3"));
-            res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
+            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
             for(SpecialCarePoJo2 poJo2 : res0) {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
@@ -146,7 +146,7 @@ public class AgNewEastmoneyStockController {
         res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("s69"));
-            res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
+            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
             for(SpecialCarePoJo2 poJo2 : res0) {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
@@ -163,7 +163,7 @@ public class AgNewEastmoneyStockController {
         res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("b69"));
-            res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
+            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
             for(SpecialCarePoJo2 poJo2 : res0) {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
@@ -180,7 +180,7 @@ public class AgNewEastmoneyStockController {
         res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("vol*9"));
-            res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
+            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
             for(SpecialCarePoJo2 poJo2 : res0) {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
@@ -197,7 +197,7 @@ public class AgNewEastmoneyStockController {
         res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("avg60"));
-            res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
+            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
             for(SpecialCarePoJo2 poJo2 : res0) {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate("");
