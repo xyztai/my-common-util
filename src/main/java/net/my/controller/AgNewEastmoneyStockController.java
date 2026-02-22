@@ -114,7 +114,7 @@ public class AgNewEastmoneyStockController {
             if(!CollectionUtils.isEmpty(res0)){
                 switch (kk) {
                     case KEY_1:
-                        res0.forEach(f -> f.setRatioB("top3-next"));
+                        res0.forEach(f -> f.setRatioB("top3"));
                         break;
                     case KEY_3:
                         res0.forEach(f -> f.setRatioB("vol*3"));
