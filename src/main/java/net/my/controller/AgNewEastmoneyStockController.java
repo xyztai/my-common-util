@@ -112,33 +112,31 @@ public class AgNewEastmoneyStockController {
         for(String kk : Arrays.asList(KEY_1, KEY_11, KEY_3, KEY_5, KEY_6, KEY_10)) {
             res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
             if(!CollectionUtils.isEmpty(res0)){
-                switch (kk) {
-                    case KEY_1:
-                        res0.forEach(f -> f.setRatioB("top3"));
-                        break;
-                    case KEY_3:
-                        res0.forEach(f -> f.setRatioB("vol*3"));
-                        break;
-                    case KEY_5:
-                        res0.forEach(f -> f.setRatioB("s69"));
-                        break;
-                    case KEY_6:
-                        res0.forEach(f -> f.setRatioB("b69"));
-                        break;
-                    case KEY_10:
-                        res0.forEach(f -> f.setRatioB("vol*9"));
-                        break;
-                    case KEY_11:
-                        res0.forEach(f -> f.setRatioB("avg60"));
-                        break;
-                }
-
                 res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
                 for(SpecialCarePoJo2 poJo2 : res0) {
                     SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                     tmp.setDate("");
                     tmp.setLast("");
-                    tmp.setRatioB(poJo2.getRatioB());
+                    switch (kk) {
+                        case KEY_1:
+                            tmp.setRatioB("top3");
+                            break;
+                        case KEY_3:
+                            tmp.setRatioB("vol*3");
+                            break;
+                        case KEY_5:
+                            tmp.setRatioB("s69");
+                            break;
+                        case KEY_6:
+                            tmp.setRatioB("b69");
+                            break;
+                        case KEY_10:
+                            tmp.setRatioB("vol*9");
+                            break;
+                        case KEY_11:
+                            tmp.setRatioB("avg60");
+                            break;
+                    }
                     tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
                     if(!stockExists.contains(tmp.getStockCode())) {
                         res.add(tmp);
