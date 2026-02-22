@@ -152,6 +152,10 @@ public class AgNewEastmoneyStockController {
             }
         }
 
+        if(!CollectionUtils.isEmpty(res)) {
+            log.info("easySnapshot:{}"
+                    , String.join(",", res.stream().map(SpecialCarePoJo2::getStockCode).collect(Collectors.toList())));
+        }
         return RestGeneralResponse.of(res);
     }
 
