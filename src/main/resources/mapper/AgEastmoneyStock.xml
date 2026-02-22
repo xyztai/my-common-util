@@ -9,7 +9,7 @@
         from t_eastmoney_node
         where `date` not like '99999%'
         order by date desc
-        limit 1 offset 5
+        limit 1 offset 4
     </select>
 
     <select id="getHs300List" resultType="net.my.pojo.HsStockPoJo">
