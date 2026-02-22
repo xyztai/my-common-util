@@ -412,7 +412,7 @@ public class AgNewEastmoneyStockController {
 //                tmp.setDate(codes.get(i).getDate());
                 tmp.setStockCode(codes.get(i).getStockCode().substring(0, 6));
 //                tmp.setLast("No." + i);
-                tmp.setRatioB("近5_S69_B9_9vol");
+                tmp.setRatioB("近5_9v");
                 res3.add(0, tmp);
             }
         }
