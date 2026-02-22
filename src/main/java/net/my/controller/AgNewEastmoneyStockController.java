@@ -95,10 +95,13 @@ public class AgNewEastmoneyStockController {
         }
         if(!CollectionUtils.isEmpty(res0)){
             res0.forEach(f -> f.setRatioB("近5_9v"));
-            res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
+            res0 = res0.stream()
+                    .filter(f -> f.getDate().compareTo(limitDate) >= 0)
+                    .sorted(Comparator.comparing(SpecialCarePoJo2::getDate).reversed())
+                    .collect(Collectors.toList());
             for(SpecialCarePoJo2 poJo2 : res0) {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-                tmp.setDate("");
+                tmp.setDate(poJo2.getDate().substring(0,10));
                 tmp.setLast("");
                 tmp.setRatioB(poJo2.getRatioB());
                 tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
@@ -112,10 +115,13 @@ public class AgNewEastmoneyStockController {
         for(String kk : Arrays.asList(KEY_1, KEY_11, KEY_3, KEY_5, KEY_6, KEY_10)) {
             res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
             if(!CollectionUtils.isEmpty(res0)){
-                res0 = res0.stream().filter(f -> f.getDate().compareTo(limitDate) >= 0).collect(Collectors.toList());
+                res0 = res0.stream()
+                        .filter(f -> f.getDate().compareTo(limitDate) >= 0)
+                        .sorted(Comparator.comparing(SpecialCarePoJo2::getDate).reversed())
+                        .collect(Collectors.toList());
                 for(SpecialCarePoJo2 poJo2 : res0) {
                     SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-                    tmp.setDate("");
+                    tmp.setDate(poJo2.getDate().substring(0,10));
                     tmp.setLast("");
                     switch (kk) {
                         case KEY_1:
