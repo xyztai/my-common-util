@@ -86,6 +86,8 @@ public class AgNewEastmoneyStockController {
         List<SpecialCarePoJo2> res = new ArrayList<>();
         String limitDate = agEastmoneyStockMapper.getLimitDate();
 
+        Map<String, List<SpecialCarePoJo2>> tmpMap = new HashMap<>();
+
         // 0、先查询9转+9vol
         String key0 = "stock#" + "queryLastest9Zhuan";
         List<SpecialCarePoJo2> res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
@@ -99,17 +101,21 @@ public class AgNewEastmoneyStockController {
                     .filter(f -> f.getDate().compareTo(limitDate) >= 0)
                     .sorted(Comparator.comparing(SpecialCarePoJo2::getDate).reversed())
                     .collect(Collectors.toList());
+
+            List<SpecialCarePoJo2> tmpList = new ArrayList<>();
             for(SpecialCarePoJo2 poJo2 : res0) {
                 SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                 tmp.setDate(poJo2.getDate().substring(0,10));
                 tmp.setLast("");
                 tmp.setRatioB(poJo2.getRatioB());
                 tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
-                if(!stockExists.contains(tmp.getStockCode())) {
-                    res.add(tmp);
-                    stockExists.add(tmp.getStockCode());
-                }
+                tmpList.add(tmp);
+//                if(!stockExists.contains(tmp.getStockCode())) {
+//                    res.add(tmp);
+//                    stockExists.add(tmp.getStockCode());
+//                }
             }
+            tmpMap.put(key0, tmpList);
         }
 
         for(String kk : Arrays.asList(KEY_1, KEY_11, KEY_3, KEY_5, KEY_6, KEY_10)) {
@@ -119,6 +125,8 @@ public class AgNewEastmoneyStockController {
                         .filter(f -> f.getDate().compareTo(limitDate) >= 0)
                         .sorted(Comparator.comparing(SpecialCarePoJo2::getDate).reversed())
                         .collect(Collectors.toList());
+
+                List<SpecialCarePoJo2> tmpList = new ArrayList<>();
                 for(SpecialCarePoJo2 poJo2 : res0) {
                     SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
                     tmp.setDate(poJo2.getDate().substring(0,10));
@@ -144,6 +152,21 @@ public class AgNewEastmoneyStockController {
                             break;
                     }
                     tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
+                    tmpList.add(tmp);
+//                    if(!stockExists.contains(tmp.getStockCode())) {
+//                        res.add(tmp);
+//                        stockExists.add(tmp.getStockCode());
+//                    }
+                }
+                tmpMap.put(kk, tmpList);
+            }
+        }
+
+        // 这里是对所有的数据进行排序处理，优先看avg，然后看top3，再看"9转+9vol"，剩下的就按照顺序来吧
+        for(String kk : Arrays.asList(KEY_11, KEY_1, key0, KEY_3, KEY_5, KEY_6, KEY_10)) {
+            List<SpecialCarePoJo2> tmpList = tmpMap.get(kk);
+            if(!CollectionUtils.isEmpty(tmpList)) {
+                for(SpecialCarePoJo2 tmp : tmpList) {
                     if(!stockExists.contains(tmp.getStockCode())) {
                         res.add(tmp);
                         stockExists.add(tmp.getStockCode());
@@ -151,6 +174,7 @@ public class AgNewEastmoneyStockController {
                 }
             }
         }
+
 
         if(!CollectionUtils.isEmpty(res)) {
             log.info("easySnapshot:{}"
