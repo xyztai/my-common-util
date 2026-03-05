@@ -3,6 +3,13 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="net.my.mapper.AgEastmoneyIndexMapper">
+    <select id="getStr" resultType="java.lang.String">
+        select str
+        from t_eastmoney_node_str
+        where stockCode = #{stockCode}
+        order by id desc
+        limit 1
+    </select>
 
     <insert id="saveIndexEastMoneyDatas" parameterType="java.util.List">
         insert into t_eastmoney_node_index(`date`, `stockCode`, `infoRaw`)
