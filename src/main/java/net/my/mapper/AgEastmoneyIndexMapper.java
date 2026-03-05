@@ -8,4 +8,5 @@ import java.util.List;
 @Repository
 public interface AgEastmoneyIndexMapper {
     int saveIndexEastMoneyDatas(List<EastmoneyNode> eastmoneyNodes);
+    int updateIndexEastMoneyDatas();
 }

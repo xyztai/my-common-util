@@ -92,6 +92,10 @@ public class AgNewEastmoneyIndexController {
             startNum += stepNum;
         }
 
+        log.info("阶段1-非99999数据-开始更新基础字段");
+        // 更新基础字段
+        agEastmoneyIndexMapper.updateIndexEastMoneyDatas();
+
         return BaseResponse.OK;
     }
 
