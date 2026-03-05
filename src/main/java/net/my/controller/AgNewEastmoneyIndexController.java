@@ -52,6 +52,7 @@ public class AgNewEastmoneyIndexController {
         String url = String.format(EASTMONEY_URL_FORMAT_QFQ, zqdm);
         List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
         try {
+            log.info("/historyAll/{}, url={}", zqdm, url);
             String res = restTemplate.getForObject(url, String.class);
             List<String> klines = new ArrayList<>();
             if(!StringUtils.isEmpty(res)) {
