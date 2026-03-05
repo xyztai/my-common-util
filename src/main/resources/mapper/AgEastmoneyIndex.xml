@@ -37,4 +37,18 @@
         where `open` is null
     </update>
 
+    <select id="xxxx" >
+        select tt.date
+                , chg
+                , rank() over (order by chg) chg_rank
+        from (
+            select *
+            from t_eastmoney_node_index
+            order by 1 desc
+            limit 250
+        ) tt
+        order by chg_rank
+        limit 20
+    </select>
+    
 </mapper>
