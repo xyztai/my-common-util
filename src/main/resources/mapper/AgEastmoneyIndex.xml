@@ -50,5 +50,32 @@
         order by chg_rank
         limit 20
     </select>
+
+    <select id="xxx1">
+        select tt.date
+        , chg, chg_chg_1
+        , last_next_5
+        , last_next_10
+        , last_next_15
+        , round((GREATEST(last_next_5, last_next_10, last_next_15)/`last` - 1 ) * 100, 1) greast_ratio
+        , rank() over (order by chg) chg_rank
+        from (
+        select t.date, t.chg , t.`last`
+        , lead(t.`chg`, 1) over (order by t.`date` ) chg_chg_1
+        , lead(t.`last`, 5) over (order by t.`date` ) last_next_5
+        , lead(t.`last`, 10) over (order by t.`date` ) last_next_10
+        , lead(t.`last`, 15) over (order by t.`date` ) last_next_15
+        , lead(t.date) over (order by t.`date` ) date_pre
+        , lead(t.date, 1) over (order by t.`date` ) date_next_1
+        , lead(t.date, 5) over (order by t.`date` ) date_next_5
+        from t_eastmoney_node_index t
+        where `date` < '2026'
+        order by 1 desc
+        limit 250
+        ) tt
+        where last_next_15 is not NULL
+        order by chg_rank
+        limit 20
+    </select>
     
 </mapper>
