@@ -12,7 +12,7 @@
     </select>
 
     <insert id="saveIndexEastMoneyDatas" parameterType="java.util.List">
-        insert into t_eastmoney_node_index(`date`, `stockCode`, `infoRaw`)
+        replace into t_eastmoney_node_index(`date`, `stockCode`, `infoRaw`)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.date}, #{item.stockCode}, #{item.infoRaw}
