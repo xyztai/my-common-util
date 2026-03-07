@@ -597,5 +597,142 @@
         </foreach>
     </insert>
 
+    <!-- 1、当天前三；2、当天chg>2%；3、相较于前一天，成交量放量25%~100%；4、前一天的chg<2%；5、前一天不在前三；-->
+    <select id="investEtf" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+            with tmp_date_1 as (
+           		select distinct date from t_eastmoney_node_etf where date not like '9999%' order by 1 desc limit 1
+       		)
+            , tmp_date_2 as (
+           		select distinct date from t_eastmoney_node_etf where date not like '9999%' order by 1 desc limit 1 offset 1
+       		)
+       		, tmp_rank_1 as (
+	            select tene.`date`
+	                   , tene.chg
+	                   , tene.volume
+	                   , rank() over (partition by tene.date order by tene.chg desc, tene.stockCode ) chg_rank
+	                   , tene.stockCode
+	                   , t3.stockName
+	            from t_eastmoney_node_etf tene , t_etf t3, tmp_date_1 t5
+	            where 1 = 1
+	            and tene.`date` = t5.`date`
+	            and tene.stockCode = concat(t3.stockType , '.', t3.stockCode )
+	            order by chg_rank, 1 desc
+       		)
+       		, tmp_rank_2 as (
+	            select tene.`date`
+	                   , tene.chg
+	                   , tene.volume
+	                   , rank() over (partition by tene.date order by tene.chg desc, tene.stockCode ) chg_rank
+	                   , tene.stockCode
+	                   , t3.stockName
+	            from t_eastmoney_node_etf tene , t_etf t3, tmp_date_2 t5
+	            where 1 = 1
+	            and tene.`date` = t5.`date`
+	            and tene.stockCode = concat(t3.stockType , '.', t3.stockCode )
+	            order by chg_rank, 1 desc
+       		)
+       		select t11.`date`
+       		       , concat(t11.stockCode, '-', t11.stockName)
+       		       , concat(t11.chg, '-', t11.chg_rank)
+       		       , concat(case when t11.chg_rank <= 3
+       		                   and t11.chg > 2
+       		                   and t11.volume BETWEEN t22.volume * 1.25 and t22.volume * 2
+       		                   and t22.chg < 2
+       		                   and t22.chg_rank > 3
+       		               then '*got-' else '' end, 'next-vol: ', round(t11.volume * 1.25/10000), 'W ~ ', round(t11.volume * 2), 'W') volume_range
+       		from tmp_rank_1 t11, tmp_rank_2 t22
+       		where t11.stockCode = t22.stockCode
+       		order by t11.chg_rank
+        ]]>
+    </select>
+
+
+    <!-- 预测概率 -->
+    <select id="xxxx5">
+        <![CDATA[
+            with tmp_res as (
+                select tene.`date`
+                        , lag(tene.date, 1) over (partition by tene.stockCode order by tene.`date` ) date_pre_1
+                        , tene.stockCode
+                        , t3.stockName
+                        , tene.chg
+                        , tene.`last`
+                        , tene.volume
+                        , lag(tene.`volume`, 1) over (partition by tene.stockCode order by tene.`date` ) volume_pre_1
+                        , round(tene.volume/lag(tene.`volume`, 1) over (partition by tene.stockCode order by tene.`date` ) *100, 1) - 100 vol_ratio_1
+                        , round(lead(tene.`last`, 10) over (partition by tene.stockCode order by tene.`date` )/tene.`last`*100, 1) - 100 chg_next_10
+                        , lag(tene.`chg`, 1) over (partition by tene.stockCode order by tene.`date` ) chg_pre_1
+                        , round(lead(tene.`high`, 1) over (partition by tene.stockCode order by tene.`date` )/tene.`last`*100, 1) - 100 high_next_1
+                        , lead(tene.`chg`, 1) over (partition by tene.stockCode order by tene.`date` ) chg_next_1
+                        , lead(tene.`chg`, 2) over (partition by tene.stockCode order by tene.`date` ) chg_next_2
+                        , rank() over (partition by tene.date order by tene.chg desc, tene.stockCode ) chg_rank
+                        , round(tene.volume/least(lag(tene.`volume`, 1) over (partition by tene.stockCode order by tene.`date` )
+                                , lag(tene.`volume`, 2) over (partition by tene.stockCode order by tene.`date` )
+                                , lag(tene.`volume`, 3) over (partition by tene.stockCode order by tene.`date` )
+                                , lag(tene.`volume`, 4) over (partition by tene.stockCode order by tene.`date` )
+                                , lag(tene.`volume`, 5) over (partition by tene.stockCode order by tene.`date` )
+                                , lag(tene.`volume`, 6) over (partition by tene.stockCode order by tene.`date` )
+                                , lag(tene.`volume`, 7) over (partition by tene.stockCode order by tene.`date` )
+                                , lag(tene.`volume`, 8) over (partition by tene.stockCode order by tene.`date` )
+                                , lag(tene.`volume`, 9) over (partition by tene.stockCode order by tene.`date` )
+                                , lag(tene.`volume`, 10) over (partition by tene.stockCode order by tene.`date` )
+                        ), 1) vol_multi
+                from t_eastmoney_node_etf tene , t_etf t3
+                where 1 = 1
+                -- and t3.stockName not like '0%'
+                and tene.`date` not like '9999%'
+                and tene.stockCode = concat(t3.stockType , '.', t3.stockCode )
+                -- and tene.chg > 2
+            )
+            , tmp_target_res as (
+                select t1.*
+                from tmp_res t1
+                where 1 = 1
+                and t1.chg_rank <= 3
+                and chg_pre_1 < 2
+                -- and t1.chg > 2
+            )
+            , tmp_ans as (
+	            select t1.*
+	                   , GREATEST(chg_next_1, chg_next_1+chg_next_2) great
+	            from tmp_target_res t1
+	            where not exists(
+	            	select 1
+	            	from tmp_res t2
+	            	where t2.chg_rank <= 3
+	            	-- and t2.chg > 2
+	            	and t1.date_pre_1 = t2.`date`
+	            	and t1.stockCode  = t2.stockCode
+	            )
+	        )
+	        select substr(date, 1, 4) 'year_', count(distinct date) date_sum
+	               , concat(round(sum(case when great > 0 then 1 else 0 end)/count(1)*100, 1), '%') win_cnt
+	               , concat(round(sum(case when great > 1 then 1 else 0 end)/sum(case when abs(great) > 1 then 1 else 0 end)*100, 1), '%') win_1_cnt
+	               , concat(round(sum(case when great > 2 then 1 else 0 end)/sum(case when abs(great) > 2 then 1 else 0 end)*100, 1), '%') win_2_cnt
+	               , concat(round(sum(case when great > 3 then 1 else 0 end)/sum(case when abs(great) > 3 then 1 else 0 end)*100, 1), '%') win_3_cnt
+	               , count(1) cnt
+	               , sum(case when great > 1 then 1 else 0 end) win_1_cnt
+	               , sum(case when great < -1 then 1 else 0 end) loss_1_cnt
+	               , sum(case when great > 2 then 1 else 0 end) win_2_cnt
+	               , sum(case when great < -2 then 1 else 0 end) loss_2_cnt
+	               , sum(case when great > 3 then 1 else 0 end) win_3_cnt
+	               , sum(case when great < -3 then 1 else 0 end) loss_3_cnt
+	        from tmp_ans
+	        where 1 = 1
+	        and date > '2020'
+	        and chg > 2
+	        and vol_ratio_1 between 25 and 100
+	        -- and vol_multi > 3
+	        -- and vol_multi < 20
+	        -- and great > 5
+	        -- and great > 3
+	        -- and date >= '2025-01-01'
+	        group by substr(date, 1, 4)
+	        order by 1 desc;
+            -- order by 1 desc, chg_rank;
+        ]]>
+    </select>
+
 
 </mapper>
