@@ -77,5 +77,94 @@
         order by chg_rank
         limit 20
     </select>
-    
+
+    <select id="xxxx2">
+        <![CDATA[
+            with tmp_res as (
+                select tene.`date`
+                        , lag(tene.date, 1) over (partition by tene.stockCode order by tene.`date` ) date_pre_1
+                        , tene.stockCode, t3.stockName
+                        , tene.chg
+                        , tene.`last`
+                        , round(lead(tene.`last`, 10) over (partition by tene.stockCode order by tene.`date` )/tene.`last`*100, 1) - 100 chg_next_10
+                        , lag(tene.`chg`, 1) over (partition by tene.stockCode order by tene.`date` ) chg_pre_1
+                        , round(lead(tene.`high`, 1) over (partition by tene.stockCode order by tene.`date` )/tene.`last`*100, 1) - 100 high_next_1
+                        , lead(tene.`chg`, 1) over (partition by tene.stockCode order by tene.`date` ) chg_next_1
+                        , lead(tene.`chg`, 2) over (partition by tene.stockCode order by tene.`date` ) chg_next_2
+                        , rank() over (partition by tene.date order by tene.chg desc, tene.stockCode ) chg_rank
+                from t_eastmoney_node_etf tene , t_etf t3
+                where 1 = 1
+                -- and t3.stockName not like '0%'
+                and tene.`date` not like '9999%'
+                and tene.stockCode = concat(t3.stockType , '.', t3.stockCode )
+                -- and tene.chg > 2
+            )
+            , tmp_target_res as (
+                select t1.*
+                from tmp_res t1
+                where -- t1.chg_rank in (2, 3)
+                 chg_pre_1 > 0
+                and t1.chg > 2
+            )
+            select t1.*, GREATEST(chg_next_1, chg_next_2) great
+            from tmp_target_res t1
+            where not exists(select 1 from tmp_res t2 where t2.chg_rank <= 3 and t2.chg > 2 and t1.date_pre_1 = t2.`date` and t1.stockCode  = t2.stockCode )
+            order by 1 desc, chg_rank;
+        ]]>
+    </select>
+
+    <select id="xxx3">
+        <![CDATA[
+            select
+                    tt.date
+                    , tt.date_pre_1
+                    , tt.`last`
+                    , tt.volume
+                    , tt.volume_pre_1
+                    , tt.chg
+                    , tt.chg_pre_1
+                    , tt.chg + tt.chg_pre_1
+                    , round((GREATEST(
+                        case when last_next_1 is null then -100 else last_next_1 end
+                        , case when last_next_2 is null then -100 else last_next_2 end
+                        , case when last_next_3 is null then -100 else last_next_3 end
+                        , case when last_next_4 is null then -100 else last_next_4 end
+                        , case when last_next_5 is null then -100 else last_next_5 end
+                       -- , case when last_next_6 is null then -100 else last_next_6 end
+                       -- , case when last_next_7 is null then -100 else last_next_7 end
+                       -- , case when last_next_8 is null then -100 else last_next_8 end
+                       -- , case when last_next_9 is null then -100 else last_next_9 end
+                       -- , case when last_next_10 is null then -100 else last_next_10 end
+                      )/`last` - 1 ) * 100, 1) greast_ratio
+            from (
+                select
+                        t.date
+                        , t.`last`
+                        , t.volume
+                        , t.chg
+                        , lag(t.`volume`, 1) over (order by t.`date` ) volume_pre_1
+                        , lag(t.`chg`, 1) over (order by t.`date` ) chg_pre_1
+                        , lag(t.date, 1) over (order by t.`date` ) date_pre_1      -- 前一天日期
+                        , lead(t.`last`, 1) over (order by t.`date` ) last_next_1
+                        , lead(t.`last`, 2) over (order by t.`date` ) last_next_2
+                        , lead(t.`last`, 3) over (order by t.`date` ) last_next_3
+                        , lead(t.`last`, 4) over (order by t.`date` ) last_next_4
+                        , lead(t.`last`, 5) over (order by t.`date` ) last_next_5
+                        , lead(t.`last`, 6) over (order by t.`date` ) last_next_6
+                        , lead(t.`last`, 7) over (order by t.`date` ) last_next_7
+                        , lead(t.`last`, 8) over (order by t.`date` ) last_next_8
+                        , lead(t.`last`, 9) over (order by t.`date` ) last_next_9
+                        , lead(t.`last`, 10) over (order by t.`date` ) last_next_10
+                from t_eastmoney_node_index t
+                where `date` between DATE_FORMAT(DATE_ADD(STR_TO_DATE('2026-03-07', '%Y-%m-%d'), INTERVAL -250 DAY), '%Y-%m-%d') and '2026-03-07'
+                order by chg -- case when chg_pre_1 is null then 1000 else chg_pre_1 end
+                limit 20
+            ) tt
+            where last_next_1 is not null
+            -- and volume > volume_pre_1
+            order by chg;
+          --  order by chg_pre_1 + chg;
+        ]]>
+    </select>
+
 </mapper>
