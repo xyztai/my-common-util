@@ -632,15 +632,16 @@
 	            and tene.stockCode = concat(t3.stockType , '.', t3.stockCode )
 	            order by chg_rank, 1 desc
        		)
-       		select t11.`date`
-       		       , concat(t11.stockCode, '-', t11.stockName)
-       		       , concat(t11.chg, '-', t11.chg_rank)
+       		select
+       		       concat(t11.stockCode, '-', t11.stockName) stockCode
+       		       , t11.`date` date
+       		       , concat(t11.chg, '-', t11.chg_rank) last
        		       , concat(case when t11.chg_rank <= 3
        		                   and t11.chg > 2
        		                   and t11.volume BETWEEN t22.volume * 1.25 and t22.volume * 2
        		                   and t22.chg < 2
        		                   and t22.chg_rank > 3
-       		               then '*got-' else '' end, 'next-vol: ', round(t11.volume * 1.25/10000), 'W ~ ', round(t11.volume * 2), 'W') volume_range
+       		               then '*got-' else '' end, 'next-vol: ', round(t11.volume * 1.25/10000), 'W ~ ', round(t11.volume * 2), 'W') ratioB
        		from tmp_rank_1 t11, tmp_rank_2 t22
        		where t11.stockCode = t22.stockCode
        		order by t11.chg_rank
