@@ -641,7 +641,7 @@
        		                   and t11.volume BETWEEN t22.volume * 1.25 and t22.volume * 2
        		                   and t22.chg < 2
        		                   and t22.chg_rank > 3
-       		               then '*got-' else '' end, 'next-vol: ', round(t11.volume * 1.25/10000), 'W ~ ', round(t11.volume * 2), 'W') ratioB
+       		               then '*got-' else '' end, 'next-vol: ', round(t11.volume * 1.25/10000), 'W ~ ', round(t11.volume * 2/10000), 'W') ratioB
        		from tmp_rank_1 t11, tmp_rank_2 t22
        		where t11.stockCode = t22.stockCode
        		order by t11.chg_rank
