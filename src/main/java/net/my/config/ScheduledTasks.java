@@ -299,6 +299,16 @@ public class ScheduledTasks {
 
 
         // 查询 ETF
+        CompletableFuture<Void> task20 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task etf investEtfChgTop3 start");
+                agNewEastmoneyETFController.investEtfChgTop3();
+                log.info("task etf investEtfChgTop3 end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
         CompletableFuture<Void> task21 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf queryEastmoneyToday start");
@@ -418,6 +428,7 @@ public class ScheduledTasks {
                 , task17
                 , task18
 
+                , task20
                 , task21
                 , task22
                 , task23
