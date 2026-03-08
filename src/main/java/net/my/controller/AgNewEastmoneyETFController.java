@@ -75,10 +75,12 @@ public class AgNewEastmoneyETFController {
     private static final String KEY_10 = "etf#" + "queryEtfLastest90Days";
     // 11、直接看 investEtfChgTop3 数据，只看前三
     private static final String KEY_11 = "etf#" + "investEtfChgTop3";
+    // 12、2025后的历史数据 直接看 investEtfChgTop3History 数据，只看前三
+    private static final String KEY_12 = "etf#" + "investEtfChgTop3History";
 
 
     /**
-     * 0、直接看 investEtfChgTop3 数据，只看前三
+     * 11、直接看 investEtfChgTop3 数据，只看前三
      * @return
      */
     @GetMapping("/etf-chg-top3")
@@ -111,13 +113,13 @@ public class AgNewEastmoneyETFController {
     }
 
     /**
-     * 0.1、2025后的历史数据 直接看 investEtfChgTop3History 数据，只看前三
+     * 12、2025后的历史数据 直接看 investEtfChgTop3History 数据，只看前三
      * @return
      */
     @GetMapping("/etf-chg-top3-history")
     public BaseResponse investEtfChgTop3History() {
         log.info("investEtfChgTop3History");
-        String key = KEY_11;
+        String key = KEY_12;
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
