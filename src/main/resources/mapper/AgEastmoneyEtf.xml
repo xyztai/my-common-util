@@ -598,7 +598,7 @@
     </insert>
 
     <!-- 1、当天前三；2、当天chg>2%；3、相较于前一天，成交量放量25%~100%；4、前一天的chg<2%；5、前一天不在前三；-->
-    <select id="investEtf" resultType="net.my.pojo.SpecialCarePoJo2">
+    <select id="investEtfChgTop3" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
             with tmp_date_1 as (
            		select distinct date from t_eastmoney_node_etf where date not like '9999%' order by 1 desc limit 1

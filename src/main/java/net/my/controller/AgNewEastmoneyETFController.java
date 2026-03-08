@@ -73,6 +73,8 @@ public class AgNewEastmoneyETFController {
     private static final String KEY_6 = "etf#" + "queryEtf9ZhuanB";
     // 10、近3个月的，成交量暴涨10倍的
     private static final String KEY_10 = "etf#" + "queryEtfLastest90Days";
+    // 11、直接看 investEtfChgTop3 数据，只看前三
+    private static final String KEY_11 = "etf#" + "investEtfChgTop3";
 
 
     /**
@@ -296,6 +298,39 @@ public class AgNewEastmoneyETFController {
         }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfLastest90Days();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("688")
+                        && !f.getStockCode().startsWith("689")
+                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+    /**
+     * 11、直接看 investEtfChgTop3 数据，只看前三
+     * @return
+     */
+    @GetMapping("/etf-chg-top3")
+    public BaseResponse investEtfChgTop3() {
+        log.info("investEtfChgTop3");
+        String key = KEY_11;
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.investEtfChgTop3();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
