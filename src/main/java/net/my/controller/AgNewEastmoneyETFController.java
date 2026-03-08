@@ -109,6 +109,39 @@ public class AgNewEastmoneyETFController {
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
+
+    /**
+     * 0.1、2025后的历史数据 直接看 investEtfChgTop3History 数据，只看前三
+     * @return
+     */
+    @GetMapping("/etf-chg-top3-history")
+    public BaseResponse investEtfChgTop3History() {
+        log.info("investEtfChgTop3History");
+        String key = KEY_11;
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.investEtfChgTop3History();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("688")
+                        && !f.getStockCode().startsWith("689")
+                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
     
 
     /**
