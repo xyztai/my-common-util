@@ -165,7 +165,8 @@ public class AgNewEastmoneyStockController {
         }
 
         // 这里是对所有的数据进行排序处理，优先看avg，然后看top3，再看"9转+9vol"，剩下的就按照顺序来吧
-        for(String kk : Arrays.asList(KEY_11, KEY_1, key0, KEY_3, KEY_5, KEY_6, KEY_10)) {
+//        for(String kk : Arrays.asList(KEY_11, KEY_1, key0, KEY_3, KEY_5, KEY_6, KEY_10)) {
+        for(String kk : Arrays.asList(KEY_11)) {
             List<SpecialCarePoJo2> tmpList = tmpMap.get(kk);
             if(!CollectionUtils.isEmpty(tmpList)) {
                 for(SpecialCarePoJo2 tmp : tmpList) {

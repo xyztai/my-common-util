@@ -31,4 +31,6 @@ public interface AgEastmoneyEtfMapper {
 
     int delEtfEastMoneyTmpCalc(@Param("methodName") String methodName);
     int saveEtfEastMoneyTmpCalc(List<EastmoneyTmpCalc> eastmoneyNodes);
+    List<SpecialCarePoJo2> investEtfChgTop3();
+    List<SpecialCarePoJo2> investEtfChgTop3History();
 }
