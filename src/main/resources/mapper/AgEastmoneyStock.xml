@@ -678,60 +678,52 @@
 
     <select id="xxxx_20260322" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-                with tmp as (
-                    select
-                        `date`
-                         , ten.stockCode
-                         , lead(ten.`date`, 1 ) over (partition by ten.stockCode order by `date` ) date_next
-                                , LAG (ten.`date` ) over (partition by ten.stockCode order by `date` ) date_pre
-                                , ten.volume
-                         , lead(ten.volume ) over (partition by ten.stockCode order by `date` ) volume_next
-                                , LAG (ten.`volume` ) over (partition by ten.stockCode order by `date` ) volume_pre
-                                , ten.chg
-                         , lead(ten.chg ) over (partition by ten.stockCode order by `date` ) chg_next
-                                , LAG (ten.`chg` ) over (partition by ten.stockCode order by `date` ) chg_pre
-                                , LAG (ten.`chg`, 1 ) over (partition by ten.stockCode order by `date` ) chg_pre_1
-                                , LAG (ten.`chg`, 2 ) over (partition by ten.stockCode order by `date` ) chg_pre_2
-                                , LAG (ten.`chg`, 3 ) over (partition by ten.stockCode order by `date` ) chg_pre_3
-                                , LAG (ten.`chg`, 4 ) over (partition by ten.stockCode order by `date` ) chg_pre_4
-                                , LAG (ten.`chg`, 5 ) over (partition by ten.stockCode order by `date` ) chg_pre_5
-                                , LAG (ten.`chg`, 6 ) over (partition by ten.stockCode order by `date` ) chg_pre_6
-                                , LAG (ten.`chg`, 7 ) over (partition by ten.stockCode order by `date` ) chg_pre_7
-                                , LAG (ten.`chg`, 8 ) over (partition by ten.stockCode order by `date` ) chg_pre_8
-                                , LAG (ten.`chg`, 9 ) over (partition by ten.stockCode order by `date` ) chg_pre_9
-                                , LAG (ten.`chg`, 10 ) over (partition by ten.stockCode order by `date` ) chg_pre_10
-                    from t_eastmoney_node ten
-                    where 1 = 1
-                      -- and `date` > '2026'
-                      and date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
-                    and `date` not like '9999%'
-                    and ten.stockCode not like '0.68%'
-                    and ten.stockCode not like '0.30%'
-                    and ten.stockCode not like '1.68%'
-                    and ten.stockCode not like '1.30%'
-                order by 1 desc
-                    )
-                        , tmp_hy as (
-                select th.*, tbs.bk_code , thi.name hy_name
-                from t_bk_stock tbs, t_hs300 th , t_hy_info thi
-                where INSTR( tbs.bk_stocks, th.stockCode ) > 0
-                  and thi.code = tbs.bk_code
-                    )
-                    , tmp_hy_cnt as (
-                select hy_name, count(1) cnt
-                from tmp_hy
-                group by hy_name
-                    )
-                select t2.hy_name, count(1), max(t3.cnt)
-                from tmp t, tmp_hy t2, t_hs300 th, tmp_hy_cnt t3
-                where 1 = 1
-                  and t.date_next is null
-                  and GREATEST(chg_pre_1, chg_pre_2, chg_pre_3, chg_pre_4, chg_pre_5, chg_pre_6, chg_pre_7, chg_pre_8, chg_pre_9, chg_pre_10) > 9.5
-                  and th.stockCode = t2.stockCode
-                  and SUBSTRING(t.stockCode , 3) = th.stockCode
-                  and t2.hy_name = t3.hy_name
-                group by t2.hy_name
-                order by 2 desc;
+with tmp as (
+    select
+        `date`
+ 		, ten.stockCode
+ 		, lead(ten.`date`, 1 ) over (partition by ten.stockCode order by `date` ) date_next
+		, LAG (ten.`date` ) over (partition by ten.stockCode order by `date` ) date_pre
+        , ten.volume
+		, lead(ten.volume ) over (partition by ten.stockCode order by `date` ) volume_next
+		, LAG (ten.`volume` ) over (partition by ten.stockCode order by `date` ) volume_pre
+        , ten.chg
+		, lead(ten.chg ) over (partition by ten.stockCode order by `date` ) chg_next
+		, LAG (ten.`chg` ) over (partition by ten.stockCode order by `date` ) chg_pre
+		, LAG (ten.`chg`, 1 ) over (partition by ten.stockCode order by `date` ) chg_pre_1
+		, LAG (ten.`chg`, 2 ) over (partition by ten.stockCode order by `date` ) chg_pre_2
+		, LAG (ten.`chg`, 3 ) over (partition by ten.stockCode order by `date` ) chg_pre_3
+		, LAG (ten.`chg`, 4 ) over (partition by ten.stockCode order by `date` ) chg_pre_4
+		, LAG (ten.`chg`, 5 ) over (partition by ten.stockCode order by `date` ) chg_pre_5
+		, LAG (ten.`chg`, 6 ) over (partition by ten.stockCode order by `date` ) chg_pre_6
+		, LAG (ten.`chg`, 7 ) over (partition by ten.stockCode order by `date` ) chg_pre_7
+		, LAG (ten.`chg`, 8 ) over (partition by ten.stockCode order by `date` ) chg_pre_8
+		, LAG (ten.`chg`, 9 ) over (partition by ten.stockCode order by `date` ) chg_pre_9
+		, LAG (ten.`chg`, 10 ) over (partition by ten.stockCode order by `date` ) chg_pre_10
+		from t_eastmoney_node ten
+		where 1 = 1
+		  -- and `date` > '2026'
+		  and date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+		and `date` not like '9999%'
+		and ten.stockCode not like '0.68%'
+		and ten.stockCode not like '0.30%'
+		and ten.stockCode not like '1.68%'
+		and ten.stockCode not like '1.30%'
+)
+, tmp_bk_cnt as (
+	select bkName, count(1) cnt
+	from t_hs300
+	group by bkName
+)
+select th.bkName, count(1), max(t3.cnt)
+from tmp t, t_hs300 th, tmp_bk_cnt t3
+where 1 = 1
+  and t.date_next is null
+  and GREATEST(chg_pre_1, chg_pre_2, chg_pre_3, chg_pre_4, chg_pre_5 , chg_pre_6, chg_pre_7, chg_pre_8, chg_pre_9, chg_pre_10) > 9.5
+  and th.bkName = t3.bkName
+  and t.stockCode = th.fullStockCode
+group by th.bkName
+order by 2 desc
         ]]>
     </select>
 
