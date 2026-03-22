@@ -25,7 +25,8 @@ public class AgNewEastmoneyBkController {
     public static final String EASTMONEY_URL_HY_LIST =
             "https://push2.eastmoney.com/api/qt/clist/get?np=1&fltt=1&invt=2&fs=m%3A90%2Bs%3A4%2Bf%3A!50&fields=f12%2Cf14&fid=f3&pn=1&pz=200&po=1&dect=1";
 
-    // 获取特定行业对应的code
+    // 现在浏览器上刷新页面 https://quote.eastmoney.com/center/gridlist.html#boards2-90.BK1031
+    // 然后在浏览器上获取特定行业对应的code
     // 举例：https://push2.eastmoney.com/api/qt/clist/get?fs=b%3ABK1015&fields=f12%2Cf14&pn=1&pz=2000
     public static final String EASTMONEY_URL_HY_FROMAT =
             "https://push2.eastmoney.com/api/qt/clist/get?fs=b%3A%s&fields=f12%2Cf14&pn=1&pz=2000";
