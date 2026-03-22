@@ -40,11 +40,11 @@ public class AgNewEastmoneyHyController {
     private RestTemplate restTemplate;
 
 
-    @ApiOperation(value = "获取行业数据", notes = "访问互联网接口获取数据")
-    @GetMapping("/hy-data")
+    @ApiOperation(value = "获取板块数据", notes = "访问互联网接口获取数据")
+    @GetMapping("/bk-data")
     @Transactional
-    public BaseResponse getHyData() {
-        log.info("getHyData start");
+    public BaseResponse getBkData() {
+        log.info("getBkData start");
 //        String hyListUrl = EASTMONEY_URL_HY_LIST;
 //        log.info("call hyListUrl={}", hyListUrl);
 //        String res = restTemplate.getForObject(hyListUrl, String.class);
@@ -63,7 +63,7 @@ public class AgNewEastmoneyHyController {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             String f12 = jsonObject.getString("f12");
             String f14 = jsonObject.getString("f14");
-            log.info("getHyData f12={}, f14={}", f12, f14);
+            log.info("getHyData replace into t_eastmoney_bk_define(bk_code, bk_name) values ('%s', '%s');", f12, f14);
         }
 
 
@@ -78,7 +78,7 @@ public class AgNewEastmoneyHyController {
 //
 
 
-        log.info("getHyData end");
+        log.info("getBkData end");
         return BaseResponse.OK;
     }
 
