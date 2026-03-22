@@ -1,12 +1,11 @@
 package net.my.controller;
 
-import com.alibaba.fastjson2.JSON;
 import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
+import net.my.mapper.AgEastmoneyBkMapper;
 import net.my.pojo.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,16 +14,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
 
 @RestController
 @RequestMapping("/ag-eastmoney-stock")
 @Slf4j
 @Api(value = "ag", description = "ag接口")
-public class AgNewEastmoneyHyController {
+public class AgNewEastmoneyBkController {
 
     // 获取行业列表
     public static final String EASTMONEY_URL_HY_LIST =
@@ -39,9 +34,11 @@ public class AgNewEastmoneyHyController {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private AgEastmoneyBkMapper agEastmoneyBkMapper;
 
     @ApiOperation(value = "获取板块数据", notes = "访问互联网接口获取数据")
-    @GetMapping("/bk-data")
+    @GetMapping("/bk-list")
     @Transactional
     public BaseResponse getBkData() {
         log.info("getBkData start");
@@ -64,6 +61,7 @@ public class AgNewEastmoneyHyController {
             String f12 = jsonObject.getString("f12");
             String f14 = jsonObject.getString("f14");
             log.info("getHyData replace into t_eastmoney_bk_define(bk_code, bk_name) values ('{}', '{}');", f12, f14);
+            agEastmoneyBkMapper.saveBkInfo(f12, f14);
         }
 
 
@@ -80,31 +78,6 @@ public class AgNewEastmoneyHyController {
 
         log.info("getBkData end");
         return BaseResponse.OK;
-    }
-
-    @Data
-    public class EastmoneyStockRes {
-        private EastmoneyStockPOJO data;
-    }
-
-    @Data
-    public static class EastmoneyStockPOJO {
-        /**
-         * [
-         *                     "2023-04-28", // 日期
-         *                     "10.78",  // 开
-         *                     "10.99",  // 收
-         *                     "11.08",  // 高
-         *                     "10.70",  // 低
-         *                     "1975714.00", // 量
-         *                     {},
-         *                     "2.58", // 换手率
-         *                     "233884.16", // 金额，单位 万元
-         *                     ""
-         *                 ]
-         */
-        private String code;
-        private List<String> klines;
     }
 }
 
