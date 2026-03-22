@@ -1,6 +1,7 @@
 package net.my.controller;
 
 import com.alibaba.fastjson2.JSON;
+import com.alibaba.fastjson2.JSONArray;
 import com.alibaba.fastjson2.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -49,13 +50,17 @@ public class AgNewEastmoneyHyController {
         log.info("call hyListUrl={}, res={}", hyListUrl, res);
         JSONObject jsonObject = JSONObject.parseObject(res);
         JSONObject joData = jsonObject.getJSONObject("data");
-        JSONObject joDiff = joData.getJSONObject("diff");
+//        JSONObject joDiff = joData.getJSONObject("diff");
+//        for(Map.Entry<String, Object> item : joDiff.entrySet()){
+//            log.info("{}", JSON.toJSONString(item.getValue()));
+//        }
+        JSONArray jsonArray = joData.getJSONArray("diff");
+        jsonArray.getJSONObject(0);
 
-        for(Map.Entry<String, Object> item : joDiff.entrySet()){
-            log.info("{}", JSON.toJSONString(item.getValue()));
-        }
 
-//
+
+
+
 //
 //        String url = String.format(EASTMONEY_URL_FORMAT_QFQ, zqdm);
 //        log.info("try num={}, stockCode={}, url={}", i, entry.getKey(), url);
