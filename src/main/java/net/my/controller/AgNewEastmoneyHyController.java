@@ -63,7 +63,7 @@ public class AgNewEastmoneyHyController {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             String f12 = jsonObject.getString("f12");
             String f14 = jsonObject.getString("f14");
-            log.info("getHyData replace into t_eastmoney_bk_define(bk_code, bk_name) values ('%s', '%s');", f12, f14);
+            log.info("getHyData replace into t_eastmoney_bk_define(bk_code, bk_name) values ('{}', '{}');", f12, f14);
         }
 
 
