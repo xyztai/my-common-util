@@ -306,6 +306,16 @@ public class ScheduledTasks {
             }
         }, executor);
 
+        CompletableFuture<Void> task110 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock queryBigSwing start");
+                agNewEastmoneyStockController.queryBigSwing();
+                log.info("task stock queryBigSwing end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
 
 
         // 查询 ETF
@@ -449,6 +459,7 @@ public class ScheduledTasks {
                 , task17
                 , task18
                 , task19
+                , task110
 
                 , task20
                 , task200

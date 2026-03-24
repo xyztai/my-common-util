@@ -676,6 +676,38 @@
         ]]>
     </select>
 
+    <select id="queryBigSwing" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+            with tmp as (
+                select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt, sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.05 then 1 else 0 end) big_swing_cnt
+                from t_eastmoney_node ten, t_hs300 th
+                where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+                and ten.`date` not like '9999%'
+                and th.fullStockCode = ten.stockCode
+                and th.stockCode not like '300%'
+                and th.stockCode not like '68%'
+                group by ten.stockCode , th.stockCode , th.bkName, th.stockName
+            )
+            , tmp_ans as (
+                select t.*
+                       , rank() over (partition by t.bkName order by big_swing_cnt desc) rank_
+                from tmp t
+            )
+            , tmp_t as (
+                select *
+                from tmp_ans
+                where big_swing_cnt > cnt * 0.6 and rank_ <= 3
+            )
+            select
+                  t1.stockCode , ten2.date, '' last, '' ratioB
+                 -- ten2.chg, t1.*
+            from tmp_t t1, t_eastmoney_node ten2
+            where t1.fullStockCode = ten2.stockCode
+            and ten2.`date` = (select max(date) from t_eastmoney_node ten3 where ten3.`date` < '9999')
+            order by 1 desc
+        ]]>
+    </select>
+
     <select id="xxxx_20260322" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
 with tmp as (
