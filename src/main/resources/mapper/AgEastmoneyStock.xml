@@ -710,27 +710,42 @@
 
     <select id="queryBigSwingAndLowestVol" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-            with tmp_suo_liang as (
+            with tmp_calc_date as (
+                /*select '2026-02-12' big_date
+                       , DATE_FORMAT(DATE_ADD(STR_TO_DATE('2026-02-12', '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d') small_date_1
+                       , DATE_FORMAT(DATE_ADD(STR_TO_DATE('2026-02-12', '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d') small_date_2*/
+                select DATE_FORMAT(NOW(), '%Y-%m-%d') big_date
+                       , DATE_FORMAT(DATE_ADD(NOW(), INTERVAL -30 DAY), '%Y-%m-%d') small_date_1
+                       , DATE_FORMAT(DATE_ADD(NOW(), INTERVAL -30 DAY), '%Y-%m-%d') small_date_2
+            )
+            , tmp_suo_liang as (
                 select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , ten.`date`
                        , rank() over (partition by ten.stockCode order by ten.volume ) volume_rank
                        , rank() over (partition by ten.stockCode order by ten.`date` desc ) date_rank
-                from t_eastmoney_node ten, t_hs300 th
-                where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 60 DAY), '%Y-%m-%d')
+                       , count(1) over (partition by ten.stockCode ) date_cnt
+                from t_eastmoney_node ten, t_hs300 th, tmp_calc_date t3
+                where `date` between t3.small_date_1 and t3.big_date
+                -- where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 60 DAY), '%Y-%m-%d')
                 and ten.`date` not like '9999%'
                 and th.fullStockCode = ten.stockCode
                 and th.stockCode not like '300%'
                 and th.stockCode not like '68%'
-            )
+                and ten.chg < 9.5
+                and ten.chg > -9.5
+            ) -- select * from tmp_suo_liang;
             , tmp_suo_liang_ans as (
                 select t.*
                 from tmp_suo_liang t
-                where date_rank <= 3
+                where date_rank <= date_cnt * 0.15
+                -- where date_rank <= 3
                 and volume_rank <= 2
             ) -- select * from tmp_suo_liang_ans order by volume_rank, date_rank
             ,  tmp_big_swing as (
-                select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt, sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.05 then 1 else 0 end) big_swing_cnt
-                from t_eastmoney_node ten, t_hs300 th
-                where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+                select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt
+                      , sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.05 then 1 else 0 end) big_swing_cnt
+                from t_eastmoney_node ten, t_hs300 th, tmp_calc_date t3
+                where `date` between t3.small_date_2 and t3.big_date
+                -- where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
                 and ten.`date` not like '9999%'
                 and th.fullStockCode = ten.stockCode
                 and th.stockCode not like '300%'
