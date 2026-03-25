@@ -708,6 +708,58 @@
         ]]>
     </select>
 
+    <select id="queryBigSwingAndLowestVol" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+            with tmp_suo_liang as (
+                select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , ten.`date`
+                       , rank() over (partition by ten.stockCode order by ten.volume ) volume_rank
+                       , rank() over (partition by ten.stockCode order by ten.`date` desc ) date_rank
+                from t_eastmoney_node ten, t_hs300 th
+                where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 60 DAY), '%Y-%m-%d')
+                and ten.`date` not like '9999%'
+                and th.fullStockCode = ten.stockCode
+                and th.stockCode not like '300%'
+                and th.stockCode not like '68%'
+            )
+            , tmp_suo_liang_ans as (
+                select t.*
+                from tmp_suo_liang t
+                where date_rank <= 3
+                and volume_rank <= 2
+            ) -- select * from tmp_suo_liang_ans order by volume_rank, date_rank
+            ,  tmp_big_swing as (
+                select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt, sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.05 then 1 else 0 end) big_swing_cnt
+                from t_eastmoney_node ten, t_hs300 th
+                where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+                and ten.`date` not like '9999%'
+                and th.fullStockCode = ten.stockCode
+                and th.stockCode not like '300%'
+                and th.stockCode not like '68%'
+                group by ten.stockCode , th.stockCode , th.bkName, th.stockName
+            )
+            , tmp_big_swing_ans as (
+                select t.*
+                       , rank() over (partition by t.bkName order by big_swing_cnt desc) rank_
+                from tmp_big_swing t
+            )
+            , tmp_t as (
+                select *
+                from tmp_big_swing_ans
+                where big_swing_cnt > cnt * 0.6 and rank_ <= 3
+            )
+            select distinct
+                  t1.stockCode ,ten2.date date , concat(t1.bkName, '-',  t1.stockName) last, concat('rank=', t5.volume_rank) ratioB
+                 -- ten2.chg, t1.*
+            from tmp_t t1, t_eastmoney_node ten2, tmp_suo_liang_ans t5
+            where t1.fullStockCode = ten2.stockCode
+            -- and ten2.`date` = (select max(date) from t_eastmoney_node ten3 where ten3.`date` < '9999')
+            and t5.date = ten2.date
+            and t5.stockCode = t1.stockCode
+            -- and ten2.chg < 9
+            order by 2 desc, 1
+        ]]>
+    </select>
+
     <select id="xxxx_20260322" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
 with tmp as (
