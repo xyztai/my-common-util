@@ -684,7 +684,7 @@
                 where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
                 and ten.`date` not like '9999%'
                 and th.fullStockCode = ten.stockCode
-                and th.stockCode not like '300%'
+                and th.stockCode not like '30%'
                 and th.stockCode not like '68%'
                 group by ten.stockCode , th.stockCode , th.bkName, th.stockName
             )
@@ -699,12 +699,13 @@
                 where big_swing_cnt > cnt * 0.6 and rank_ <= 3
             )
             select
-                  t1.stockCode , ten2.date, '' last, '' ratioB
+                  t1.stockCode , ten2.date, concat(th.bkName, '-',  th.stockName) last, '' ratioB
                  -- ten2.chg, t1.*
-            from tmp_t t1, t_eastmoney_node ten2
+            from tmp_t t1, t_eastmoney_node ten2, t_hs300 th
             where t1.fullStockCode = ten2.stockCode
+            and th.fullStockCode = ten2.stockCode
             and ten2.`date` = (select max(date) from t_eastmoney_node ten3 where ten3.`date` < '9999')
-            order by 1 desc
+            order by last, 1
         ]]>
     </select>
 
@@ -728,7 +729,7 @@
                 -- where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 60 DAY), '%Y-%m-%d')
                 and ten.`date` not like '9999%'
                 and th.fullStockCode = ten.stockCode
-                and th.stockCode not like '300%'
+                and th.stockCode not like '30%'
                 and th.stockCode not like '68%'
                 and ten.chg < 9.5
                 and ten.chg > -9.5
@@ -748,7 +749,7 @@
                 -- where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
                 and ten.`date` not like '9999%'
                 and th.fullStockCode = ten.stockCode
-                and th.stockCode not like '300%'
+                and th.stockCode not like '30%'
                 and th.stockCode not like '68%'
                 group by ten.stockCode , th.stockCode , th.bkName, th.stockName
             )
