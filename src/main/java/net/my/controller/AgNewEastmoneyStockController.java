@@ -620,8 +620,9 @@ public class AgNewEastmoneyStockController {
         List<String> calcDates = agEastmoneyStockMapper.getCalcDatesFromMA();
         if(!CollectionUtils.isEmpty(calcDates)) {
             for(String calcDate : calcDates) {
-                log.info("genMA calcDate={}", calcDate);
+                log.info("genMA calcDate={} start", calcDate);
                 agEastmoneyStockMapper.genMA(calcDate);
+                log.info("genMA calcDate={} end", calcDate);
             }
         }
         log.info("genMA end");
