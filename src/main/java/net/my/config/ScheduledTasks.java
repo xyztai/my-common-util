@@ -326,6 +326,16 @@ public class ScheduledTasks {
             }
         }, executor);
 
+        CompletableFuture<Void> task112 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock queryDuoTou start");
+                agNewEastmoneyStockController.queryDuoTou();
+                log.info("task stock queryDuoTou end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
 
 
         // 查询 ETF
@@ -471,6 +481,7 @@ public class ScheduledTasks {
                 , task109
                 , task110
                 , task111
+                , task112
 
                 , task201
                 , task202
