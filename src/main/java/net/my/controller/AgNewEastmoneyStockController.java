@@ -81,6 +81,8 @@ public class AgNewEastmoneyStockController {
     private static final String KEY_13 = "stock#" + "queryBigSwing";
     // 14、查询最近一个月的大波动且最低Vol
     private static final String KEY_14 = "stock#" + "queryBigSwingAndLowestVol";
+    // 15、查询多头排列的票
+    private static final String KEY_15 = "stock#" + "queryDuoTou";
 
     /**
      * 0、方便截屏
@@ -577,6 +579,52 @@ public class AgNewEastmoneyStockController {
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+    /**
+     * 15、查询多头排列的票
+     * * @return
+     */
+    @GetMapping("/eastmoney-queryDuoTou")
+    public BaseResponse queryDuoTou() {
+        log.info("queryDuoTou");
+        String key = KEY_15;
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        genMA();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryDuoTou();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("688")
+                        && !f.getStockCode().startsWith("689")
+                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+    public void genMA() {
+        log.info("genMA start");
+        List<String> calcDates = agEastmoneyStockMapper.getCalcDatesFromMA();
+        if(!CollectionUtils.isEmpty(calcDates)) {
+            for(String calcDate : calcDates) {
+                log.info("genMA calcDate={}", calcDate);
+                agEastmoneyStockMapper.genMA(calcDate);
+            }
+        }
+        log.info("genMA end");
     }
 
     /**
