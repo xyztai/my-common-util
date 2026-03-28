@@ -881,4 +881,54 @@ order by 2 desc
         ]]>
     </select>
 
+    <select id="xxxtttt">
+        <![CDATA[
+
+with tmp_ma as (
+	select date, count(1) cnt
+	from t_eastmoney_node_ma
+	group by date
+	-- having cnt >= 100
+	order by 1 desc
+)
+select t1.`date` , t1.stockCode , t1.`last` , tm.cnt
+from t_eastmoney_node_index t1, tmp_ma tm
+where t1.stockCode = '1.000001'
+and t1.date = tm.date
+order by date desc;
+
+with tmp_all as (
+	select ten.stockCode
+	       , ten.`date`
+	       , lead(ten.`date`, 1) over (partition by ten.stockCode order by ten.`date`) date_next_1
+	       , ten.chg
+	       , lead(ten.`chg`, 1) over (partition by ten.stockCode order by ten.`date`) chg_next_1
+	       , lead(ten.`chg`, 2) over (partition by ten.stockCode order by ten.`date`) chg_next_2
+	       , lead(ten.`chg`, 3) over (partition by ten.stockCode order by ten.`date`) chg_next_3
+	       , ten.`last`
+	       , lead(ten.`last`, 1) over (partition by ten.stockCode order by ten.`date`) last_next_1
+	       , lead(ten.`last`, 2) over (partition by ten.stockCode order by ten.`date`) last_next_2
+	from t_eastmoney_node ten
+	where ten.`date` > '2025-01'
+	and `date` not like '9999%'
+)
+, tmp_ans as (
+	select ta.*
+	from tmp_all ta, t_eastmoney_node_ma tenm
+	where ta.stockCode = tenm.fullStockCode
+	and ta.date = tenm.date
+	and tenm.date > '2025-01'
+	and ta.chg < 9.9
+)
+select count(1)
+       , sum(case when t.chg_next_1 < 0 then 1 else 0 end ) chg_next_1_positive
+       , sum(case when t.chg_next_1 < 0 and t.chg_next_2 < 0 then 1 else 0 end ) chg_next_2_positive
+from tmp_ans t
+where t.chg_next_3 is not NULL
+order by 2 desc;
+
+        ]]>
+
+    </select>
+
 </mapper>
