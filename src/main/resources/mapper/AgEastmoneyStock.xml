@@ -772,7 +772,7 @@
             and t5.date = ten2.date
             and t5.stockCode = t1.stockCode
             -- and ten2.chg < 9
-            order by 2 desc, 1
+            order by 2 desc, 3, 1
         ]]>
     </select>
 
