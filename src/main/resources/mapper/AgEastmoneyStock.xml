@@ -824,7 +824,8 @@
             and th.stockCode not like '68%'
             and exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 60)
             group by t1.stockCode, th.stockName , th.bkName
-            having `last` >= ma5  and ma5 >= ma10 and ma10 >= ma20 and ma20 >= ma60
+            having -- `last` >= ma5  and
+                   ma5 >= ma10 and ma10 >= ma20 and ma20 >= ma60
             order by 2, 1
         ]]>
     </insert>
