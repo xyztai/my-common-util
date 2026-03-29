@@ -778,11 +778,70 @@
 
     <select id="queryDuoTou" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-            select th.stockCode ,ma.date date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
-            from t_eastmoney_node_ma ma, t_hs300 th
-            where date in (select max(date) from t_eastmoney_node_ma)
-            and ma.fullStockCode = th.fullStockCode
-            order by 3
+            with tmp_calc_date as (
+                select DATE_FORMAT(NOW(), '%Y-%m-%d') big_date
+                   , DATE_FORMAT(DATE_ADD(NOW(), INTERVAL -60 DAY), '%Y-%m-%d') small_date_1
+                /*select '2026-03-27' big_date
+                   , DATE_FORMAT(DATE_ADD(STR_TO_DATE('2026-03-26', '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d') small_date_1*/
+            )
+            , tmp_ma_dates as (
+                select tenm.*
+                       , rank() over (partition by tenm.stockName order by tenm.`date` desc) date_rank_ma
+                from t_eastmoney_node_ma tenm, tmp_calc_date
+                where date >= small_date_1 and date <= big_date
+                order by fullStockCode , date_rank_ma
+            ) -- select * from tmp_ma_dates t where t.fullStockCode = '1.603659';
+            , tmp_ten_dates as (
+                select ten.stockCode
+                       , DATE
+                       , rank() over (partition by ten.stockCode order by ten.`date` desc) date_rank
+                from t_eastmoney_node ten, tmp_calc_date
+                where date >= small_date_1 and date <= big_date
+                and date not like '9999%'
+            ) -- select * from tmp_ten_dates t where t.stockCode = '1.603659'; -- 1.603659 0.002025
+            -- 5天以内必有2次正头排列
+            , tmp_ten_max_min as (
+                select ten.stockCode , max(ten.chg ) chg_max, min(ten.chg) chg_min, max(ttd.date) date_max, min(ttd.date) date_min
+                from t_eastmoney_node ten, tmp_ten_dates ttd
+                where ttd.date_rank <= 5
+                and ten.stockCode = ttd.stockCode
+                and ten.date = ttd.date
+                group by ten.stockCode
+            ) -- select * from tmp_ten_max_min where stockCode = '1.603659';
+            , tmp_sp_get as (
+                select -- t1.*
+                       t1.fullStockCode, t1.bkName , t1.stockName, count(1) cnt, ten.chg_max, max(t1.date) date
+                from tmp_ma_dates t1, tmp_ten_max_min ten
+                where 1 = 1
+                and t1.date_rank_ma <= 5
+                and t1.fullStockCode = ten.stockCode
+                and t1.`date` BETWEEN ten.date_min and ten.date_max
+                group by t1.fullStockCode, t1.bkName , t1.stockName
+                having cnt >= 3 and chg_max > 5
+                -- and ten.chg > 5
+            ) -- select distinct t1.fullStockCode, t1.bkName , t1.stockName , t1.date, chg_max, cnt  from tmp_sp_get t1 where t1.fullStockCode = '1.603659' order by t1.date desc;
+            , tmp_sp_drop as (
+                select -- t1.*
+                       distinct t1.fullStockCode, t1.bkName , t1.stockName -- , t1.date
+                from tmp_ma_dates t1, t_eastmoney_node ten, tmp_ten_dates ttd
+                where t1.date_rank_ma <= 5
+                and t1.fullStockCode = ten.stockCode
+                and t1.date = ten.date
+                and ttd.date_rank <= 5
+                and t1.fullStockCode = ttd.stockCode
+                and t1.date = ttd.date
+                and ten.chg < -8
+            ) -- select distinct t1.fullStockCode, t1.bkName , t1.stockName , t1.date  from tmp_sp_drop t1 order by t1.date desc;
+            select -- t1.*
+                   -- distinct t1.fullStockCode, t1.bkName , t1.stockName  -- , t1.date
+                   th.stockCode ,max(t1.date) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
+            from tmp_ma_dates t1, t_hs300 th
+            where 1 = 1 -- and t1.fullStockCode = '1.603659'
+            and t1.fullStockCode = th.fullStockCode
+            and exists (select 1 from tmp_sp_get t11 where t1.fullStockCode = t11.fullStockCode)
+            and not exists (select 1 from tmp_sp_drop t12 where t1.fullStockCode = t12.fullStockCode)
+            group by th.stockCode ,th.bkName, th.stockName
+            order by 3 desc, 1
         ]]>
     </select>
 
