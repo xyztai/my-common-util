@@ -778,11 +778,31 @@
 
     <select id="queryDuoTou" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
+			select
+                   t1.stockCode ,t1.okDate date , concat(t1.bkName, '-',  t1.stockName) last, '' ratioB
+            from t_eastmoney_node_duotou t1
+            where 1 = 1
+            and t1.date = (select max(date) from t_eastmoney_node_duotou)
+            order by 3, 2
+        ]]>
+    </select>
+
+    <select id="getCalcDatesFromDuoTou"  resultType="java.lang.String">
+        select distinct date
+        from t_eastmoney_node ten
+        where ten.`date` > (select ifnull(max(date), '2024-01-01') from t_eastmoney_node_duotou)
+        and ten.`date` not like '9999%'
+        order by 1
+    </select>
+
+    <insert id="genDuoTou">
+        <![CDATA[
+			replace into t_eastmoney_node_duotou(date, okDate, fullStockCode, bkName, stockCode, stockName)
             with tmp_calc_date as (
-                select DATE_FORMAT(NOW(), '%Y-%m-%d') big_date
-                   , DATE_FORMAT(DATE_ADD(NOW(), INTERVAL -60 DAY), '%Y-%m-%d') small_date_1
-                /*select '2026-03-27' big_date
-                   , DATE_FORMAT(DATE_ADD(STR_TO_DATE('2026-03-26', '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d') small_date_1*/
+                /*select DATE_FORMAT(NOW(), '%Y-%m-%d') big_date
+                   , DATE_FORMAT(DATE_ADD(NOW(), INTERVAL -60 DAY), '%Y-%m-%d') small_date_1*/
+                select #{calcDate} big_date
+                   , DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d') small_date_1
             )
             , tmp_ma_dates as (
                 select tenm.*
@@ -834,16 +854,17 @@
             ) -- select distinct t1.fullStockCode, t1.bkName , t1.stockName , t1.date  from tmp_sp_drop t1 order by t1.date desc;
             select -- t1.*
                    -- distinct t1.fullStockCode, t1.bkName , t1.stockName  -- , t1.date
-                   th.stockCode ,max(t1.date) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
+                   -- th.stockCode ,max(t1.date) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
+                   #{calcDate}, max(t1.date), t1.fullStockCode, th.bkName, th.stockCode, th.stockName
             from tmp_ma_dates t1, t_hs300 th
             where 1 = 1 -- and t1.fullStockCode = '1.603659'
             and t1.fullStockCode = th.fullStockCode
             and exists (select 1 from tmp_sp_get t11 where t1.fullStockCode = t11.fullStockCode)
             and not exists (select 1 from tmp_sp_drop t12 where t1.fullStockCode = t12.fullStockCode)
-            group by th.stockCode ,th.bkName, th.stockName
-            order by 3 desc, 1
+            group by t1.fullStockCode, th.bkName, th.stockCode, th.stockName
+            order by 4, 5
         ]]>
-    </select>
+    </insert>
 
     <select id="getCalcDatesFromMA"  resultType="java.lang.String">
         select distinct date

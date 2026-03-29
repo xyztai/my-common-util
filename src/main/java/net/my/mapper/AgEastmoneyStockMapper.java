@@ -35,6 +35,8 @@ public interface AgEastmoneyStockMapper {
     List<SpecialCarePoJo2> queryBigSwing();
     List<SpecialCarePoJo2> queryBigSwingAndLowestVol();
     List<SpecialCarePoJo2> queryDuoTou();
+    List<String> getCalcDatesFromDuoTou();
+    int genDuoTou(@Param("calcDate") String calcDate);
     List<String> getCalcDatesFromMA();
     int genMA(@Param("calcDate") String calcDate);
 }

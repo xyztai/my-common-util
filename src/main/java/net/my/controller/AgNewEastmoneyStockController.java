@@ -595,7 +595,10 @@ public class AgNewEastmoneyStockController {
             return RestGeneralResponse.of(res);
         }
 
+        // 计算MA
         genMA();
+        // 计算多头数据
+        genDuoTou();
         List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryDuoTou();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
@@ -626,6 +629,19 @@ public class AgNewEastmoneyStockController {
             }
         }
         log.info("genMA end");
+    }
+
+    public void genDuoTou() {
+        log.info("genDuoTou start");
+        List<String> calcDates = agEastmoneyStockMapper.getCalcDatesFromDuoTou();
+        if(!CollectionUtils.isEmpty(calcDates)) {
+            for(String calcDate : calcDates) {
+                log.info("genDuoTou calcDate={} start", calcDate);
+                agEastmoneyStockMapper.genDuoTou(calcDate);
+                log.info("genDuoTou calcDate={} end", calcDate);
+            }
+        }
+        log.info("genDuoTou end");
     }
 
     /**
