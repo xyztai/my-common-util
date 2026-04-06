@@ -21,6 +21,7 @@ import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 
@@ -43,6 +44,9 @@ public class AgNewEastmoneyIndexController {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private AgNewSinaController agNewSinaController;
 
     @ApiOperation(value = "获取历史的cp数据（用来补历史数据）zqdm=1.000001", notes = "访问互联网接口获取数据")
     @GetMapping("/historyAll/{zqdm}")
@@ -103,6 +107,49 @@ public class AgNewEastmoneyIndexController {
 
         return BaseResponse.OK;
     }
+
+    @ApiOperation(value = "获取当天的数据（从sina来）zqdm=1.000001", notes = "访问互联网接口获取数据")
+    @GetMapping("/historyAll-sina")
+    @Transactional
+    public BaseResponse getHistoryDataOuterSina() {
+        List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
+        try {
+            Map<String, String> sinaMap = agNewSinaController.getSinaDataForIndex();
+            log.info("getSinaDataForIndex soHuMap = {}", JSON.toJSON(sinaMap));
+
+            if(StringUtils.isEmpty(sinaMap)) {
+                throw new CommonException(401, "获取数据异常");
+            }
+
+            if(!CollectionUtils.isEmpty(sinaMap)) {
+                for(Map.Entry<String, String> entry : sinaMap.entrySet()) {
+                    String item = entry.getValue();
+                    String[] xxs = item.split(",");
+                    eastmoneyNodeList.add(EastmoneyNode.builder().date(xxs[0]).stockCode(entry.getKey()).infoRaw(item).build());
+                }
+            }
+        } catch (Exception ex) {
+            log.error("", ex);
+            throw new CommonException(401, "获取数据异常");
+        }
+
+        int startNum = 0;
+        int stepNum = 100;
+        while(startNum < eastmoneyNodeList.size()) {
+            List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
+            log.info("tmpNodes.size={}", tmpNodes.size());
+            agEastmoneyIndexMapper.saveIndexEastMoneyDatas(tmpNodes);
+            startNum += stepNum;
+        }
+
+        log.info("阶段1-非99999数据-开始更新基础字段");
+        // 更新基础字段
+        agEastmoneyIndexMapper.updateIndexEastMoneyDatas();
+
+        return BaseResponse.OK;
+    }
+
+
 
     @Data
     public class EtfEastmoneyRes {

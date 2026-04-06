@@ -21,6 +21,13 @@
         ]]>
     </select>
 
+    <select id="getIndexs" resultType="java.lang.String">
+        <![CDATA[
+        select distinct stockCode
+        from t_eastmoney_node_str
+        ]]>
+    </select>
+
     <select id="getMaxDateFromStock" resultType="java.lang.String">
         <![CDATA[
         select max(`date`)

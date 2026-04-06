@@ -191,6 +191,102 @@ public class AgNewSinaController {
         return resMap;
     }
 
+
+    public Map<String, String> getSinaDataForIndex() {
+        List<String> allCodes = new ArrayList<>();
+
+        List<String> hsStocks = agSohuMapper.getIndexs();
+        if(!CollectionUtils.isEmpty(hsStocks)) {
+            allCodes.addAll(hsStocks);
+        }
+
+        Map<String, String> resMap = new HashMap<>();
+        if(CollectionUtils.isEmpty(allCodes)) {
+            return resMap;
+        }
+
+        Map<String, String> nameMap = new HashMap<>();
+        allCodes.forEach(f -> {
+            nameMap.put((f.substring(0, 2).equals("0.") ? "sz" : "sh") + f.substring(2), f);
+        });
+
+        List<String> allCodesCn = nameMap.keySet().stream().sorted().collect(Collectors.toList());
+        List<String> targetSohuCodes = new ArrayList<>();
+        int startNum = 0;
+        int stepNum = 300;
+        while(startNum < allCodesCn.size()) {
+            List<String> tmpNodes = allCodesCn.stream().skip(startNum).limit(stepNum)
+                    .collect(Collectors.toList());
+            log.info("tmpNodes.size={}", tmpNodes.size());
+            targetSohuCodes.add(String.join(",", tmpNodes));
+            startNum += stepNum;
+        }
+
+        log.info("targetSohuCodes size={}", targetSohuCodes.size());
+        for(String sohuCode : targetSohuCodes) {
+            log.info("sohuCode={}", sohuCode);
+
+            try {
+                Thread.sleep(2000);
+                String url = String.format(SINA_URL_FORMAT, sohuCode);
+                log.info("url: {}", url);
+
+                // 创建请求头
+                HttpHeaders headers = new HttpHeaders();
+                headers.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36");
+                headers.add("referer", "https://quotes.sina.cn");
+
+                // 创建HttpEntity
+                HttpEntity<String> entity = new HttpEntity<>(headers);
+
+                // 发送GET请求
+                ResponseEntity<String> response = restTemplate.exchange(
+                        url,
+                        HttpMethod.GET,
+                        entity,
+                        String.class
+                );
+
+                log.info("响应状态: " + response.getStatusCode());
+                log.info("响应体: " + response.getBody());
+                String res = response.getBody();
+                List<String> lines = Arrays.asList(res.split("\\R"));
+                for(String line : lines) {
+                    String[] entry = line.split("=");
+                    String key = entry[0].substring(11);
+                    String value = entry[1].replace("\"", "").replace(";", "");
+//                    30,1,3,4,5,8/100,9,round((4-5)/2*100,2),round(3/2*100 -100,2),3-2,0
+                    String[] fields = value.split(",");
+                    if(Double.parseDouble(fields[8]) == 0 || Double.parseDouble(fields[9]) == 0) {
+                        continue;
+                    }
+
+                    resMap.put(nameMap.get(key),
+                            fields[30] + "," + fields[1] + "," + fields[3] + "," + fields[4] + "," + fields[5]
+                                    + "," + new BigDecimal(Double.parseDouble(fields[8])/100).setScale(0, RoundingMode.HALF_UP)
+                                    + "," + fields[9]
+                                    + "," + new BigDecimal((Double.parseDouble(fields[4]) - Double.parseDouble(fields[5]))/Double.parseDouble(fields[2]) * 100).setScale(2, RoundingMode.HALF_UP)
+                                    + "," + new BigDecimal(Double.parseDouble(fields[3])/Double.parseDouble(fields[2]) * 100 - 100).setScale(2, RoundingMode.HALF_UP)
+                                    + "," + new BigDecimal(Double.parseDouble(fields[3]) - Double.parseDouble(fields[2])).setScale(3, RoundingMode.HALF_UP)
+                                    + "," + "0"
+                    );
+                }
+            } catch (Exception ex) {
+                log.error("{}", ex);
+                return new HashMap<>();
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(resMap)) {
+            log.info("start log resMap, size={}", resMap.size());
+            resMap.entrySet().forEach(f -> {
+                log.info("key={}, value={}", f.getKey(), f.getValue());
+            });
+        }
+
+        return resMap;
+    }
+
     public String getMaxDateFromStock() {
         return agSohuMapper.getMaxDateFromStock();
     }
