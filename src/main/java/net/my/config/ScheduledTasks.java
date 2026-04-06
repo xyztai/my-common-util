@@ -54,6 +54,9 @@ public class ScheduledTasks {
     private AgNewEastmoneyETFController agNewEastmoneyETFController;
 
     @Autowired
+    private AgNewEastmoneyIndexController agNewEastmoneyIndexController;
+
+    @Autowired
     private AgEastmoneyEChartsMapper agEastmoneyEChartsMapper;
 
     @Autowired
@@ -181,6 +184,9 @@ public class ScheduledTasks {
         log.info("task 获取etf的历史数据 start");
         agNewEastmoneyETFController.getHistoryData();
         log.info("task 获取etf的历史数据 end");
+        log.info("task 获取index的历史数据 start");
+        agNewEastmoneyIndexController.getHistoryDataOuterSina();
+        log.info("task 获取index的历史数据 end");
 
         execCalc();
         taskState = 0;
