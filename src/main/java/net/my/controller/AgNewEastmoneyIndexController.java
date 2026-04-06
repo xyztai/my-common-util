@@ -118,7 +118,7 @@ public class AgNewEastmoneyIndexController {
             log.info("getSinaDataForIndex soHuMap = {}", JSON.toJSON(sinaMap));
 
             if(StringUtils.isEmpty(sinaMap)) {
-                throw new CommonException(401, "获取数据异常");
+                return BaseResponse.OK;
             }
 
             if(!CollectionUtils.isEmpty(sinaMap)) {
@@ -130,7 +130,11 @@ public class AgNewEastmoneyIndexController {
             }
         } catch (Exception ex) {
             log.error("", ex);
-            throw new CommonException(401, "获取数据异常");
+//            throw new CommonException(401, "获取数据异常");
+        }
+
+        if(StringUtils.isEmpty(eastmoneyNodeList)) {
+            return BaseResponse.OK;
         }
 
         int startNum = 0;
