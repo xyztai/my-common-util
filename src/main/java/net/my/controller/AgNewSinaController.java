@@ -257,7 +257,7 @@ public class AgNewSinaController {
                     String value = entry[1].replace("\"", "").replace(";", "");
 //                    30,1,3,4,5,8/100,9,round((4-5)/2*100,2),round(3/2*100 -100,2),3-2,0
                     String[] fields = value.split(",");
-                    if(Double.parseDouble(fields[8]) == 0 || Double.parseDouble(fields[9]) == 0) {
+                    if(fields.length == 0 || Double.parseDouble(fields[8]) == 0 || Double.parseDouble(fields[9]) == 0) {
                         continue;
                     }
 
