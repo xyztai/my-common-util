@@ -821,7 +821,7 @@
                 where ten.`date` > td.date_min
                 and ten.`date` < '2099'
             )
-            select th.stockCode ,max(t1.date_curr) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
+            select th.stockCode ,min(t1.date_curr) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
             from tmp_ans t1 , t_hs300 th
             where chg_pre_1 > 0 and chg_pre_2 > 0 and chg_pre_3 > 0 and chg_pre_4 > 0 and chg_pre_5 > 0
             and t1.stockCode = th.fullStockCode
