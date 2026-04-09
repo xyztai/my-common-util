@@ -797,6 +797,41 @@
         ]]>
     </select>
 
+    <select id="queryUp5Lian" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+            with tmp_date as (
+                select min(date) date_min from (
+                    select *
+                    from t_eastmoney_node_index teni
+                    where stockCode = '1.000001'
+                    order by `date` desc
+                    limit 20
+                ) tt
+            ) -- select * from tmp_date;
+            , tmp_ans as (
+                select lag(ten.`date`, 1) over (partition by ten.stockCode order by `date`) date_pre_1
+                       , ten.`date` date_curr
+                       , lag(ten.last - ten.`open`, 1) over (partition by ten.stockCode order by `date`) chg_pre_1
+                       , lag(ten.last - ten.`open`, 2) over (partition by ten.stockCode order by `date`) chg_pre_2
+                       , lag(ten.last - ten.`open`, 3) over (partition by ten.stockCode order by `date`) chg_pre_3
+                       , lag(ten.last - ten.`open`, 4) over (partition by ten.stockCode order by `date`) chg_pre_4
+                       , lag(ten.last - ten.`open`, 5) over (partition by ten.stockCode order by `date`) chg_pre_5
+                       , ten.*
+                from t_eastmoney_node ten, tmp_date td
+                where ten.`date` > td.date_min
+                and ten.`date` < '2099'
+            )
+            select th.stockCode ,max(t1.date_curr) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
+            from tmp_ans t1 , t_hs300 th
+            where chg_pre_1 > 0 and chg_pre_2 > 0 and chg_pre_3 > 0 and chg_pre_4 > 0 and chg_pre_5 > 0
+            and t1.stockCode = th.fullStockCode
+            and th.stockCode not like '30%'
+            and th.stockCode not like '68%'
+            group by th.bkName, th.stockName, th.stockCode
+            order by date desc
+        ]]>
+    </select>
+
     <select id="getCalcDatesFromDuoTou"  resultType="java.lang.String">
         select distinct date
         from t_eastmoney_node ten
