@@ -805,12 +805,13 @@
                     from t_eastmoney_node_index teni
                     where stockCode = '1.000001'
                     order by `date` desc
-                    limit 20
+                    limit 40
                 ) tt
             ) -- select * from tmp_date;
             , tmp_ans as (
                 select lag(ten.`date`, 1) over (partition by ten.stockCode order by `date`) date_pre_1
                        , ten.`date` date_curr
+                       , ten.last - ten.`open` chg_pre_0
                        , lag(ten.last - ten.`open`, 1) over (partition by ten.stockCode order by `date`) chg_pre_1
                        , lag(ten.last - ten.`open`, 2) over (partition by ten.stockCode order by `date`) chg_pre_2
                        , lag(ten.last - ten.`open`, 3) over (partition by ten.stockCode order by `date`) chg_pre_3
@@ -822,12 +823,15 @@
                 and ten.`date` < '2099'
             )
             select th.stockCode ,min(t1.date_curr) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
-            from tmp_ans t1 , t_hs300 th
-            where chg_pre_1 > 0 and chg_pre_2 > 0 and chg_pre_3 > 0 and chg_pre_4 > 0 and chg_pre_5 > 0
+            from tmp_ans t1 , t_hs300 th , t_eastmoney_node_ma ma
+            where chg_pre_0 > 0 and chg_pre_1 > 0 and chg_pre_2 > 0 and chg_pre_3 > 0 and chg_pre_4 > 0 -- and chg_pre_5 > 0
             and t1.stockCode = th.fullStockCode
             and th.stockCode not like '30%'
             and th.stockCode not like '68%'
+            and ma.fullStockCode  = t1.stockCode
+            and ma.`date` = t1.date_curr
             group by th.bkName, th.stockName, th.stockCode
+            having min(t1.date_curr) > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
             order by date desc
         ]]>
     </select>
