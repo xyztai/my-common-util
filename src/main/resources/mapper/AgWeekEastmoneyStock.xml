@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.my.mapper.AgWeekEastmoneyStockMapper">
+
+    <select id="getHs300List" resultType="net.my.pojo.HsStockPoJo">
+        select stockCode, stockType, stockName
+        from t_hs300
+             -- where stockCode not like '30%'
+             -- and stockCode not like '68%'
+        order by 1
+    </select>
+
+    <select id="getMaxEastMoneyNode" resultType="net.my.pojo.EastmoneyNode">
+        select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw
+        from t_eastmoney_node_weekly
+        where stockCode = #{stockCode}
+          and `date` not like '99999%'
+        order by date desc
+            limit 1
+    </select>
+
+    <insert id="saveEastMoneyDatas" parameterType="java.util.List">
+        insert into t_eastmoney_node_weekly(`date`, `stockCode`, `infoRaw`)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.date}, #{item.stockCode}, #{item.infoRaw}
+            )
+        </foreach>
+    </insert>
+
+    <update id="updateEastMoneyDatas">
+        update t_eastmoney_node_weekly
+        set `date` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -11), ',', 1) ,
+            `open` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -10), ',', 1) ,
+            `last` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -9), ',', 1) ,
+            `high` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -8), ',', 1) ,
+            `low` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -7), ',', 1) ,
+            `volume` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -6), ',', 1) ,
+            `amount` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -5), ',', 1) ,
+            `chg` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -3), ',', 1) ,
+            -- SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -4), ',', 1),
+            -- SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -3), ',', 1),
+            -- SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -2), ',', 1),
+            `exchangeRaw` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -1), ',', 1)
+        where `open` is null
+    </update>
+
+</mapper>
