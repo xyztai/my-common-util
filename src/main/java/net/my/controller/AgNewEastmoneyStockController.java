@@ -23,6 +23,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
+import java.net.HttpURLConnection;
+import java.net.MalformedURLException;
+import java.net.ProtocolException;
+import java.net.URL;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -788,33 +792,51 @@ public class AgNewEastmoneyStockController {
 
     @GetMapping("/eastmoney-cookie")
     @Transactional
-    public BaseResponse getEastmoneyCookie() {
-        String url = "https://www.eastmoney.com/";
+    public BaseResponse getEastmoneyCookie() throws Exception {
+        String urlStr = "https://www.eastmoney.com/";
 
-        // 创建请求头
-        HttpHeaders headers = new HttpHeaders();
-        headers.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36");
-        headers.add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
-        headers.add("Accept-Language", "zh-CN,zh;q=0.9");
-        headers.add("Accept-Language", "keep-alive");
 
-        // 创建HttpEntity
-        HttpEntity<String> entity = new HttpEntity<>(headers);
+        URL url = new URL(urlStr);
+        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+        conn.setRequestMethod("GET");
 
-        // 发送GET请求
-        ResponseEntity<String> response = restTemplate.exchange(
-                url,
-                HttpMethod.GET,
-                entity,
-                String.class
-        );
+        // 获取所有响应头
+        Map<String, List<String>> headers = conn.getHeaderFields();
 
-        log.info("响应状态: " + response.getStatusCode());
-        log.info("响应体: " + response.getBody());
-        String res = response.getBody();
-        log.info("res={}", res);
-        HttpHeaders resHeaders = response.getHeaders();
-        log.info("resHeaders={}", JSON.toJSONString(resHeaders));
+        // 获取 Set-Cookie
+        List<String> cookies = headers.get("Set-Cookie");
+
+        if (cookies != null) {
+            for (String cookie : cookies) {
+                log.info("cookie={}", cookie);
+            }
+        }
+
+//
+//        // 创建请求头
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/146.0.0.0 Safari/537.36");
+//        headers.add("Accept", "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7");
+//        headers.add("Accept-Language", "zh-CN,zh;q=0.9");
+//        headers.add("Accept-Language", "keep-alive");
+//
+//        // 创建HttpEntity
+//        HttpEntity<String> entity = new HttpEntity<>(headers);
+//
+//        // 发送GET请求
+//        ResponseEntity<String> response = restTemplate.exchange(
+//                url,
+//                HttpMethod.GET,
+//                entity,
+//                String.class
+//        );
+//
+//        log.info("响应状态: " + response.getStatusCode());
+//        log.info("响应体: " + response.getBody());
+//        String res = response.getBody();
+//        log.info("res={}", res);
+//        HttpHeaders resHeaders = response.getHeaders();
+//        log.info("resHeaders={}", JSON.toJSONString(resHeaders));
 
         return BaseResponse.OK;
     }
