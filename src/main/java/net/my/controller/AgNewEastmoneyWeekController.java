@@ -99,9 +99,15 @@ public class AgNewEastmoneyWeekController {
                 }
 
                 // 5. 测试：用这个Cookie访问东财行情接口
-                String url = String.format("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=102&fqt=1&beg=0&end=20500101&fields1=f1&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
-                , e);
+                // beg=0 表示获取全量的历史数据
+//                String url = String.format("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=102&fqt=1&beg=0&end=20500101&fields1=f1&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
+//                , e);
 
+                // beg=20260301 表示只获取 20260301 以后的数据
+                String url = String.format("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=102&fqt=1&beg=20260301&end=20500101&fields1=f1&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
+                        , e);
+
+                log.info("url={}", url);
                 try {
                     String res = testWithCookie(client, cookieFromWeb, url);
 
