@@ -219,6 +219,12 @@ public class ScheduledTasks {
         log.info("task 清空缓存");
         agNewQQController.invalidateAll();
 
+        
+        // 4、此处有计算，需要提前进行计算
+        log.info("task stock queryDuoTou start");
+        agNewEastmoneyStockController.queryDuoTou();
+        log.info("task stock queryDuoTou end");
+
         // 开始进行查询缓存
         ExecutorService executor = Executors.newFixedThreadPool(5);
         // 计算缓存
@@ -332,15 +338,16 @@ public class ScheduledTasks {
             }
         }, executor);
 
-        CompletableFuture<Void> task112 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task stock queryDuoTou start");
-                agNewEastmoneyStockController.queryDuoTou();
-                log.info("task stock queryDuoTou end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
+        // 该任务需要先执行，不能放在这里一起执行
+//        CompletableFuture<Void> task112 = CompletableFuture.runAsync(() -> {
+//            try {
+//                log.info("task stock queryDuoTou start");
+//                agNewEastmoneyStockController.queryDuoTou();
+//                log.info("task stock queryDuoTou end");
+//            } catch (Exception e) {
+//                Thread.currentThread().interrupt();
+//            }
+//        }, executor);
 
 
         CompletableFuture<Void> task113 = CompletableFuture.runAsync(() -> {
@@ -508,7 +515,7 @@ public class ScheduledTasks {
                 , task109
                 , task110
                 , task111
-                , task112
+//                , task112
                 , task113
                 , task114
 
