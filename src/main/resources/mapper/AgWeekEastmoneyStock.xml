@@ -7,6 +7,7 @@
     <select id="getHs300List" resultType="net.my.pojo.HsStockPoJo">
         select stockCode, stockType, stockName
         from t_hs300
+        where fullStockCode not in (select distinct stockCode from t_eastmoney_node_weekly tenw where date >= #{targetDate})
              -- where stockCode not like '30%'
              -- and stockCode not like '68%'
         order by 1

@@ -75,7 +75,7 @@ public class AgNewEastmoneyWeekController {
             System.out.println(cookieStr);
 
 
-            List<HsStockPoJo> hs300List = mapper.getHs300List();
+            List<HsStockPoJo> hs300List = mapper.getHs300List(targetDate);
 
             if(CollectionUtils.isEmpty(hs300List)) {
                 return BaseResponse.OK;
@@ -87,9 +87,10 @@ public class AgNewEastmoneyWeekController {
 
             List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
 
-            int i = 1;
+            int i = 0;
             for(String e : eList) {
-                log.info("e={}", e);
+                i++;
+                log.info("get e={}, seq:{}/{}", e, i, eList.size());
                 String maxDate = mapper.getMaxEastMoneyNode(e);
                 if(maxDate != null) {
                     if(maxDate.compareTo(targetDate) >= 0) {
@@ -134,7 +135,7 @@ public class AgNewEastmoneyWeekController {
                         eastmoneyNodeList.addAll(nodes);
                     }
 
-                    log.info("get seq:{}/{}", i++, eList.size());
+//                    log.info("get seq:{}/{}", i, eList.size());
                     if(eastmoneyNodeList.size() > 1000) {
                         int startNum = 0;
                         int stepNum = 500;
@@ -155,9 +156,9 @@ public class AgNewEastmoneyWeekController {
                     break;
                 }
 
-                if(i > 100) {
-                    break;
-                }
+//                if(i > 100) {
+//                    break;
+//                }
             }
 
             int startNum = 0;
