@@ -88,9 +88,10 @@ public class AgNewEastmoneyWeekController {
 
             int i = 1;
             for(String e : eList) {
-                EastmoneyNode existsNode = mapper.getMaxEastMoneyNode(e);
-                if(existsNode != null) {
-                    if(existsNode.getDate().compareTo(targetDate) >= 0) {
+                log.info("e={}", e);
+                String maxDate = mapper.getMaxEastMoneyNode(e);
+                if(maxDate != null) {
+                    if(maxDate.compareTo(targetDate) >= 0) {
                         continue;
                     }
                 }
@@ -123,28 +124,43 @@ public class AgNewEastmoneyWeekController {
                         nodes.add(EastmoneyNode.builder().date(xxs[0]).stockCode(e).infoRaw(item).build());
                     }
 
-                    if(existsNode != null) {
+                    if(maxDate != null) {
                         nodes = nodes.stream()
-                                .filter(f -> f.getDate().compareTo(existsNode.getDate()) > 0).collect(Collectors.toList());
+                                .filter(f -> f.getDate().compareTo(maxDate) > 0).collect(Collectors.toList());
                     }
 
                     if(!CollectionUtils.isEmpty(nodes)) {
                         eastmoneyNodeList.addAll(nodes);
+                    }
+
+                    log.info("get seq:{}/{}", i++, eList.size());
+                    if(eastmoneyNodeList.size() > 1000) {
+                        int startNum = 0;
+                        int stepNum = 500;
+                        while(startNum < eastmoneyNodeList.size()) {
+                            List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
+                            log.info("tmpNodes.size={}", tmpNodes.size());
+                            mapper.saveEastMoneyDatas(tmpNodes);
+                            startNum += stepNum;
+                        }
+                        // 清空一下
+                        eastmoneyNodeList = new ArrayList<>();
+                    } else {
+                        // 不处理数据就暂停2s
+                        Thread.sleep(2000L);
                     }
                 } catch (Exception ex) {
                     log.error("", ex);
                     break;
                 }
 
-                log.info("get seq:{}/{}", i++, eList.size());
-                Thread.sleep(2000L);
                 if(i > 100) {
                     break;
                 }
             }
 
             int startNum = 0;
-            int stepNum = 100;
+            int stepNum = 500;
             while(startNum < eastmoneyNodeList.size()) {
                 List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
                 log.info("tmpNodes.size={}", tmpNodes.size());

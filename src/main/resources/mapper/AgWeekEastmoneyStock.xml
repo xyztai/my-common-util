@@ -12,13 +12,11 @@
         order by 1
     </select>
 
-    <select id="getMaxEastMoneyNode" resultType="net.my.pojo.EastmoneyNode">
-        select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw
+    <select id="getMaxEastMoneyNode" resultType="java.lang.String">
+        select max(date)
         from t_eastmoney_node_weekly
         where stockCode = #{stockCode}
           and `date` not like '99999%'
-        order by date desc
-            limit 1
     </select>
 
     <insert id="saveEastMoneyDatas" parameterType="java.util.List">

@@ -11,7 +11,7 @@ import java.util.List;
 public interface AgWeekEastmoneyStockMapper {
     // hs300 数据
     List<HsStockPoJo> getHs300List();
-    EastmoneyNode getMaxEastMoneyNode(@Param("stockCode") String stockCode);
+    String getMaxEastMoneyNode(@Param("stockCode") String stockCode);
     int saveEastMoneyDatas(List<EastmoneyNode> eastmoneyNodes);
     int updateEastMoneyDatas();
 }
