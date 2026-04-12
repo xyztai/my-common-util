@@ -802,9 +802,11 @@ public class AgNewEastmoneyStockController {
 
         // 获取所有响应头
         Map<String, List<String>> headers = conn.getHeaderFields();
+        log.info("headers={}", JSON.toJSONString(headers));
 
         // 获取 Set-Cookie
         List<String> cookies = headers.get("Set-Cookie");
+        log.info("cookies={}", JSON.toJSONString(cookies));
 
         if (cookies != null) {
             for (String cookie : cookies) {
