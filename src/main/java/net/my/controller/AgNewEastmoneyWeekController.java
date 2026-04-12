@@ -31,6 +31,7 @@ public class AgNewEastmoneyWeekController {
     private AgWeekEastmoneyStockMapper mapper;
 
     /**
+     * 127.0.0.1:51666//ag-week-eastmoney-stock/test?cookieFromWeb=xxx&targetDate=2026-04-10
      * 通过浏览器访问 https://finance.eastmoney.com/ 来获取 cookie，然后作为参数给到参数，参数里面的 targetDate 为计算周的最后一个交易日的时间比如：2026-04-10
      * @param cookieFromWeb
      * @param targetDate
