@@ -219,7 +219,7 @@ public class ScheduledTasks {
         log.info("task 清空缓存");
         agNewQQController.invalidateAll();
 
-        
+
         // 4、此处有计算，需要提前进行计算
         log.info("task stock queryDuoTou start");
         agNewEastmoneyStockController.queryDuoTou();
@@ -365,6 +365,17 @@ public class ScheduledTasks {
                 log.info("task stock queryUp5Lian start");
                 agNewEastmoneyStockController.queryUp5Lian();
                 log.info("task stock queryUp5Lian end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
+
+        CompletableFuture<Void> task115 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock queryOnlyThem start");
+                agNewEastmoneyStockController.queryOnlyThem();
+                log.info("task stock queryOnlyThem end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
@@ -518,6 +529,7 @@ public class ScheduledTasks {
 //                , task112
                 , task113
                 , task114
+                , task115
 
                 , task201
                 , task202

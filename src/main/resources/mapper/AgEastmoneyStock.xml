@@ -836,6 +836,40 @@
         ]]>
     </select>
 
+    <select id="queryOnlyThem" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+        with tmp_longtou as (
+            select ten.`date`
+                 , lag(ten.`date` , 20) over (partition by ten.stockCode order by ten.`date` ) date_pre_20
+		   , ten.stockCode
+                 , ten.`last`
+                 , lag(ten.`last` , 20) over (partition by ten.stockCode order by ten.`date` ) last_pre_20
+		   , lag(ten.`last` , 5) over (partition by ten.stockCode order by ten.`date` ) last_pre_5
+            from t_eastmoney_node ten
+            where ten.`date` > '2025-01-01'
+              and `date` < '2099'
+        )
+           , tmp_3_bei as (
+            select ten.stockCode, max(`last` ) last_max, min(`last` ) last_min
+            from t_eastmoney_node ten
+            where ten.`date` > '2025-01-01'
+              and `date` < '2099'
+            group by ten.stockCode
+            having last_max > last_min * 3
+        )
+        select -- th.stockCode, th.stockName , th.bkName , min(t.date) date_min, max(t.date) date_max
+               th.stockCode ,min(t.date) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
+        from tmp_longtou t, t_hs300 th, tmp_3_bei tb
+        where (t.last >= t.last_pre_20 * 2 or t.last >= t.last_pre_5 * 1.2)
+          and th.stockCode not like '30%'
+          and th.stockCode not like '68%'
+          and t.stockCode = th.fullStockCode
+          and t.stockCode = tb.stockCode
+        group by th.stockCode, th.stockName , th.bkName
+        order by 4, 1
+        ]]>
+    </select>
+
     <select id="getCalcDatesFromDuoTou"  resultType="java.lang.String">
         select distinct date
         from t_eastmoney_node ten
