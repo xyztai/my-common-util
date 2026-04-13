@@ -75,7 +75,7 @@ public class AgNewEastmoneyWeekController {
             System.out.println(cookieStr);
 
 
-            List<HsStockPoJo> hs300List = mapper.getHs300List();
+            List<HsStockPoJo> hs300List = mapper.getHs300List(targetDate);
 
             if(CollectionUtils.isEmpty(hs300List)) {
                 return BaseResponse.OK;
@@ -87,9 +87,10 @@ public class AgNewEastmoneyWeekController {
 
             List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
 
-            int i = 1;
+            int i = 0;
             for(String e : eList) {
-                log.info("e={}", e);
+                i++;
+                log.info("get e={}, seq:{}/{}", e, i, eList.size());
                 String maxDate = mapper.getMaxEastMoneyNode(e);
                 if(maxDate != null) {
                     if(maxDate.compareTo(targetDate) >= 0) {
@@ -98,9 +99,15 @@ public class AgNewEastmoneyWeekController {
                 }
 
                 // 5. 测试：用这个Cookie访问东财行情接口
-                String url = String.format("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=102&fqt=1&beg=0&end=20500101&fields1=f1&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
-                , e);
+                // beg=0 表示获取全量的历史数据
+//                String url = String.format("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=102&fqt=1&beg=0&end=20500101&fields1=f1&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
+//                , e);
 
+                // beg=20260301 表示只获取 20260301 以后的数据
+                String url = String.format("https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=102&fqt=1&beg=20260301&end=20500101&fields1=f1&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61"
+                        , e);
+
+                log.info("url={}", url);
                 try {
                     String res = testWithCookie(client, cookieFromWeb, url);
 
@@ -134,7 +141,7 @@ public class AgNewEastmoneyWeekController {
                         eastmoneyNodeList.addAll(nodes);
                     }
 
-                    log.info("get seq:{}/{}", i++, eList.size());
+//                    log.info("get seq:{}/{}", i, eList.size());
                     if(eastmoneyNodeList.size() > 1000) {
                         int startNum = 0;
                         int stepNum = 500;
@@ -155,9 +162,9 @@ public class AgNewEastmoneyWeekController {
                     break;
                 }
 
-                if(i > 100) {
-                    break;
-                }
+//                if(i > 100) {
+//                    break;
+//                }
             }
 
             int startNum = 0;
