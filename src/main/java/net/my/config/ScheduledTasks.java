@@ -133,7 +133,8 @@ public class ScheduledTasks {
     /**
      * 计算每周的数据
      */
-    @Scheduled(cron = "0 51,55 * * * ?")
+//    @Scheduled(cron = "0 51,55 * * * ?")
+    @Scheduled(cron = "0,30 0 0 ? * SUN")
     public void genWeeklyData() {
         log.info("genWeeklyData start");
         agWeekEastmoneyStockMapper.genWeeklyData();
