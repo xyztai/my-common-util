@@ -45,4 +45,42 @@
         where `open` is null
     </update>
 
+
+    <insert id="genWeeklyData">
+        <![CDATA[
+        replace into t_eastmoney_node_weekly(`date`, `stockCode`, `open`, `last`, `high`, `low`, `volume`, `amount`, `chg` )
+        with tmp_week as (
+            select stockCode stockCode_w, max(date) date_w
+            from t_eastmoney_node_weekly
+            -- where `date` < '2026-04-10'
+            group by stockCode
+        )
+        , tmp_1 as (
+            select
+                   rank() over (partition by ten.stockCode order by `date` ) date_rn
+                   , rank() over (partition by ten.stockCode order by `date` desc) revert_date_rn
+                   , ten.*
+            from t_eastmoney_node ten, tmp_week tw
+            where `date` > tw.date_w
+            and `date` <= DATE_FORMAT( sysdate(), '%Y-%m-%d')
+            and ten.stockCode = tw.stockCode_w
+        )
+        select max(case when revert_date_rn = 1 then ten.`date` else null end) date
+               , ten.stockCode
+               , max(case when date_rn = 1 then ten.`open` else null end) open
+               , max(case when revert_date_rn = 1 then ten.`last` else null end) last
+               , max(ten.high ) high
+               , min(ten.low ) low
+               , sum(ten.volume ) volume
+               , round(sum(ten.amount ), 0) amount
+               , round(max(case when revert_date_rn = 1 then ten.`last` else null end)/
+                       (max(case when date_rn = 1 then ten.`last` else null end)) * (1 + 0.01 * max(case when date_rn = 1 then ten.`chg` else null end)) * 100
+                 , 2) - 100 chg
+        from tmp_1 ten
+        group by ten.stockCode
+        order by 1, 2
+        ]]>
+    </insert>
+
+
 </mapper>

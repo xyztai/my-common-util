@@ -3,6 +3,7 @@ package net.my.config;
 import lombok.extern.slf4j.Slf4j;
 import net.my.controller.*;
 import net.my.mapper.AgEastmoneyEChartsMapper;
+import net.my.mapper.AgWeekEastmoneyStockMapper;
 import net.my.mapper.DataCalcMapper;
 import net.my.mapper.TmpMapper;
 import net.my.pojo.EastmoneyWinRatioPOJO;
@@ -65,6 +66,9 @@ public class ScheduledTasks {
     @Autowired
     private net.my.mapper.AgEastmoneyWinRatioMapper agEastmoneyWinRatioMapper;
 
+    @Autowired
+    private AgWeekEastmoneyStockMapper agWeekEastmoneyStockMapper;
+
     @Value("${executeOnceTaskEnable}")
     private Boolean executeOnceTaskEnable;
 
@@ -124,6 +128,17 @@ public class ScheduledTasks {
 //        }
 //        log.info("execGetHistoryData end");
 //    }
+
+
+    /**
+     * 计算每周的数据
+     */
+    @Scheduled(cron = "0 51,55 * * * ?")
+    public void genWeeklyData() {
+        log.info("genWeeklyData start");
+        agWeekEastmoneyStockMapper.genWeeklyData();
+        log.info("genWeeklyData end");
+    }
 
     /**
      * 自动获取/更新历史上5天的cp数据

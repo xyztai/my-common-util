@@ -14,4 +14,5 @@ public interface AgWeekEastmoneyStockMapper {
     String getMaxEastMoneyNode(@Param("stockCode") String stockCode);
     int saveEastMoneyDatas(List<EastmoneyNode> eastmoneyNodes);
     int updateEastMoneyDatas();
+    int genWeeklyData();
 }
