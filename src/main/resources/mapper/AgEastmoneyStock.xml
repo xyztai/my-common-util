@@ -915,6 +915,47 @@
         ]]>
     </select>
 
+    <select id="MA20maSSP" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+        with tmp as (
+            select `date`
+                 -- , lag(`date`, 1) over (partition by stockCode order by ten.`date` ) data_pre_1
+                 -- , lag(`date`, 60) over (partition by stockCode order by ten.`date` ) data_pre_60
+                 , rank() over (partition by stockCode order by ten.`date` desc) date_rank
+                        , last
+           , stockCode
+           , chg
+        from t_eastmoney_node ten
+        where ten.`date` > DATE_FORMAT(DATE_ADD(SYSDATE() , INTERVAL -120 DAY), '%Y-%m-%d')
+          and ten.`date` not like '9999%'
+        -- and ten.stockCode = '0.002025'
+        order by ten.`date` desc
+            )
+                , tmp_ans as (
+        select t1.stockCode
+                , avg(case when t1.date_rank <= 1 then t1.chg else null end) `chg`
+                , avg(case when t1.date_rank <= 1 then t1.last else null end) `last`
+                , max(case when t1.date_rank <= 10 then t1.chg else null end) chg_max_10
+                , round(avg(case when t1.date_rank <= 5 then t1.last else null end), 3) ma5
+                , round(avg(case when t1.date_rank <= 10 then t1.last else null end), 3) ma10
+                , round(avg(case when t1.date_rank <= 20 then t1.last else null end), 3) ma20
+                , round(avg(case when t1.date_rank <= 60 then t1.last else null end), 3) ma60
+                , max(t1.date) date
+        from tmp t1
+        where exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 60)
+        group by t1.stockCode
+        having `last` >= ma10 * 0.99 and ma5 >= ma10 * 0.99 and ma10 >= ma20 * 0.98 -- and ma20 >= ma60
+           and chg_max_10 > 8 -- and chg > -2 and chg < 2
+            )
+        select th.stockCode, t1.date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
+        from tmp_ans t1, t_hs300 th
+        where t1.stockCode = th.fullStockCode
+          and th.stockCode not like '30%'
+          and th.stockCode not like '68%'
+        order by 2, 1
+        ]]>
+    </select>
+
     <select id="getCalcDatesFromDuoTou"  resultType="java.lang.String">
         select distinct date
         from t_eastmoney_node ten

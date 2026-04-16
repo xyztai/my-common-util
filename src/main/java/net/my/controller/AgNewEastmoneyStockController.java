@@ -91,6 +91,8 @@ public class AgNewEastmoneyStockController {
     private static final String KEY_18 = "stock#" + "queryOnlyThem";
     // 19、跳空高开，等回调
     private static final String KEY_19 = "stock#" + "jumpAndWait";
+    // 20、ssp，最近10个交易日有冲高，然后均线粘结
+    private static final String KEY_20 = "stock#" + "MA20maSSP";
 
     /**
      * 0、方便截屏
@@ -766,6 +768,39 @@ public class AgNewEastmoneyStockController {
         }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.jumpAndWait();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("688")
+                        && !f.getStockCode().startsWith("689")
+                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+    /**
+     * 20、ssp，最近10个交易日有冲高，然后均线粘结
+     * * @return
+     */
+    @GetMapping("/eastmoney-MA20maSSP")
+    public BaseResponse MA20maSSP() {
+        log.info("MA20maSSP");
+        String key = KEY_20;
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.MA20maSSP();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
