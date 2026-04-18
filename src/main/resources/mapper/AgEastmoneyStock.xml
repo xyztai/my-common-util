@@ -956,6 +956,94 @@
         ]]>
     </select>
 
+    <select id="considerAll" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+        -- 1、必须站上5日均线
+        -- 2、禁止出现上引线
+        -- 3、5、10、20、30 必须多头排列
+        -- 4、必须出现5日连涨
+        -- 5、涨幅不能太大
+        with tmp as (
+            select `date`
+                   , lag(`date`, 1) over (partition by stockCode order by ten.`date` ) date_pre_1
+                   -- , lag(`date`, 60) over (partition by stockCode order by ten.`date` ) date_pre_60
+                   , rank() over (partition by stockCode order by ten.`date` desc) date_rank
+                   , last
+                   , chg
+                   , stockCode
+            from t_eastmoney_node ten
+            where ten.`date` <= '2099' -- and  stockCode = '0.002025'
+              AND ten.`date` > DATE_FORMAT(DATE_ADD(SYSDATE() , INTERVAL -120 DAY), '%Y-%m-%d')
+        )
+        , tmp_30_duotou as (
+            select t1.date, t1.date_pre_1, t1.stockCode
+                    , max(t1.last) `last`
+                    , round(sum(case when t1.date_rank + 5 > t2.date_rank then round(t2.chg, 2) else 0 end), 3) chg_sum_5
+                    , round(sum(case when t1.date_rank + 10 > t2.date_rank then round(t2.chg, 2) else 0 end), 3) chg_sum_10
+                    , round(sum(case when t1.date_rank + 20 > t2.date_rank then round(t2.chg, 2) else 0 end), 3) chg_sum_20
+                    , round(avg(case when t1.date_rank + 5 > t2.date_rank then round(t2.last, 2) else null end), 3) ma5
+                    , round(avg(case when t1.date_rank + 10 > t2.date_rank then round(t2.last, 2) else null end), 3) ma10
+                    , round(avg(case when t1.date_rank + 20 > t2.date_rank then round(t2.last, 2) else null end), 3) ma20
+                    , round(avg(case when t1.date_rank + 30 > t2.date_rank then round(t2.last, 2) else null end), 3) ma30
+                    , sum(case when t1.date_rank + 30 > t2.date_rank then 1 else 0 end) cnt_
+            from tmp t1, tmp t2
+            where t1.stockCode = t2.stockCode
+              and t1.date_rank <= t2.date_rank
+              and t1.date_rank <= 60
+            group by t1.date, t1.date_pre_1, t1.stockCode
+            having ma5 >= ma10 and ma10 >= ma20 * 0.995 and ma20 >= ma30 * 0.995 -- 3、5、10、20、30 必须多头排列
+               and cnt_ = 30
+               and `last` >= ma5 -- 1、必须站上5日均线
+               and chg_sum_5 < 20 and chg_sum_10 < 30 and chg_sum_20 < 30 -- 5、涨幅不能太大
+        ) -- select * from tmp_30_duotou where stockCode = '0.002025';
+        , tmp_date as (
+            select min(date) date_min from (
+                select *
+                from t_eastmoney_node_index teni
+                where stockCode = '1.000001'
+                order by `date` desc
+                limit 60
+            ) tt
+        ) -- select * from tmp_date;
+        , tmp_ans as (
+            select lag(ten.`date`, 1) over (partition by ten.stockCode order by `date`) date_pre_1
+                    , ten.`date` date_curr
+                    , ten.last - ten.`open` chg_pre_0
+                    , lag(ten.last - ten.`open`, 1) over (partition by ten.stockCode order by `date`) chg_pre_1
+                    , lag(ten.last - ten.`open`, 2) over (partition by ten.stockCode order by `date`) chg_pre_2
+                    , lag(ten.last - ten.`open`, 3) over (partition by ten.stockCode order by `date`) chg_pre_3
+                    , lag(ten.last - ten.`open`, 4) over (partition by ten.stockCode order by `date`) chg_pre_4
+                    , lag(ten.last - ten.`open`, 5) over (partition by ten.stockCode order by `date`) chg_pre_5
+                    , lead(ten.chg, 2) over (partition by ten.stockCode order by `date`) chg_next_2
+                    , ten.*
+            from t_eastmoney_node ten, tmp_date td
+            where ten.`date` > td.date_min
+              and ten.`date` < '2099'
+        ) --  select * from tmp_30_duotou;  where stockCode = '0.002025' And  chg_pre_0 >= -0.02 and chg_pre_1 >= -0.02 and chg_pre_2 >= -0.02 and chg_pre_3 >= -0.02 and chg_pre_4 >= -0.02;  -- and chg_pre_5 > 0
+        , tmp_has_pre_date as (
+            select  th.stockCode
+                    , t1.date_curr -- ,min(t1.date_curr) date
+                    , lag(t1.date_curr, 1) over (partition by stockCode order by t1.date_curr ) ans_date_pre_1
+                    , t3d.date_pre_1
+                    , concat(th.bkName, '-',  th.stockName) last, concat('', chg_next_2) ratioB
+            from tmp_ans t1 , t_hs300 th, tmp_30_duotou t3d
+            where 1 = 1
+              and chg_pre_0 >= -0.02 and chg_pre_1 >= -0.02 and chg_pre_2 >= -0.02 and chg_pre_3 >= -0.02 and chg_pre_4 >= -0.02 -- and chg_pre_5 > 0 -- 4、必须出现5日连涨
+              and t1.stockCode = th.fullStockCode
+              and th.stockCode not like '30%'
+              and th.stockCode not like '68%'
+              and t3d.stockCode = t1.stockCode
+              and t3d.`date` = t1.date_curr -- and t3d.stockCode = '1.600011'
+              and not (case when t1.`open` > t1.`last` then (t1.high - t1.`open`) > 2 * (t1.`last`  - t1.low ) and (t1.high - t1.low ) > 2 * (t1.`open` - t1.`last` )
+                else (t1.high - t1.`last`) > 2 * (t1.`open`  - t1.`low` ) and (t1.high - t1.low ) > 2 * (t1.`last` - t1.`open` )  end) -- 2、禁止出现上引线
+        ) -- select * from tmp_has_pre_date where stockCode = '002025' ;
+        select stockCode, date_curr date, last, concat('T+2: ', ratioB) ratioB
+        from tmp_has_pre_date t
+        where IFNULL(t.ans_date_pre_1, '1000') != IFNULL(t.date_pre_1, '1001')
+        order by 2 desc, 1
+        ]]>
+    </select>
+
     <select id="getCalcDatesFromDuoTou"  resultType="java.lang.String">
         select distinct date
         from t_eastmoney_node ten

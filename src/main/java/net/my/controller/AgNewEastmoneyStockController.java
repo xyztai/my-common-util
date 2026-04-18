@@ -93,6 +93,8 @@ public class AgNewEastmoneyStockController {
     private static final String KEY_19 = "stock#" + "jumpAndWait";
     // 20、ssp，最近10个交易日有冲高，然后均线粘结
     private static final String KEY_20 = "stock#" + "MA20maSSP";
+    // 21、综合考虑，可以下手了
+    private static final String KEY_21 = "stock#" + "considerAll";
 
     /**
      * 0、方便截屏
@@ -801,6 +803,44 @@ public class AgNewEastmoneyStockController {
         }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.MA20maSSP();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("688")
+                        && !f.getStockCode().startsWith("689")
+                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+    /**
+     * 21、综合考虑，可以下手了
+     * -- 1、必须站上5日均线
+     * -- 2、禁止出现上引线
+     * -- 3、5、10、20、30 必须多头排列
+     * -- 4、必须出现5日连涨
+     * -- 5、涨幅不能太大
+     * * @return
+     */
+    @GetMapping("/eastmoney-considerAll")
+    public BaseResponse considerAll() {
+        log.info("considerAll");
+        String key = KEY_21;
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.considerAll();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
