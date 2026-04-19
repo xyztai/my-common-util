@@ -983,7 +983,7 @@
             -- , round(sum(case when t1.date_rank + 20 > t2.date_rank then round(t2.chg, 2) else 0 end), 3) chg_sum_20
                 , round(avg(case when t1.date_rank + 5 > t2.date_rank then round(t2.last, 2) else null end), 3) ma5
                 , round(avg(case when t1.date_rank + 10 > t2.date_rank then round(t2.last, 2) else null end), 3) ma10
-                , round(avg(case when t1.date_rank + 20 > t2.date_rank then round(t2.last, 2) else null end), 3) ma20
+            -- , round(avg(case when t1.date_rank + 20 > t2.date_rank then round(t2.last, 2) else null end), 3) ma20
             -- , round(avg(case when t1.date_rank + 30 > t2.date_rank then round(t2.last, 2) else null end), 3) ma30
                 , sum(case when t1.date_rank + 30 > t2.date_rank then 1 else 0 end) cnt_
         from tmp t1, tmp t2
@@ -991,7 +991,7 @@
           and t1.date_rank <= t2.date_rank
           and t1.date_rank <= 60
         group by t1.date, t1.date_pre_1, t1.stockCode
-        having ma5 >= ma10 and ma10 >= ma20 -- and ma20 >= ma30 * 0.995   -- 3、5、10、20 必须多头排列
+        having ma5 >= ma10 -- and ma10 >= ma20 -- and ma20 >= ma30 * 0.995   -- 3、5、10、20 必须多头排列
            and cnt_ = 30
            and `last` >= ma5 -- 1、必须站上5日均线
            and chg_sum_5 < 20 and chg_sum_10 < 30 -- and chg_sum_20 < 30 -- 5、涨幅不能太大
