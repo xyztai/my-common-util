@@ -973,7 +973,7 @@
            , stockCode
         from t_eastmoney_node ten
         where ten.`date` <= '2099' -- and  stockCode = '0.002056'
-          AND ten.`date` > DATE_FORMAT(DATE_ADD(SYSDATE() , INTERVAL -120 DAY), '%Y-%m-%d')
+          AND ten.`date` > DATE_FORMAT(DATE_ADD(SYSDATE() , INTERVAL -90 DAY), '%Y-%m-%d')
             )
             , tmp_30_duotou as (
         select t1.date, t1.date_pre_1, t1.stockCode
