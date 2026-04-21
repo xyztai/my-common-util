@@ -1093,7 +1093,7 @@
             and ifnull(_chg_next_1, -1) < 0
             and th.stockCode not like '30%'
             and th.stockCode not like '68%'
-            order by 1 desc
+            order by 2 desc
         ]]>
     </select>
 
