@@ -95,6 +95,8 @@ public class AgNewEastmoneyStockController {
     private static final String KEY_20 = "stock#" + "MA20maSSP";
     // 21、综合考虑，可以下手了
     private static final String KEY_21 = "stock#" + "considerAll";
+    // 22、查询出现5连跌，且当天的开盘>收盘、chg<0
+    private static final String KEY_22 = "stock#" + "down5";
 
     /**
      * 0、方便截屏
@@ -841,6 +843,39 @@ public class AgNewEastmoneyStockController {
         }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.considerAll();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("688")
+                        && !f.getStockCode().startsWith("689")
+                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+    /**
+     * 22、查询出现5连跌，且当天的开盘>收盘、chg<0
+     * * @return
+     */
+    @GetMapping("/eastmoney-down5")
+    public BaseResponse down5() {
+        log.info("down5");
+        String key = KEY_22;
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.down5();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")

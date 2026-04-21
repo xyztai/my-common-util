@@ -1044,6 +1044,59 @@
         ]]>
     </select>
 
+    <select id="down5" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+            with tmp_date as (
+                select min(date) date_min from (
+                    select *
+                    from t_eastmoney_node_index teni
+                    where stockCode = '1.000001'
+                    order by `date` desc
+                    limit 60
+                ) tt
+            ) -- select * from tmp_date;
+            , tmp_ans as (
+                select lag(ten.`date`, 1) over (partition by ten.stockCode order by `date`) date_pre_1
+                        , ten.`date` date_curr
+                        , ten.last - ten.`open` chg_pre_0
+                        , lag(ten.last - ten.`open`, 1) over (partition by ten.stockCode order by `date`) chg_pre_1
+                        , lag(ten.last - ten.`open`, 2) over (partition by ten.stockCode order by `date`) chg_pre_2
+                        , lag(ten.last - ten.`open`, 3) over (partition by ten.stockCode order by `date`) chg_pre_3
+                        , lag(ten.last - ten.`open`, 4) over (partition by ten.stockCode order by `date`) chg_pre_4
+                    -- , lag(ten.last - ten.`open`, 5) over (partition by ten.stockCode order by `date`) chg_pre_5
+                        , lead(ten.last - ten.`open`, 1) over (partition by ten.stockCode order by `date`) chg_next_1
+                        , lead(ten.chg, 2) over (partition by ten.stockCode order by `date`) chg_next_2
+                        , ten.volume volume_0
+                        , lag(ten.volume , 1) over (partition by ten.stockCode order by `date`) volume_pre_1
+                        , lag(ten.volume , 2) over (partition by ten.stockCode order by `date`) volume_pre_2
+                        , lag(ten.volume , 3) over (partition by ten.stockCode order by `date`) volume_pre_3
+                        , lag(ten.volume , 4) over (partition by ten.stockCode order by `date`) volume_pre_4
+                        , ten.chg _chg_0
+                        , lag(ten.chg , 1) over (partition by ten.stockCode order by `date`) _chg_pre_1
+                        , lag(ten.chg , 2) over (partition by ten.stockCode order by `date`) _chg_pre_2
+                        , lag(ten.chg , 3) over (partition by ten.stockCode order by `date`) _chg_pre_3
+                        , lag(ten.chg , 4) over (partition by ten.stockCode order by `date`) _chg_pre_4
+                        , lead(ten.chg, 1) over (partition by ten.stockCode order by `date`) _chg_next_1
+                        , ten.*
+                from t_eastmoney_node ten, tmp_date td
+                where ten.`date` > td.date_min
+                  and ten.`date` < '2099'
+            )
+            select -- ta.date_curr, th.bkName , th.stockName , th.stockCode , th.fullStockCode , ta.chg_next_2
+                  th.stockCode, ta.date_curr date, concat(th.bkName, '-',  th.stockName) last, concat('T+2: ', ta.chg_next_2) ratioB
+            from tmp_ans ta , t_hs300 th
+            where ta.chg_pre_0 < 0 and chg_pre_1 < 0 and chg_pre_2 < 0 and  chg_pre_3 < 0 and chg_pre_4 < 0
+            and ta._chg_0 < 0 and _chg_pre_1 < 0 and _chg_pre_1 < 0 and _chg_pre_1 < 0 and _chg_pre_1 < 0
+            and volume_0 < LEAST (volume_pre_1, volume_pre_2, volume_pre_3, volume_pre_4)
+            and ta.stockCode = th.fullStockCode
+            and ifnull(chg_next_1, -1) < 0
+            and ifnull(_chg_next_1, -1) < 0
+            and th.stockCode not like '30%'
+            and th.stockCode not like '68%'
+            order by 1 desc
+        ]]>
+    </select>
+
     <select id="getCalcDatesFromDuoTou"  resultType="java.lang.String">
         select distinct date
         from t_eastmoney_node ten
