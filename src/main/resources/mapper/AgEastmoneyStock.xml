@@ -141,7 +141,7 @@
     </update>
 
     <select id="queryEastmoneyToday" resultType="net.my.pojo.SpecialCarePoJo2">
-        <![CDATA[
+    <![CDATA[
         with tmp_all as (
             select ten.`date` , ten.stockCode , round(ten.`last`, 3) last, ten.chg
                , rank() over (partition by ten.stockCode order by clac_expma_10/clac_expma_5 desc) rank_
@@ -211,7 +211,7 @@
         from tmp_consider_99999 t1, t_hs300 t3
         where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
         order by 1 desc, 2
-        ]]>
+    ]]>
     </select>
 
     <select id="queryEastmoneyLast30" resultType="net.my.pojo.SpecialCarePoJo2">
