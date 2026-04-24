@@ -61,8 +61,8 @@ public class AgNewEastmoneyStockController {
     @Autowired
     private AgNewSinaController agNewSinaController;
 
-    // 1、根据最近一年的数据，判断今天能否进入TOP3， 日期是以9999开头
-    private static final String KEY_1 = "stock#" + "special-care-days-eastmoney-365-top3";
+    // 1、根据最近一年的数据，使用 clac_expma_10/clac_expma_5 进行计算，找出低点，找出TOP3
+    private static final String KEY_1 = "stock#" + "get-left-side-expma10-expma5-top3";
     // 2、根据top3查看最近30天的情况， 日期是以9999开头
     private static final String KEY_2 = "stock#" + "special-care-days-eastmoney-30";
     // 3、找到成交量放大3倍及以上的stock
@@ -230,10 +230,10 @@ public class AgNewEastmoneyStockController {
 //    }
 
     /**
-     * 1、根据最近一年的数据，判断今天能否进入TOP3， 日期是以9999开头
+     * 1、根据最近一年的数据，使用 clac_expma_10/clac_expma_5 进行计算，找出低点，找出TOP3
      * @return
      */
-    @GetMapping("/special-care-days-eastmoney-365-top3")
+    @GetMapping("/get-left-side-expma10-expma5-top3")
     public BaseResponse queryEastmoneyToday() {
         log.info("queryEastmoneyToday");
         String key = KEY_1;

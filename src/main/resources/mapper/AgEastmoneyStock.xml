@@ -144,67 +144,67 @@
         <![CDATA[
         with tmp_all as (
             select ten.`date` , ten.stockCode , round(ten.`last`, 3) last, ten.chg
-           , rank() over (partition by ten.stockCode order by clac_expma_10/clac_expma_5 desc) rank_
-           , round(clac_expma_10/clac_expma_5, 3) ratioB
-           , round(clac_expma_5, 3) clac_expma_5
-           , round(clac_expma_10, 3) clac_expma_10
-        from t_eastmoney_node ten
-        where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 YEAR), '%Y-%m-%d')
-            )
-            , tmp_stock_code as (
-        select DISTINCT stockCode
-        from tmp_all t1
-        where t1.rank_ <= 5
-          and t1.`date` like '9999%'
-            )
-            , tmp_rank_99999 as (
-        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
-                , rank() over (partition by stockCode order by rank_ ) rank_2
-        from tmp_all t, tmp_stock_code t1
-        where t.rank_ <= 5 * 2
-          and (t.`date` = '99999+0.01' or t.`date` not like '99999%')
-          and t.stockCode = t1.stockCode
-        union
-        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
-                , rank() over (partition by stockCode order by rank_ ) rank_2
-        from tmp_all t, tmp_stock_code t1
-        where t.rank_ <= 5 * 2
-          and (t.`date` = '99999-0.00' or t.`date` not like '99999%')
-          and t.stockCode = t1.stockCode
-        union
-        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
-                , rank() over (partition by stockCode order by rank_ ) rank_2
-        from tmp_all t, tmp_stock_code t1
-        where t.rank_ <= 5 * 2
-          and (t.`date` = '99999-0.01' or t.`date` not like '99999%')
-          and t.stockCode = t1.stockCode
-        union
-        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
-                , rank() over (partition by stockCode order by rank_ ) rank_2
-        from tmp_all t, tmp_stock_code t1
-        where t.rank_ <= 5 * 2
-          and (t.`date` = '99999-0.02' or t.`date` not like '99999%')
-          and t.stockCode = t1.stockCode
-        union
-        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
-                , rank() over (partition by stockCode order by rank_ ) rank_2
-        from tmp_all t, tmp_stock_code t1
-        where t.rank_ <= 5 * 2
-          and (t.`date` = '99999-0.03' or t.`date` not like '99999%')
-          and t.stockCode = t1.stockCode
-            )
-            , tmp_all_but_99999 as (
-        select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
-                , rank() over (partition by stockCode order by rank_ ) rank_2
-        from tmp_all t, tmp_stock_code t1
-        where t.rank_ <= 5 * 2
-          and t.`date` not like '99999%'
-          and t.stockCode = t1.stockCode
-            )
-            , tmp_consider_99999 as (
-        select * from tmp_all_but_99999 where rank_2 <= 5
-        union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 3 )
-            )
+               , rank() over (partition by ten.stockCode order by clac_expma_10/clac_expma_5 desc) rank_
+               , round(clac_expma_10/clac_expma_5, 3) ratioB
+               , round(clac_expma_5, 3) clac_expma_5
+               , round(clac_expma_10, 3) clac_expma_10
+            from t_eastmoney_node ten
+            where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 YEAR), '%Y-%m-%d')
+        )
+        , tmp_stock_code as (
+            select DISTINCT stockCode
+            from tmp_all t1
+            where t1.rank_ <= 5
+              and t1.`date` like '9999%'
+        )
+        , tmp_rank_99999 as (
+            select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
+                    , rank() over (partition by stockCode order by rank_ ) rank_2
+            from tmp_all t, tmp_stock_code t1
+            where t.rank_ <= 5 * 2
+              and (t.`date` = '99999+0.01' or t.`date` not like '99999%')
+              and t.stockCode = t1.stockCode
+            union
+            select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
+                    , rank() over (partition by stockCode order by rank_ ) rank_2
+            from tmp_all t, tmp_stock_code t1
+            where t.rank_ <= 5 * 2
+              and (t.`date` = '99999-0.00' or t.`date` not like '99999%')
+              and t.stockCode = t1.stockCode
+            union
+            select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
+                    , rank() over (partition by stockCode order by rank_ ) rank_2
+            from tmp_all t, tmp_stock_code t1
+            where t.rank_ <= 5 * 2
+              and (t.`date` = '99999-0.01' or t.`date` not like '99999%')
+              and t.stockCode = t1.stockCode
+            union
+            select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
+                    , rank() over (partition by stockCode order by rank_ ) rank_2
+            from tmp_all t, tmp_stock_code t1
+            where t.rank_ <= 5 * 2
+              and (t.`date` = '99999-0.02' or t.`date` not like '99999%')
+              and t.stockCode = t1.stockCode
+            union
+            select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
+                    , rank() over (partition by stockCode order by rank_ ) rank_2
+            from tmp_all t, tmp_stock_code t1
+            where t.rank_ <= 5 * 2
+              and (t.`date` = '99999-0.03' or t.`date` not like '99999%')
+              and t.stockCode = t1.stockCode
+        )
+        , tmp_all_but_99999 as (
+            select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
+                    , rank() over (partition by stockCode order by rank_ ) rank_2
+            from tmp_all t, tmp_stock_code t1
+            where t.rank_ <= 5 * 2
+              and t.`date` not like '99999%'
+              and t.stockCode = t1.stockCode
+        )
+        , tmp_consider_99999 as (
+            select * from tmp_all_but_99999 where rank_2 <= 5
+            union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 3 )
+        )
         select distinct t1.date
                       , concat(t3.stockCode, '-', t3.stockName, '-', case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_2, '/3' ) stockCode
                       , concat(round(t1.last, 3), '\n(', case when t1.date like '99999%' then replace(replace(t1.date, '0.0', ''), '99999', '') else t1.chg end, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
@@ -224,7 +224,7 @@
             where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 365+30 DAY), '%Y-%m-%d')
                or ten.`date` like '9999%'
         )
-           , tmp_calc_days as (
+        , tmp_calc_days as (
             select distinct t1.date end_date
                           , case when t1.`date` like '9999%' then DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 365 DAY), '%Y-%m-%d')
                                  else DATE_FORMAT(DATE_SUB(STR_TO_DATE(t1.date, '%Y-%m-%d'), INTERVAL 365 DAY), '%Y-%m-%d')
