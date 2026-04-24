@@ -63,36 +63,36 @@ public class AgNewEastmoneyStockController {
 
     // 1、根据最近一年的数据，使用 clac_expma_10/clac_expma_5 进行计算，找出低点，找出TOP3
     private static final String KEY_1 = "stock#" + "get-left-side-expma10-expma5-top3";
-    // 2、根据top3查看最近30天的情况， 日期是以9999开头
-    private static final String KEY_2 = "stock#" + "special-care-days-eastmoney-30";
-    // 3、找到成交量放大3倍及以上的stock
-    private static final String KEY_3 = "stock#" + "queryEastmoneyVolSuddenlyRisedTriple";
-    // 5、query9ZhuanS
-    private static final String KEY_5 = "stock#" + "query9ZhuanS";
-    // 6、query9ZhuanB
-    private static final String KEY_6 = "stock#" + "query9ZhuanB";
-    // 10、近3个月的，成交量暴涨9倍的
-    private static final String KEY_10 =  "stock#" + "query9VolInLastest90Days";
-    // 11、查询 60 日均
-    private static final String KEY_11 = "stock#" + "queryAvg60";
-    // 12、查询最近的冲顶
-    private static final String KEY_12 = "stock#" + "queryLatestRiseLimit";
+    // 2、根据最近一年的数据，使用 clac_expma_10/clac_expma_5 进行计算，找出低点，找出TOP3，历史上30天记录，其实就是第1点的历史数据
+    private static final String KEY_2 = "stock#" + "get-left-side-expma10-expma5-top3-history-30days";
+    // 3、成交量相较于前一天上涨3倍，且当天上涨超过3
+    private static final String KEY_3 = "stock#" + "volumn-suddenly-rised-tiple-next-day";
+    // 4、近3个月的，成交量暴涨9倍的，可以观察，说不定可以追
+    private static final String KEY_4 =  "stock#" + "volumn-rised-9x-in-past-90-days";
+    // 5、query9ZhuanS，查看了上涨过程中的九转，可能会下跌，也可能继续上涨
+    private static final String KEY_5 = "stock#" + "get-right-side-query9ZhuanS";
+    // 6、query9ZhuanB，查看了下跌过程中的九转，可能会上涨，也可能继续下跌
+    private static final String KEY_6 = "stock#" + "get-left-side-query9ZhuanB";
+    // 11、收盘在20日均或者60日均的位置，可能会反弹
+    private static final String KEY_11 = "stock#" + "get-right-side-avg20-or-avg60";
+    // 12、找到最近的冲顶数据
+    private static final String KEY_12 = "stock#" + "get-right-side-latest-rise-limit";
     // 13、查询最近一个月的大波动
-    private static final String KEY_13 = "stock#" + "queryBigSwing";
+    private static final String KEY_13 = "stock#" + "get-right-side-big-swing";
     // 14、查询最近一个月的大波动且最低Vol
-    private static final String KEY_14 = "stock#" + "queryBigSwingAndLowestVol";
-    // 15、查询多头排列的票
-    private static final String KEY_15 = "stock#" + "queryDuoTou";
-    // 16、查询多头排列的票（ma多头）
-    private static final String KEY_16 = "stock#" + "queryDuoTouMA";
+    private static final String KEY_14 = "stock#" + "get-right-side-big-swing-and-lowest-vol";
+    // 15、查询多头排列的票(5>10>20>60)
+    private static final String KEY_15 = "stock#" + "get-right-side-duo-tou";
+    // 16、查询多头排列的票(ma多头)
+    private static final String KEY_16 = "stock#" + "get-right-side-duo-tou-ma";
     // 17、5连up
-    private static final String KEY_17 = "stock#" + "queryUp5Lian";
+    private static final String KEY_17 = "stock#" + "get-right-side-up-5-lian";
     // 18、25年后上涨2倍，且存在短期快速上涨
-    private static final String KEY_18 = "stock#" + "queryOnlyThem";
+    private static final String KEY_18 = "stock#" + "get-right-side-up-fast";
     // 19、跳空高开，等回调
-    private static final String KEY_19 = "stock#" + "jumpAndWait";
+    private static final String KEY_19 = "stock#" + "get-right-side-up-jump-and-wait";
     // 20、ssp，最近10个交易日有冲高，然后均线粘结
-    private static final String KEY_20 = "stock#" + "MA20maSSP";
+    private static final String KEY_20 = "stock#" + "get-right-side-ma-duo-tou-ma-5-10-20";
     // 21、综合考虑，可以下手了
     private static final String KEY_21 = "stock#" + "considerAll";
     // 22、查询出现5连跌，且当天的开盘>收盘、chg<0
@@ -140,7 +140,7 @@ public class AgNewEastmoneyStockController {
             tmpMap.put(key0, tmpList);
         }
 
-        for(String kk : Arrays.asList(KEY_1, KEY_11, KEY_3, KEY_5, KEY_6, KEY_10)) {
+        for(String kk : Arrays.asList(KEY_1, KEY_11, KEY_3, KEY_5, KEY_6, KEY_4)) {
             res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
             if(!CollectionUtils.isEmpty(res0)){
                 res0 = res0.stream()
@@ -166,7 +166,7 @@ public class AgNewEastmoneyStockController {
                         case KEY_6:
                             tmp.setRatioB("b69");
                             break;
-                        case KEY_10:
+                        case KEY_4:
                             tmp.setRatioB("vol*9");
                             break;
                         case KEY_11:
@@ -266,7 +266,7 @@ public class AgNewEastmoneyStockController {
      * 2、根据top3查看最近30天的情况， 日期是以9999开头
      * @return
      */
-    @GetMapping("/special-care-days-eastmoney-30-top3")
+    @GetMapping("/get-left-side-expma10-expma5-top3-history-30days")
     public BaseResponse queryEastmoneyLast30() {
         log.info("specialCareDaysEastmoney");
         String key = KEY_2;
@@ -297,10 +297,10 @@ public class AgNewEastmoneyStockController {
 
 
     /**
-     * 3、找到成交量放大3倍及以上的stock
+     * 3、成交量相较于前一天上涨3倍，且当天上涨超过3
      * @return
      */
-    @GetMapping("/volumn-suddenly-rised-tiple")
+    @GetMapping("/volumn-suddenly-rised-tiple-next-day")
     public BaseResponse queryEastmoneyVolSuddenlyRisedTriple() {
         log.info("queryEastmoneyVolSuddenlyRisedTriple");
         String key = KEY_3;
@@ -330,7 +330,7 @@ public class AgNewEastmoneyStockController {
     }
 
     /**
-     * 5、query9ZhuanS
+     * 5、query9ZhuanS，查看了上涨过程中的九转，可能会下跌，也可能继续上涨
      * @return
      */
     @GetMapping("/query9ZhuanS")
@@ -364,7 +364,7 @@ public class AgNewEastmoneyStockController {
 
 
     /**
-     * 6、query9ZhuanB
+     * 6、query9ZhuanB，查看了下跌过程中的九转，可能会上涨，也可能继续下跌
      * @return
      */
     @GetMapping("/query9ZhuanB")
@@ -434,10 +434,10 @@ public class AgNewEastmoneyStockController {
      * 10、近3个月的，成交量暴涨9倍的
      * @return
      */
-    @GetMapping("/eastmoney-9-vol-in-90-days")
+    @GetMapping("/volumn-rised-9x-in-past-90-days")
     public BaseResponse query9VolInLastest90Days() {
         log.info("query9VolInLastest90Days");
-        String key = KEY_10;
+        String key = KEY_4;
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
         if(res != null) {
             log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
@@ -464,10 +464,10 @@ public class AgNewEastmoneyStockController {
     }
 
     /**
-     * 11、查询 60 日均
+     * 11、收盘在20日均或者60日均的位置，可能会反弹
      * @return
      */
-    @GetMapping("/eastmoney-avg-60")
+    @GetMapping("/get-right-side-avg20-or-avg60")
     public BaseResponse queryAvg60() {
         log.info("queryAvg60");
         String key = KEY_11;
@@ -497,10 +497,10 @@ public class AgNewEastmoneyStockController {
     }
 
     /**
-     * 12、查询最近的冲顶
+     * 12、找到最近的冲顶数据
      * * @return
      */
-    @GetMapping("/eastmoney-latest-rise-limit")
+    @GetMapping("/get-right-side-latest-rise-limit")
     public BaseResponse queryLatestRiseLimit() {
         log.info("queryLatestRiseLimit");
         String key = KEY_12;
@@ -533,7 +533,7 @@ public class AgNewEastmoneyStockController {
      * 13、查询最近一个月的大波动
      * * @return
      */
-    @GetMapping("/eastmoney-queryBigSwing")
+    @GetMapping("/get-right-side-big-swing")
     public BaseResponse queryBigSwing() {
         log.info("queryBigSwing");
         String key = KEY_13;
@@ -563,10 +563,10 @@ public class AgNewEastmoneyStockController {
     }
 
     /**
-     * 14、查询最近一个月的大波动且最低Vol
+     * 14、查询最近一个月的大波动且Vol是短期地点，很可能是上涨中继
      * * @return
      */
-    @GetMapping("/eastmoney-queryBigSwingAndLowestVol")
+    @GetMapping("/get-right-side-big-swing-and-lowest-vol")
     public BaseResponse queryBigSwingAndLowestVol() {
         log.info("queryBigSwingAndLowestVol");
         String key = KEY_14;
@@ -596,10 +596,10 @@ public class AgNewEastmoneyStockController {
     }
 
     /**
-     * 15、查询多头排列的票
+     * 15、查询多头排列的票(5>10>20>60)
      * * @return
      */
-    @GetMapping("/eastmoney-queryDuoTou")
+    @GetMapping("/get-right-side-duo-tou")
     public BaseResponse queryDuoTou() {
         log.info("queryDuoTou");
         String key = KEY_15;
@@ -659,10 +659,10 @@ public class AgNewEastmoneyStockController {
     }
 
     /**
-     * 16、查询多头排列的票（ma多头）
+     * 16、查询多头排列的票(ma多头)
      * * @return
      */
-    @GetMapping("/eastmoney-queryDuoTouMA")
+    @GetMapping("/get-right-side-duo-tou-ma")
     public BaseResponse queryDuoTouMA() {
         log.info("queryDuoTouMA");
         String key = KEY_16;
@@ -695,7 +695,7 @@ public class AgNewEastmoneyStockController {
      * 17、5连up
      * * @return
      */
-    @GetMapping("/eastmoney-queryUp5Lian")
+    @GetMapping("/get-right-side-up-5-lian")
     public BaseResponse queryUp5Lian() {
         log.info("queryUp5Lian");
         String key = KEY_17;
@@ -725,10 +725,10 @@ public class AgNewEastmoneyStockController {
     }
 
     /**
-     * 18、25年后上涨2倍，且存在短期快速上涨
+     * 18、25年后有过3倍的涨幅，且存在短期快速上涨
      * * @return
      */
-    @GetMapping("/eastmoney-queryOnlyThem")
+    @GetMapping("/get-right-side-up-fast")
     public BaseResponse queryOnlyThem() {
         log.info("queryOnlyThem");
         String key = KEY_18;
@@ -761,7 +761,7 @@ public class AgNewEastmoneyStockController {
      * 19、跳空高开，等回调
      * * @return
      */
-    @GetMapping("/eastmoney-jumpAndWait")
+    @GetMapping("/get-right-side-up-jump-and-wait")
     public BaseResponse jumpAndWait() {
         log.info("jumpAndWait");
         String key = KEY_19;
@@ -794,7 +794,7 @@ public class AgNewEastmoneyStockController {
      * 20、ssp，最近10个交易日有冲高，然后均线粘结
      * * @return
      */
-    @GetMapping("/eastmoney-MA20maSSP")
+    @GetMapping("/get-right-side-ma-duo-tou-ma-5-10-20")
     public BaseResponse MA20maSSP() {
         log.info("MA20maSSP");
         String key = KEY_20;

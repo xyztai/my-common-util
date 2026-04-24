@@ -215,7 +215,7 @@
     </select>
 
     <select id="queryEastmoneyLast30" resultType="net.my.pojo.SpecialCarePoJo2">
-        <![CDATA[
+    <![CDATA[
         with tmp_all as (
             select ten.*
                    -- ten.`date` , ten.stockCode , ten.`last`,
@@ -228,7 +228,7 @@
             select distinct t1.date end_date
                           , case when t1.`date` like '9999%' then DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 365 DAY), '%Y-%m-%d')
                                  else DATE_FORMAT(DATE_SUB(STR_TO_DATE(t1.date, '%Y-%m-%d'), INTERVAL 365 DAY), '%Y-%m-%d')
-                end start_date
+                            end start_date
             from tmp_all t1
             where t1.date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
         )
@@ -236,30 +236,30 @@
              , concat(t3.stockCode, '-', t3.stockName, '-', case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_, '/3' ) stockCode
              , concat(round(t1.last, 3), '\n(', case when t1.date like '99999%' then replace(replace(t1.date, '0.0', ''), '99999', '') else t1.chg end, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
         from (
-            select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
-                , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_
-                , clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
-            from tmp_calc_days t1, tmp_all t2
-            where t2.`date` BETWEEN t1.start_date and t1.end_date
-            and t1.end_date not like '9999%' -- 非9999开头
-            union
-            select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
-                , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_
-                , clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
-            from tmp_calc_days t1, tmp_all t2
-            where t2.`date` BETWEEN t1.start_date and t1.end_date
-            and ( t2.`date` = t1.end_date or t2.`date` not like '9999%' )
-            and t1.end_date like '9999%' -- 9999开头的
+                select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
+                       , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_
+                       , clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
+                from tmp_calc_days t1, tmp_all t2
+                where t2.`date` BETWEEN t1.start_date and t1.end_date
+                and t1.end_date not like '9999%' -- 非9999开头
+                union
+                select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
+                    , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_
+                    , clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
+                from tmp_calc_days t1, tmp_all t2
+                where t2.`date` BETWEEN t1.start_date and t1.end_date
+                and ( t2.`date` = t1.end_date or t2.`date` not like '9999%' )
+                and t1.end_date like '9999%' -- 9999开头的
             ) t1, t_hs300 t3
         where t1.rank_ <= 3
           and t1.end_date = t1.`date`
           and t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
         order by 1 desc, 2
-        ]]>
+    ]]>
     </select>
 
     <select id="queryEastmoneyVolSuddenlyRisedTriple" resultType="net.my.pojo.SpecialCarePoJo2">
-        <![CDATA[
+    <![CDATA[
         select concat(t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
              , case when t1.end_buy_date = 1 then concat('慎重\n', round(t1.to_buy, 3)) else concat('历史\n', round(t1.to_buy, 3)) end ratioB
         from (
@@ -298,14 +298,14 @@
              ) t1, t_hs300 t3
         where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
         order by 2 desc
-        ]]>
+    ]]>
     </select>
 
     <select id="query9ZhuanB" resultType="net.my.pojo.SpecialCarePoJo2">
-        <![CDATA[
+    <![CDATA[
         select concat(t3.stockCode, '-', t3.stockName) stockCode, t9.date
              , concat(round(t9.last, 3), '\n(', t9.chg, ')'
-            , case when chg_next_1 is null then concat('\n(', '--', ')')
+             , case when chg_next_1 is null then concat('\n(', '--', ')')
                    when chg_next_2 is null and chg_next_1 is not null then concat('\n(', round(chg_next_1, 1), ')')
                    when chg_next_3 is null and chg_next_2 is not null then concat('\n(', round(chg_next_2, 1), ')')
                    when chg_next_4 is null and chg_next_3 is not null then concat('\n(', round(chg_next_3, 1), ')')
@@ -316,8 +316,9 @@
                    when chg_next_9 is null and chg_next_8 is not null then concat('\n(', round(chg_next_8, 1), ')')
                    when chg_next_10 is null and chg_next_9 is not null then concat('\n(', round(chg_next_9, 1), ')')
                    else '' end) last
-             , concat(_direction, '_', _9_zhuan
-                 , case when chg_next_1 is null then 'U' else '' end) ratioB -- , chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
+             , concat(_direction, '_'
+                      , _9_zhuan
+                      , case when chg_next_1 is null then 'U' else '' end) ratioB -- , chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
         from (
                 select t3.`date`, t3.stockCode , t3.`last`, t3.chg, chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
                     , case  when pre_tag_6 = 0 then '06'
@@ -336,7 +337,7 @@
                                             when pre_tag_27 = 0 then '09'
                                     else '00' end
                             else '00' end
-                    else '00' end _9_zhuan
+                        else '00' end _9_zhuan
                     , 'B' _direction
                 from (
                         select t2.`date` , t2.stockCode , t2.`last`, t2.chg, t2.pre_last_4, chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
@@ -414,14 +415,14 @@
           and t9.date >  DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d')
           and _9_zhuan != '00'
         order by 2 desc, _direction, _9_zhuan desc
-        ]]>
+    ]]>
     </select>
 
     <select id="query9ZhuanS" resultType="net.my.pojo.SpecialCarePoJo2">
-        <![CDATA[
+    <![CDATA[
         select concat(t3.stockCode, '-', t3.stockName) stockCode, t9.date
-             , concat(round(t9.last, 3), '\n(', t9.chg, ')'
-            , case when chg_next_1 is null then concat('\n(', '--', ')')
+               , concat(round(t9.last, 3), '\n(', t9.chg, ')'
+               , case when chg_next_1 is null then concat('\n(', '--', ')')
                    when chg_next_2 is null and chg_next_1 is not null then concat('\n(', round(chg_next_1, 1), ')')
                    when chg_next_3 is null and chg_next_2 is not null then concat('\n(', round(chg_next_2, 1), ')')
                    when chg_next_4 is null and chg_next_3 is not null then concat('\n(', round(chg_next_3, 1), ')')
@@ -432,28 +433,29 @@
                    when chg_next_9 is null and chg_next_8 is not null then concat('\n(', round(chg_next_8, 1), ')')
                    when chg_next_10 is null and chg_next_9 is not null then concat('\n(', round(chg_next_9, 1), ')')
                    else '' end) last
-             , concat(_direction, '_', _9_zhuan
-                 , case when chg_next_1 is null then 'U' else '' end) ratioB -- , chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
+               , concat(_direction, '_'
+                        , _9_zhuan
+                        , case when chg_next_1 is null then 'U' else '' end) ratioB -- , chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
         from (
                 select t3.`date`, t3.stockCode , t3.`last`, t3.chg, chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
-                    , case  when pre_tag_6 = 0 then '06'
-                            when pre_tag_7 = 0 then '07'
-                            when pre_tag_8 = 0 then '08'
-                            when pre_tag_9 = 0 then '09'
-                            when pre_tag_10 + pre_tag_11 + pre_tag_12 + pre_tag_13 + pre_tag_14 = 5 then
-                            case    when pre_tag_15 = 0 then '06'
+                       , case when pre_tag_6 = 0 then '06'
+                              when pre_tag_7 = 0 then '07'
+                              when pre_tag_8 = 0 then '08'
+                              when pre_tag_9 = 0 then '09'
+                              when pre_tag_10 + pre_tag_11 + pre_tag_12 + pre_tag_13 + pre_tag_14 = 5 then
+                              case  when pre_tag_15 = 0 then '06'
                                     when pre_tag_16 = 0 then '07'
                                     when pre_tag_17 = 0 then '08'
                                     when pre_tag_18 = 0 then '09'
                                     when pre_tag_19 + pre_tag_20 + pre_tag_21 + pre_tag_22 + pre_tag_23 = 5 then
-                                    case    when pre_tag_24 = 0 then '06'
-                                            when pre_tag_25 = 0 then '07'
-                                            when pre_tag_26 = 0 then '08'
-                                            when pre_tag_27 = 0 then '09'
+                                    case when pre_tag_24 = 0 then '06'
+                                         when pre_tag_25 = 0 then '07'
+                                         when pre_tag_26 = 0 then '08'
+                                         when pre_tag_27 = 0 then '09'
                                     else '00' end
-                            else '00' end
-                    else '00' end _9_zhuan
-                    , 'S' _direction
+                               else '00' end
+                           else '00' end _9_zhuan
+                       , 'S' _direction
                 from (
                         select t2.`date` , t2.stockCode , t2.`last`, t2.chg, t2.pre_last_4, chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
                             , t2.tag_
@@ -530,7 +532,7 @@
           and t9.date >  DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d')
           and _9_zhuan != '00'
         order by 2 desc, _direction, _9_zhuan desc
-        ]]>
+    ]]>
     </select>
 
     <select id="queryEastmoneyLatestInfo" resultType="net.my.pojo.SpecialCarePoJo2">
