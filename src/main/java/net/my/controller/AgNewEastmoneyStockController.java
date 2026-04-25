@@ -128,6 +128,7 @@ public class AgNewEastmoneyStockController {
         // 依次计算
         for(String kk : Arrays.asList(KEY_101, KEY_102, KEY_103)) {
             List<SpecialCarePoJo2> res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
+            log.info("get cache value. key = {}, value = {}", kk, JSON.toJSON(res0));
             if(!CollectionUtils.isEmpty(res0)){
                 Set<String> strs = res0.stream()
                                     .filter(f -> f.getDate().compareTo(startDate) >= 0)
@@ -221,6 +222,7 @@ public class AgNewEastmoneyStockController {
                 , KEY_226, KEY_227, KEY_228, KEY_229, KEY_230
                 , KEY_231, KEY_232, KEY_233, KEY_234)) {
             List<SpecialCarePoJo2> res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
+            log.info("get cache value. key = {}, value = {}", kk, JSON.toJSON(res0));
             if(!CollectionUtils.isEmpty(res0)){
                 Set<String> strs = res0.stream()
                         .filter(f -> f.getDate().compareTo(startDate) >= 0)
