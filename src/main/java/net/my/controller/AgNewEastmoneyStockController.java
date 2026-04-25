@@ -61,6 +61,11 @@ public class AgNewEastmoneyStockController {
     @Autowired
     private AgNewSinaController agNewSinaController;
 
+    // 10000、方便截图，进行数据汇总（左侧）
+    private static final String KEY_10000 = "stock#" + "easy-snapshot-left";
+    // 10000、方便截图，进行数据汇总（右侧）
+    private static final String KEY_10001 = "stock#" + "easy-snapshot-right";
+
     // 101、查询出现5连跌，且当天的开盘>收盘、chg<0，可以快进，第二天上涨必须卖出，急快短线，博个反弹
     private static final String KEY_101 = "stock#" + "get-left-side-5-lian-down-must-sell-next-day";
     // 102、query9ZhuanB，查看了下跌过程中的九转，可能会上涨，也可能继续下跌
@@ -102,112 +107,183 @@ public class AgNewEastmoneyStockController {
 
 
     /**
-     * 0、方便截屏(左侧)
+     * 10000、
      * @return
      */
     @GetMapping("/easy-snapshot-left")
-    public BaseResponse easySnapshot() {
-        Set<String> stockExists = new HashSet<>();
-        List<SpecialCarePoJo2> res = new ArrayList<>();
-        String limitDate = agEastmoneyStockMapper.getLimitDate();
-
-        Map<String, List<SpecialCarePoJo2>> tmpMap = new HashMap<>();
-
-        // 0、先查询9转+9vol
-        String key0 = "stock#" + "queryLastest9Zhuan";
-        List<SpecialCarePoJo2> res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(key0);
-        if(CollectionUtils.isEmpty(res0)) {
-            res0 = agEastmoneyStockMapper.queryLastest9Zhuan9Vol();
-            myCaffeineCache.put(key0, res0);
-        }
-        if(!CollectionUtils.isEmpty(res0)){
-            res0.forEach(f -> f.setRatioB("*近5v9"));
-            res0 = res0.stream()
-                    .filter(f -> f.getDate().compareTo(limitDate) >= 0)
-                    .sorted(Comparator.comparing(SpecialCarePoJo2::getDate).reversed())
-                    .collect(Collectors.toList());
-
-            List<SpecialCarePoJo2> tmpList = new ArrayList<>();
-            for(SpecialCarePoJo2 poJo2 : res0) {
-                SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-                tmp.setDate(poJo2.getDate().substring(0,10));
-                tmp.setLast("");
-                tmp.setRatioB(poJo2.getRatioB());
-                tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
-                tmpList.add(tmp);
-//                if(!stockExists.contains(tmp.getStockCode())) {
-//                    res.add(tmp);
-//                    stockExists.add(tmp.getStockCode());
-//                }
-            }
-            tmpMap.put(key0, tmpList);
+    public BaseResponse easySnapshotLeft() {
+        log.info("easySnapshotLeft start...");
+        String cacheKey = KEY_10000;
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(cacheKey);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", cacheKey, res);
+            return RestGeneralResponse.of(res);
         }
 
-        for(String kk : Arrays.asList(KEY_103, KEY_234, KEY_226, KEY_231, KEY_102, KEY_227)) {
-            res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
+        res = new ArrayList<>();
+        Map<String, String> statisRes = new HashMap<>(); // 结构为：601800#--#基础建设-中国交建, KEY_101#KEY_102
+        Set<String> fieldsSet = new HashSet<>();
+
+        String startDate = agEastmoneyStockMapper.getLimitDate();
+        // 依次计算
+        for(String kk : Arrays.asList(KEY_101, KEY_102, KEY_103)) {
+            List<SpecialCarePoJo2> res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
             if(!CollectionUtils.isEmpty(res0)){
-                res0 = res0.stream()
-                        .filter(f -> f.getDate().compareTo(limitDate) >= 0)
-                        .sorted(Comparator.comparing(SpecialCarePoJo2::getDate).reversed())
-                        .collect(Collectors.toList());
-
-                List<SpecialCarePoJo2> tmpList = new ArrayList<>();
-                for(SpecialCarePoJo2 poJo2 : res0) {
-                    SpecialCarePoJo2 tmp = new SpecialCarePoJo2();
-                    tmp.setDate(poJo2.getDate().substring(0,10));
-                    tmp.setLast("");
-                    switch (kk) {
-                        case KEY_103:
-                            tmp.setRatioB("*top3");
-                            break;
-                        case KEY_226:
-                            tmp.setRatioB("vol*3");
-                            break;
-                        case KEY_231:
-                            tmp.setRatioB("s69");
-                            break;
-                        case KEY_102:
-                            tmp.setRatioB("b69");
-                            break;
-                        case KEY_227:
-                            tmp.setRatioB("vol*9");
-                            break;
-                        case KEY_234:
-                            tmp.setRatioB("*avg");
-                            break;
-                    }
-                    tmp.setStockCode(poJo2.getStockCode().substring(0, 6));
-                    tmpList.add(tmp);
-//                    if(!stockExists.contains(tmp.getStockCode())) {
-//                        res.add(tmp);
-//                        stockExists.add(tmp.getStockCode());
-//                    }
+                Set<String> strs = res0.stream()
+                                    .filter(f -> f.getDate().compareTo(startDate) >= 0)
+                                    .map(m -> String.join("#", Arrays.asList(m.getStockCode(), "--", m.getLast(), kk)))
+                                    .collect(Collectors.toSet());
+                if(!CollectionUtils.isEmpty(strs)) {
+                    // 拿到key值的列表
+                    fieldsSet.addAll(strs);
                 }
-                tmpMap.put(kk, tmpList);
             }
         }
 
-        // 这里是对所有的数据进行排序处理，优先看avg，然后看top3，再看"9转+9vol"，剩下的就按照顺序来吧
-//        for(String kk : Arrays.asList(KEY_11, KEY_1, key0, KEY_3, KEY_5, KEY_6, KEY_10)) {
-        for(String kk : Arrays.asList(KEY_234)) {
-            List<SpecialCarePoJo2> tmpList = tmpMap.get(kk);
-            if(!CollectionUtils.isEmpty(tmpList)) {
-                for(SpecialCarePoJo2 tmp : tmpList) {
-                    if(!stockExists.contains(tmp.getStockCode())) {
-                        res.add(tmp);
-                        stockExists.add(tmp.getStockCode());
+        // 将数据转到set里面
+        if(!CollectionUtils.isEmpty(fieldsSet)) {
+            for(String str : fieldsSet) {
+                String[] fields = str.split("#");
+                if(fields != null && fields.length == 4) {
+                    String kk = fields[3];
+                    String key = str.replace(kk, "");
+                    if(!statisRes.containsKey(key)) {
+                        statisRes.put(key, kk + "#");
+                    } else {
+                        statisRes.put(key, statisRes.get(key) + kk + "#");
                     }
                 }
             }
         }
 
+        // 将set里面的数据进行一个统计
+        if(!CollectionUtils.isEmpty(statisRes)) {
+            for(Map.Entry<String, String> entry : statisRes.entrySet()) {
+                SpecialCarePoJo2 tmpPoJo2 = new SpecialCarePoJo2();
+                String key = entry.getKey();
+                String[] fileds = key.split("#");
+                if(fileds != null && fileds.length >= 3) {
+                    tmpPoJo2.setStockCode(fileds[0]);
+                    tmpPoJo2.setDate(fileds[1]);
+                    tmpPoJo2.setLast(fileds[2]);
+                }
+
+                String value = entry.getValue();
+                fileds = value.split("#");
+                if(fileds != null) {
+                    tmpPoJo2.setRatioB(String.format(Locale.ROOT, "%02d", fileds.length - 1) + "#" + value);
+                }
+                res.add(tmpPoJo2);
+            }
+        }
 
         if(!CollectionUtils.isEmpty(res)) {
-            log.info("easySnapshot:{}"
-                    , String.join(",", res.stream().map(SpecialCarePoJo2::getStockCode).collect(Collectors.toList())));
+            res = res.stream().sorted(Comparator.comparing(SpecialCarePoJo2::getRatioB).reversed()).collect(Collectors.toList());
+        } else {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            res = Arrays.asList(empty);
         }
+
+        myCaffeineCache.put(cacheKey, res);
+        log.info("myCaffeineCache put, key={}, res={}", cacheKey, res);
         return RestGeneralResponse.of(res);
     }
+
+
+    /**
+     * 10001、
+     * @return
+     */
+    @GetMapping("/easy-snapshot-right")
+    public BaseResponse easySnapshotRight() {
+        log.info("easySnapshotLeft start...");
+        String cacheKey = KEY_10001;
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(cacheKey);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", cacheKey, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        res = new ArrayList<>();
+        Map<String, String> statisRes = new HashMap<>(); // 结构为：601800#--#基础建设-中国交建, KEY_101#KEY_102
+        Set<String> fieldsSet = new HashSet<>();
+
+        String startDate = agEastmoneyStockMapper.getLimitDate();
+        // 依次计算
+        for(String kk : Arrays.asList(
+                KEY_221, KEY_222, KEY_223, KEY_224, KEY_225
+                , KEY_226, KEY_227, KEY_228, KEY_229, KEY_230
+                , KEY_231, KEY_232, KEY_233, KEY_234)) {
+            List<SpecialCarePoJo2> res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
+            if(!CollectionUtils.isEmpty(res0)){
+                Set<String> strs = res0.stream()
+                        .filter(f -> f.getDate().compareTo(startDate) >= 0)
+                        .map(m -> String.join("#", Arrays.asList(m.getStockCode(), "--", m.getLast(), kk)))
+                        .collect(Collectors.toSet());
+                if(!CollectionUtils.isEmpty(strs)) {
+                    // 拿到key值的列表
+                    fieldsSet.addAll(strs);
+                }
+            }
+        }
+
+        // 将数据转到set里面
+        if(!CollectionUtils.isEmpty(fieldsSet)) {
+            for(String str : fieldsSet) {
+                String[] fields = str.split("#");
+                if(fields != null && fields.length == 4) {
+                    String kk = fields[3];
+                    String key = str.replace(kk, "");
+                    if(!statisRes.containsKey(key)) {
+                        statisRes.put(key, kk + "#");
+                    } else {
+                        statisRes.put(key, statisRes.get(key) + kk + "#");
+                    }
+                }
+            }
+        }
+
+        // 将set里面的数据进行一个统计
+        if(!CollectionUtils.isEmpty(statisRes)) {
+            for(Map.Entry<String, String> entry : statisRes.entrySet()) {
+                SpecialCarePoJo2 tmpPoJo2 = new SpecialCarePoJo2();
+                String key = entry.getKey();
+                String[] fileds = key.split("#");
+                if(fileds != null && fileds.length >= 3) {
+                    tmpPoJo2.setStockCode(fileds[0]);
+                    tmpPoJo2.setDate(fileds[1]);
+                    tmpPoJo2.setLast(fileds[2]);
+                }
+
+                String value = entry.getValue();
+                fileds = value.split("#");
+                if(fileds != null) {
+                    tmpPoJo2.setRatioB(String.format(Locale.ROOT, "%02d", fileds.length - 1) + "#" + value);
+                }
+                res.add(tmpPoJo2);
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(res)) {
+            res = res.stream().sorted(Comparator.comparing(SpecialCarePoJo2::getRatioB).reversed()).collect(Collectors.toList());
+        } else {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            res = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(cacheKey, res);
+        log.info("myCaffeineCache put, key={}, res={}", cacheKey, res);
+        return RestGeneralResponse.of(res);
+    }
+
 
 //    /**
 //     * 1、根据 t_eastmoney_node_buy 表获取最近的300条记录
