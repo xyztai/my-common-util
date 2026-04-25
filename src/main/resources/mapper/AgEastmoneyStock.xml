@@ -303,22 +303,25 @@
 
     <select id="query9ZhuanB" resultType="net.my.pojo.SpecialCarePoJo2">
     <![CDATA[
-        select concat(t3.stockCode, '-', t3.stockName) stockCode, t9.date
-             , concat(round(t9.last, 3), '\n(', t9.chg, ')'
-             , case when chg_next_1 is null then concat('\n(', '--', ')')
-                   when chg_next_2 is null and chg_next_1 is not null then concat('\n(', round(chg_next_1, 1), ')')
-                   when chg_next_3 is null and chg_next_2 is not null then concat('\n(', round(chg_next_2, 1), ')')
-                   when chg_next_4 is null and chg_next_3 is not null then concat('\n(', round(chg_next_3, 1), ')')
-                   when chg_next_5 is null and chg_next_4 is not null then concat('\n(', round(chg_next_4, 1), ')')
-                   when chg_next_6 is null and chg_next_5 is not null then concat('\n(', round(chg_next_5, 1), ')')
-                   when chg_next_7 is null and chg_next_6 is not null then concat('\n(', round(chg_next_6, 1), ')')
-                   when chg_next_8 is null and chg_next_7 is not null then concat('\n(', round(chg_next_7, 1), ')')
-                   when chg_next_9 is null and chg_next_8 is not null then concat('\n(', round(chg_next_8, 1), ')')
-                   when chg_next_10 is null and chg_next_9 is not null then concat('\n(', round(chg_next_9, 1), ')')
-                   else '' end) last
+        select th.stockCode stockCode, t9.date, concat(th.bkName, '-',  th.stockName) last
              , concat(_direction, '_'
                       , _9_zhuan
-                      , case when chg_next_1 is null then 'U' else '' end) ratioB -- , chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
+                      , case when chg_next_1 is null then 'U' else '' end
+                      , '###'
+                      , concat(round(t9.last, 3), '(', t9.chg, ')'
+                               ,  case when chg_next_1 is null then concat('(', '--', ')')
+                                       when chg_next_2 is null and chg_next_1 is not null then concat('(', round(chg_next_1, 1), ')')
+                                       when chg_next_3 is null and chg_next_2 is not null then concat('(', round(chg_next_2, 1), ')')
+                                       when chg_next_4 is null and chg_next_3 is not null then concat('(', round(chg_next_3, 1), ')')
+                                       when chg_next_5 is null and chg_next_4 is not null then concat('(', round(chg_next_4, 1), ')')
+                                       when chg_next_6 is null and chg_next_5 is not null then concat('(', round(chg_next_5, 1), ')')
+                                       when chg_next_7 is null and chg_next_6 is not null then concat('(', round(chg_next_6, 1), ')')
+                                       when chg_next_8 is null and chg_next_7 is not null then concat('(', round(chg_next_7, 1), ')')
+                                       when chg_next_9 is null and chg_next_8 is not null then concat('(', round(chg_next_8, 1), ')')
+                                       when chg_next_10 is null and chg_next_9 is not null then concat('(', round(chg_next_9, 1), ')')
+                                       else '' end
+                        )
+                   ) ratioB -- , chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
         from (
                 select t3.`date`, t3.stockCode , t3.`last`, t3.chg, chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
                     , case  when pre_tag_6 = 0 then '06'
@@ -410,8 +413,8 @@
                         ) t2
                 ) t3
                 where tag_ + pre_tag_1 + pre_tag_2 + pre_tag_3 + pre_tag_4 + pre_tag_5 = 6
-            ) t9, t_hs300 t3
-        where t9.stockCode = concat(t3.stockType , '.', t3.stockCode )
+            ) t9, t_hs300 th
+        where t9.stockCode = th.fullStockCode
           and t9.date >  DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d')
           and _9_zhuan != '00'
         order by 2 desc, _direction, _9_zhuan desc
@@ -420,22 +423,24 @@
 
     <select id="query9ZhuanS" resultType="net.my.pojo.SpecialCarePoJo2">
     <![CDATA[
-        select concat(t3.stockCode, '-', t3.stockName) stockCode, t9.date
-               , concat(round(t9.last, 3), '\n(', t9.chg, ')'
-               , case when chg_next_1 is null then concat('\n(', '--', ')')
-                   when chg_next_2 is null and chg_next_1 is not null then concat('\n(', round(chg_next_1, 1), ')')
-                   when chg_next_3 is null and chg_next_2 is not null then concat('\n(', round(chg_next_2, 1), ')')
-                   when chg_next_4 is null and chg_next_3 is not null then concat('\n(', round(chg_next_3, 1), ')')
-                   when chg_next_5 is null and chg_next_4 is not null then concat('\n(', round(chg_next_4, 1), ')')
-                   when chg_next_6 is null and chg_next_5 is not null then concat('\n(', round(chg_next_5, 1), ')')
-                   when chg_next_7 is null and chg_next_6 is not null then concat('\n(', round(chg_next_6, 1), ')')
-                   when chg_next_8 is null and chg_next_7 is not null then concat('\n(', round(chg_next_7, 1), ')')
-                   when chg_next_9 is null and chg_next_8 is not null then concat('\n(', round(chg_next_8, 1), ')')
-                   when chg_next_10 is null and chg_next_9 is not null then concat('\n(', round(chg_next_9, 1), ')')
-                   else '' end) last
+        select th.stockCode stockCode, t9.date, concat(th.bkName, '-',  th.stockName) last
                , concat(_direction, '_'
                         , _9_zhuan
-                        , case when chg_next_1 is null then 'U' else '' end) ratioB -- , chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
+                        , case when chg_next_1 is null then 'U' else '' end
+                        , '###'
+                        , concat(round(t9.last, 3), '(', t9.chg, ')'
+                                , case when chg_next_1 is null then concat('(', '--', ')')
+                                       when chg_next_2 is null and chg_next_1 is not null then concat('(', round(chg_next_1, 1), ')')
+                                       when chg_next_3 is null and chg_next_2 is not null then concat('(', round(chg_next_2, 1), ')')
+                                       when chg_next_4 is null and chg_next_3 is not null then concat('(', round(chg_next_3, 1), ')')
+                                       when chg_next_5 is null and chg_next_4 is not null then concat('(', round(chg_next_4, 1), ')')
+                                       when chg_next_6 is null and chg_next_5 is not null then concat('(', round(chg_next_5, 1), ')')
+                                       when chg_next_7 is null and chg_next_6 is not null then concat('(', round(chg_next_6, 1), ')')
+                                       when chg_next_8 is null and chg_next_7 is not null then concat('(', round(chg_next_7, 1), ')')
+                                       when chg_next_9 is null and chg_next_8 is not null then concat('(', round(chg_next_8, 1), ')')
+                                       when chg_next_10 is null and chg_next_9 is not null then concat('(', round(chg_next_9, 1), ')')
+                                       else '' end)
+                 ) ratioB -- , chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
         from (
                 select t3.`date`, t3.stockCode , t3.`last`, t3.chg, chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10
                        , case when pre_tag_6 = 0 then '06'
@@ -527,8 +532,8 @@
                         ) t2
                 ) t3
                 where tag_ + pre_tag_1 + pre_tag_2 + pre_tag_3 + pre_tag_4 + pre_tag_5 = 6
-            ) t9, t_hs300 t3
-        where t9.stockCode = concat(t3.stockType , '.', t3.stockCode )
+            ) t9, t_hs300 th
+        where t9.stockCode = th.fullStockCode
           and t9.date >  DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d')
           and _9_zhuan != '00'
         order by 2 desc, _direction, _9_zhuan desc
