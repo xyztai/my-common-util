@@ -235,9 +235,9 @@
             from tmp_all t1
             where t1.date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
         )
-        select t1.date
-             , concat(t3.stockCode, '-', t3.stockName, '-', case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_, '/3' ) stockCode
-             , concat(round(t1.last, 3), '\n(', case when t1.date like '99999%' then replace(replace(t1.date, '0.0', ''), '99999', '') else t1.chg end, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
+        select th.stockCode, t1.date, concat(th.bkName, '-',  th.stockName) last
+               , concat(case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_, '/3'
+                       , round(t1.last, 3), '(', case when t1.date like '99999%' then replace(replace(t1.date, '0.0', ''), '99999', '') else t1.chg end, ')', round(t1.clac_expma_5, 3), round(t1.clac_expma_10, 3)) ratioB
         from (
                 select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
                        , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_
@@ -253,10 +253,10 @@
                 where t2.`date` BETWEEN t1.start_date and t1.end_date
                 and ( t2.`date` = t1.end_date or t2.`date` not like '9999%' )
                 and t1.end_date like '9999%' -- 9999开头的
-            ) t1, t_hs300 t3
+            ) t1, t_hs300 th
         where t1.rank_ <= 3
           and t1.end_date = t1.`date`
-          and t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
+          and t1.stockCode = th.fullStockCode
         order by 1 desc, 2
     ]]>
     </select>
