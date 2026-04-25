@@ -622,20 +622,22 @@
 
     <select id="queryAvg60" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-            select stockCode, date, last, ratioB
+            select th.stockCode, tt.date, concat(th.bkName, '-',  th.stockName) last
+                   , tt.ratioB
             from (
                 select t3.stockCode
-                        , concat(tena.`_date`, '\n',  t3.stockName) date
-                        , concat(ten.`last`, '\n',  ten.chg) last
-                        , concat(round(tena.avg_5, 3),'\n', round(tena.avg_10, 3),'\n', round(tena.avg_20, 3),'\n', round(tena.avg_60, 3) ) ratioB
+                        , tena.`_date` date
+                        , concat(ten.`last`, ':',  ten.chg) last
+                        , concat(round(tena.avg_5, 3),':', round(tena.avg_10, 3),':', round(tena.avg_20, 3),':', round(tena.avg_60, 3) ) ratioB
                         , dense_rank() over (order by tena._date desc) _date_rn
                 from t_eastmoney_node_avg tena, t_hs300 t3, t_eastmoney_node ten
                 where tena._stockCode = concat(t3.stockType , '.', t3.stockCode)
                 and tena._date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
                 and tena.`_date` = ten.`date`
                 and tena.`_stockCode` = ten.stockCode
-            ) tt
+            ) tt, t_hs300 th
             where tt._date_rn <= 7
+            and tt.stockCode = th.stockCode
             order by `date` desc
         ]]>
     </select>
