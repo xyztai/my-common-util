@@ -130,9 +130,19 @@ public class AgNewEastmoneyStockController {
             List<SpecialCarePoJo2> res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
             log.info("get cache value. key = {}, value = {}", kk, JSON.toJSON(res0));
             if(!CollectionUtils.isEmpty(res0)){
+                String kkName = "";
+                switch (kk) {
+                    case KEY_101: kkName = "KEY_101"; break;
+                    case KEY_102: kkName = "KEY_102"; break;
+                    case KEY_103: kkName = "KEY_103"; break;
+                    default:
+                        break;
+                }
+
+                String finalKkName = kkName;
                 Set<String> strs = res0.stream()
                                     .filter(f -> f.getDate().compareTo(startDate) >= 0)
-                                    .map(m -> String.join("#", Arrays.asList(m.getStockCode(), "--", m.getLast(), kk)))
+                                    .map(m -> String.join("#", Arrays.asList(m.getStockCode(), "--", m.getLast(), finalKkName)))
                                     .collect(Collectors.toSet());
                 if(!CollectionUtils.isEmpty(strs)) {
                     // 拿到key值的列表
@@ -205,7 +215,7 @@ public class AgNewEastmoneyStockController {
      */
     @GetMapping("/easy-snapshot-right")
     public BaseResponse easySnapshotRight() {
-        log.info("easySnapshotLeft start...");
+        log.info("easySnapshotRight start...");
         String cacheKey = KEY_10001;
         List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(cacheKey);
         if(res != null) {
@@ -226,9 +236,30 @@ public class AgNewEastmoneyStockController {
             List<SpecialCarePoJo2> res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
             log.info("get cache value. key = {}, value = {}", kk, JSON.toJSON(res0));
             if(!CollectionUtils.isEmpty(res0)){
+                String kkName = "";
+                switch (kk) {
+                    case KEY_221: kkName = "KEY_221"; break;
+                    case KEY_222: kkName = "KEY_222"; break;
+                    case KEY_223: kkName = "KEY_223"; break;
+                    case KEY_224: kkName = "KEY_224"; break;
+                    case KEY_225: kkName = "KEY_225"; break;
+                    case KEY_226: kkName = "KEY_226"; break;
+                    case KEY_227: kkName = "KEY_227"; break;
+                    case KEY_228: kkName = "KEY_228"; break;
+                    case KEY_229: kkName = "KEY_229"; break;
+                    case KEY_230: kkName = "KEY_230"; break;
+                    case KEY_231: kkName = "KEY_231"; break;
+                    case KEY_232: kkName = "KEY_232"; break;
+                    case KEY_233: kkName = "KEY_233"; break;
+                    case KEY_234: kkName = "KEY_234"; break;
+                    default:
+                        break;
+                }
+
+                String finalKkName = kkName;
                 Set<String> strs = res0.stream()
                         .filter(f -> f.getDate().compareTo(startDate) >= 0)
-                        .map(m -> String.join("#", Arrays.asList(m.getStockCode(), "--", m.getLast(), kk)))
+                        .map(m -> String.join("#", Arrays.asList(m.getStockCode(), "--", m.getLast(), finalKkName)))
                         .collect(Collectors.toSet());
                 if(!CollectionUtils.isEmpty(strs)) {
                     // 拿到key值的列表
