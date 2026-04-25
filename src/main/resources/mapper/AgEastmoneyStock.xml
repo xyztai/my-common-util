@@ -205,11 +205,14 @@
             select * from tmp_all_but_99999 where rank_2 <= 5
             union (select * from tmp_rank_99999 where `date` like '99999%' and rank_2 <= 3 )
         )
-        select distinct t1.date
-                      , concat(t3.stockCode, '-', t3.stockName, '-', case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end, '-', t1.rank_2, '/3' ) stockCode
-                      , concat(round(t1.last, 3), '\n(', case when t1.date like '99999%' then replace(replace(t1.date, '0.0', ''), '99999', '') else t1.chg end, ')') last, concat(round(t1.clac_expma_5, 3), '\n', round(t1.clac_expma_10, 3)) ratioB
-        from tmp_consider_99999 t1, t_hs300 t3
-        where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
+        select distinct th.stockCode, t1.date, concat(th.bkName, '-',  th.stockName) last
+                      , concat(case when t1.date like '99999%' then t1.date else replace(t1.date, '-', '') end
+                                , '-'
+                                , t1.rank_2
+                                , '/3###'
+                                , round(t1.last, 3), '(', case when t1.date like '99999%' then replace(replace(t1.date, '0.0', ''), '99999', '') else t1.chg end, ')', round(t1.clac_expma_5, 3), round(t1.clac_expma_10, 3)) ratioB
+        from tmp_consider_99999 t1, t_hs300 th
+        where t1.stockCode = th.fullStockCode
         order by 1 desc, 2
     ]]>
     </select>
