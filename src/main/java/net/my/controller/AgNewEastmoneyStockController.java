@@ -178,7 +178,9 @@ public class AgNewEastmoneyStockController {
         }
 
         if(!CollectionUtils.isEmpty(res)) {
-            res = res.stream().sorted(Comparator.comparing(SpecialCarePoJo2::getRatioB).reversed()).collect(Collectors.toList());
+            res = res.stream()
+                    .sorted(Comparator.comparing(SpecialCarePoJo2::getRatioB).reversed().thenComparing(SpecialCarePoJo2::getLast))
+                    .collect(Collectors.toList());
         } else {
             SpecialCarePoJo2 empty = new SpecialCarePoJo2();
             empty.setDate("--");
@@ -269,7 +271,9 @@ public class AgNewEastmoneyStockController {
         }
 
         if(!CollectionUtils.isEmpty(res)) {
-            res = res.stream().sorted(Comparator.comparing(SpecialCarePoJo2::getRatioB).reversed()).collect(Collectors.toList());
+            res = res.stream()
+                    .sorted(Comparator.comparing(SpecialCarePoJo2::getRatioB).reversed().thenComparing(SpecialCarePoJo2::getLast))
+                    .collect(Collectors.toList());
         } else {
             SpecialCarePoJo2 empty = new SpecialCarePoJo2();
             empty.setDate("--");
