@@ -183,8 +183,13 @@ public class AgNewEastmoneyStockController {
 
                 String value = entry.getValue();
                 fileds = value.split("#");
+                if(fileds.length < 2) {
+                    continue;
+                }
+
                 if(fileds != null) {
-                    tmpPoJo2.setRatioB(String.format(Locale.ROOT, "%02d", fileds.length - 1) + "#" + value);
+                    tmpPoJo2.setLast(String.format(Locale.ROOT, "%02d", fileds.length) + "#" + tmpPoJo2.getLast());
+                    tmpPoJo2.setRatioB(value);
                 }
                 res.add(tmpPoJo2);
             }
@@ -192,7 +197,7 @@ public class AgNewEastmoneyStockController {
 
         if(!CollectionUtils.isEmpty(res)) {
             res = res.stream()
-                    .sorted(Comparator.comparing(SpecialCarePoJo2::getRatioB).reversed().thenComparing(SpecialCarePoJo2::getLast))
+                    .sorted(Comparator.comparing(SpecialCarePoJo2::getLast).reversed())
                     .collect(Collectors.toList());
         } else {
             SpecialCarePoJo2 empty = new SpecialCarePoJo2();
@@ -300,8 +305,13 @@ public class AgNewEastmoneyStockController {
 
                 String value = entry.getValue();
                 fileds = value.split("#");
+                if(fileds.length < 3) {
+                    continue;
+                }
+
                 if(fileds != null) {
-                    tmpPoJo2.setRatioB(String.format(Locale.ROOT, "%02d", fileds.length - 1) + "#" + value);
+                    tmpPoJo2.setLast(String.format(Locale.ROOT, "%02d", fileds.length) + "#" + tmpPoJo2.getLast());
+                    tmpPoJo2.setRatioB(value);
                 }
                 res.add(tmpPoJo2);
             }
@@ -309,7 +319,7 @@ public class AgNewEastmoneyStockController {
 
         if(!CollectionUtils.isEmpty(res)) {
             res = res.stream()
-                    .sorted(Comparator.comparing(SpecialCarePoJo2::getRatioB).reversed().thenComparing(SpecialCarePoJo2::getLast))
+                    .sorted(Comparator.comparing(SpecialCarePoJo2::getLast).reversed())
                     .collect(Collectors.toList());
         } else {
             SpecialCarePoJo2 empty = new SpecialCarePoJo2();
