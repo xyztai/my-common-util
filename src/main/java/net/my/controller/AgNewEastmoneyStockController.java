@@ -102,10 +102,10 @@ public class AgNewEastmoneyStockController {
 
 
     /**
-     * 0、方便截屏
+     * 0、方便截屏(左侧)
      * @return
      */
-    @GetMapping("/easy-snapshot")
+    @GetMapping("/easy-snapshot-left")
     public BaseResponse easySnapshot() {
         Set<String> stockExists = new HashSet<>();
         List<SpecialCarePoJo2> res = new ArrayList<>();
