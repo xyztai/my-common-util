@@ -605,14 +605,14 @@
                 ) t , t_hs300 t3
                 where t.stockCode = concat(t3.stockType , '.', t3.stockCode)
             ) -- select distinct `date`, date_rn from tmp_ where date_rn = 10
-            select substring(t1.stockCode, 3) stockCode, concat(t2.`date`,'\n', t1.date,'\n', t1.stockName) date
-                   , concat(t2.`last`,'\n', round(t2.volume/t1.volume,1)) last
-                   , concat(round(t2.`volume`/10000),'\n', round(t1.volume/10000) ) ratioB
+            select th.stockCode, t2.`date` date, concat(th.bkName, '-',  th.stockName) last
+                   , concat(t2.`last`, ':', round(t2.volume/t1.volume,1), round(t2.`volume`/10000),'#', round(t1.volume/10000) ) ratioB
                    -- , round(t2.volume/t1.volume,1) highest_ratio
             from (select stockCode, stockName , `date` , volume from tmp_ where vol_min_rank = 1) t1,
                  (select stockCode, stockName , `date` , volume, last, chg from tmp_ where vol_max_rank = 1) t2,
-                 (select distinct `date` from tmp_ where date_rn = 10) t3
+                 (select distinct `date` from tmp_ where date_rn = 10) t3 , t_hs300 th
             where t1.stockCode = t2.stockCode
+            and t2.stockCode = th.fullStockCode
             and t2.`date` >= t3.date -- DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 15 DAY), '%Y-%m-%d')
             and t2.volume > 9 * t1.volume
             and t2.chg > 1
