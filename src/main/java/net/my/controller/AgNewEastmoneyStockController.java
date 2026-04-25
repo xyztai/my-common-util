@@ -141,11 +141,12 @@ public class AgNewEastmoneyStockController {
             }
         }
 
+        log.info("fieldsSet = {}", JSON.toJSONString(fieldsSet));
         // 将数据转到set里面
         if(!CollectionUtils.isEmpty(fieldsSet)) {
             for(String str : fieldsSet) {
                 String[] fields = str.split("#");
-                if(fields != null && fields.length == 4) {
+                if(fields != null && fields.length >= 4) {
                     String kk = fields[3];
                     String key = str.replace(kk, "");
                     if(!statisRes.containsKey(key)) {
@@ -157,6 +158,7 @@ public class AgNewEastmoneyStockController {
             }
         }
 
+        log.info("statisRes = {}", JSON.toJSONString(statisRes));
         // 将set里面的数据进行一个统计
         if(!CollectionUtils.isEmpty(statisRes)) {
             for(Map.Entry<String, String> entry : statisRes.entrySet()) {
@@ -235,11 +237,12 @@ public class AgNewEastmoneyStockController {
             }
         }
 
+        log.info("fieldsSet = {}", JSON.toJSONString(fieldsSet));
         // 将数据转到set里面
         if(!CollectionUtils.isEmpty(fieldsSet)) {
             for(String str : fieldsSet) {
                 String[] fields = str.split("#");
-                if(fields != null && fields.length == 4) {
+                if(fields != null && fields.length >= 4) {
                     String kk = fields[3];
                     String key = str.replace(kk, "");
                     if(!statisRes.containsKey(key)) {
@@ -251,6 +254,7 @@ public class AgNewEastmoneyStockController {
             }
         }
 
+        log.info("statisRes = {}", JSON.toJSONString(statisRes));
         // 将set里面的数据进行一个统计
         if(!CollectionUtils.isEmpty(statisRes)) {
             for(Map.Entry<String, String> entry : statisRes.entrySet()) {
