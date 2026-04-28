@@ -24,6 +24,7 @@ public interface AgEastmoneyStockMapper {
     int batchUpdateExpmaEastmoney(List<EastmoneyNode> node);
     List<SpecialCarePoJo2> queryEastmoneyToday();
     List<SpecialCarePoJo2> queryEastmoneyLast30();
+    List<SpecialCarePoJo2> queryIndexTop12In1Year();
     List<SpecialCarePoJo2> queryEastmoneyVolSuddenlyRisedTriple();
     List<SpecialCarePoJo2> query9ZhuanB();
     List<SpecialCarePoJo2> query9ZhuanS();

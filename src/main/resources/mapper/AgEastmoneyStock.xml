@@ -261,6 +261,26 @@
     ]]>
     </select>
 
+    <select id="queryIndexTop12In1Year" resultType="net.my.pojo.SpecialCarePoJo2">
+    <![CDATA[
+        with tmp as (
+            select ti.stockCode
+                   , ti.stockName
+                   , teni.`date`
+                   , teni.chg
+                   , rank() over (partition by teni.stockCode order by chg) chg_rank
+            from t_eastmoney_node_index teni , t_index ti
+            where teni.stockCode = ti.fullStockCode
+            and teni.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 YEAR), '%Y-%m-%d')
+        )
+        select t.stockCode, t.date, concat('',  t.stockName) last
+               , concat('TOP ', lpad(t.chg_rank, 2, ' '), ', chg: ', t.chg , '%') ratioB
+        from tmp t
+        where t.chg_rank <= 12
+        order by 2 desc
+    ]]>
+    </select>
+
     <select id="queryEastmoneyVolSuddenlyRisedTriple" resultType="net.my.pojo.SpecialCarePoJo2">
     <![CDATA[
         select th.stockCode, t1.date, concat(th.bkName, '-',  th.stockName) last

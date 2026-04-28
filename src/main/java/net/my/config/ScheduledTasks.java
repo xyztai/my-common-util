@@ -284,6 +284,16 @@ public class ScheduledTasks {
             }
         }, executor);
 
+        CompletableFuture<Void> stock_task_105 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock queryIndexTop12In1Year start");
+                agNewEastmoneyStockController.queryIndexTop12In1Year();
+                log.info("task stock queryIndexTop12In1Year end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
 
 
         CompletableFuture<Void> stock_task_221 = CompletableFuture.runAsync(() -> {
@@ -571,6 +581,7 @@ public class ScheduledTasks {
                 , stock_task_102
                 , stock_task_103
                 , stock_task_104
+                , stock_task_105
                 , stock_task_221
                 , stock_task_222
                 , stock_task_223

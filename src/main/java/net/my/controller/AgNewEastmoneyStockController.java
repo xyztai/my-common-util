@@ -74,6 +74,8 @@ public class AgNewEastmoneyStockController {
     private static final String KEY_103 = "stock#" + "get-left-side-expma10-expma5-top3";
     // 104、根据最近一年的数据，使用 clac_expma_10/clac_expma_5 进行计算，找出低点，找出TOP3，历史上30天记录，其实就是第1点的历史数据
     private static final String KEY_104 = "stock#" + "get-left-side-expma10-expma5-top3-history-30days";
+    // 105、统计最近一年，主要指数的跌幅TOP12
+    private static final String KEY_105 = "stock#" + "get-left-side-index-top12-1-year";
 
 
     // 221、综合考虑，可以下手了：1)必须站上5日均线;2)禁止出现上引线；3）5、10、20 必须多头排列;4)必须出现4日连涨；5）涨幅不能太大
@@ -475,6 +477,39 @@ public class AgNewEastmoneyStockController {
         }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryEastmoneyLast30();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("688")
+                        && !f.getStockCode().startsWith("689")
+                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+    /**
+     * 105、
+     * @return
+     */
+    @GetMapping("/get-left-side-index-top12-1-year")
+    public BaseResponse queryIndexTop12In1Year() {
+        log.info("queryIndexTop12In1Year");
+        String key = KEY_105;
+        List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryIndexTop12In1Year();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
