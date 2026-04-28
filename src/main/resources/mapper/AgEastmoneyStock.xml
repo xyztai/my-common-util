@@ -566,14 +566,15 @@
 
     <select id="queryEastmoneyLatestInfo" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        select concat(t3.stockCode, '-', t3.stockName) stockCode, t1.date, concat(round(t1.last, 3), '\n(', t1.chg, ')') last
-             , concat(round(clac_expma_5, 3), '\n', round(clac_expma_10, 3)) ratioB
+        select th.stockCode stockCode, t1.date, concat(th.bkName, '-',  th.stockName) last
+               , concat('last: ', round(t1.last, 3), ', chg: ', t1.chg) ratioB
         from (
                  select t.*, rank() over (partition by t.stockCode order by t.date desc) rank_
                  from t_eastmoney_node t
-                 where t.`date` > '2025-01-01' and t.date not like '99999%'
-             ) t1, t_hs300 t3
-        where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
+                 where t.`date` > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
+                 and t.date not like '99999%'
+             ) t1, t_hs300 th
+        where t1.stockCode = th.fullStockCode
           and t1.rank_ = 1
         order by 2, 1
         ]]>
