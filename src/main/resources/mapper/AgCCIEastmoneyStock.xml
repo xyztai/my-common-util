@@ -56,9 +56,12 @@
             t1.date
              , t1.stockCode
              -- , concat('cci ', round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2)) cci_5
-             , round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2) cci5
-             , round((t1.tp - t1.avg_tp_10)/t2.avg_dev_10/0.015, 2) cci10
-             , round((t1.tp - t1.avg_tp_14)/t2.avg_dev_14/0.015, 2) cci14
+             , round((t1.tp - t1.avg_tp_5)/(case when t2.avg_dev_5 < 0.0000001 then 0.0000001 else t2.avg_dev_5 end )/0.015, 2) cci5
+             , round((t1.tp - t1.avg_tp_10)/(case when t2.avg_dev_10 < 0.0000001 then 0.0000001 else t2.avg_dev_10 end )/0.015, 2) cci10
+             , round((t1.tp - t1.avg_tp_14)/(case when t2.avg_dev_14 < 0.0000001 then 0.0000001 else t2.avg_dev_14 end )/0.015, 2) cci14
+             -- , round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2) cci5
+             -- , round((t1.tp - t1.avg_tp_10)/t2.avg_dev_10/0.015, 2) cci10
+             -- , round((t1.tp - t1.avg_tp_14)/t2.avg_dev_14/0.015, 2) cci14
         from tmp_md t1, tmp_avgdev t2
         where t1.stockCode = t2.stockCode
         order by 1, 2
