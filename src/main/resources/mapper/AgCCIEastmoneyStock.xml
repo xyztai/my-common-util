@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.my.mapper.AgCCIEastmoneyStockMapper">
+
+    <select id="getCalcCCIDates" resultType="java.lang.String">
+        select DISTINCT `date`
+        from t_eastmoney_node_index teni
+        where stockCode = '1.000001'
+          and `date` >= '2021-01-01'
+          and not exists (select 1 from t_eastmoney_node_cci t2 where teni.`date` = t2.date)
+          and date not like '9999%'
+          order by 1
+    </select>
+
+    <insert id="genCCIData">
+        <![CDATA[
+        replace into t_eastmoney_node_cci(`date`, `stockCode`, `cci5`, `cci10`, `cci14`)
+        with tmp as (
+            select `date`
+                   -- , lag(`date`, 1) over (partition by stockCode order by ten.`date` ) data_pre_1
+                   -- , lag(`date`, 60) over (partition by stockCode order by ten.`date` ) data_pre_60
+                   , rank() over (partition by stockCode order by ten.`date` desc) date_rank
+                   , last
+                   , stockCode
+                   , chg
+                   , round((high + low + `last`)/3, 6) tp
+                from t_eastmoney_node ten
+                where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d') , INTERVAL -60 DAY), '%Y-%m-%d')
+        and ten.`date` <= #{calcDate}
+        -- and ten.stockCode = '1.600118'
+        order by ten.`date` desc
+        )
+        , tmp_md as (
+        select t1.stockCode
+        , max(case when t1.date_rank <= 1 then t1.date else null end) date
+        , max(case when t1.date_rank <= 1 then t1.tp else null end) tp
+        , round(avg(case when t1.date_rank <= 5 then t1.tp else null end), 6) avg_tp_5
+        , round(avg(case when t1.date_rank <= 10 then t1.tp else null end), 6) avg_tp_10
+        , round(avg(case when t1.date_rank <= 14 then t1.tp else null end), 6) avg_tp_14
+        from tmp t1
+        where exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 14)
+        group by t1.stockCode
+        )
+        , tmp_avgdev as (
+        select t1.stockCode
+        , round(avg(case when t1.date_rank <= 5 then abs(t2.avg_tp_5 - t1.tp) else null end), 6) avg_dev_5
+        , round(avg(case when t1.date_rank <= 10 then abs(t2.avg_tp_10 - t1.tp) else null end), 6) avg_dev_10
+        , round(avg(case when t1.date_rank <= 14 then abs(t2.avg_tp_14 - t1.tp) else null end), 6) avg_dev_14
+        from tmp t1, tmp_md t2
+        where t1.stockCode = t2.stockCode
+        group by t1.stockCode
+        ) -- (TYP-MA(TYP,84))/(0.015*AVEDEV(TYP,84)),COLORFF00FF;
+        select -- round((t1.tp - t1.avg_tp_5)/t2.avg_dev/0.015, 2) cci_5, t1.*
+            t1.date
+             , t1.stockCode
+             -- , concat('cci ', round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2)) cci_5
+             , round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2) cci5
+             , round((t1.tp - t1.avg_tp_10)/t2.avg_dev_10/0.015, 2) cci10
+             , round((t1.tp - t1.avg_tp_14)/t2.avg_dev_14/0.015, 2) cci14
+        from tmp_md t1, tmp_avgdev t2
+        where t1.stockCode = t2.stockCode
+        order by 1, 2
+        ]]>
+    </insert>
+
+</mapper>
