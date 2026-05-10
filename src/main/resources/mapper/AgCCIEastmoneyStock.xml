@@ -68,4 +68,72 @@
         ]]>
     </insert>
 
+    <select id="considerCCI">
+        <![CDATA[
+            with
+            tmp_vol as (
+                select ten.`date`
+                       , ten.stockCode
+                       , ten.volume
+                       , lag(ten.`date`, 1) over (partition by ten.stockCode order by date) date_pre_1
+                       , lag(ten.`volume`, 1) over (partition by ten.stockCode order by date) vol_pre_1
+                       , lag(ten.`volume`, 2) over (partition by ten.stockCode order by date) vol_pre_2
+                       , lag(ten.`volume`, 3) over (partition by ten.stockCode order by date) vol_pre_3
+                       , lag(ten.`volume`, 4) over (partition by ten.stockCode order by date) vol_pre_4
+                       , lag(ten.`volume`, 5) over (partition by ten.stockCode order by date) vol_pre_5
+                from t_eastmoney_node ten
+                where ten.`date` not like '9999%'
+                -- and ten.stockCode = '0.002532'
+                and ten.chg < 0.5
+                and ten.`date` > '2026'
+                order by 1 desc
+            )
+            , tmp_consider_vol as (
+                select tv.*
+                from tmp_vol tv
+                where tv.volume <= least(tv.vol_pre_1, vol_pre_2, vol_pre_3, vol_pre_4, vol_pre_5) -- or tv.date = '2025-12-15'
+            )  -- select * from tmp_consider_vol order by 1 desc;
+            , tmp as (
+                select tenc.`date`
+                       , tenc.stockCode
+                       , tenc.cci14
+                       , rank() over (partition by tenc.stockCode order by date desc) date_rn
+                from t_eastmoney_node_cci tenc
+                where 1 = 1
+                and tenc.`date` > '2026'
+                -- and exists (select 1 from tmp_consider_vol t2 where tenc.stockCode = t2.stockCode )
+                order by 1 desc
+            ) -- select * from tmp
+            , tmp_d as (
+                select t1.*, t2.cci14 cci14_2, t2.date_rn date_rn_2
+                from tmp t1, tmp t2
+                where t2.date_rn BETWEEN t1.date_rn and t1.date_rn + 22
+                order by t1.date_rn , date_rn_2
+            )
+            , tmp_consider_cci as (
+                select td.date
+                       , td.stockCode
+                       , max(case when td.date_rn = date_rn_2 then td.cci14_2 else null end) cci14_2
+                       , sum(case when td.cci14_2 < -100 then 1 else 0 end) cci_low_cnt_100
+                       , sum(case when td.cci14_2 < -150 then 1 else 0 end) cci_low_cnt_150
+                       , sum(case when td.cci14_2 > 100 then 1 else 0 end) cci_high_cnt_100
+                       , min(case when td.cci14_2 < -100 then td.date_rn_2  else null end) low_rank_
+                       , min(case when td.cci14_2 > 100 then td.date_rn_2  else null end) high_rank_
+                from tmp_d td
+                group by td.date, td.stockCode
+                having cci_low_cnt_100 > 0
+                and cci_low_cnt_100 <= 3
+                and cci_low_cnt_150 = 0
+                and cci_high_cnt_100 > 0
+                and low_rank_ > high_rank_
+                -- and cci14_2
+                order by td.date desc
+            )
+            select *
+            from tmp_consider_cci t1, tmp_consider_vol t2
+            where t1.date = t2.`date`
+            and t1.stockCode = t2.stockCode
+            order by 2, 1 desc
+        ]]>
+    </select>
 </mapper>
