@@ -237,8 +237,8 @@ public class AgNewEastmoneyStockController {
         }
 
         res = new ArrayList<>();
-        Map<String, String> statisRes = new HashMap<>(); // 结构为：601800#--#基础建设-中国交建, KEY_101#KEY_102
-        Set<String> fieldsSet = new HashSet<>();
+        Map<String, String> statisRes = new LinkedHashMap<>(); // 结构为：601800#--#基础建设-中国交建, KEY_101#KEY_102
+        List<String> fieldList = new ArrayList<>();
 
         String startDate = agEastmoneyStockMapper.getLimitDate();
         // 依次计算
@@ -277,15 +277,15 @@ public class AgNewEastmoneyStockController {
                         .collect(Collectors.toSet());
                 if(!CollectionUtils.isEmpty(strs)) {
                     // 拿到key值的列表
-                    fieldsSet.addAll(strs);
+                    fieldList.addAll(strs);
                 }
             }
         }
 
-        log.info("fieldsSet = {}", JSON.toJSONString(fieldsSet));
+        log.info("fieldsSet = {}", JSON.toJSONString(fieldList));
         // 将数据转到set里面
-        if(!CollectionUtils.isEmpty(fieldsSet)) {
-            for(String str : fieldsSet) {
+        if(!CollectionUtils.isEmpty(fieldList)) {
+            for(String str : fieldList) {
                 String[] fields = str.split("#");
                 if(fields != null && fields.length >= 4) {
                     String kk = fields[3];
