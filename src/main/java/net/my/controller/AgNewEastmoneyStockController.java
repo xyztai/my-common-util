@@ -207,6 +207,16 @@ public class AgNewEastmoneyStockController {
             res = res.stream()
                     .sorted(Comparator.comparing(SpecialCarePoJo2::getLast).reversed())
                     .collect(Collectors.toList());
+            for(SpecialCarePoJo2 pojo2 : res) {
+                String tmp = pojo2.getRatioB();
+                String[] splits = tmp.replace("#", "").split("KEY_");
+                tmp = String.join("_"
+                        , Arrays.stream(splits)
+                                .sorted()
+                                .filter(f -> !StringUtils.isEmpty(f))
+                                .collect(Collectors.toList()));
+                pojo2.setRatioB(tmp);
+            }
         } else {
             SpecialCarePoJo2 empty = new SpecialCarePoJo2();
             empty.setDate("--");
@@ -330,6 +340,16 @@ public class AgNewEastmoneyStockController {
             res = res.stream()
                     .sorted(Comparator.comparing(SpecialCarePoJo2::getLast).reversed())
                     .collect(Collectors.toList());
+            for(SpecialCarePoJo2 pojo2 : res) {
+                String tmp = pojo2.getRatioB();
+                String[] splits = tmp.replace("#", "").split("KEY_");
+                tmp = String.join("_"
+                        , Arrays.stream(splits)
+                                .sorted()
+                                .filter(f -> !StringUtils.isEmpty(f))
+                                .collect(Collectors.toList()));
+                pojo2.setRatioB(tmp);
+            }
         } else {
             SpecialCarePoJo2 empty = new SpecialCarePoJo2();
             empty.setDate("--");
