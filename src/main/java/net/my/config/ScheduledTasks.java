@@ -46,6 +46,9 @@ public class ScheduledTasks {
     private AgNewEastmoneyStockController agNewEastmoneyStockController;
 
     @Autowired
+    private AgNewEastmoneyCCIController agNewEastmoneyCCIController;
+
+    @Autowired
     private TmpMapper tmpMapper;
 
     @Autowired
@@ -241,6 +244,11 @@ public class ScheduledTasks {
         agNewEastmoneyStockController.queryDuoTou();
         log.info("task stock queryDuoTou end");
 
+        // 5、此处有计算cci
+        log.info("task stock cci start");
+        agNewEastmoneyCCIController.historyAll();
+        log.info("task stock cci end");
+
         // 开始进行查询缓存
         ExecutorService executor = Executors.newFixedThreadPool(5);
         // 计算缓存
@@ -429,6 +437,16 @@ public class ScheduledTasks {
             }
         }, executor);
 
+        CompletableFuture<Void> stock_task_235 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock considerCCIAndVol start");
+                agNewEastmoneyStockController.considerCCIAndVol();
+                log.info("task stock considerCCIAndVol end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
         CompletableFuture<Void> stock_task_999 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryEastmoneyLatestInfo start");
@@ -595,6 +613,7 @@ public class ScheduledTasks {
                 , stock_task_231
                 , stock_task_232
                 , stock_task_234
+                , stock_task_235
                 // 233 因为有计算，所有在查询之前执行
                 , stock_task_999
 

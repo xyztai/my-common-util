@@ -10,5 +10,5 @@ import java.util.List;
 public interface AgCCIEastmoneyStockMapper {
     List<String> getCalcCCIDates();
     int genCCIData(@Param("calcDate") String calcDate);
-    List<SpecialCarePoJo2> considerCCI();
+    List<SpecialCarePoJo2> considerCCIAndVol();
 }
