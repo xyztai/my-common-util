@@ -156,123 +156,156 @@
 
     <select id="considerCCIXXXX" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-
-            with
+        with
             tmp_date_last as (
                 select ten.`date`
-                       , ten.stockCode
-                       , ten.volume
-                       , ten.`last`
+                     , ten.stockCode
+                     , ten.volume
+                     , ten.`last`
+                     , lag(ten.`low`, 1) over (partition by ten.stockCode order by date desc) low_next_1
                        , ten.chg
-                       , lag(ten.`last`, 1) over (partition by ten.stockCode order by date desc) last_next_1
+                     , lag(ten.`last`, 1) over (partition by ten.stockCode order by date desc) last_next_1
                        , lag(ten.`last`, 5) over (partition by ten.stockCode order by date desc) last_next_5
+                       , rank() over (partition by ten.stockCode order by date) date_rn
                 from t_eastmoney_node ten
                 where ten.`date` not like '9999%'
-                -- and ten.stockCode = '0.002532'
-                and ten.`date` > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+                  -- and ten.stockCode = '0.002532'
+                  and ten.`date` > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
                 order by 1 desc
             )
-            , tmp_vol as (
-                select ten.`date`
-                       , ten.stockCode
-                       , ten.volume
-                       -- , lag(ten.`date`, 1) over (partition by ten.stockCode order by date desc) date_next_1
-                       -- , lag(ten.`date`, 2) over (partition by ten.stockCode order by date desc) date_next_2
-                       , lag(ten.`date`, 1) over (partition by ten.stockCode order by date) date_pre_1
+           , tmp_vol as (
+            select ten.`date`
+                 , ten.stockCode
+                 , ten.volume
+                 -- , lag(ten.`date`, 1) over (partition by ten.stockCode order by date desc) date_next_1
+                 -- , lag(ten.`date`, 2) over (partition by ten.stockCode order by date desc) date_next_2
+                 , lag(ten.`date`, 1) over (partition by ten.stockCode order by date) date_pre_1
                        , lag(ten.`volume`, 1) over (partition by ten.stockCode order by date) vol_pre_1
                        , lag(ten.`volume`, 2) over (partition by ten.stockCode order by date) vol_pre_2
                        , lag(ten.`volume`, 3) over (partition by ten.stockCode order by date) vol_pre_3
                        , lag(ten.`volume`, 4) over (partition by ten.stockCode order by date) vol_pre_4
                        -- , lag(ten.`volume`, 5) over (partition by ten.stockCode order by date) vol_pre_5
                        , ten.`last`
-                       , lead(ten.`last`, 5) over (partition by ten.stockCode order by date) last_next_5
-                from t_eastmoney_node ten
-                where ten.`date` not like '9999%'
-                -- and ten.stockCode = '0.002532'
-                and ten.chg < 0.5
-                and ten.`date` > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
-                order by 1 desc
-            )
-            , tmp_consider_vol as (
-                select tv.*
-                from tmp_vol tv
-                where tv.volume <= least(tv.vol_pre_1, vol_pre_2, vol_pre_3, vol_pre_4) -- or tv.date = '2025-12-15'
-            )  -- select * from tmp_consider_vol  where stockCode = '1.603920' order by 1 desc;
-            , tmp_cci as (
-                select tenc.`date`
-                       , tenc.stockCode
-                       , tenc.cci14
-                       , rank() over (partition by tenc.stockCode order by date desc) date_rn
+                 , lead(ten.`last`, 5) over (partition by ten.stockCode order by date) last_next_5
+            from t_eastmoney_node ten
+            where ten.`date` not like '9999%'
+              -- and ten.stockCode = '0.002532'
+              and ten.chg < 0.5
+              and ten.`date` > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+            order by 1 desc
+        )
+           , tmp_consider_vol as (
+            select tv.*
+            from tmp_vol tv
+            where tv.volume <= least(tv.vol_pre_1, vol_pre_2, vol_pre_3, vol_pre_4) -- or tv.date = '2025-12-15'
+        )  -- select * from tmp_consider_vol  where stockCode = '1.603920' order by 1 desc;
+           , tmp_cci as (
+            select tenc.`date`
+                 , tenc.stockCode
+                 , tenc.cci14
+                 , rank() over (partition by tenc.stockCode order by date desc) date_rn
                        , lag(tenc.`date`, 5) over (partition by tenc.stockCode order by date) date_pre_5
-                from t_eastmoney_node_cci tenc
-                where 1 = 1
-                and tenc.`date` >  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
-                -- and exists (select 1 from tmp_consider_vol t2 where tenc.stockCode = t2.stockCode )
-                order by 1 desc
-            ) -- select * from tmp
-            , tmp_cci_d as (
-                select t1.*, t2.cci14 cci14_2, t2.date_rn date_rn_2
-                from tmp_cci t1, tmp_cci t2
-                where t1.stockCode = t2.stockCode
-                and t2.date_rn BETWEEN t1.date_rn and t1.date_rn + 6
-                order by t1.date_rn , date_rn_2
+            from t_eastmoney_node_cci tenc
+            where 1 = 1
+              and tenc.`date` >  DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+              -- and exists (select 1 from tmp_consider_vol t2 where tenc.stockCode = t2.stockCode )
+            order by 1 desc
+        ) -- select * from tmp
+           , tmp_cci_d as (
+            select t1.*, t2.cci14 cci14_2, t2.date_rn date_rn_2
+            from tmp_cci t1, tmp_cci t2
+            where t1.stockCode = t2.stockCode
+              and t2.date_rn BETWEEN t1.date_rn and t1.date_rn + 6
+            order by t1.date_rn , date_rn_2
+        )
+           , tmp_consider_cci as (
+            select td.date, td.date_pre_5
+                 , td.stockCode
+                 , max(case when td.date_rn = date_rn_2 then td.cci14_2 else null end) cci14_2
+                 , sum(case when td.cci14_2 < -100 then 1 else 0 end) cci_low_cnt_100_n
+                 , sum(case when td.cci14_2 < -150 then 1 else 0 end) cci_low_cnt_150_n
+                 -- , sum(case when td.cci14_2 > 100 then 1 else 0 end) cci_high_cnt_100
+                 -- , min(case when td.cci14_2 < -100 then td.date_rn_2  else null end) low_rank_
+                 , ifnull(min(case when td.cci14_2 > -100 then td.date_rn_2  else null end), 0) cci_1
+                 , ifnull(min(case when td.cci14_2 < -100 then td.date_rn_2  else null end), 0) cci_2
+                 -- , ifnull(max(case when td.cci14_2 < -100 then td.date_rn_2  else null end), 0) cci_3
+                 , ifnull(max(case when td.cci14_2 > -100 then td.date_rn_2  else null end), 0) cci_4
+                 , count(1) date_cnt
+            from tmp_cci_d td
+            group by td.date, td.stockCode
+            having cci_low_cnt_100_n > 0
+               and cci_low_cnt_100_n <= 3
+               and cci_low_cnt_150_n = 0
+               and cci_1 > 0
+               and cci_2 > 0
+               -- and cci_3 > 0
+               and cci_4 > 0
+               and cci_1 < cci_2
+               AND cci_2 < cci_4
+               -- and cci_2 < cci_3
+               -- and cci_3 < cci_4
+               -- and low_rank_ > high_rank_1
+               -- and low_rank_ < high_rank_2
+               and date_cnt = 7
+               -- and cci14_2
+            order by td.date desc
+        ) -- select * from tmp_consider_cci t1 where stockCode = '0.000400';
+           , tmp_ans as (
+            select distinct th.stockCode stockCode
+                          , t1.date, t2.date date_2
+                          , concat(th.bkName, '-',  th.stockName) last
+           , concat('cci14: ', t1.cci14_2) ratioB,  th.fullStockCode
+        -- , concat('cci14: ', t1.cci14_2
+        --          , ' last: ', last
+        --          , ' last_5: ', last_next_5
+        --          , ' chg_3: ', round(last_next_5/last, 4) * 100 - 100 ) ratioB
+        from tmp_consider_cci t1, tmp_consider_vol t2, t_hs300 th
+        where t2.date BETWEEN t1.date_pre_5 and t1.`date`
+          and t1.stockCode = t2.stockCode
+          and t1.stockCode = th.fullStockCode
+          and th.stockCode not like '30%'
+          and th.stockCode not like '68%'
+            ) -- select * from tmp_ans  where stockCode = '000400'; -- order by 2 desc, 1
+            , tmp_ans_rank as (
+        select distinct t1.stockCode, t1.date, t1.last, t1.ratioB, t1.fullStockCode, t2.last last_0, t2.low_next_1, t2.last_next_1, t2.last_next_5, t2.date_rn
+        from tmp_ans t1, tmp_date_last t2
+        where t1.date = t2.date
+          and t1.fullStockCode = t2.stockCode
             )
-            , tmp_consider_cci as (
-                select td.date, td.date_pre_5
-                       , td.stockCode
-                       , max(case when td.date_rn = date_rn_2 then td.cci14_2 else null end) cci14_2
-                       , sum(case when td.cci14_2 < -100 then 1 else 0 end) cci_low_cnt_100_n
-                       , sum(case when td.cci14_2 < -150 then 1 else 0 end) cci_low_cnt_150_n
-                      -- , sum(case when td.cci14_2 > 100 then 1 else 0 end) cci_high_cnt_100
-                      -- , min(case when td.cci14_2 < -100 then td.date_rn_2  else null end) low_rank_
-                       , ifnull(min(case when td.cci14_2 > -100 then td.date_rn_2  else null end), 0) cci_1
-                       , ifnull(min(case when td.cci14_2 < -100 then td.date_rn_2  else null end), 0) cci_2
-                       -- , ifnull(max(case when td.cci14_2 < -100 then td.date_rn_2  else null end), 0) cci_3
-                       , ifnull(max(case when td.cci14_2 > -100 then td.date_rn_2  else null end), 0) cci_4
-                       , count(1) date_cnt
-                from tmp_cci_d td
-                group by td.date, td.stockCode
-                having cci_low_cnt_100_n > 0
-                and cci_low_cnt_100_n <= 3
-                and cci_low_cnt_150_n = 0
-                and cci_1 > 0
-                and cci_2 > 0
-                -- and cci_3 > 0
-                and cci_4 > 0
-                and cci_1 < cci_2
-                AND cci_2 < cci_4
-                -- and cci_2 < cci_3
-                -- and cci_3 < cci_4
-                -- and low_rank_ > high_rank_1
-                -- and low_rank_ < high_rank_2
-                and date_cnt = 7
-                -- and cci14_2
-                order by td.date desc
-            ) -- select * from tmp_consider_cci t1 where stockCode = '1.603920';
-            , tmp_ans as (
-	            select distinct th.stockCode stockCode
-	                   , t1.date -- , t2.date date_2
-	                   , concat(th.bkName, '-',  th.stockName) last
-	                   , concat('cci14: ', t1.cci14_2) ratioB,  th.fullStockCode
-	                   -- , concat('cci14: ', t1.cci14_2
-	                   --          , ' last: ', last
-	                   --          , ' last_5: ', last_next_5
-	                   --          , ' chg_3: ', round(last_next_5/last, 4) * 100 - 100 ) ratioB
-	            from tmp_consider_cci t1, tmp_consider_vol t2, t_hs300 th
-	            where t2.date BETWEEN t1.date_pre_5 and t1.`date`
-	            and t1.stockCode = t2.stockCode
-	            and t1.stockCode = th.fullStockCode
-	            and th.stockCode not like '30%'
-	            and th.stockCode not like '68%'
-	        ) -- select distinct stockCode, last from tmp_ans  -- where stockCode = '603920'; -- order by 2 desc, 1
-	        select t1.*, t2.last, t2.last_next_1, t2.last_next_5
-	        from tmp_ans t1, tmp_date_last t2
-	        where t1.date = t2.date
-	        and t1.fullStockCode = t2.stockCode
-	        order by 2 desc, 3;
-	      --  and t1.stockCode = '603920';
-	        -- and t2.chg < 0.5 -- where stockCode = '600339';
-
+            , tmp_rank_2 as (
+        select t1.*, t1.date_rn - rank() over (partition by t1.stockCode order by t1.date) date_rank_2
+        from tmp_ans_rank t1
+            )
+                , tmp_rank_3 as (
+        select t1.*, rank() over (partition by t1.stockCode, t1.date_rank_2 order by t1.date_rn) date_rank_3
+        from tmp_rank_2 t1
+            )
+                , tmp_bigswing as (
+        select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt, sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.04 then 1 else 0 end) big_swing_cnt
+        from t_eastmoney_node ten, t_hs300 th
+        where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+          and ten.`date` not like '9999%'
+          and th.fullStockCode = ten.stockCode
+          and th.stockCode not like '30%'
+          and th.stockCode not like '68%'
+        group by ten.stockCode , th.stockCode , th.bkName, th.stockName
+            )
+                , tmp_ans_bigswing as (
+        select t.*
+                , rank() over (partition by t.bkName order by big_swing_cnt desc) rank_
+        from tmp_bigswing t
+            )
+                , tmp_t_bigswing as (
+        select *
+        from tmp_ans_bigswing
+        where big_swing_cnt > cnt * 0.6 and rank_ <= 5
+            )     --   select * from tmp_t_bigswing;
+        select *
+        from tmp_rank_3 t1
+        where 1 = 1
+          and date_rank_3 = 1
+          and exists (select 1 from tmp_t_bigswing t2 where t1.stockCode = t2.stockCode)
+        order by 3, 2 desc;
         ]]>
     </select>
 </mapper>
