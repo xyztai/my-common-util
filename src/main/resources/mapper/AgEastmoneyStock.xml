@@ -811,6 +811,82 @@
         ]]>
     </select>
 
+    <select id="queryBigSwingAndIn5LowestVol" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+        with
+        tmp_min_date as (select DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d') min_date)
+        , tmp_base_info as (
+            select ten.`date`
+                 , ten.stockCode
+                 , ten.volume
+                 , ten.`last`
+                 , lag(ten.`low`, 1) over (partition by ten.stockCode order by date desc) low_next_1
+                 , ten.chg
+                 , lag(ten.`last`, 1) over (partition by ten.stockCode order by date desc) last_next_1
+                 , lag(ten.`last`, 2) over (partition by ten.stockCode order by date desc) last_next_2
+                 , lag(ten.`last`, 5) over (partition by ten.stockCode order by date desc) last_next_5
+                 , rank() over (partition by ten.stockCode order by date) date_rn
+            from t_eastmoney_node ten, tmp_min_date tmd
+            where ten.`date` not like '9999%'
+            and ten.`date` > tmd.min_date
+            order by 1 desc
+         )
+         -- 1、考虑低量
+         , tmp_vol as (
+            select ten.`date`
+                 , ten.stockCode
+                 , ten.volume
+                 , lag(ten.`date`, 1) over (partition by ten.stockCode order by date) date_pre_1
+                 , lag(ten.`volume`, 1) over (partition by ten.stockCode order by date) vol_pre_1
+                 , lag(ten.`volume`, 2) over (partition by ten.stockCode order by date) vol_pre_2
+                 , lag(ten.`volume`, 3) over (partition by ten.stockCode order by date) vol_pre_3
+                 , lag(ten.`volume`, 4) over (partition by ten.stockCode order by date) vol_pre_4
+                 , ten.`last`
+            from t_eastmoney_node ten, tmp_min_date tmd
+            where ten.`date` not like '9999%'
+              and ten.chg < 0.5
+              and ten.`date` > tmd.min_date
+            order by 1 desc
+        )
+        -- 找出近5日的，量最低的
+        , tmp_consider_vol as (
+            select tv.*
+            from tmp_vol tv
+            where tv.volume <= least(tv.vol_pre_1, vol_pre_2, vol_pre_3, vol_pre_4) -- or tv.date = '2025-12-15'
+        )  -- select * from tmp_consider_vol  where stockCode = '1.600482' order by 1 desc;
+        -- 3、考虑大振幅
+        , tmp_bigswing as (
+	        select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt
+	               , sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.04 then 1 else 0 end) big_swing_cnt
+	        from t_eastmoney_node ten, t_hs300 th
+	        where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
+	          and ten.`date` not like '9999%'
+	          and th.fullStockCode = ten.stockCode
+	          and th.stockCode not like '30%'
+	          and th.stockCode not like '68%'
+	        group by ten.stockCode , th.stockCode , th.bkName, th.stockName
+        )
+        , tmp_consider_bigswing as (
+        	select t.*
+                	, rank() over (partition by t.bkName order by big_swing_cnt desc) rank_
+        	from tmp_bigswing t
+        )
+        , tmp_ans_bigswing as (
+	        select distinct fullStockCode, stockCode, bkName, stockName
+	        from tmp_consider_bigswing
+	        where big_swing_cnt > cnt * 0.6 and rank_ <= 5
+        ) -- select * from tmp_ans_bigswing;
+        select t2.stockCode, t1.date, concat(t2.bkName, '-',  t2.stockName) last, '' ratioB
+               -- , case when t3.last > t3.last_next_2 and t3.last > t3.last_next_5 then 0 else 1 end win_is_1
+        from tmp_consider_vol t1, tmp_ans_bigswing t2, tmp_base_info t3
+        where t1.stockCode = t2.fullStockCode
+        and t2.fullStockCode = t3.stockCode
+        and t1.date = t3.date
+        order by 2 desc, 3
+        ]]>
+    </select>
+
+
     <select id="queryDuoTou" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
 			select

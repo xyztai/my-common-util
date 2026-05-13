@@ -112,6 +112,8 @@ public class AgNewEastmoneyStockController {
     private static final String KEY_234 = "stock#" + "get-right-side-avg20-or-avg60";
     // 235、考虑cci在-100掠过，即只是简单地经过-100，且地量+大振幅的目的
     private static final String KEY_235 = "stock#" + "get-right-side-cci-and-low-vol-and-big-swing";
+    // 236、查询最近一个月的大波动且Vol是5天内的最低点，很可能是上涨中继
+    private static final String KEY_236 = "stock#" + "get-right-side-big-swing-and-lowest-vol-2";
 
 
     /**
@@ -255,7 +257,7 @@ public class AgNewEastmoneyStockController {
         for(String kk : Arrays.asList(
                 KEY_221, KEY_222, KEY_223, KEY_224, KEY_225
                 , KEY_226, KEY_227, KEY_228, KEY_229, KEY_230
-                , KEY_231, KEY_232, KEY_233, KEY_234, KEY_235)) {
+                , KEY_231, KEY_232, KEY_233, KEY_234, KEY_235, KEY_236)) {
             List<SpecialCarePoJo2> res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
             log.info("get cache value. key = {}, value = {}", kk, JSON.toJSON(res0));
             if(!CollectionUtils.isEmpty(res0)){
@@ -276,6 +278,7 @@ public class AgNewEastmoneyStockController {
                     case KEY_233: kkName = "KEY_233"; break;
                     case KEY_234: kkName = "KEY_234"; break;
                     case KEY_235: kkName = "KEY_235"; break;
+                    case KEY_236: kkName = "KEY_236"; break;
                     default:
                         break;
                 }
@@ -1071,6 +1074,39 @@ public class AgNewEastmoneyStockController {
         }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = agCCIEastmoneyStockMapper.considerCCIAndVol();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("688")
+                        && !f.getStockCode().startsWith("689")
+                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+    /**
+     * 236、
+     * * @return
+     */
+    @GetMapping("/get-right-side-big-swing-and-lowest-vol-2")
+    public BaseResponse queryBigSwingAndIn5LowestVol() {
+        log.info("queryBigSwingAndIn5LowestVol");
+        String key = KEY_236;
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryBigSwingAndIn5LowestVol();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")

@@ -447,6 +447,16 @@ public class ScheduledTasks {
             }
         }, executor);
 
+        CompletableFuture<Void> stock_task_236 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock queryBigSwingAndIn5LowestVol start");
+                agNewEastmoneyStockController.queryBigSwingAndIn5LowestVol();
+                log.info("task stock queryBigSwingAndIn5LowestVol end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
         CompletableFuture<Void> stock_task_999 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryEastmoneyLatestInfo start");
@@ -614,6 +624,7 @@ public class ScheduledTasks {
                 , stock_task_232
                 , stock_task_234
                 , stock_task_235
+                , stock_task_236
                 // 233 因为有计算，所有在查询之前执行
                 , stock_task_999
 
