@@ -44,6 +44,7 @@ public interface AgEastmoneyStockMapper {
     List<SpecialCarePoJo2> MA20maSSP();
     List<SpecialCarePoJo2> considerAll();
     List<SpecialCarePoJo2> down5();
+    List<SpecialCarePoJo2> getDailyCnt();
     List<String> getCalcDatesFromDuoTou();
     int genDuoTou(@Param("calcDate") String calcDate);
     List<String> getCalcDatesFromMA();
