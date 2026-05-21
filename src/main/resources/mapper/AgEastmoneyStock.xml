@@ -6,7 +6,7 @@
 
     <select id="getDailyCnt" resultType="net.my.pojo.SpecialCarePoJo2">
     <![CDATA[
-        select '' stockCode, ten.date, '' last, concat('cnt: ', count(1)) ratioB
+        select '' stockCode, ten.date, concat('cnt: ', count(1)) last, '' ratioB
         from t_eastmoney_node ten
         where ten.`date` > '2026'
           and `date` not like '9999%'
