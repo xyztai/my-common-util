@@ -16,6 +16,57 @@
     ]]>
     </select>
 
+    <select id="ge_t000001_lowest" resultType="net.my.pojo.SpecialCarePoJo2">
+    <![CDATA[
+            with tmp_data as (
+                select t.`date` , t.`last` , rank() over (order by t.`date` ) rank_
+                from t_eastmoney_node_index t
+                where t.stockCode = '1.000001'
+                and date > '2025'
+            )
+            , tmp_max_last as (
+                select t1.date, t1.last, max(t2.last) max_last, max(t2.rank_) - t1.rank_ rank_diff
+                from tmp_data t1, tmp_data t2
+                where t1.rank_ < t2.rank_
+                and t2.rank_ < t1.rank_ + 22
+                -- and t1.date = '2025-01-13'
+                group by t1.date, t1.last
+            )
+            , tmp_cnt as(
+                select t.`date`
+                       , t.chg
+                       , t.stockCode
+                       , rank() over (partition by t.stockCode order by chg) chg_rank
+                       , count(1) over (partition by t.stockCode ) cnt_s
+                from t_eastmoney_node_index t
+                where t.stockCode = '1.000001'
+                and date > '2025'
+            )
+            , tmp_ans as (
+                select tml.date date
+                       , t.stockCode
+                       , tml.last
+                       , case when tml.rank_diff < 21 then null else tml.max_last end max_last
+                       , tml.rank_diff
+                       , t.chg
+                       , LPAD(concat(t.chg_rank, '/', cnt_s), length(t.cnt_s) * 2 + 1, '0')  r_
+                from tmp_cnt t, tmp_max_last tml
+                where t.chg_rank <= cnt_s/20
+                and t.date = tml.date
+            )
+            select SUBSTRING(t.stockCode, 3) stockCode
+                   , t.date
+                   , t.chg last
+                   , case when t.max_last is not null then
+                          concat(t.r_, ' @ ', '22个工作日 chg= ', round(t.max_last/t.last*100 - 100, 1), ' %')
+                     else t.r_
+                     end  ratioB
+                   -- '' stockCode, ten.date, concat('cnt: ', count(1)) last, '' ratioB
+            from tmp_ans t
+            order by 3, 2
+    ]]>
+    </select>
+
     <select id="getLimitDate" resultType="java.lang.String">
         select distinct date
         from t_eastmoney_node
