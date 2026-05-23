@@ -203,12 +203,13 @@
 	        select t1.*, rank() over (partition by t1.stockCode, t1.date_rank_2 order by t1.date_rn) date_rank_3
 	        from tmp_ans_rank_2 t1
         )
-        select t1.stockCode, t1.date, t1.last, t1.ratioB -- t1.* , case when t1.last_0 > last_next_2 and t1.last_0 > last_next_5 then 0 else 1 end win_is_1
+        select t1.stockCode, t1.date, t1.last
+                , concat(t1.ratioB, '__五日内win: ', case when t1.last_0 > last_next_2 and t1.last_0 > last_next_5 then 'No' else 'Yes' end) ratioB
         from tmp_ans_rank_3 t1
         where 1 = 1
           and date_rank_3 = 1
           and exists (select 1 from tmp_ans_bigswing t2 where t1.stockCode = t2.stockCode)
-        order by 2 desc, 3;
+        order by 2 desc, 3
         ]]>
     </select>
 </mapper>
