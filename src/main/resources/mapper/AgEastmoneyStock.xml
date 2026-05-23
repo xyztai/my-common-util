@@ -16,7 +16,7 @@
     ]]>
     </select>
 
-    <select id="ge_t000001_lowest" resultType="net.my.pojo.SpecialCarePoJo2">
+    <select id="get_000001_lowest" resultType="net.my.pojo.SpecialCarePoJo2">
     <![CDATA[
             with tmp_data as (
                 select t.`date` , t.`last` , rank() over (order by t.`date` ) rank_
