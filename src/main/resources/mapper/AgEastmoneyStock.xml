@@ -27,7 +27,7 @@
             , tmp_max_last as (
                 select t1.date, t1.last, max(t2.last) max_last, max(t2.rank_) - t1.rank_ rank_diff
                 from tmp_data t1, tmp_data t2
-                where t1.rank_ < t2.rank_
+                where t1.rank_ <= t2.rank_
                 and t2.rank_ < t1.rank_ + 22
                 -- and t1.date = '2025-01-13'
                 group by t1.date, t1.last
