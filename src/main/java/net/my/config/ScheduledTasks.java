@@ -677,7 +677,9 @@ public class ScheduledTasks {
         agNewEastmoneyEChartsController.s69();
         log.info("task echarts s69 end");
 
-
+        log.info("task agNewEastmoneyStockController.easySnapshotRight start");
+        agNewEastmoneyStockController.easySnapshotRight();
+        log.info("task agNewEastmoneyStockController.easySnapshotRight end");
 
 
 
