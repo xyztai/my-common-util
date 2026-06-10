@@ -353,6 +353,11 @@ public class AgNewEastmoneyStockController {
                                 .collect(Collectors.toList()));
                 pojo2.setRatioB(tmp);
             }
+
+            // 将结果保存到数据库
+            String maxDate = agEastmoneyStockMapper.getMaxDate();
+            res.forEach(f -> f.setDate(maxDate));
+            agEastmoneyStockMapper.saveRightData(res);
         } else {
             SpecialCarePoJo2 empty = new SpecialCarePoJo2();
             empty.setDate("--");
