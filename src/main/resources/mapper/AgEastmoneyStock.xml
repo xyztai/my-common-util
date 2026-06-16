@@ -1519,4 +1519,23 @@ order by 2 desc;
 
     </select>
 
+<!-- 比如 6-11 号低点，6-12买入，6-15卖出 -->
+    <select id="test-certain-data">
+        with tmp_next_day as (
+        select tenr.*, th.fullStockCode , ten.chg chg_1
+        from t_eastmoney_node_right tenr , t_eastmoney_node ten , t_hs300 th
+        where tenr.`date` = '2026-06-11'
+        and ten.`date` = '2026-06-12'
+        and tenr.stockCode = th.stockCode
+        and ten.stockCode = th.fullStockCode
+        and (substring(tenr.stockName , 1, 2) in ('10', '09') or instr(tenr.stockName, '224') > 0)
+        and ten.chg > -5
+        )
+        select ten.chg, t1.chg_1, t1.*
+        from tmp_next_day t1, t_eastmoney_node ten
+        where t1.fullStockCode = ten.stockCode
+        and ten.`date` = '2026-06-15'
+        order by 4 desc;
+    </select>
+
 </mapper>
