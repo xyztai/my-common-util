@@ -1,0 +1,50 @@
+
+-- 1、找到 win_ratio >= 50 的日期，然后再去看能否入手，看echart在底部
+select tewr._date, max(round(cnt_win/cnt_all * 100)) win_ratio
+from t_eastmoney_node_avg_statis tewr
+where 1 =1 -- tewr.`_date` = '2026-06-12'
+group by tewr._date
+having win_ratio >= 50
+order by 1 desc;
+
+
+-- 2、测算sql
+with tmp_dates as (
+	select  teni.date date_next_0
+	        , lead(teni.`date` , 1) over (order by teni.`date` ) date_next_1
+	        , lead(teni.`date` , 2) over (order by teni.`date` ) date_next_2
+	        , lead(teni.`date` , 3) over (order by teni.`date` ) date_next_3
+	        , lead(teni.`date` , 4) over (order by teni.`date` ) date_next_4
+	        , lag(teni.`date` , 1) over (order by teni.`date` ) date_pre_1
+	from t_eastmoney_node_index teni
+	where teni.`date` >= '2026-06-11'
+	and teni.stockCode = '1.000001'
+)
+select tenr.stockCode , tenr.stockName , tenr.info
+       , sum(case when ten.`date` = td.date_next_0 then last else 0 end) last
+       , sum(case when ten.`date` between td.date_next_2 and ifnull(td.date_next_4, '9999') then chg else 0 end) should_win_chg
+       -- , sum(case when ten.`date` >= td.date_next_1 then chg else 0 end) chg_t_plus
+       -- , sum(case when ten.`date` >= td.date_next_0 then chg else 0 end) chg_t
+       , sum(case when ten.`date` = td.date_next_0 then chg else 0 end) chg_next_0
+       , sum(case when ten.`date` = td.date_next_1 then chg else 0 end) chg_next_1
+       , sum(case when ten.`date` = td.date_next_2 then chg else 0 end) chg_next_2
+       , sum(case when ten.`date` = td.date_next_3 then chg else 0 end) chg_next_3
+       , sum(case when ten.`date` = td.date_next_4 then chg else 0 end) chg_next_4
+from t_eastmoney_node_right tenr , t_eastmoney_node ten , t_hs300 th, tmp_dates td
+where tenr.`date` = td.date_next_0
+-- and substring(tenr.stockName , 1, 2) >= '07'
+-- and ten.`date` < '3000'
+and ten.`date` >= td.date_next_0
+and tenr.stockCode = th.stockCode
+and ten.stockCode = th.fullStockCode
+and tenr.info like '%222_223%' -- 多头排列
+and tenr.info like '%225%' -- 大波动
+and td.date_pre_1 is null
+group by tenr.stockCode , tenr.stockName, tenr.info  order by 5 desc
+
+
+
+-- T日（比如2026-06-11）出现买点机会，看T+1日（比如2026-06-12）
+-- 如果T+1的收盘chg<-5%,则在T+2,以(T+1)的收盘价格*（1-4%）的价格buy
+-- 如果T+1的收盘chg>-5%,则在尾盘以close价格buy
+-- 持有最多3天
