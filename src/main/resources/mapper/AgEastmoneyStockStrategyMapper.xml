@@ -27,86 +27,89 @@
             group by t1.`_date`, value9
             order by 1 desc
             limit 250
-            )
-           , tmp_69_rank as (
-        select t.name
-                , t.value9
-                , t.value10
-                , rank() over (order by t.value10) rank_
-        from tmp_69 t
-            )
--- 2、找到目标日期
-                , target_days as (
-        select t.name today_date
-                , t.value9 win_ratio
-                , t.value10 today_value
-                , t1.value10 limit_line
-                , rank() over (order by t.name desc) date_rn
-        from tmp_69_rank t
-                , (select max(value10) value10 from tmp_69_rank where rank_ <= 250 * 0.2) t1
-        where t.value10 < t1.value10 * 1 -- 需要低于buy线
-          and t.value9 >= 50  -- win_ratio需要大于50
-            )
--- 3、测算sql
-            , tmp_dates_000001 as (
-        select  teni.date date_next_0
-                , lead(teni.`date` , 1) over (order by teni.`date` ) date_next_1
-                , lead(teni.`date` , 2) over (order by teni.`date` ) date_next_2
-                , lead(teni.`date` , 3) over (order by teni.`date` ) date_next_3
-                , lead(teni.`date` , 4) over (order by teni.`date` ) date_next_4
-            -- , lag(teni.`date` , 1) over (order by teni.`date` ) date_pre_1
-        from t_eastmoney_node_index teni
-        where teni.`date` >= '2026-06-10' -- (select today_date from target_days where date_rn = 2) -- '2026-06-11'
-          and teni.stockCode = '1.000001'
-            )
-            , tmp_dates as (
-        select  t1.*
-        from tmp_dates_000001 t1, target_days t2
-        where date_rn <= 3  -- teni.`date` >= '2026-06-10' -- (select today_date from target_days) -- '2026-06-11'
-          and t1.date_next_0 = t2.today_date
-            ) -- select * from tmp_dates  order by 1, 2;
-            , tmp_ans as (
-        select tenr.stockCode , tenr.stockName , tenr.info
-                , sum(case when ten.`date` = td.date_next_0 then last else 0 end) last
-                , sum(case when ten.`date` between td.date_next_2 and ifnull(td.date_next_4, '9999') then chg else 0 end) should_win_chg
-            -- , sum(case when ten.`date` >= td.date_next_1 then chg else 0 end) chg_t_plus
-            -- , sum(case when ten.`date` >= td.date_next_0 then chg else 0 end) chg_t
-                , sum(case when ten.`date` = td.date_next_0 then chg else 0 end) chg_next_0
-                , sum(case when ten.`date` = td.date_next_1 then chg else 0 end) chg_next_1
-                , sum(case when ten.`date` = td.date_next_2 then chg else 0 end) chg_next_2
-                , sum(case when ten.`date` = td.date_next_3 then chg else 0 end) chg_next_3
-                , sum(case when ten.`date` = td.date_next_4 then chg else 0 end) chg_next_4
-                , td.date_next_0, date_next_1, date_next_2, date_next_3, date_next_4
-        from t_eastmoney_node_right tenr , t_eastmoney_node ten , t_hs300 th, tmp_dates td
-        where tenr.`date` = td.date_next_0 -- and ten.date <= '2026-06-15'
-            -- and substring(tenr.stockName , 1, 2) >= '07'
-            -- and ten.`date` < '3000'
-          and ten.`date` >= td.date_next_0
-          and tenr.stockCode = th.stockCode
-          and ten.stockCode = th.fullStockCode
-          and tenr.info like '%222_223%' -- 多头排列
-          and tenr.info like '%225%' -- 大波动
-            -- and td.date_pre_1 is null
-        group by td.date_next_0, tenr.stockCode , tenr.stockName, tenr.info , td.date_next_0, date_next_1, date_next_2, date_next_3, date_next_4
-            )
-            , tmp_today as (select max(date) date_ from t_eastmoney_node_index teni )
-        select stockCode, case when t2.date_ = date_next_0 then concat('*', date_next_0) else date_next_0 end date, stockName last
-       , concat('should_win_chg=', round(should_win_chg, 1)
-                , '; last=', round(last, 2)
-                , '; chg=', round(chg_next_0, 1)
-                , '; chg_next_1=', round(chg_next_1, 1)
-                , '; chg_next_2=', round(chg_next_2, 1)
-                , '; chg_next_3=', round(chg_next_3, 1)
-                , '; chg_next_4=', round(chg_next_4, 1)
-                , '; info=', info
-       ) ratioB
-       -- , info, should_win_chg, last, chg_next_0 chg , chg_next_1, chg_next_2, chg_next_3, chg_next_4
-	   -- , concat(date_next_0, ': ', chg_next_0) chg_next_0
-	   -- , concat(date_next_1, ': ', chg_next_1) chg_next_1
-	   -- , concat(date_next_2, ': ', chg_next_2) chg_next_2
-	   -- , concat(date_next_3, ': ', chg_next_3) chg_next_3
-	   -- , concat(date_next_4, ': ', chg_next_4) chg_next_4
-        from tmp_ans t1, tmp_today t2
+        )
+        , tmp_69_rank as (
+            select t.name
+                    , t.value9
+                    , t.value10
+                    , rank() over (order by t.value10) rank_
+            from tmp_69 t
+        )
+        -- 2、找到目标日期
+        , target_days as (
+            select t.name today_date
+                    , t.value9 win_ratio
+                    , t.value10 today_value
+                    , t1.value10 limit_line
+                    , rank() over (order by t.name desc) date_rn
+            from tmp_69_rank t
+                    , (select max(value10) value10 from tmp_69_rank where rank_ <= 250 * 0.2) t1
+            where t.value10 < t1.value10 * 1 -- 需要低于buy线
+              and t.value9 >= 50  -- win_ratio需要大于50
+        )
+        -- 3、测算sql
+        , tmp_dates_000001 as (
+            select  teni.date date_next_0
+                    , lead(teni.`date` , 1) over (order by teni.`date` ) date_next_1
+                    , lead(teni.`date` , 2) over (order by teni.`date` ) date_next_2
+                    , lead(teni.`date` , 3) over (order by teni.`date` ) date_next_3
+                    , lead(teni.`date` , 4) over (order by teni.`date` ) date_next_4
+                -- , lag(teni.`date` , 1) over (order by teni.`date` ) date_pre_1
+            from t_eastmoney_node_index teni
+            where teni.`date` >= '2026-06-10' -- (select today_date from target_days where date_rn = 2) -- '2026-06-11'
+              and teni.stockCode = '1.000001'
+        )
+        , tmp_dates as (
+            select  t1.*
+            from tmp_dates_000001 t1, target_days t2
+            where date_rn <= 5  -- teni.`date` >= '2026-06-10' -- (select today_date from target_days) -- '2026-06-11'
+              and t1.date_next_0 = t2.today_date
+        ) -- select * from tmp_dates  order by 1, 2;
+        , tmp_ans as (
+            select tenr.stockCode , tenr.stockName , tenr.info
+                    , sum(case when ten.`date` = td.date_next_0 then last else 0 end) last
+                    , sum(case when ten.`date` between td.date_next_2 and ifnull(td.date_next_4, '9999') then chg else 0 end) should_win_chg
+                -- , sum(case when ten.`date` >= td.date_next_1 then chg else 0 end) chg_t_plus
+                -- , sum(case when ten.`date` >= td.date_next_0 then chg else 0 end) chg_t
+                    , sum(case when ten.`date` = td.date_next_0 then chg else 0 end) chg_next_0
+                    , sum(case when ten.`date` = td.date_next_1 then chg else 0 end) chg_next_1
+                    , sum(case when ten.`date` = td.date_next_2 then chg else 0 end) chg_next_2
+                    , sum(case when ten.`date` = td.date_next_3 then chg else 0 end) chg_next_3
+                    , sum(case when ten.`date` = td.date_next_4 then chg else 0 end) chg_next_4
+                    , td.date_next_0, date_next_1, date_next_2, date_next_3, date_next_4
+            from t_eastmoney_node_right tenr , t_eastmoney_node ten , t_hs300 th, tmp_dates td
+            where tenr.`date` = td.date_next_0 -- and ten.date <= '2026-06-15'
+                -- and substring(tenr.stockName , 1, 2) >= '07'
+                -- and ten.`date` < '3000'
+              and ten.`date` >= td.date_next_0
+              and tenr.stockCode = th.stockCode
+              and ten.stockCode = th.fullStockCode
+              and tenr.info like '%222_223%' -- 多头排列
+              and tenr.info like '%225%' -- 大波动
+                -- and td.date_pre_1 is null
+            group by td.date_next_0, tenr.stockCode , tenr.stockName, tenr.info , td.date_next_0, date_next_1, date_next_2, date_next_3, date_next_4
+        )
+        , tmp_today as (select max(date) date_ from t_eastmoney_node_index teni )
+        , tmp_max_date as (select today_date date_max_in_target_days from target_days where date_rn = 1)
+        select stockCode
+                , case when t3.date_max_in_target_days = date_next_0 then concat('*', date_next_0)
+	                   when t2.date_ = date_next_0 then concat('**', date_next_0) else date_next_0 end date, stockName last
+                , concat('should_win_chg=', round(should_win_chg, 1)
+                        , '; last=', round(last, 2)
+                        , '; chg=', round(chg_next_0, 1)
+                        , '; chg_next_1=', round(chg_next_1, 1)
+                        , '; chg_next_2=', round(chg_next_2, 1)
+                        , '; chg_next_3=', round(chg_next_3, 1)
+                        , '; chg_next_4=', round(chg_next_4, 1)
+                        , '; info=', info
+                        ) ratioB
+               -- , info, should_win_chg, last, chg_next_0 chg , chg_next_1, chg_next_2, chg_next_3, chg_next_4
+               -- , concat(date_next_0, ': ', chg_next_0) chg_next_0
+               -- , concat(date_next_1, ': ', chg_next_1) chg_next_1
+               -- , concat(date_next_2, ': ', chg_next_2) chg_next_2
+               -- , concat(date_next_3, ': ', chg_next_3) chg_next_3
+               -- , concat(date_next_4, ': ', chg_next_4) chg_next_4
+        from tmp_ans t1, tmp_today t2, tmp_max_date t3
         order by date_next_0 desc, 3 desc
         ]]>
     </select>
