@@ -45,27 +45,39 @@ with tmp_dates as (
 	where teni.`date` >= '2026-06-11'
 	and teni.stockCode = '1.000001'
 )
-select tenr.stockCode , tenr.stockName , tenr.info
-       , sum(case when ten.`date` = td.date_next_0 then last else 0 end) last
-       , sum(case when ten.`date` between td.date_next_2 and ifnull(td.date_next_4, '9999') then chg else 0 end) should_win_chg
-       -- , sum(case when ten.`date` >= td.date_next_1 then chg else 0 end) chg_t_plus
-       -- , sum(case when ten.`date` >= td.date_next_0 then chg else 0 end) chg_t
-       , sum(case when ten.`date` = td.date_next_0 then chg else 0 end) chg_next_0
-       , sum(case when ten.`date` = td.date_next_1 then chg else 0 end) chg_next_1
-       , sum(case when ten.`date` = td.date_next_2 then chg else 0 end) chg_next_2
-       , sum(case when ten.`date` = td.date_next_3 then chg else 0 end) chg_next_3
-       , sum(case when ten.`date` = td.date_next_4 then chg else 0 end) chg_next_4
-from t_eastmoney_node_right tenr , t_eastmoney_node ten , t_hs300 th, tmp_dates td
-where tenr.`date` = td.date_next_0
--- and substring(tenr.stockName , 1, 2) >= '07'
--- and ten.`date` < '3000'
-and ten.`date` >= td.date_next_0
-and tenr.stockCode = th.stockCode
-and ten.stockCode = th.fullStockCode
-and tenr.info like '%222_223%' -- 多头排列
-and tenr.info like '%225%' -- 大波动
-and td.date_pre_1 is null
-group by tenr.stockCode , tenr.stockName, tenr.info  order by 5 desc
+, tmp_ans as (
+	select tenr.stockCode , tenr.stockName , tenr.info
+	       , sum(case when ten.`date` = td.date_next_0 then last else 0 end) last
+	       , sum(case when ten.`date` between td.date_next_2 and ifnull(td.date_next_4, '9999') then chg else 0 end) should_win_chg
+	       -- , sum(case when ten.`date` >= td.date_next_1 then chg else 0 end) chg_t_plus
+	       -- , sum(case when ten.`date` >= td.date_next_0 then chg else 0 end) chg_t
+	       , sum(case when ten.`date` = td.date_next_0 then chg else 0 end) chg_next_0
+	       , sum(case when ten.`date` = td.date_next_1 then chg else 0 end) chg_next_1
+	       , sum(case when ten.`date` = td.date_next_2 then chg else 0 end) chg_next_2
+	       , sum(case when ten.`date` = td.date_next_3 then chg else 0 end) chg_next_3
+	       , sum(case when ten.`date` = td.date_next_4 then chg else 0 end) chg_next_4
+	       , td.date_next_0, date_next_1, date_next_2, date_next_3, date_next_4
+	from t_eastmoney_node_right tenr , t_eastmoney_node ten , t_hs300 th, tmp_dates td
+	where tenr.`date` = td.date_next_0
+	-- and substring(tenr.stockName , 1, 2) >= '07'
+	-- and ten.`date` < '3000'
+	and ten.`date` >= td.date_next_0
+	and tenr.stockCode = th.stockCode
+	and ten.stockCode = th.fullStockCode
+	and tenr.info like '%222_223%' -- 多头排列
+	and tenr.info like '%225%' -- 大波动
+	and td.date_pre_1 is null
+	group by tenr.stockCode , tenr.stockName, tenr.info , td.date_next_0, date_next_1, date_next_2, date_next_3, date_next_4
+)
+select date_next_0, stockCode, stockName, info, should_win_chg
+       , last, chg_next_0 chg , chg_next_1, chg_next_2, chg_next_3, chg_next_4
+	   -- , concat(date_next_0, ': ', chg_next_0) chg_next_0
+	   -- , concat(date_next_1, ': ', chg_next_1) chg_next_1
+	   -- , concat(date_next_2, ': ', chg_next_2) chg_next_2
+	   -- , concat(date_next_3, ': ', chg_next_3) chg_next_3
+	   -- , concat(date_next_4, ': ', chg_next_4) chg_next_4
+from tmp_ans
+order by 3 desc, 5 desc
 
 
 
