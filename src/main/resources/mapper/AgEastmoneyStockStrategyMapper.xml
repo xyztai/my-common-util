@@ -89,7 +89,8 @@
             -- and td.date_pre_1 is null
         group by td.date_next_0, tenr.stockCode , tenr.stockName, tenr.info , td.date_next_0, date_next_1, date_next_2, date_next_3, date_next_4
             )
-        select stockCode, date_next_0 date, stockName last
+            , tmp_today as (select max(date) date_ from t_eastmoney_node_index teni )
+        select stockCode, case when t2.date_ = date_next_0 then concat('*', date_next_0) else date_next_0 end date, stockName last
        , concat('should_win_chg=', round(should_win_chg, 1)
                 , '; last=', round(last, 2)
                 , '; chg=', round(chg_next_0, 1)
@@ -105,8 +106,8 @@
 	   -- , concat(date_next_2, ': ', chg_next_2) chg_next_2
 	   -- , concat(date_next_3, ': ', chg_next_3) chg_next_3
 	   -- , concat(date_next_4, ': ', chg_next_4) chg_next_4
-        from tmp_ans
-        order by 2 desc, 3 desc
+        from tmp_ans t1, tmp_today t2
+        order by date_next_0 desc, 3 desc
         ]]>
     </select>
 

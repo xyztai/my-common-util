@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/ag-eastmoney-stock")
+@RequestMapping("/ag-eastmoney-stock-strategy")
 @Slf4j
 @Api(value = "ag", description = "ag接口")
 public class AgEastmoneyStockStrategyController {
