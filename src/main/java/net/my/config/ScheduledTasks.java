@@ -43,6 +43,9 @@ public class ScheduledTasks {
     private AgNewQQ300Controller agNewQQ300Controller;
 
     @Autowired
+    private AgEastmoneyStockStrategyController agEastmoneyStockStrategyController;
+
+    @Autowired
     private AgNewEastmoneyStockController agNewEastmoneyStockController;
 
     @Autowired
@@ -490,6 +493,19 @@ public class ScheduledTasks {
             }
         }, executor);
 
+        // 888 开头的表示策略
+        CompletableFuture<Void> stock_task_88801 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock strategy_1 start");
+                agEastmoneyStockStrategyController.strategy_1();
+                log.info("task stock strategy_1 end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
+
+
 
 
 
@@ -652,6 +668,7 @@ public class ScheduledTasks {
                 , stock_task_997
                 , stock_task_998
                 , stock_task_999
+                , stock_task_88801
 
 
                 , etf_task_201
