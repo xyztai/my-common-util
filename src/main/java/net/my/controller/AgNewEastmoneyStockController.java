@@ -1065,7 +1065,7 @@ public class AgNewEastmoneyStockController {
     }
 
     /**
-     * 235、
+     * 235、废止，cci的计算有误，该计算返回空
      * @return
      */
     @GetMapping("/get-right-side-cci-and-low-vol-and-big-swing")
@@ -1078,11 +1078,12 @@ public class AgNewEastmoneyStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agCCIEastmoneyStockMapper.considerCCIAndVol();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
-                .filter(f -> !f.getStockCode().startsWith("688")
-                        && !f.getStockCode().startsWith("689")
-                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = new ArrayList<>();
+//        List<SpecialCarePoJo2> buyDataFromEastmoneys = agCCIEastmoneyStockMapper.considerCCIAndVol();
+//        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+//                .filter(f -> !f.getStockCode().startsWith("688")
+//                        && !f.getStockCode().startsWith("689")
+//                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
         if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
             SpecialCarePoJo2 empty = new SpecialCarePoJo2();
             empty.setDate("--");
