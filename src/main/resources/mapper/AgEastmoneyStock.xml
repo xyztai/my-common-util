@@ -1395,7 +1395,6 @@
     </insert>
 
 
-
     <insert id="saveRightData" parameterType="java.util.List">
         replace into t_eastmoney_node_right(`date`, `stockCode`, `stockName`, `info`)
         values
@@ -1406,136 +1405,17 @@
     </insert>
 
 
-
     <select id="getMaxDate" resultType="java.lang.String">
         select max(date) from t_eastmoney_node_index
     </select>
 
 
 
-    <select id="xxxx_20260322" resultType="net.my.pojo.SpecialCarePoJo2">
-        <![CDATA[
-with tmp as (
-    select
-        `date`
- 		, ten.stockCode
- 		, lead(ten.`date`, 1 ) over (partition by ten.stockCode order by `date` ) date_next
-		, LAG (ten.`date` ) over (partition by ten.stockCode order by `date` ) date_pre
-        , ten.volume
-		, lead(ten.volume ) over (partition by ten.stockCode order by `date` ) volume_next
-		, LAG (ten.`volume` ) over (partition by ten.stockCode order by `date` ) volume_pre
-        , ten.chg
-		, lead(ten.chg ) over (partition by ten.stockCode order by `date` ) chg_next
-		, LAG (ten.`chg` ) over (partition by ten.stockCode order by `date` ) chg_pre
-		, LAG (ten.`chg`, 1 ) over (partition by ten.stockCode order by `date` ) chg_pre_1
-		, LAG (ten.`chg`, 2 ) over (partition by ten.stockCode order by `date` ) chg_pre_2
-		, LAG (ten.`chg`, 3 ) over (partition by ten.stockCode order by `date` ) chg_pre_3
-		, LAG (ten.`chg`, 4 ) over (partition by ten.stockCode order by `date` ) chg_pre_4
-		, LAG (ten.`chg`, 5 ) over (partition by ten.stockCode order by `date` ) chg_pre_5
-		, LAG (ten.`chg`, 6 ) over (partition by ten.stockCode order by `date` ) chg_pre_6
-		, LAG (ten.`chg`, 7 ) over (partition by ten.stockCode order by `date` ) chg_pre_7
-		, LAG (ten.`chg`, 8 ) over (partition by ten.stockCode order by `date` ) chg_pre_8
-		, LAG (ten.`chg`, 9 ) over (partition by ten.stockCode order by `date` ) chg_pre_9
-		, LAG (ten.`chg`, 10 ) over (partition by ten.stockCode order by `date` ) chg_pre_10
-		from t_eastmoney_node ten
-		where 1 = 1
-		  -- and `date` > '2026'
-		  and date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
-		and `date` not like '9999%'
-		and ten.stockCode not like '0.68%'
-		and ten.stockCode not like '0.30%'
-		and ten.stockCode not like '1.68%'
-		and ten.stockCode not like '1.30%'
-)
-, tmp_bk_cnt as (
-	select bkName, count(1) cnt
-	from t_hs300
-	group by bkName
-)
-select th.bkName, count(1), max(t3.cnt)
-from tmp t, t_hs300 th, tmp_bk_cnt t3
-where 1 = 1
-  and t.date_next is null
-  and GREATEST(chg_pre_1, chg_pre_2, chg_pre_3, chg_pre_4, chg_pre_5 , chg_pre_6, chg_pre_7, chg_pre_8, chg_pre_9, chg_pre_10) > 9.5
-  and th.bkName = t3.bkName
-  and t.stockCode = th.fullStockCode
-group by th.bkName
-order by 2 desc
-        ]]>
-    </select>
 
-    <select id="xxxtttt">
-        <![CDATA[
-with tmp_all as (
-	select ten.stockCode
-	       , ten.`date`
-	       , lead(ten.`date`, 1) over (partition by ten.stockCode order by ten.`date`) date_next_1
-	       , ten.chg
-	       , lead(ten.`chg`, 1) over (partition by ten.stockCode order by ten.`date`) chg_next_1
-	       , lead(ten.`chg`, 2) over (partition by ten.stockCode order by ten.`date`) chg_next_2
-	       , lead(ten.`chg`, 3) over (partition by ten.stockCode order by ten.`date`) chg_next_3
-	       , ten.`last`
-	       -- , lead(ten.`last`, 1) over (partition by ten.stockCode order by ten.`date`) last_next_1
-	       -- , lead(ten.`last`, 2) over (partition by ten.stockCode order by ten.`date`) last_next_2
-	from t_eastmoney_node ten
-	where ten.`date` > '2026-01'
-	and `date` not like '9999%'
-	and ten.stockCode in (
-		select distinct fullStockCode
-		from t_eastmoney_node_duotou
-		where date > '2026'
-	)
-)
-, tmp_ans as (
-	select ta.*
-	from tmp_all ta, t_eastmoney_node_duotou tenm
-	where ta.stockCode = tenm.fullStockCode
-	and ta.date = tenm.date
-	and tenm.date > '2026-01'
-	and ta.chg < 9.9
-)
-select count(1)
-       , sum(case when t.chg < 0 then 1 else 0 end ) _1
-       , sum(case when t.chg < 0 and t.chg_next_1 < 0 then 1 else 0 end ) a1
-       , sum(case when t.chg < 0 and t.chg_next_1 < 0 and t.chg_next_2 < 0 then 1 else 0 end ) b1
-       , sum(case when t.chg < 0 and t.chg_next_1 < 0 and t.chg_next_2 < 0 and t.chg_next_2 + t.chg_next_3 < 0  then 1 else 0 end ) c1
-       , '---2'
-       , sum(case when t.chg < 0 and t.chg_next_1 > 0 then 1 else 0 end ) a2
-       , sum(case when t.chg < 0 and t.chg_next_1 > 0 and t.chg_next_2 < 0 then 1 else 0 end ) b2
-       , sum(case when t.chg < 0 and t.chg_next_1 > 0 and t.chg_next_2 < 0 and t.chg_next_2 + t.chg_next_3 < 0  then 1 else 0 end ) c2
-       , '---3'
-       , sum(case when t.chg > 0 then 1 else 0 end ) _2
-       , sum(case when t.chg > 0 and t.chg_next_1 < 0 then 1 else 0 end ) a1
-       , sum(case when t.chg > 0 and t.chg_next_1 < 0 and t.chg_next_2 < 0 then 1 else 0 end ) b1
-       , sum(case when t.chg > 0 and t.chg_next_1 < 0 and t.chg_next_2 < 0 and t.chg_next_2 + t.chg_next_3 < 0  then 1 else 0 end ) c1
-       , '---4'
-       , sum(case when t.chg > 0 and t.chg_next_1 > 0 then 1 else 0 end ) a2
-       , sum(case when t.chg > 0 and t.chg_next_1 > 0 and t.chg_next_2 < 0 then 1 else 0 end ) b2
-       , sum(case when t.chg > 0 and t.chg_next_1 > 0 and t.chg_next_2 < 0 and t.chg_next_2 + t.chg_next_3 < 0  then 1 else 0 end ) c2
-from tmp_ans t
-where t.chg_next_3 is not NULL
-order by 2 desc;
-        ]]>
 
-    </select>
 
-<!-- 比如 6-11 号低点，6-12买入，6-15卖出 -->
-    <select id="test-certain-data">
-        with tmp_next_day as (
-        select tenr.*, th.fullStockCode , ten.chg chg_1
-        from t_eastmoney_node_right tenr , t_eastmoney_node ten , t_hs300 th
-        where tenr.`date` = '2026-06-11'
-        and ten.`date` = '2026-06-12'
-        and tenr.stockCode = th.stockCode
-        and ten.stockCode = th.fullStockCode
-        and (substring(tenr.stockName , 1, 2) in ('10', '09') or instr(tenr.stockName, '224') > 0)
-        and ten.chg > -5
-        )
-        select ten.chg, t1.chg_1, t1.*
-        from tmp_next_day t1, t_eastmoney_node ten
-        where t1.fullStockCode = ten.stockCode
-        and ten.`date` = '2026-06-15'
-        order by 4 desc;
-    </select>
+
 
 </mapper>
+
+
