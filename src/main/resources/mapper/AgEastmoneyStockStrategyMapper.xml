@@ -44,8 +44,8 @@
                     , rank() over (order by t.name desc) date_rn
             from tmp_69_rank t
                     , (select max(value10) value10 from tmp_69_rank where rank_ <= 250 * 0.2) t1
-            where t.value10 < t1.value10 * 1 -- 需要低于buy线
-              and t.value9 >= 50  -- win_ratio需要大于50
+            where t.value10 < t1.value10 * 1.2 -- 需要低于buy线
+            --  and t.value9 >= 50  -- win_ratio需要大于50
         )
         -- 3、测算sql
         , tmp_dates_000001 as (
