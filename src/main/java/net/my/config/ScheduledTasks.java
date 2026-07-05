@@ -255,6 +255,19 @@ public class ScheduledTasks {
         // 开始进行查询缓存
         ExecutorService executor = Executors.newFixedThreadPool(5);
         // 计算缓存
+
+        // 策略2计算，速度慢，需要提前计算
+        CompletableFuture<Void> stock_task_88802 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock strategy_2 start");
+                agEastmoneyStockStrategyController.strategy_2();
+                log.info("task stock strategy_2 end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
+
         CompletableFuture<Void> stock_task_101 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock down5 start");
@@ -633,7 +646,8 @@ public class ScheduledTasks {
 
         // 等待所有任务完成
         CompletableFuture<Void> allTasks = CompletableFuture.allOf(
-                stock_task_101
+                stock_task_88802
+                , stock_task_101
                 , stock_task_102
                 , stock_task_103
                 , stock_task_104

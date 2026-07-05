@@ -38,9 +38,17 @@ public class AgEastmoneyStockStrategyController {
      */
     private static final String KEY_88801 = "stock#" + "strategy_1";
 
+    /* 策略2
+     T日（比如2026-06-11）出现买点机会，看T+1日（比如2026-06-12）
+     如果T+1的收盘chg<-5%,则在T+2,以(T+1)的收盘价格*（1-4%）的价格buy
+     如果T+1的收盘chg>-5%,则在尾盘以close价格buy
+     持有最多3天
+     */
+    private static final String KEY_88802 = "stock#" + "strategy_2";
+
 
     /**
-     * 99901、
+     * 88801、
      * * @return
      */
     @GetMapping("/strategy_1")
@@ -54,6 +62,40 @@ public class AgEastmoneyStockStrategyController {
         }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = mapper.strategy_1();
+        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+                .filter(f -> !f.getStockCode().startsWith("688")
+                        && !f.getStockCode().startsWith("689")
+                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+
+    /**
+     * 88802、
+     * * @return
+     */
+    @GetMapping("/strategy_2")
+    public BaseResponse strategy_2() {
+        log.info("strategy_2");
+        String key = KEY_88802;
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = mapper.strategy_2();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")

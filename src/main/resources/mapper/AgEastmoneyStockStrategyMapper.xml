@@ -114,4 +114,94 @@
         ]]>
     </select>
 
+
+    <select id="strategy_2" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+        with tmp_calc_dates as (
+            select date tc_date
+            from t_eastmoney_node_index teni
+            where stockCode = '1.000001'
+            order by `date` desc
+            limit 10
+        )
+        , tmp as (
+            select `date`
+                , tc_date
+                , lag(`date`, 1) over (partition by stockCode, tcd.tc_date order by ten.`date` ) date_pre_1
+                , lag(volume, 1) over (partition by stockCode, tcd.tc_date order by ten.`date` ) vol_pre_1
+                , lag(volume, 2) over (partition by stockCode, tcd.tc_date order by ten.`date` ) vol_pre_2
+                , volume
+                , rank() over (partition by stockCode, tcd.tc_date order by ten.`date` desc) date_rank
+                , last
+                , chg
+                , stockCode
+                , lead(chg, 1) over (partition by stockCode, tcd.tc_date order by ten.`date` ) chg_next_1
+                , lead(chg, 2) over (partition by stockCode, tcd.tc_date order by ten.`date` ) chg_next_2
+            from t_eastmoney_node ten, tmp_calc_dates tcd
+            where ten.`date` <= '2099' -- and  stockCode = '0.002056'
+              AND ten.`date` > DATE_FORMAT(DATE_ADD(SYSDATE() , INTERVAL -60 DAY), '%Y-%m-%d')
+              and ten.stockCode not like '%.3%'
+              and ten.stockCode not like '%.68%'
+              and ten.stockCode not like '%.69%'
+              AND ten.`date` <= tc_date
+        ) -- select * from tmp where stockCode = '0.002025' order by 2 desc, 1 desc;
+        -- 1)、成交量>前2天之和
+        , tmp_vol as (
+            select distinct tc_date, stockCode
+            from tmp
+            where volume > vol_pre_1 + vol_pre_2
+              and date_rank <= 3
+        )
+        -- 2)、5天内存在chg>5
+        , tmp_has_5_chg as (
+            select t.stockCode, tc_date, max(chg) chg_max
+            from tmp t
+            where t.date_rank <= 3
+            group by t.stockCode, tc_date
+            having chg_max > 5
+        )
+        -- 3)、5、10、20多头
+        , tmp_30_duotou as (
+            select t1.date, t1.tc_date, t1.date_rank, t1.date_pre_1, t1.stockCode
+                , max(t1.last) `last`
+                , round(avg(case when t1.date_rank + 3 > t2.date_rank then round(t2.last, 4) else null end), 3) ma3
+                , round(avg(case when t1.date_rank + 6 > t2.date_rank then round(t2.last, 4) else null end), 3) ma6
+                , round(avg(case when t1.date_rank + 12 > t2.date_rank then round(t2.last, 4) else null end), 3) ma12
+                , round(avg(case when t1.date_rank + 24 > t2.date_rank then round(t2.last, 4) else null end), 3) ma24 -- 计算 bbi
+                , round(avg(case when t1.date_rank + 5 > t2.date_rank then round(t2.last, 4) else null end), 3) ma5
+                , round(avg(case when t1.date_rank + 10 > t2.date_rank then round(t2.last, 4) else null end), 3) ma10
+                , round(avg(case when t1.date_rank + 20 > t2.date_rank then round(t2.last, 4) else null end), 3) ma20 -- 计算均线
+                , round(sum(case when t1.date_rank + 5 > t2.date_rank then round(t2.chg, 4) else 0 end), 3) chg_sum_5
+                --        , sum(case when t1.date_rank + 30 > t2.date_rank then 1 else 0 end) cnt_
+            from tmp t1, tmp t2
+            where t1.stockCode = t2.stockCode
+              and t1.tc_date = t2.tc_date
+              and t1.date_rank <= t2.date_rank
+                --      and t1.date_rank <= 30
+            group by t1.date, t1.tc_date, t1.date_rank, t1.date_pre_1, t1.stockCode
+            having ma5 >= ma10 and ma10 >= ma20
+                 --     and cnt_ = 30
+               and chg_sum_5 > 10
+        ) -- select * from tmp_30_duotou where stockCode = '0.002056';
+        -- 4)、last 在bbi上方
+        select t.stockCode, t.date, concat(th.bkName, '-',  th.stockName) last
+               , concat('last:', t.last, '; ma5:', t.ma5, '; ma10:', t.ma10, '; ma20:', t.ma20, '; bbi:', round((t.ma3+t.ma6+t.ma12+t.ma24)/4, 3)) ratioB
+               , t3.chg_next_1, t3.chg_next_2
+               -- , t.last, t.ma5, t.ma10, t.ma20
+        	   -- , round((t.ma3+t.ma6+t.ma12+t.ma24)/4, 3) bbi
+        from tmp_30_duotou t, tmp_has_5_chg t1, tmp_vol t2, t_hs300 th, tmp t3
+        where t.date_rank = 1
+          and t.stockCode = t1.stockCode
+          and t.tc_date = t1.tc_date
+          and t.stockCode = t2.stockCode
+          and t.tc_date = t2.tc_date
+          and t.stockCode = th.fullStockCode
+          and t.stockCode = t3.stockCode
+          and t.date = t3.date
+          and t3.tc_date = (select max(tc_date) from tmp_calc_dates)
+          and t.last >= round((t.ma3+t.ma6+t.ma12+t.ma24)/4, 3)
+        order by 2 desc, 1 desc
+        ]]>
+    </select>
+
 </mapper>
