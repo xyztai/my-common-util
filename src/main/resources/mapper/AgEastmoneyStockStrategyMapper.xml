@@ -184,7 +184,7 @@
                and chg_sum_5 > 10
         ) -- select * from tmp_30_duotou where stockCode = '0.002056';
         -- 4)、last 在bbi上方
-        select t.stockCode, t.date, concat(th.bkName, '-',  th.stockName) last
+        select th.stockCode, t.date, concat(th.bkName, '-',  th.stockName) last
                -- , concat('last:', t.last, '; ma5:', t.ma5, '; ma10:', t.ma10, '; ma20:', t.ma20, '; bbi:', round((t.ma3+t.ma6+t.ma12+t.ma24)/4, 3)) ratioB
                , concat('should_win_chg=', round(t3.chg_next_2, 1)
                         , '; last=', round(t.last, 2)
