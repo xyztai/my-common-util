@@ -185,8 +185,19 @@
         ) -- select * from tmp_30_duotou where stockCode = '0.002056';
         -- 4)、last 在bbi上方
         select t.stockCode, t.date, concat(th.bkName, '-',  th.stockName) last
-               , concat('last:', t.last, '; ma5:', t.ma5, '; ma10:', t.ma10, '; ma20:', t.ma20, '; bbi:', round((t.ma3+t.ma6+t.ma12+t.ma24)/4, 3)) ratioB
-               , t3.chg_next_1, t3.chg_next_2
+               -- , concat('last:', t.last, '; ma5:', t.ma5, '; ma10:', t.ma10, '; ma20:', t.ma20, '; bbi:', round((t.ma3+t.ma6+t.ma12+t.ma24)/4, 3)) ratioB
+               , concat('should_win_chg=', round(t3.chg_next_2, 1)
+                        , '; last=', round(t.last, 2)
+                        , '; chg=', round(t.chg, 1)
+                        , '; chg_next_1=', round(t3.chg_next_1, 1)
+                        , '; chg_next_2=', round(t3.chg_next_2, 1)
+                        , '; ma5=', round(t.ma5, 1)
+                        , '; ma10=', round(t.ma10, 1)
+                        , '; ma20=', round(t.ma20, 1)
+                        , '; bbi=', round((t.ma3+t.ma6+t.ma12+t.ma24)/4, 3))
+                        , '; info=', 'T+1买(T+2卖)'
+                        ) ratioB
+               -- , t3.chg_next_1, t3.chg_next_2
                -- , t.last, t.ma5, t.ma10, t.ma20
         	   -- , round((t.ma3+t.ma6+t.ma12+t.ma24)/4, 3) bbi
         from tmp_30_duotou t, tmp_has_5_chg t1, tmp_vol t2, t_hs300 th, tmp t3
