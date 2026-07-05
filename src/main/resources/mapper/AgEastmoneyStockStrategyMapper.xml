@@ -162,7 +162,7 @@
         )
         -- 3)、5、10、20多头
         , tmp_30_duotou as (
-            select t1.date, t1.tc_date, t1.date_rank, t1.date_pre_1, t1.stockCode
+            select t1.date, t1.tc_date, t1.date_rank, t1.date_pre_1, t1.stockCode, t1.chg
                 , max(t1.last) `last`
                 , round(avg(case when t1.date_rank + 3 > t2.date_rank then round(t2.last, 4) else null end), 3) ma3
                 , round(avg(case when t1.date_rank + 6 > t2.date_rank then round(t2.last, 4) else null end), 3) ma6
@@ -178,7 +178,7 @@
               and t1.tc_date = t2.tc_date
               and t1.date_rank <= t2.date_rank
                 --      and t1.date_rank <= 30
-            group by t1.date, t1.tc_date, t1.date_rank, t1.date_pre_1, t1.stockCode
+            group by t1.date, t1.tc_date, t1.date_rank, t1.date_pre_1, t1.stockCode, t1.chg
             having ma5 >= ma10 and ma10 >= ma20
                  --     and cnt_ = 30
                and chg_sum_5 > 10
@@ -194,7 +194,7 @@
                         , '; ma5=', round(t.ma5, 1)
                         , '; ma10=', round(t.ma10, 1)
                         , '; ma20=', round(t.ma20, 1)
-                        , '; bbi=', round((t.ma3+t.ma6+t.ma12+t.ma24)/4, 3))
+                        , '; bbi=', round((t.ma3+t.ma6+t.ma12+t.ma24)/4, 3)
                         , '; info=', 'T+1买(T+2卖)'
                         ) ratioB
                -- , t3.chg_next_1, t3.chg_next_2
