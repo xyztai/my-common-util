@@ -179,7 +179,7 @@
               and t1.date_rank <= t2.date_rank
                 --      and t1.date_rank <= 30
             group by t1.date, t1.tc_date, t1.date_rank, t1.date_pre_1, t1.stockCode, t1.chg
-            having ma5 >= ma10 and ma10 >= ma20
+            having max(t1.last) >= ma5 and ma5 >= ma10 * 0.98 and ma10 >= ma20 * 0.98
                  --     and cnt_ = 30
                and chg_sum_5 > 10
         ) -- select * from tmp_30_duotou where stockCode = '0.002056';
@@ -250,7 +250,7 @@
                   distinct tlt.stockCode, tbk.`date`, concat(tlt.bkName, '-', tlt.ranking, '-', tlt.stockName) last
                   , concat('当天chg=', round(tt.chg, 2), '; '
                             , '板块avg-chg=', round(tbk.chg_avg, 1)
-                            , case when tt.last >= tt.ma5 and tt.ma5 > tt.ma10 * 0.98 and tt.ma10 > tt.ma20 * 0.98 then '多头排列' else '' end
+                            , case when tt.last >= tt.ma5 and tt.ma5 >= tt.ma10 * 0.98 and tt.ma10 >= tt.ma20 * 0.98 then '多头排列' else '' end
                           ) ratioB
                    , tbk.chg_avg
             from tmp_today tt, t_longtou tlt
