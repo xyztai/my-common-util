@@ -9,4 +9,5 @@ import java.util.List;
 public interface AgEastmoneyStockStrategyMapper {
     List<SpecialCarePoJo2> strategy_1();
     List<SpecialCarePoJo2> strategy_2();
+    List<SpecialCarePoJo2> strategy_3();
 }

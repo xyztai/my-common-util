@@ -267,6 +267,17 @@ public class ScheduledTasks {
             }
         }, executor);
 
+        // 策略3计算
+        CompletableFuture<Void> stock_task_88803 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock strategy_3 start");
+                agEastmoneyStockStrategyController.strategy_3();
+                log.info("task stock strategy_3 end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
 
         CompletableFuture<Void> stock_task_101 = CompletableFuture.runAsync(() -> {
             try {
@@ -647,6 +658,7 @@ public class ScheduledTasks {
         // 等待所有任务完成
         CompletableFuture<Void> allTasks = CompletableFuture.allOf(
                 stock_task_88802
+                , stock_task_88803
                 , stock_task_101
                 , stock_task_102
                 , stock_task_103
