@@ -266,4 +266,63 @@
         ]]>
     </select>
 
+
+    <select id="strategy_5" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+            with tmp_date_rank as (
+                select rank() over (order by `date` desc) date_rn, date
+                from t_eastmoney_node_index teni
+                where stockCode = '1.000001'
+            )
+            , tmp_ans as (
+                select
+                       lag(date, 1) over (partition by ten.stockCode order by `date` ) pre_date
+                       , lag(volume, 1) over (partition by ten.stockCode order by `date` ) pre_volume
+                       , ten.*
+                from t_eastmoney_node ten
+                where ten.`date` > (select min(date) from tmp_date_rank where date_rn <=5)
+                and ten.`date` < '2099'
+            )
+            , tmp_die_ting as (
+                select distinct ta.stockCode
+                from tmp_ans ta
+                where ta.chg < -9
+            ) -- select * from tmp_die_ting;
+            , tmp_big_swing as (
+                select stockCode, avg(abs(chg)) avg_chg
+                from tmp_ans
+                group by stockCode
+                having avg_chg > 2
+            )
+            , tmp_suo_liang as (
+                select distinct round(ta.volume/ta.pre_volume, 2) ratio
+                       , tl.stockCode
+                       , ta.pre_volume, ta.chg, ta.last, ta.volume, tl.bkName , tl.stockName, ta.date
+                from tmp_ans ta, t_longtou tl, tmp_big_swing tgs
+                where 1 = 1
+                and ta.date = (select max(date) from tmp_date_rank where date_rn = 1)
+                and ta.stockCode = tl.fullStockCode
+                and ta.chg > -9 and ta.chg < 9
+                and round(ta.volume/ta.pre_volume, 2) <= 0.68
+                and ta.chg < 0
+                and not exists (select 1 from tmp_die_ting tdt where ta.stockCode = tdt.stockCode)
+                and tl.stockCode not like '3%'
+                and tl.stockCode not like '68%'
+                and tl.stockCode not like '69%'
+                and ta.stockCode = tgs.stockCode
+            )
+            , tmp_ready as (
+	            select t.ratio, t.stockCode, t.pre_volume, t.volume, t.chg, t.last, th.stockName, group_concat(t.bkName) bkName_multi, t.date
+	            from tmp_suo_liang t, t_hs300 th
+	            where t.stockCode = th.stockCode
+	            group by  t.ratio, t.stockCode, t.pre_volume, t.volume, t.chg, t.last, th.stockName, t.date
+	        )
+	        select stockCode, date, concat(bkName_multi, '-', stockName) last
+	               , concat('suo-liang-ratio=', t.ratio, '; pre-vol=', t.pre_volume, '; vol=', t.volume, '; last=', t.last, '; chg=', t.chg) ratioB
+	        from tmp_ready t
+	        order by t.ratio, 1;
+        ]]>
+    </select>
+
+
 </mapper>

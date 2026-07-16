@@ -51,6 +51,11 @@ public class AgEastmoneyStockStrategyController {
      */
     private static final String KEY_88803 = "stock#" + "strategy_3";
 
+    /* 策略5
+     最近没有暴跌过的，且缩量严重的
+     */
+    private static final String KEY_88805 = "stock#" + "strategy_5";
+
 
     /**
      * 88801、
@@ -135,6 +140,40 @@ public class AgEastmoneyStockStrategyController {
         }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = mapper.strategy_3();
+//        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
+//                .filter(f -> !f.getStockCode().startsWith("688")
+//                        && !f.getStockCode().startsWith("689")
+//                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
+        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            buyDataFromEastmoneys = Arrays.asList(empty);
+        }
+
+        myCaffeineCache.put(key, buyDataFromEastmoneys);
+        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+        return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+
+    /**
+     * 88805、
+     * * @return
+     */
+    @GetMapping("/strategy_5")
+    public BaseResponse strategy_5() {
+        log.info("strategy_5");
+        String key = KEY_88805;
+        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(res != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+            return RestGeneralResponse.of(res);
+        }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = mapper.strategy_5();
 //        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
 //                .filter(f -> !f.getStockCode().startsWith("688")
 //                        && !f.getStockCode().startsWith("689")
