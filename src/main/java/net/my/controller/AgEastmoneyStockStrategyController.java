@@ -52,7 +52,7 @@ public class AgEastmoneyStockStrategyController {
     private static final String KEY_88803 = "stock#" + "strategy_3";
 
     /* 策略5
-     最近没有暴跌过的，且缩量严重的
+     最近没有暴跌过的，且缩量严重的，并且多头、无长上引线
      */
     private static final String KEY_88805 = "stock#" + "strategy_5";
 
