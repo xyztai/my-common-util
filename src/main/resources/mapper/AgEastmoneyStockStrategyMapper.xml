@@ -327,7 +327,7 @@
 	            where t.stockCode = th.stockCode
 	            group by  t.ratio, t.stockCode, t.pre_volume, t.volume, t.chg, t.last, th.stockName, t.date
 	        )
-	        select stockCode, date, concat(bkName_multi, '-', stockName) last
+	        select t.stockCode, t.date, concat(t.bkName_multi, '-', t.stockName) last
 	               , concat('suo-liang-ratio=', t.ratio, '; pre-vol=', t.pre_volume, '; vol=', t.volume, '; last=', t.last, '; chg=', t.chg) ratioB
 	        from tmp_ready t
                   , (
