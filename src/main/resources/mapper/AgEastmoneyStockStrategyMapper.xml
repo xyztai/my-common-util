@@ -266,6 +266,13 @@
         ]]>
     </select>
 
+    <select id="getLast5Days" resultType="java.lang.String">
+        select distinct `date`
+        from t_eastmoney_node_index teni
+        where stockCode = '1.000001'
+        order by 1 desc
+        limit 5;
+    </select>
 
     <select id="strategy_5" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
@@ -273,113 +280,102 @@
                 select rank() over (order by `date` desc) date_rn, date
                 from t_eastmoney_node_index teni
                 where stockCode = '1.000001'
-            -- and `date` < '2026-07-18'
+                  and `date` <= #{calcDate}
             )
             , tmp_ans as (
                 select
-                       lag(date, 1) over (partition by ten.stockCode order by `date` ) pre_date
-                       , lag(volume, 1) over (partition by ten.stockCode order by `date` ) pre_volume
-		               , lag(volume, 2) over (partition by ten.stockCode order by `date` ) pre_volume_2
-		               , lag(volume, 3) over (partition by ten.stockCode order by `date` ) pre_volume_3
-                       , ten.*
+                    lag(date, 1) over (partition by ten.stockCode order by `date` ) pre_date
+                    , lag(volume, 1) over (partition by ten.stockCode order by `date` ) pre_volume
+                    , lag(volume, 2) over (partition by ten.stockCode order by `date` ) pre_volume_2
+                    , lag(volume, 3) over (partition by ten.stockCode order by `date` ) pre_volume_3
+                    , ten.*
                 from t_eastmoney_node ten
                 where ten.`date` > (select min(date) from tmp_date_rank where date_rn <=5)
-                and ten.`date` < '2099'
+                  and ten.`date` <= (select max(date) from tmp_date_rank where date_rn <=5)
             )
+            -- 不要长上引
             , tmp_long_shang_yin as (
-	            select distinct ta.stockCode
-	            from tmp_ans ta
-	            where (ta.high - ta.last) > 2*abs(ta.last-ta.open)
-	              and abs(abs(ta.high-ta.low)/ta.last*100) > 6
-            ) 
+                select distinct ta.stockCode
+                from tmp_ans ta
+                where (ta.high - ta.last) > 2*abs(ta.last-ta.open)
+                  and abs(abs(ta.high-ta.low)/ta.last*100) > 6
+            )
+            -- 不要跌停过
             , tmp_die_ting as (
                 select distinct ta.stockCode
                 from tmp_ans ta
                 where ta.chg < -9
             ) -- select * from tmp_die_ting;
+            -- 必须大振幅
             , tmp_big_swing as (
                 select stockCode, avg(abs(chg)) avg_chg
-            from tmp_ans
+                from tmp_ans
                 group by stockCode
                 having avg_chg > 2
             )
-            , tmp_suo_liang as (
+            -- 缩量严重
+             , tmp_suo_liang as (
                 select distinct round(ta.volume/ta.pre_volume, 2) ratio
-                       , tl.stockCode
-                       , ta.pre_volume, ta.chg, ta.last, ta.volume, tl.bkName , tl.stockName, ta.date
+                    , tl.stockCode
+                    , ta.pre_volume, ta.chg, ta.last, ta.volume, tl.bkName , tl.stockName, ta.date
                 from tmp_ans ta, t_longtou tl, tmp_big_swing tgs
                 where 1 = 1
-                and ta.date = (select max(date) from tmp_date_rank where date_rn = 1)
-                and ta.stockCode = tl.fullStockCode
-                and ta.chg > -9 and ta.chg < 9
-                and (round(ta.volume/ta.pre_volume, 2) <= 0.68 and ta.last < ta.open or round(ta.volume/ta.pre_volume_2, 2) <= 0.68 and ta.last < ta.open /*or round(ta.volume/ta.pre_volume_3, 2) <= 0.68*/)
-                and ta.chg < 0
-                and not exists (select 1 from tmp_die_ting tdt where ta.stockCode = tdt.stockCode)
-                and not exists (select 1 from tmp_long_shang_yin tdt where ta.stockCode = tdt.stockCode)
-                and tl.stockCode not like '3%'
-                and tl.stockCode not like '68%'
-                and tl.stockCode not like '69%'
-                and ta.stockCode = tgs.stockCode
+                  and ta.date = (select max(date) from tmp_date_rank where date_rn = 1)
+                  and ta.stockCode = tl.fullStockCode
+                  and ta.chg > -9 and ta.chg < 9
+                  and (round(ta.volume/ta.pre_volume, 2) <= 0.68 and ta.last < ta.open or round(ta.volume/ta.pre_volume_2, 2) <= 0.68 and ta.last < ta.open /*or round(ta.volume/ta.pre_volume_3, 2) <= 0.68*/)
+                  and ta.chg < 0
+                  and not exists (select 1 from tmp_die_ting tdt where ta.stockCode = tdt.stockCode)
+                  and not exists (select 1 from tmp_long_shang_yin tdt where ta.stockCode = tdt.stockCode)
+                  and tl.stockCode not like '3%'
+                  and tl.stockCode not like '68%'
+                  and tl.stockCode not like '69%'
+                  and ta.stockCode = tgs.stockCode
             )
             , tmp_ready as (
-	            select t.ratio, t.stockCode, t.pre_volume, t.volume, t.chg, t.last, th.stockName, group_concat(t.bkName) bkName_multi, t.date
-	            from tmp_suo_liang t, t_hs300 th
-	            where t.stockCode = th.stockCode
-	            group by  t.ratio, t.stockCode, t.pre_volume, t.volume, t.chg, t.last, th.stockName, t.date
-	        )
-	        select t.stockCode, t.date, concat(t.bkName_multi, '-', t.stockName) last
-	               , concat('suo-liang-ratio=', t.ratio, '; pre-vol=', t.pre_volume, '; vol=', t.volume, '; last=', t.last, '; chg=', t.chg) ratioB
-	        from tmp_ready t
-                  , (
-                        with tmp_codes as (select distinct fullStockCode from t_longtou)
-                            , tmp_rank as (
-                                select ten.date, ten.chg, ten.stockCode, ten.`last`
-                                    , rank() over (partition by ten.stockCode order by ten.`date` desc) date_rank
-                                from t_eastmoney_node ten, tmp_codes tc
-                                where ten.stockCode = tc.fullStockCode
-                                and ten.date < '2099-01-01'
-                                -- and `date` < '2026-07-18'
-                                AND ten.`date` > DATE_FORMAT(DATE_ADD(SYSDATE() , INTERVAL -90 DAY), '%Y-%m-%d')
+                select t.ratio, t.stockCode, t.pre_volume, t.volume, t.chg, t.last, th.stockName, group_concat(t.bkName) bkName_multi, t.date
+                from tmp_suo_liang t, t_hs300 th
+                where t.stockCode = th.stockCode
+                group by  t.ratio, t.stockCode, t.pre_volume, t.volume, t.chg, t.last, th.stockName, t.date
+            )
+            select t.stockCode, t.date, concat(t.bkName_multi, '-', t.stockName) last
+                       , concat('suo-liang-ratio=', t.ratio, '; pre-vol=', t.pre_volume, '; vol=', t.volume, '; last=', t.last, '; chg=', t.chg) ratioB
+            from tmp_ready t
+                    , (
+                            --  多头排列
+                            with tmp_codes as (select distinct fullStockCode from t_longtou)
+                                , tmp_rank as (
+                            select ten.date, ten.chg, ten.stockCode, ten.`last`
+                                , rank() over (partition by ten.stockCode order by ten.`date` desc) date_rank
+                            from t_eastmoney_node ten, tmp_codes tc
+                            where ten.stockCode = tc.fullStockCode
+                            and ten.date < '2099-01-01'
+                            and `date` <= #{calcDate}
+                            AND ten.`date` > DATE_FORMAT(DATE_ADD(SYSDATE() , INTERVAL -90 DAY), '%Y-%m-%d')
                             ) -- select * from tmp_rank;
-                            , tmp_duotou as (
-                                select t1.date, t1.date_rank, t1.stockCode, t1.chg, t1.last
-                                -- , max(t1.last) `last`
-                                    , round(avg(case when t1.date_rank + 5 > t2.date_rank then round(t2.last, 4) else null end), 3) ma5
-                                    , round(avg(case when t1.date_rank + 10 > t2.date_rank then round(t2.last, 4) else null end), 3) ma10
-                                    , round(avg(case when t1.date_rank + 20 > t2.date_rank then round(t2.last, 4) else null end), 3) ma20 -- 计算均线
-                                -- , sum(case when t1.date_rank + 20 > t2.date_rank then 1 else 0 end) ma_cnt -- 计算均线天数
-                                from tmp_rank t1, tmp_rank t2
-                                where t1.stockCode = t2.stockCode
-                                and t1.date_rank <= t2.date_rank
-                                group by t1.date, t1.date_rank, t1.stockCode, t1.chg, t1.last
-                                -- having ma5 >= ma10 and ma10 >= ma20
+                                , tmp_duotou as (
+                            select t1.date, t1.date_rank, t1.stockCode, t1.chg, t1.last
+                            -- , max(t1.last) `last`
+                                , round(avg(case when t1.date_rank + 5 > t2.date_rank then round(t2.last, 4) else null end), 3) ma5
+                                , round(avg(case when t1.date_rank + 10 > t2.date_rank then round(t2.last, 4) else null end), 3) ma10
+                                , round(avg(case when t1.date_rank + 20 > t2.date_rank then round(t2.last, 4) else null end), 3) ma20 -- 计算均线
+                            -- , sum(case when t1.date_rank + 20 > t2.date_rank then 1 else 0 end) ma_cnt -- 计算均线天数
+                            from tmp_rank t1, tmp_rank t2
+                            where t1.stockCode = t2.stockCode
+                            and t1.date_rank <= t2.date_rank
+                            group by t1.date, t1.date_rank, t1.stockCode, t1.chg, t1.last
+                            having last >= ma5 and ma5 >= ma10 * 0.98 and ma10 >= ma20 * 0.98
                             ) -- select * from tmp_30_duotou;
-                            , tmp_today as (
-                                select * from tmp_duotou where date_rank <= 5
-                            ) -- select * from tmp_today;
-                            , tmp_ans as (
-                                select -- distinct tt.`date` , tlt.stockCode , tlt.stockName , tlt.bkName , tlt.ranking, tt.chg, tt.`last`
-                                -- , case when tt.last >= tt.ma5 and tt.ma5 > tt.ma10 * 0.98 and tt.ma10 > tt.ma20 * 0.98 then '多头排列' else '' end 'duo_tou'
-                                -- , tbk.chg_avg
-                                distinct tlt.stockCode, tbk.`date`, concat(tlt.bkName, '-', tlt.ranking, '-', tlt.stockName) last
-                                    , concat('当天chg=', round(tt.chg, 2), '; '
-                                        , '板块avg-chg=', round(tbk.chg_avg, 1)
-                                        , case when tt.last >= tt.ma5 and tt.ma5 >= tt.ma10 * 0.98 and tt.ma10 >= tt.ma20 * 0.98 then '多头排列' else '' end
-                                        ) ratioB
-                                    , tbk.chg_avg
-                                from tmp_today tt, t_longtou tlt
-                                    , (
-                                        select date, bkName, round(avg(chg), 1) chg_avg from tmp_today t1, t_longtou tlt where t1.stockCode = tlt.fullStockCode group by date, tlt.bkName
-                                       ) tbk
-                                where tt.stockCode = tlt.fullStockCode
-                                and tbk.bkName = tlt.bkName
-                                and tbk.date = tt.date
-                                and tt.last >= tt.ma5 and tt.ma5 >= tt.ma10 * 0.98 and tt.ma10 >= tt.ma20 * 0.98
-                                order by tbk.date desc, tbk.chg_avg desc, concat(tlt.bkName, '-', tlt.ranking, '-', tlt.stockName)
+                                , tmp_today as (
+                            select *
+                            from tmp_duotou tt
+                            where date_rank <= 5
+
                             )
-                            select distinct stockCode -- , date, last, ratioB
-                            from tmp_ans
-                 ) t1
+                            select distinct t2.stockCode
+                            from tmp_today t1, t_longtou t2
+                            where t1.stockCode = t2.fullStockCode
+                        ) t1
             where  t.stockCode = t1.stockCode
             order by t.ratio, 3;
         ]]>

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -173,7 +174,15 @@ public class AgEastmoneyStockStrategyController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = mapper.strategy_5();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = new ArrayList<>();
+        List<String> calcDates = mapper.getLast5Days();
+        if(!CollectionUtils.isEmpty(calcDates)) {
+            for(String calcDate : calcDates) {
+                List<SpecialCarePoJo2> tmp = mapper.strategy_5(calcDate);
+                buyDataFromEastmoneys.addAll(tmp);
+            }
+        }
+
 //        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
 //                .filter(f -> !f.getStockCode().startsWith("688")
 //                        && !f.getStockCode().startsWith("689")
