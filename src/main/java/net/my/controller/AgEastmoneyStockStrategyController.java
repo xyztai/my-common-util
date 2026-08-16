@@ -174,14 +174,15 @@ public class AgEastmoneyStockStrategyController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = new ArrayList<>();
-        List<String> calcDates = mapper.getLast5Days();
+        List<String> calcDates = mapper.getLast120Days4Strategy5();
         if(!CollectionUtils.isEmpty(calcDates)) {
             for(String calcDate : calcDates) {
-                List<SpecialCarePoJo2> tmp = mapper.strategy_5(calcDate);
-                buyDataFromEastmoneys.addAll(tmp);
+                mapper.gen_strategy_5(calcDate);
+                mapper.gen_strategy_5_default(calcDate);
             }
         }
+
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = mapper.strategy_5();
 
 //        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
 //                .filter(f -> !f.getStockCode().startsWith("688")

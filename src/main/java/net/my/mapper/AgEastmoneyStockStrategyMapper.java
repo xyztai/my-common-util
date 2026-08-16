@@ -12,5 +12,8 @@ public interface AgEastmoneyStockStrategyMapper {
     List<SpecialCarePoJo2> strategy_2();
     List<SpecialCarePoJo2> strategy_3();
     List<String> getLast5Days();
-    List<SpecialCarePoJo2> strategy_5(@Param("calcDate") String calcDate);
+    List<String> getLast120Days4Strategy5();
+    int gen_strategy_5_default(@Param("calcDate") String calcDate);
+    int gen_strategy_5(@Param("calcDate") String calcDate);
+    List<SpecialCarePoJo2> strategy_5();
 }

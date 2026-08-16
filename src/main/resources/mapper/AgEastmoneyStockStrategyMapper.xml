@@ -266,6 +266,16 @@
         ]]>
     </select>
 
+    <select id="getLast120Days4Strategy5" resultType="java.lang.String">
+        select date from (
+            select distinct `date`
+            from t_eastmoney_node_index teni
+            where stockCode = '1.000001'
+            order by 1 desc
+            limit 120
+        ) t where not exists (select 1 from t_strategy_result t1 where t1.`date` = t.`date` and t.date and strategy_type = 'strategy_5')
+    </select>
+
     <select id="getLast5Days" resultType="java.lang.String">
         select distinct `date`
         from t_eastmoney_node_index teni
@@ -274,8 +284,14 @@
         limit 5;
     </select>
 
-    <select id="strategy_5" resultType="net.my.pojo.SpecialCarePoJo2">
+    <insert id="gen_strategy_5_default">
+        replace into t_strategy_result(abbrStockCode, date, strategy_type, attribute‌‌_1)
+        select '--' stockCode, #{calcDate} date, 'strategy_5' strategy_type, '--' attribute‌‌_1
+    </insert>
+
+    <insert id="gen_strategy_5">
         <![CDATA[
+            replace into t_strategy_result(abbrStockCode, date, strategy_type, attribute‌‌_1)
             with tmp_date_rank as (
                 select rank() over (order by `date` desc) date_rn, date
                 from t_eastmoney_node_index teni
@@ -338,8 +354,9 @@
                 where t.stockCode = th.stockCode
                 group by  t.ratio, t.stockCode, t.pre_volume, t.volume, t.chg, t.last, th.stockName, t.date
             )
-            select t.stockCode, t.date, concat(t.bkName_multi, '-', t.stockName) last
-                       , concat('suo-liang-ratio=', t.ratio, '; pre-vol=', t.pre_volume, '; vol=', t.volume, '; last=', t.last, '; chg=', t.chg) ratioB
+            select t.stockCode, t.date, 'strategy_5' strategy_type, t.ratio attribute‌‌_1
+            -- select t.stockCode, t.date, concat(t.bkName_multi, '-', t.stockName) last
+            --           , concat('suo-liang-ratio=', t.ratio, '; pre-vol=', t.pre_volume, '; vol=', t.volume, '; last=', t.last, '; chg=', t.chg) ratioB
             from tmp_ready t
                     , (
                             --  多头排列
@@ -378,6 +395,53 @@
                         ) t1
             where  t.stockCode = t1.stockCode
             order by t.ratio, 3;
+        ]]>
+    </insert>
+
+    <select id="strategy_5" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+                with tmp_codes as (
+                    select distinct abbrStockCode, tl.fullStockCode
+                    from t_strategy_result t, t_longtou tl
+                    where t.date > DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -30 DAY), '%Y-%m-%d')
+                    and t.abbrStockCode = tl.stockCode
+                )
+                , tmp_code_bk as (
+                    select t.abbrStockCode, tl.fullStockCode, max(tl.stockName ) stockName, group_concat(tl.bkName) bkName_multi
+                    from tmp_codes t, t_longtou tl
+                    where t.abbrStockCode = tl.stockCode
+                    group by t.abbrStockCode, tl.fullStockCode
+                )
+                , tmp_node as (
+                        select
+                            lead(last, 1) over (partition by ten.stockCode order by `date` ) next_last_1
+                            , lead(last, 2) over (partition by ten.stockCode order by `date` ) next_last_2
+                            , lead(last, 3) over (partition by ten.stockCode order by `date` ) next_last_3
+                            , lead(last, 4) over (partition by ten.stockCode order by `date` ) next_last_4
+                            , lead(last, 5) over (partition by ten.stockCode order by `date` ) next_last_5
+                            , ten.*
+                            , tc.bkName_multi
+                            , tc.stockName
+                            , tc.abbrStockCode
+                        from t_eastmoney_node ten, tmp_code_bk tc
+                        where ten.`date` > DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -60 DAY), '%Y-%m-%d')
+                          and ten.`date` <= '2222-01-01'
+                          and ten.stockCode = tc.fullStockCode
+                )
+                select t.abbrStockCode stockCode, tsr.date, concat(t.bkName_multi, '-', t.stockName) last, tsr.attribute‌‌_1
+                       , concat('suo-liang-ratio=', tsr.attribute‌‌_1
+                          , case when t.next_last_1 is not null then concat('; next_chg_1=', round(t.next_last_1/t.last*100-100,1)) else '' end
+                          , case when t.next_last_2 is not null then concat('; next_chg_2=', round(t.next_last_2/t.last*100-100,1)) else '' end
+                          , case when t.next_last_3 is not null then concat('; next_chg_3=', round(t.next_last_3/t.last*100-100,1)) else '' end
+                          , case when t.next_last_4 is not null then concat('; next_chg_4=', round(t.next_last_4/t.last*100-100,1)) else '' end
+                          , case when t.next_last_5 is not null then concat('; next_chg_4=', round(t.next_last_5/t.last*100-100,1)) else '' end
+                          , ';'
+                       ) ratioB
+                from t_strategy_result tsr,
+                     tmp_node t
+                where t.abbrStockCode = tsr.abbrStockCode
+                and t.`date` = tsr.`date`
+                order by 2 desc, 1
         ]]>
     </select>
 
