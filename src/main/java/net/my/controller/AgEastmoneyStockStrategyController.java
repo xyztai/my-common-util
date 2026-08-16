@@ -177,7 +177,9 @@ public class AgEastmoneyStockStrategyController {
         List<String> calcDates = mapper.getLast120Days4Strategy5();
         if(!CollectionUtils.isEmpty(calcDates)) {
             for(String calcDate : calcDates) {
+                log.info("strategy_5 gen_strategy_5 calcDate={}", calcDate);
                 mapper.gen_strategy_5(calcDate);
+                log.info("strategy_5 gen_strategy_5_default calcDate={}", calcDate);
                 mapper.gen_strategy_5_default(calcDate);
             }
         }
