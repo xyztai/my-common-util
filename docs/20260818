@@ -1,0 +1,15 @@
+
+重点关注
+select group_concat(x)
+from (
+	select distinct replace(replace(fullStockCode, '0.', 'sz'), '1.', 'sh') x
+	from t_longtou tl
+	where ranking <= 2
+	-- limit 10
+) t;
+
+
+
+curl --location --request GET 'https://w.sinajs.cn/list=sz002938,sz002463,sz000636,sz300408,sh600584,sz002156,sz603986,sz301308,sz000725,sh603773,sh603256,sh600183,sz002837,sz300499,sz000657,sh688146,sz300750,sz002460,sz002475,sz300916,sh601869,sh600487,sz300308,sz300502,sz000977,sh603019,sh688981,sz002371,sh601899,sh603993,sh600118,sh600879,sz300274,sh601012,sh601698,sh600547,sh600988,sh600406,sh601179,sz002008,sz002472,sh600276,sh688235,sh600030,sh600837,sh600410,sz000938,sz002025,sz000733,sz002594,sz002015,sh600089' \
+--header 'User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36' \
+--header 'referer: https://quotes.sina.cn'
