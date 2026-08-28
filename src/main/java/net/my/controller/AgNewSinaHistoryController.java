@@ -79,7 +79,7 @@ public class AgNewSinaHistoryController {
         // 开始去访问历史数据，用来补充数据使用
         List<DataSohu> sohuListToSave = new ArrayList<>();
         for(String code : allCodesCn) {
-            if(!"sh000001".equals(code)) {continue;}
+//            if(!"sh000001".equals(code)) {continue;}
             log.info("开始补历史数据 code={}", code);
             String url = String.format(SINA_URL_FORMAT, code, days);
             log.info("url: {}", url);
