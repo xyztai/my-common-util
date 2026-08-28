@@ -78,6 +78,7 @@ public class AgNewSinaHistoryController {
         List<String> allCodesCn = nameMap.keySet().stream().sorted().collect(Collectors.toList());
         // 开始去访问历史数据，用来补充数据使用
         for(String code : allCodesCn) {
+            if(!"sh600039".equals(code)) {continue;}
             log.info("开始补历史数据 code={}", code);
             String url = String.format(SINA_URL_FORMAT, code, days);
             log.info("url: {}", url);
