@@ -46,7 +46,7 @@ public class AgNewSinaHistoryController {
 
     @GetMapping("/history/{days}")
     @Transactional
-    public BaseResponse getHistoryData(@PathVariable("days") Integer days, List<DataSohu> list1) {
+    public BaseResponse getHistoryData(@PathVariable("days") Integer days) {
         log.info("开始获取历史数据 days={} start", days);
         List<String> allCodes = new ArrayList<>();
 
