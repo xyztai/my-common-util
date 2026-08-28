@@ -77,6 +77,7 @@ public class AgNewSinaHistoryController {
 
         List<String> allCodesCn = nameMap.keySet().stream().sorted().collect(Collectors.toList());
         // 开始去访问历史数据，用来补充数据使用
+        List<DataSohu> sohuListToSave = new ArrayList<>();
         for(String code : allCodesCn) {
             if(!"sh000001".equals(code)) {continue;}
             log.info("开始补历史数据 code={}", code);
@@ -105,10 +106,28 @@ public class AgNewSinaHistoryController {
                 log.info("res={}", res);
                 List<DataSohu> sohuList = JSON.parseArray(res, DataSohu.class);
                 log.info("sohuList={}", JSON.toJSON(sohuList));
+                if(!CollectionUtils.isEmpty(sohuList)) {
+                    sohuListToSave.addAll(sohuList);
+                }
             } catch (Exception ex) {
                 log.info("", ex);
             }
         }
+
+        if(!CollectionUtils.isEmpty(sohuListToSave)) {
+            int startNum = 0;
+            int stepNum = 200;
+            while(startNum < sohuListToSave.size()) {
+                List<DataSohu> tmpDatas = sohuListToSave.stream().skip(startNum).limit(stepNum)
+                        .collect(Collectors.toList());
+                if(!CollectionUtils.isEmpty(tmpDatas)) {
+                    log.info("tmpDatas.size={}", tmpDatas.size());
+                    agSohuMapper.saveDataSohu(tmpDatas);
+                }
+                startNum += stepNum;
+            }
+        }
+
 
         return BaseResponse.OK;
     }
@@ -116,6 +135,7 @@ public class AgNewSinaHistoryController {
     @Data
     public class DataSohu {
         private String day;
+        private String code;
         private Double open;
         private Double high;
         private Double low;
