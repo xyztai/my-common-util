@@ -107,6 +107,7 @@ public class AgNewSinaHistoryController {
                 List<DataSohu> sohuList = JSON.parseArray(res, DataSohu.class);
                 log.info("sohuList={}", JSON.toJSON(sohuList));
                 if(!CollectionUtils.isEmpty(sohuList)) {
+                    sohuList.forEach(f -> f.setCode(code));
                     sohuListToSave.addAll(sohuList);
                 }
             } catch (Exception ex) {
