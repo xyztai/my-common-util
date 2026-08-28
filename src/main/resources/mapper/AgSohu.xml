@@ -50,7 +50,7 @@
         replace into t_sohu_data_history(`day`, `code`, `open`, `close`, `high`, `low`, `volume`)
         values
         <foreach collection="list" item="item" separator=",">
-            (#{item.day}, #{item.code}, #{item.open}, #{item.close}, #{item.high}, #{item.low}, #{item.volume} }
+            (#{item.day}, #{item.code}, #{item.open}, #{item.close}, #{item.high}, #{item.low}, #{item.volume}
             )
         </foreach>
     </insert>
