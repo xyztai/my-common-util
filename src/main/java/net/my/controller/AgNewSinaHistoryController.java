@@ -85,6 +85,7 @@ public class AgNewSinaHistoryController {
             log.info("url: {}", url);
 
             try {
+                Thread.sleep(200);
                 // 创建请求头
                 HttpHeaders headers = new HttpHeaders();
                 headers.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36");
