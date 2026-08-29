@@ -38,6 +38,10 @@ public class AgNewSinaController {
     @Autowired
     private AgSohuMapper agSohuMapper;
 
+    /**
+     * 注意：调用该方法后，还需要 使用 获取sina的历史数据后，需要再加工一下 文档来处理chg数据
+     * @return
+     */
     @GetMapping("/history")
     @Transactional
     public BaseResponse test() {

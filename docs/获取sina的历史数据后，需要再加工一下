@@ -1,0 +1,66 @@
+
+select * from t_eastmoney_node where date not like '99%' order by 1 desc;
+-- 1、将数据插入 t_eastmoney_node
+insert into t_eastmoney_node(`date` , stockCode , `open` , `last` , high , low , volume)
+select t1.day date, t2.fullStockCode stockCode, t1.open open, t1.`close` last, t1.high , t1.low, round(t1.volume/100,0)
+from t_sohu_data_history t1, t_hs300 t2
+where replace(replace(t1.code, 'sh', '1.'), 'sz', '0.') = t2.fullStockCode
+and t1.day >= '2026-08-27';
+
+replace into t_eastmoney_node   (`date` , stockCode , `open` , `last` , high , low , volume, chg)
+select `date` , stockCode , `open` , `last` , high , low , volume, round(last/last_pre, 4) * 100 - 100 chg -- , date_pre, last_pre
+from (
+	select `date` , stockCode , `open` , `last` , high , low , volume
+	        , rank() over (partition by t1.stockCode order by date desc) rn_
+	        , lead(date) over (partition by t1.stockCode order by date desc) date_pre
+	        , lead(last) over (partition by t1.stockCode order by date desc) last_pre
+	from t_eastmoney_node t1
+	where t1.`date` <= '2026-08-28' and t1.`date` >= '2026-06-27'
+) t
+where `date` = '2026-08-28';
+
+
+select * from t_eastmoney_node_etf where date not like '99%' order by 1 desc;
+-- 2、将数据插入 t_eastmoney_node_etf
+insert into t_eastmoney_node_etf (`date` , stockCode , `open` , `last` , high , low , volume)
+select t1.day date, t2.fullStockCode stockCode, t1.open open, t1.`close` last, t1.high , t1.low, round(t1.volume/100,0)
+from t_sohu_data_history t1, t_etf t2
+where replace(replace(t1.code, 'sh', '1.'), 'sz', '0.') = t2.fullStockCode
+and t1.day >= '2026-08-27';
+
+replace into t_eastmoney_node_etf   (`date` , stockCode , `open` , `last` , high , low , volume, chg)
+select `date` , stockCode , `open` , `last` , high , low , volume, round(last/last_pre, 4) * 100 - 100 chg -- , date_pre, last_pre
+from (
+	select `date` , stockCode , `open` , `last` , high , low , volume
+	        , rank() over (partition by t1.stockCode order by date desc) rn_
+	        , lead(date) over (partition by t1.stockCode order by date desc) date_pre
+	        , lead(last) over (partition by t1.stockCode order by date desc) last_pre
+	from t_eastmoney_node_etf t1
+	where t1.`date` <= '2026-08-28' and t1.`date` >= '2026-06-27'
+) t
+where `date` = '2026-08-28';
+
+
+select * from t_eastmoney_node_index where date not like '99%' order by 1 desc;
+-- 3、将数据插入 t_eastmoney_node_index
+insert into t_eastmoney_node_index   (`date` , stockCode , `open` , `last` , high , low , volume)
+select t1.day date, t2.fullStockCode stockCode, t1.open open, t1.`close` last, t1.high , t1.low, round(t1.volume/100,0)
+from t_sohu_data_history t1, t_index  t2
+where replace(replace(t1.code, 'sh', '1.'), 'sz', '0.') = t2.fullStockCode
+and t1.day >= '2026-08-27';
+-- 更新chg
+
+replace into t_eastmoney_node_index   (`date` , stockCode , `open` , `last` , high , low , volume, chg)
+select `date` , stockCode , `open` , `last` , high , low , volume, round(last/last_pre, 4) * 100 - 100 chg -- , date_pre, last_pre
+from (
+	select `date` , stockCode , `open` , `last` , high , low , volume
+	        , rank() over (partition by t1.stockCode order by date desc) rn_
+	        , lead(date) over (partition by t1.stockCode order by date desc) date_pre
+	        , lead(last) over (partition by t1.stockCode order by date desc) last_pre
+	from t_eastmoney_node_index t1
+	where t1.`date` <= '2026-08-28'
+) t
+where `date` = '2026-08-28';
+
+
+
