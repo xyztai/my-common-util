@@ -33,6 +33,7 @@ public class KLineRealTimeController {
     @Autowired
     private KLineRealTimeMapper kLineRealTimeMapper;
 
+    // https://qt.gtimg.cn/?q=s_sz002025 这里只返回简略信息
     // demo
     // https://web.sqt.gtimg.cn/q=sh600875,sh688082
     public static final String QQ_URL_FORMAT = "https://web.sqt.gtimg.cn/q=%s";
@@ -86,6 +87,22 @@ public class KLineRealTimeController {
                     tmp.setCode(code.get());
                     String[] fields = line.split("~");
                     tmp.setKLineTime(fields[30]);
+
+                    tmp.setDay(fields[30].substring(0, 8));
+                    tmp.setStockName(fields[1]);
+                    tmp.setOpen(Double.parseDouble(fields[5]));
+                    tmp.setLast(Double.parseDouble(fields[3]));
+                    tmp.setHigh(Double.parseDouble(fields[33]));
+                    tmp.setLow(Double.parseDouble(fields[34]));
+                    tmp.setVolume(Double.parseDouble(fields[6]));
+                    tmp.setChg(Double.parseDouble(fields[32]));
+                    tmp.setZhengFu(Double.parseDouble(fields[43]));
+                    tmp.setAmount(Double.parseDouble(fields[37]));
+                    tmp.setExchangeRaw(Double.parseDouble(fields[38]));
+
+                    tmp.setTtm(Double.parseDouble(fields[39]));
+                    tmp.setPe(Double.parseDouble(fields[53]));
+
                     usefulLines.add(tmp);
                 }
             }
@@ -120,5 +137,20 @@ public class KLineRealTimeController {
         private String kLineTime;
         private String code;
         private String klineStr;
+
+        private String day;
+        private String stockName;
+        private Double open;
+        private Double last;
+        private Double high;
+        private Double low;
+        private Double volume;
+        private Double chg;
+        private Double zhengFu;
+        private Double amount;
+        private Double exchangeRaw;
+
+        private Double ttm; // 动态市盈率
+        private Double pe; // 市盈率
     }
 }
