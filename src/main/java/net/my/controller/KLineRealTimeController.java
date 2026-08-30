@@ -11,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -81,30 +82,97 @@ public class KLineRealTimeController {
             for(String line : lines) {
                 Optional<String> code = allQQStocks.stream().filter(f -> line.contains(f)).findAny();
                 if(code.isPresent()) {
-                    KLineRealTime tmp = new KLineRealTime();
-                    tmp.setSource("qq");
-                    tmp.setKlineStr(line);
-                    tmp.setCode(code.get());
-                    String[] fields = line.split("~");
-                    tmp.setKLineTime(fields[30]);
+                    try {
+                        KLineRealTime tmp = new KLineRealTime();
+                        tmp.setSource("qq");
+                        tmp.setKlineStr(line);
+                        tmp.setCode(code.get());
+                        String[] fields = line.split("~");
+                        if(StringUtils.isEmpty(fields[30]) || StringUtils.isEmpty(fields[1])) {
+                            continue;
+                        }
 
-                    tmp.setDay(fields[30].substring(0, 8));
-                    tmp.setStockName(fields[1]);
-                    tmp.setOpen(Double.parseDouble(fields[5]));
-                    tmp.setLast(Double.parseDouble(fields[3]));
-                    tmp.setHigh(Double.parseDouble(fields[33]));
-                    tmp.setLow(Double.parseDouble(fields[34]));
-                    tmp.setVolume(Double.parseDouble(fields[6]));
-                    tmp.setChg(Double.parseDouble(fields[32]));
-                    tmp.setZhengFu(Double.parseDouble(fields[43]));
-                    tmp.setAmount(Double.parseDouble(fields[37]));
-                    tmp.setExchangeRaw(Double.parseDouble(fields[38]));
+                        tmp.setKLineTime(fields[30]);
 
-                    tmp.setTtm(Double.parseDouble(fields[39]));
-                    tmp.setPe(Double.parseDouble(fields[53]));
-                    tmp.setVr(Double.parseDouble(fields[49]));
+                        tmp.setDay(fields[30].substring(0, 8));
+                        tmp.setStockName(fields[1]);
 
-                    usefulLines.add(tmp);
+                        try {
+                            tmp.setOpen(Double.parseDouble(fields[5]));
+                        } catch (Exception ex) {
+                            ;
+                        }
+
+                        try {
+                            tmp.setLast(Double.parseDouble(fields[3]));
+                        } catch (Exception ex) {
+                            ;
+                        }
+
+                        try {
+                            tmp.setHigh(Double.parseDouble(fields[33]));
+                        } catch (Exception ex) {
+                            ;
+                        }
+
+                        try {
+                            tmp.setLow(Double.parseDouble(fields[34]));
+                        } catch (Exception ex) {
+                            ;
+                        }
+
+                        try {
+                            tmp.setVolume(Double.parseDouble(fields[6]));
+                        } catch (Exception ex) {
+                            ;
+                        }
+
+                        try {
+                            tmp.setChg(Double.parseDouble(fields[32]));
+                        } catch (Exception ex) {
+                            ;
+                        }
+
+                        try {
+                            tmp.setZhengFu(Double.parseDouble(fields[43]));
+                        } catch (Exception ex) {
+                            ;
+                        }
+
+                        try {
+                            tmp.setAmount(Double.parseDouble(fields[37]));
+                        } catch (Exception ex) {
+                            ;
+                        }
+
+                        try {
+                            tmp.setExchangeRaw(Double.parseDouble(fields[38]));
+                        } catch (Exception ex) {
+                            ;
+                        }
+
+                        try {
+                            tmp.setTtm(Double.parseDouble(fields[39]));
+                        } catch (Exception ex) {
+                            ;
+                        }
+
+                        try {
+                            tmp.setPe(Double.parseDouble(fields[53]));
+                        } catch (Exception ex) {
+                            ;
+                        }
+
+                        try {
+                            tmp.setVr(Double.parseDouble(fields[49]));
+                        } catch (Exception ex) {
+                            ;
+                        }
+
+                        usefulLines.add(tmp);
+                    } catch (Exception ex) {
+                        log.info("解析字符串失败", ex);
+                    }
                 }
             }
 
