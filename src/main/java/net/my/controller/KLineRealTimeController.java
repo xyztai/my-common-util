@@ -102,6 +102,7 @@ public class KLineRealTimeController {
 
                     tmp.setTtm(Double.parseDouble(fields[39]));
                     tmp.setPe(Double.parseDouble(fields[53]));
+                    tmp.setVr(Double.parseDouble(fields[87]));
 
                     usefulLines.add(tmp);
                 }
@@ -152,5 +153,6 @@ public class KLineRealTimeController {
 
         private Double ttm; // 动态市盈率
         private Double pe; // 市盈率
+        private Double vr; // 市盈率
     }
 }

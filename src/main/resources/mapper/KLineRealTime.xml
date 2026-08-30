@@ -18,7 +18,7 @@
                  from t_index ti
              ) t
         where t.stockCode like 's%'
-        limit 100;
+--         limit 100;
         ]]>
     </select>
 
@@ -27,13 +27,13 @@
         replace into t_kline_data_real_time(`source`, `kline_time`, `code`, `kline_str`
         , `day`, `stock_name`, `open`, `last`, `high`
         , `low`, `volume`, `amount`, `chg`, `zheng_fu`
-        , `exchangeRaw`, `ttm`, `pe`)
+        , `exchangeRaw`, `ttm`, `pe`, `vr`)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.source}, #{item.kLineTime}, #{item.code}, #{item.klineStr}
             , #{item.day}, #{item.stockName}, #{item.open}, #{item.last}, #{item.high}
             , #{item.low}, #{item.volume}, #{item.amount}, #{item.chg}, #{item.zhengFu}
-            , #{item.exchangeRaw}, #{item.ttm}, #{item.pe}
+            , #{item.exchangeRaw}, #{item.ttm}, #{item.pe}, #{item.vr}
             )
         </foreach>
     </insert>
