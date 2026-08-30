@@ -6,12 +6,10 @@ import net.my.mapper.AgEastmoneyEChartsMapper;
 import net.my.mapper.AgWeekEastmoneyStockMapper;
 import net.my.mapper.DataCalcMapper;
 import net.my.mapper.TmpMapper;
-import net.my.pojo.EastmoneyWinRatioPOJO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
@@ -19,7 +17,6 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
@@ -56,6 +53,9 @@ public class ScheduledTasks {
 
     @Autowired
     private TmpController tmpController;
+
+    @Autowired
+    private KLineRealTimeController KLineRealTimeController;
 
     @Autowired
     private AgNewEastmoneyETFController agNewEastmoneyETFController;
@@ -148,9 +148,40 @@ public class ScheduledTasks {
     }
 
     /**
+     * 每日更新下 KLineRealTime 数据
+     */
+    @Scheduled(cron = "0 51 * * * ?")
+    public void execKLineRealTime() {
+        long startTime = System.currentTimeMillis();
+        log.info("execKLineRealTime begin");
+        // 设置时区为北京
+        LocalDateTime now = LocalDateTime.now();
+        ZoneId beijngZoneId = ZoneId.of("Asia/Shanghai");
+        ZonedDateTime beijingTime = now.atZone(beijngZoneId);
+        // 输出北京时间
+        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+        String formattedTime = beijingTime.format(formatter);
+        log.info("time: {}", formattedTime);
+        if(
+                (formattedTime.compareTo("05:01:00") > 0 && formattedTime.compareTo("05:55:00") < 0) ||  // 这里5点，对应北京时间17点
+//                        (formattedTime.compareTo("05:01:00") > 0 && formattedTime.compareTo("05:55:00") < 0) ||
+                        (formattedTime.compareTo("17:01:00") > 0 && formattedTime.compareTo("17:55:00") < 0)
+//                                || (formattedTime.compareTo("16:01:00") > 0 && formattedTime.compareTo("16:55:00") < 0)
+        ) {
+            log.info("time to execKLineRealTime");
+            KLineRealTimeController.getDataFromQQ();
+        } else {
+            log.info("not time to execKLineRealTime");
+        }
+        log.info("execKLineRealTime end");
+        log.info("execKLineRealTime Time-Consuming: {} ms", System.currentTimeMillis() - startTime);
+    }
+
+    /**
      * 自动获取/更新历史上5天的cp数据
      */
-    @Scheduled(cron = "0 7 * * * ?")
+    @Scheduled(cron = "0 37 * * * ?")
     public void execGetHistoryDataNew() {
         long startTime = System.currentTimeMillis();
         log.info("execGetHistoryDataNew begin");
@@ -164,9 +195,9 @@ public class ScheduledTasks {
         String formattedTime = beijingTime.format(formatter);
         log.info("time: {}", formattedTime);
         if(
-                        (formattedTime.compareTo("03:01:00") > 0 && formattedTime.compareTo("03:55:00") < 0) ||  // 这里3点，对应北京时间16点
+                        (formattedTime.compareTo("04:01:00") > 0 && formattedTime.compareTo("04:55:00") < 0) ||  // 这里4点，对应北京时间16点
 //                        (formattedTime.compareTo("05:01:00") > 0 && formattedTime.compareTo("05:55:00") < 0) ||
-                        (formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:55:00") < 0)
+                        (formattedTime.compareTo("16:01:00") > 0 && formattedTime.compareTo("16:55:00") < 0)
 //                                || (formattedTime.compareTo("16:01:00") > 0 && formattedTime.compareTo("16:55:00") < 0)
         ) {
             log.info("time to execGetHistoryData");

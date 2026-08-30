@@ -42,7 +42,7 @@ public class KLineRealTimeController {
 
     @GetMapping("/qq")
     @Transactional
-    public BaseResponse getHistoryData() {
+    public BaseResponse getDataFromQQ() {
         log.info("获取实时数据 start");
         List<String> allQQStocks = kLineRealTimeMapper.getAllQQStocks();
         if(CollectionUtils.isEmpty(allQQStocks)) {
