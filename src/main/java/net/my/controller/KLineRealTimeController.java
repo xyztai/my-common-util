@@ -102,7 +102,7 @@ public class KLineRealTimeController {
 
                     tmp.setTtm(Double.parseDouble(fields[39]));
                     tmp.setPe(Double.parseDouble(fields[53]));
-                    tmp.setVr(Double.parseDouble(fields[87]));
+                    tmp.setVr(Double.parseDouble(fields[49]));
 
                     usefulLines.add(tmp);
                 }
