@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.my.mapper.KLineRealTimeMapper">
+
+    <select id="getAllQQStocks" resultType="string">
+        <![CDATA[
+        select *
+        from (
+                 select concat(case when stockType = 1 then 'sh' when stockType = 0 then 'sz' else '' end, stockCode) stockCode
+                 from t_hs300 th
+                 union
+                 select concat(case when stockType = 1 then 'sh' when stockType = 0 then 'sz' else '' end, stockCode) stockCode
+                 from t_etf te
+                 union
+                 select concat(case when stockType = 1 then 'sh' when stockType = 0 then 'sz' else '' end, stockCode) stockCode
+                 from t_index ti
+             ) t
+        where t.stockCode like 's%'
+        limit 100;
+        ]]>
+    </select>
+
+
+    <insert id="saveDataQQ" parameterType="java.util.List">
+        replace into t_kline_data_real_time(`source`, `kline_time`, `code`, `kline_str`)
+        values
+        <foreach collection="list" item="item" separator=",">
+            (#{item.source}, #{item.kLineTime}, #{item.code}, #{item.klineStr}
+            )
+        </foreach>
+    </insert>
+
+</mapper>
