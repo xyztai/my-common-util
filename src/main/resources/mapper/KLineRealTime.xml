@@ -38,4 +38,17 @@
         </foreach>
     </insert>
 
+    <delete id="delDuplicateData">
+        DELETE from t_kline_data_real_time
+        where id in (
+            select min_id
+            from (
+               select code, day , count(1), min(id) min_id, max(id), min(kline_time ), max(kline_time )
+               from t_kline_data_real_time tkdrt
+               group by code, day
+               having count(1) = 2
+            ) t
+        )
+    </delete>
+
 </mapper>

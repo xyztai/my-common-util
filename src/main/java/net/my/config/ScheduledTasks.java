@@ -2,10 +2,7 @@ package net.my.config;
 
 import lombok.extern.slf4j.Slf4j;
 import net.my.controller.*;
-import net.my.mapper.AgEastmoneyEChartsMapper;
-import net.my.mapper.AgWeekEastmoneyStockMapper;
-import net.my.mapper.DataCalcMapper;
-import net.my.mapper.TmpMapper;
+import net.my.mapper.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -74,6 +71,9 @@ public class ScheduledTasks {
 
     @Autowired
     private AgWeekEastmoneyStockMapper agWeekEastmoneyStockMapper;
+
+    @Autowired
+    private KLineRealTimeMapper kLineRealTimeMapper;
 
     @Value("${executeOnceTaskEnable}")
     private Boolean executeOnceTaskEnable;
@@ -170,7 +170,10 @@ public class ScheduledTasks {
 //                                || (formattedTime.compareTo("16:01:00") > 0 && formattedTime.compareTo("16:55:00") < 0)
         ) {
             log.info("time to execKLineRealTime");
+            // 获取当天的实时数据
             KLineRealTimeController.getDataFromQQ();
+            // 清理重复数据
+            kLineRealTimeMapper.delDuplicateData();
         } else {
             log.info("not time to execKLineRealTime");
         }

@@ -1,1 +1,12 @@
+方案一、从腾讯处获取当天的数据
+
+# 补偿数据，从腾讯处获取当天的数据
+formatted=$(date "+%Y%m%d")
+curl --location --request GET 'https://web.sqt.gtimg.cn/q=sh601001,sh601000' >> /root/kline-real-time/${formatted}.txt
+
+#调用shell命令，分析上面的数据，插入当天的数据
 cat 20260911.txt | awk -F'~' '{print  "replace into t_kline_data_real_time(source, kline_time, code, kline_str, day, stock_name, open, last, high, low, volume, amount, chg, zheng_fu, exchangeRaw, ttm, pe, vr) values(\047qq""\047,\047"$31"\047,\047"substr($1,3,8)"\047,\047"$0"\047,\047"substr($31,1,8)"\047,\047"$2"\047,\047"$6"\047,\047"$4"\047,\047"$34"\047,\047"$35"\047,\047"$7"\047,\047"$38"\047,\047"$33"\047,\047"$44"\047,\047"$39"\047,\047"$40"\047,\047"$54"\047,\047"$50"\047);"}' > ans.txt
+
+
+方案二、从sohu处获取当天的数据
+

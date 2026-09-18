@@ -10,4 +10,5 @@ public interface KLineRealTimeMapper {
     List<String> getAllQQStocks();
 
     int saveDataQQ(List<KLineRealTimeController.KLineRealTime> data);
+    int delDuplicateData();
 }
