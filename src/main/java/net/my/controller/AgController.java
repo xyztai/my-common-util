@@ -230,9 +230,9 @@ public class AgController {
             startNum += stepNum;
         }
 
-        log.info("targetSohuCodes size={}", codes.size());
+        log.info("codes size={}", codes.size());
         for(String code : codes) {
-            log.info("sohuCode={}", code);
+            log.info("code={}", code);
 
             try {
                 Thread.sleep(2000);
@@ -340,13 +340,13 @@ public class AgController {
             startNum += stepNum;
         }
 
-        log.info("targetSohuCodes size={}", targetSohuCodes.size());
-        for(String sohuCode : targetSohuCodes) {
-            log.info("sohuCode={}", sohuCode);
+        log.info("codes size={}", targetSohuCodes.size());
+        for(String code : targetSohuCodes) {
+            log.info("code={}", code);
 
             try {
                 Thread.sleep(2000);
-                String url = String.format(SO_HU_URL_FORMAT, sohuCode);
+                String url = String.format(SO_HU_URL_FORMAT, code);
                 log.info("url: {}", url);
 
                 // 创建请求头
@@ -367,9 +367,9 @@ public class AgController {
                 log.info("响应状态: " + response.getStatusCode());
                 log.info("响应体: " + response.getBody());
                 String res = response.getBody();
-                Map<String, Object> soHuRes = com.alibaba.fastjson2.JSON.parseObject(res, Map.class);
-                log.info("soHuRes={}", com.alibaba.fastjson2.JSON.toJSON(soHuRes));
-                for(Map.Entry<String, Object> entry : soHuRes.entrySet()) {
+                Map<String, Object> outMap = com.alibaba.fastjson2.JSON.parseObject(res, Map.class);
+                log.info("outMap={}", com.alibaba.fastjson2.JSON.toJSON(outMap));
+                for(Map.Entry<String, Object> entry : outMap.entrySet()) {
                     String key = entry.getKey();
                     Object obj = entry.getValue();
                     List<String> values = com.alibaba.fastjson2.JSON.parseArray(obj.toString(), String.class);
