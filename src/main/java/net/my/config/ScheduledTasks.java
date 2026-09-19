@@ -182,7 +182,7 @@ public class ScheduledTasks {
     }
 
     /**
-     * 自动获取/更新历史上5天的cp数据
+     * 自动获取当前的收盘数据
      */
     @Scheduled(cron = "0 37 * * * ?")
     public void execGetHistoryDataNew() {
@@ -212,6 +212,7 @@ public class ScheduledTasks {
         log.info("execGetHistoryDataNew Time-Consuming: {} ms", System.currentTimeMillis() - startTime);
     }
 
+    // 启动后，自动计算相关数据
     @Scheduled(initialDelay = 5000, fixedDelay = 7 * 24 * 3600 * 1000)
     public void executeOnceTask() {
         long startTime = System.currentTimeMillis();
@@ -255,6 +256,9 @@ public class ScheduledTasks {
         taskState = 0;
     }
 
+    /**
+     * 基于已有的数据，进行数据计算
+     */
     void execCalc() {
 
         // 1、先计算9倍成交量的数据
