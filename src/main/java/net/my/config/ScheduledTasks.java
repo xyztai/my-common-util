@@ -233,16 +233,23 @@ public class ScheduledTasks {
         }
         taskState = 1;
 
-        // 获取得到历史数据
-        log.info("task 获取stock的历史数据 start");
-        agNewEastmoneyStockController.getHistoryData();
-        log.info("task 获取stock的历史数据 end");
-        log.info("task 获取etf的历史数据 start");
-        agNewEastmoneyETFController.getHistoryData();
-        log.info("task 获取etf的历史数据 end");
-        log.info("task 获取index的历史数据 start");
-        agNewEastmoneyIndexController.getHistoryDataOuterSina();
-        log.info("task 获取index的历史数据 end");
+        // 获得当天数据
+        log.info("getTodayDataStockCode start");
+        agController.getTodayDataStockCode();
+        log.info("getTodayDataEtf start");
+        agController.getTodayDataEtf();
+        log.info("getTodayDataIndex start");
+        agController.getTodayDataIndex();
+
+//        log.info("task 获取stock的历史数据 start");
+//        agNewEastmoneyStockController.getHistoryData();
+//        log.info("task 获取stock的历史数据 end");
+//        log.info("task 获取etf的历史数据 start");
+//        agNewEastmoneyETFController.getHistoryData();
+//        log.info("task 获取etf的历史数据 end");
+//        log.info("task 获取index的历史数据 start");
+//        agNewEastmoneyIndexController.getHistoryDataOuterSina();
+//        log.info("task 获取index的历史数据 end");
 
         execCalc();
         taskState = 0;
