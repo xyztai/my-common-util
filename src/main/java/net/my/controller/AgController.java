@@ -1,5 +1,6 @@
 package net.my.controller;
 
+import com.alibaba.fastjson2.JSON;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
@@ -72,11 +73,13 @@ public class AgController {
         List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
         // 1、先sina数据
         if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
-            eastmoneyNodeList = getQQResFromSina(fullStockCodes);
+            List<EastmoneyNode> eastmoneyNodeList2 = getQQResFromSina(fullStockCodes);
+            log.info("eastmoneyNodeList2={}", JSON.toJSONString(eastmoneyNodeList2));
         }
         // 2、后sohu数据
         if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
-            eastmoneyNodeList = getQQResFromSohu(fullStockCodes);
+            List<EastmoneyNode> eastmoneyNodeList3 = getQQResFromSohu(fullStockCodes);
+            log.info("eastmoneyNodeList3={}", JSON.toJSONString(eastmoneyNodeList3));
         }
         // 3、其他的方法，从QQ或者从雪球，只能逐条记录去取，太慢了，不再使用那种方法，相关代码就不删除了
         if(!CollectionUtils.isEmpty(eastmoneyNodeList)) {
@@ -116,11 +119,13 @@ public class AgController {
         List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
         // 1、先sina数据
         if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
-            eastmoneyNodeList = getQQResFromSina(fullStockCodes);
+            List<EastmoneyNode> eastmoneyNodeList2 = getQQResFromSina(fullStockCodes);
+            log.info("eastmoneyNodeList2={}", JSON.toJSONString(eastmoneyNodeList2));
         }
         // 2、后sohu数据
         if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
-            eastmoneyNodeList = getQQResFromSohu(fullStockCodes);
+            List<EastmoneyNode> eastmoneyNodeList3 = getQQResFromSohu(fullStockCodes);
+            log.info("eastmoneyNodeList3={}", JSON.toJSONString(eastmoneyNodeList3));
         }
         // 3、其他的方法，从QQ或者从雪球，只能逐条记录去取，太慢了，不再使用那种方法，相关代码就不删除了
         if(!CollectionUtils.isEmpty(eastmoneyNodeList)) {
@@ -160,12 +165,14 @@ public class AgController {
         List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
         // 1、先sina数据
         if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
-            eastmoneyNodeList = getQQResFromSina(fullStockCodes);
+            List<EastmoneyNode> eastmoneyNodeList2 = getQQResFromSina(fullStockCodes);
+            log.info("eastmoneyNodeList2={}", JSON.toJSONString(eastmoneyNodeList2));
         }
-        // 2、后sohu数据，指数sohu取不到
-//        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
-//            eastmoneyNodeList = getQQResFromSohu(fullStockCodes);
-//        }
+        // 2、后sohu数据
+        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            List<EastmoneyNode> eastmoneyNodeList3 = getQQResFromSohu(fullStockCodes);
+            log.info("eastmoneyNodeList3={}", JSON.toJSONString(eastmoneyNodeList3));
+        }
         // 3、其他的方法，从QQ或者从雪球，只能逐条记录去取，太慢了，不再使用那种方法，相关代码就不删除了
         if(!CollectionUtils.isEmpty(eastmoneyNodeList)) {
             int startNum = 0;
