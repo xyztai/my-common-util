@@ -1,0 +1,10 @@
+
+1、先把code写入 t_stock_code/t_etf/t_index表；
+2、将code写入 t_eastmoney_node_str；
+3、浏览器访问腾讯连接：
+https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.603049&klt=101&fqt=1&beg=0&end=20500101&fields1=f1&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61
+其中 secid=1.603049 为code，将结果，手工放入表 t_eastmoney_node_str
+4、调用接口，
+就可以将code的历史数据全部写入了 e.welcomeuhere.top:51666/ag-history/historyAll/1.603049
+
+这里第3步，腾讯的全量连接经常被封IP，被封后，浏览器访问 网页：https://quote.eastmoney.com/sz300827.html，腾讯会进行验证，验证通过了，IP就会被解封，就可以继续调用接口了

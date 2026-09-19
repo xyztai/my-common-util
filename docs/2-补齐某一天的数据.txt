@@ -1,0 +1,3 @@
+
+1、定时任务同时写入了 t_eastmoney_node/t_eastmoney_node_etf/t_eastmoney_node_index 当天表，以及 t_kline_data_real_time 表；
+2、如果 t_eastmoney_node/t_eastmoney_node_etf/t_eastmoney_node_index 没有数据，
