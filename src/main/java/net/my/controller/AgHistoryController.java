@@ -74,7 +74,7 @@ public class AgHistoryController {
         try {
             String res = "";
             String tableValue = agHistoryMapper.getStr(zqdm);
-            if(!StringUtils.isEmpty(res)) {
+            if(!StringUtils.isEmpty(tableValue)) {
                 // 直接用表中数据
                 res = tableValue;
                 log.info("agHistoryMapper.getStr res={}", res);
