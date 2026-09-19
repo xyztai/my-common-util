@@ -198,9 +198,9 @@ public class ScheduledTasks {
         String formattedTime = beijingTime.format(formatter);
         log.info("time: {}", formattedTime);
         if(
-                        (formattedTime.compareTo("04:01:00") > 0 && formattedTime.compareTo("04:55:00") < 0) ||  // 这里4点，对应北京时间16点
+                (formattedTime.compareTo("05:01:00") > 0 && formattedTime.compareTo("05:55:00") < 0) ||  // 这里5点，对应北京时间17点
 //                        (formattedTime.compareTo("05:01:00") > 0 && formattedTime.compareTo("05:55:00") < 0) ||
-                        (formattedTime.compareTo("16:01:00") > 0 && formattedTime.compareTo("16:55:00") < 0)
+                        (formattedTime.compareTo("17:01:00") > 0 && formattedTime.compareTo("17:55:00") < 0)
 //                                || (formattedTime.compareTo("16:01:00") > 0 && formattedTime.compareTo("16:55:00") < 0)
         ) {
             log.info("time to execGetHistoryData");
