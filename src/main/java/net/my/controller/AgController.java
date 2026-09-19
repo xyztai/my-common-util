@@ -68,7 +68,7 @@ public class AgController {
         }
         log.info("getTodayDataStockCode-开始计算今天的数据");
         ScheduledTasks.taskState = 1;
-        List<String> fullStockCodes = agMapper.getCodes(type.getTableName());
+        List<String> fullStockCodes = agMapper.getCodes(type.getCodeTableName());
         List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
         // 1、先sina数据
         if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
@@ -85,13 +85,13 @@ public class AgController {
             while(startNum < eastmoneyNodeList.size()) {
                 List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
                 log.info("tmpNodes.size={}", tmpNodes.size());
-                agMapper.saveNodeDatas(type.getTableName(), tmpNodes);
+                agMapper.saveNodeDatas(type.getNodeTableName(), tmpNodes);
                 startNum += stepNum;
             }
 
             log.info("getTodayDataStockCode-开始更新基础字段");
             // 更新基础字段
-            agMapper.updateNodeDatas(type.getTableName());
+            agMapper.updateNodeDatas(type.getNodeTableName());
 
         }
 
@@ -112,7 +112,7 @@ public class AgController {
         }
         log.info("getTodayDataEtf-开始计算今天的数据");
         ScheduledTasks.taskState = 1;
-        List<String> fullStockCodes = agMapper.getCodes(type.getTableName());
+        List<String> fullStockCodes = agMapper.getCodes(type.getCodeTableName());
         List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
         // 1、先sina数据
         if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
@@ -129,13 +129,13 @@ public class AgController {
             while(startNum < eastmoneyNodeList.size()) {
                 List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
                 log.info("tmpNodes.size={}", tmpNodes.size());
-                agMapper.saveNodeDatas(type.getTableName(), tmpNodes);
+                agMapper.saveNodeDatas(type.getNodeTableName(), tmpNodes);
                 startNum += stepNum;
             }
 
             log.info("getTodayDataEtf-开始更新基础字段");
             // 更新基础字段
-            agMapper.updateNodeDatas(type.getTableName());
+            agMapper.updateNodeDatas(type.getNodeTableName());
 
         }
 
@@ -156,7 +156,7 @@ public class AgController {
         }
         log.info("getTodayDataEtf-开始计算今天的数据");
         ScheduledTasks.taskState = 1;
-        List<String> fullStockCodes = agMapper.getCodes(type.getTableName());
+        List<String> fullStockCodes = agMapper.getCodes(type.getCodeTableName());
         List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
         // 1、先sina数据
         if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
@@ -173,13 +173,13 @@ public class AgController {
             while(startNum < eastmoneyNodeList.size()) {
                 List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
                 log.info("tmpNodes.size={}", tmpNodes.size());
-                agMapper.saveNodeDatas(type.getTableName(), tmpNodes);
+                agMapper.saveNodeDatas(type.getNodeTableName(), tmpNodes);
                 startNum += stepNum;
             }
 
             log.info("getTodayDataEtf-开始更新基础字段");
             // 更新基础字段
-            agMapper.updateNodeDatas(type.getTableName());
+            agMapper.updateNodeDatas(type.getNodeTableName());
 
         }
 

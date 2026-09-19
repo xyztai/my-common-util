@@ -120,13 +120,13 @@ public class AgHistoryController {
         while(startNum < eastmoneyNodeList.size()) {
             List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
             log.info("插入infoRaw字段 tmpNodes.size={}", tmpNodes.size());
-            agMapper.saveNodeDatas(agDataType.getTableName(), tmpNodes);
+            agMapper.saveNodeDatas(agDataType.getNodeTableName(), tmpNodes);
             startNum += stepNum;
         }
 
         log.info("根据infoRaw字段,更新基础字段");
         // 更新基础字段
-        agMapper.updateNodeDatas(agDataType.getTableName());
+        agMapper.updateNodeDatas(agDataType.getNodeTableName());
 
         return BaseResponse.OK;
     }

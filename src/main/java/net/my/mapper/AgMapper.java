@@ -8,10 +8,10 @@ import java.util.List;
 
 @Repository
 public interface AgMapper {
-    int saveNodeDatas(@Param("tableName") String tableName, @Param("eastmoneyNodes") List<EastmoneyNode> eastmoneyNodes);
-    int updateNodeDatas(@Param("tableName") String tableName);
+    int saveNodeDatas(@Param("nodeTableName") String nodeTableName, @Param("eastmoneyNodes") List<EastmoneyNode> eastmoneyNodes);
+    int updateNodeDatas(@Param("nodeTableName") String nodeTableName);
     String getAgDataTypeByCode(@Param("code") String code);
 
-    List<String> getCodes(@Param("tableName") String tableName);
+    List<String> getCodes(@Param("codeTableName") String codeTableName);
 
 }

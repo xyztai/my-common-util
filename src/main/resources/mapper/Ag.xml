@@ -5,7 +5,7 @@
 <mapper namespace="net.my.mapper.AgMapper">
 
     <insert id="saveNodeDatas" parameterType="java.util.List">
-        replace into ${tableName} (`date`, `stockCode`, `infoRaw`)
+        replace into ${nodeTableName} (`date`, `stockCode`, `infoRaw`)
         values
         <foreach collection="eastmoneyNodes" item="item" separator=",">
             (#{item.date}, #{item.stockCode}, #{item.infoRaw}
@@ -14,7 +14,7 @@
     </insert>
 
     <update id="updateNodeDatas">
-        update ${tableName}
+        update ${nodeTableName}
         set `date` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -11), ',', 1) ,
         `open` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -10), ',', 1) ,
         `last` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -9), ',', 1) ,
@@ -51,7 +51,7 @@
     <select id="getCodes" resultType="java.lang.String">
         <![CDATA[
         select fullStockCode
-        from ${tableName} t
+        from ${codeTableName} t
         order by 1
         ]]>
     </select>
