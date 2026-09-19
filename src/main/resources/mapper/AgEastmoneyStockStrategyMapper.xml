@@ -77,7 +77,7 @@
                     , sum(case when ten.`date` = td.date_next_3 then chg else 0 end) chg_next_3
                     , sum(case when ten.`date` = td.date_next_4 then chg else 0 end) chg_next_4
                     , td.date_next_0, date_next_1, date_next_2, date_next_3, date_next_4
-            from t_eastmoney_node_right tenr , t_eastmoney_node ten , t_hs300 th, tmp_dates td
+            from t_eastmoney_node_right tenr , t_eastmoney_node ten , t_stock_code th, tmp_dates td
             where tenr.`date` = td.date_next_0 -- and ten.date <= '2026-06-15'
                 -- and substring(tenr.stockName , 1, 2) >= '07'
                 -- and ten.`date` < '3000'
@@ -200,7 +200,7 @@
                -- , t3.chg_next_1, t3.chg_next_2
                -- , t.last, t.ma5, t.ma10, t.ma20
         	   -- , round((t.ma3+t.ma6+t.ma12+t.ma24)/4, 3) bbi
-        from tmp_30_duotou t, tmp_has_5_chg t1, tmp_vol t2, t_hs300 th, tmp t3
+        from tmp_30_duotou t, tmp_has_5_chg t1, tmp_vol t2, t_stock_code th, tmp t3
         where t.date_rank = 1
           and t.stockCode = t1.stockCode
           and t.tc_date = t1.tc_date
@@ -350,7 +350,7 @@
             )
             , tmp_ready as (
                 select t.ratio, t.stockCode, t.pre_volume, t.volume, t.chg, t.last, th.stockName, group_concat(t.bkName) bkName_multi, t.date
-                from tmp_suo_liang t, t_hs300 th
+                from tmp_suo_liang t, t_stock_code th
                 where t.stockCode = th.stockCode
                 group by  t.ratio, t.stockCode, t.pre_volume, t.volume, t.chg, t.last, th.stockName, t.date
             )

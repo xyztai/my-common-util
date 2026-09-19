@@ -6,7 +6,7 @@
     <select id="getStocks" resultType="java.lang.String">
         <![CDATA[
         select concat(t.stockType, '.', t.stockCode)
-        from t_hs300 t
+        from t_stock_code t
         -- where stockCode = '601212'
         order by 1
         ]]>
@@ -23,8 +23,8 @@
 
     <select id="getIndexs" resultType="java.lang.String">
         <![CDATA[
-        select distinct stockCode
-        from t_eastmoney_node_str
+        select DISTINCT fullStockCode
+        from t_index
         ]]>
     </select>
 

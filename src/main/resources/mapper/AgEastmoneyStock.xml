@@ -77,7 +77,7 @@
 
     <select id="getHs300List" resultType="net.my.pojo.HsStockPoJo">
         select stockCode, stockType, stockName
-        from t_hs300
+        from t_stock_code
         -- where stockCode not like '30%'
         -- and stockCode not like '68%'
         order by 1
@@ -274,7 +274,7 @@
                                 , t1.rank_2
                                 , '/3###'
                                 , round(t1.last, 3), '(', case when t1.date like '99999%' then replace(replace(t1.date, '0.0', ''), '99999', '') else t1.chg end, ')', round(t1.clac_expma_5, 3), round(t1.clac_expma_10, 3)) ratioB
-        from tmp_consider_99999 t1, t_hs300 th
+        from tmp_consider_99999 t1, t_stock_code th
         where t1.stockCode = th.fullStockCode
         order by 1 desc, 2
     ]]>
@@ -316,7 +316,7 @@
                 where t2.`date` BETWEEN t1.start_date and t1.end_date
                 and ( t2.`date` = t1.end_date or t2.`date` not like '9999%' )
                 and t1.end_date like '9999%' -- 9999开头的
-            ) t1, t_hs300 th
+            ) t1, t_stock_code th
         where t1.rank_ <= 3
           and t1.end_date = t1.`date`
           and t1.stockCode = th.fullStockCode
@@ -382,7 +382,7 @@
                    -- and date_exists is not null
                    -- and (chg_next_1 >= 0 or (chg_next_1 < 0 and vol_next_1 <= volume*0.618))
                    -- and (chg_next_2 >= 0 or (chg_next_2 < 0 and vol_next_2 <= volume*0.618))
-             ) t1, t_hs300 th
+             ) t1, t_stock_code th
         where t1.stockCode = th.fullStockCode
         order by 2 desc
     ]]>
@@ -500,7 +500,7 @@
                         ) t2
                 ) t3
                 where tag_ + pre_tag_1 + pre_tag_2 + pre_tag_3 + pre_tag_4 + pre_tag_5 = 6
-            ) t9, t_hs300 th
+            ) t9, t_stock_code th
         where t9.stockCode = th.fullStockCode
           and t9.date >  DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d')
           and _9_zhuan != '00'
@@ -619,7 +619,7 @@
                         ) t2
                 ) t3
                 where tag_ + pre_tag_1 + pre_tag_2 + pre_tag_3 + pre_tag_4 + pre_tag_5 = 6
-            ) t9, t_hs300 th
+            ) t9, t_stock_code th
         where t9.stockCode = th.fullStockCode
           and t9.date >  DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d')
           and _9_zhuan != '00'
@@ -636,7 +636,7 @@
                  from t_eastmoney_node t
                  where t.`date` > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
                  and t.date not like '99999%'
-             ) t1, t_hs300 th
+             ) t1, t_stock_code th
         where t1.stockCode = th.fullStockCode
           and t1.rank_ = 1
         order by 2, 1
@@ -654,7 +654,7 @@
             where tenz._date = tenv._date
             and tenz._date > DATE_FORMAT(DATE_ADD(SYSDATE(), INTERVAL -90 DAY), '%Y-%m-%d')
             and tenz._stockCode = tenv._stockCode
-        ) t1, t_hs300 t3
+        ) t1, t_stock_code t3
         where date_rn <= 5
         and t1._stockCode = concat(t3.stockType , '.', t3.stockCode )
         and (t1._direction = 'S' or t1._9_zhuan = '09')
@@ -686,7 +686,7 @@
                     and ten.stockCode not like '1.68%'
                     and ten.stockCode not like '1.30%'
                     -- and ten.last < 80
-                ) t , t_hs300 t3
+                ) t , t_stock_code t3
                 where t.stockCode = concat(t3.stockType , '.', t3.stockCode)
             ) -- select distinct `date`, date_rn from tmp_ where date_rn = 10
             select th.stockCode, t2.`date` date, concat(th.bkName, '-',  th.stockName) last
@@ -694,7 +694,7 @@
                    -- , round(t2.volume/t1.volume,1) highest_ratio
             from (select stockCode, stockName , `date` , volume from tmp_ where vol_min_rank = 1) t1,
                  (select stockCode, stockName , `date` , volume, last, chg from tmp_ where vol_max_rank = 1) t2,
-                 (select distinct `date` from tmp_ where date_rn = 10) t3 , t_hs300 th
+                 (select distinct `date` from tmp_ where date_rn = 10) t3 , t_stock_code th
             where t1.stockCode = t2.stockCode
             and t2.stockCode = th.fullStockCode
             and t2.`date` >= t3.date -- DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 15 DAY), '%Y-%m-%d')
@@ -714,12 +714,12 @@
                         , concat(ten.`last`, ':',  ten.chg) last
                         , concat(round(tena.avg_5, 3),':', round(tena.avg_10, 3),':', round(tena.avg_20, 3),':', round(tena.avg_60, 3) ) ratioB
                         , dense_rank() over (order by tena._date desc) _date_rn
-                from t_eastmoney_node_avg tena, t_hs300 t3, t_eastmoney_node ten
+                from t_eastmoney_node_avg tena, t_stock_code t3, t_eastmoney_node ten
                 where tena._stockCode = concat(t3.stockType , '.', t3.stockCode)
                 and tena._date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
                 and tena.`_date` = ten.`date`
                 and tena.`_stockCode` = ten.stockCode
-            ) tt, t_hs300 th
+            ) tt, t_stock_code th
             where tt._date_rn <= 7
             and tt.stockCode = th.stockCode
             order by `date` desc
@@ -764,7 +764,7 @@
             select -- t.date, count(1)
                   -- t.*, th.stockName
                   th.stockCode , t.date, concat(th.bkName, '-',  th.stockName) last, '' ratioB
-            from tmp t , t_hs300 th
+            from tmp t , t_stock_code th
             where 1 = 1
             and t.date_next is null
             and SUBSTRING(t.stockCode , 3) = th.stockCode
@@ -778,7 +778,7 @@
         <![CDATA[
             with tmp as (
                 select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt, sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.05 then 1 else 0 end) big_swing_cnt
-                from t_eastmoney_node ten, t_hs300 th
+                from t_eastmoney_node ten, t_stock_code th
                 where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
                 and ten.`date` not like '9999%'
                 and th.fullStockCode = ten.stockCode
@@ -799,7 +799,7 @@
             select
                   t1.stockCode , ten2.date, concat(th.bkName, '-',  th.stockName) last, '' ratioB
                  -- ten2.chg, t1.*
-            from tmp_t t1, t_eastmoney_node ten2, t_hs300 th
+            from tmp_t t1, t_eastmoney_node ten2, t_stock_code th
             where t1.fullStockCode = ten2.stockCode
             and th.fullStockCode = ten2.stockCode
             and ten2.`date` = (select max(date) from t_eastmoney_node ten3 where ten3.`date` < '9999')
@@ -822,7 +822,7 @@
                        , rank() over (partition by ten.stockCode order by ten.volume ) volume_rank
                        , rank() over (partition by ten.stockCode order by ten.`date` desc ) date_rank
                        , count(1) over (partition by ten.stockCode ) date_cnt
-                from t_eastmoney_node ten, t_hs300 th, tmp_calc_date t3
+                from t_eastmoney_node ten, t_stock_code th, tmp_calc_date t3
                 where `date` between t3.small_date_1 and t3.big_date
                 -- where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 60 DAY), '%Y-%m-%d')
                 and ten.`date` not like '9999%'
@@ -842,7 +842,7 @@
             ,  tmp_big_swing as (
                 select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt
                       , sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.05 then 1 else 0 end) big_swing_cnt
-                from t_eastmoney_node ten, t_hs300 th, tmp_calc_date t3
+                from t_eastmoney_node ten, t_stock_code th, tmp_calc_date t3
                 where `date` between t3.small_date_2 and t3.big_date
                 -- where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
                 and ten.`date` not like '9999%'
@@ -921,7 +921,7 @@
         , tmp_bigswing as (
 	        select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt
 	               , sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.04 then 1 else 0 end) big_swing_cnt
-	        from t_eastmoney_node ten, t_hs300 th
+	        from t_eastmoney_node ten, t_stock_code th
 	        where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
 	          and ten.`date` not like '9999%'
 	          and th.fullStockCode = ten.stockCode
@@ -964,7 +964,7 @@
     <select id="queryDuoTouMA" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
             select th.stockCode , tenm.date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
-            from t_eastmoney_node_ma tenm , t_hs300 th
+            from t_eastmoney_node_ma tenm , t_stock_code th
             where date in (select max(date) from t_eastmoney_node_ma)
               and tenm .fullStockCode = th.fullStockCode
             order by 3, 2
@@ -997,7 +997,7 @@
                 and ten.`date` < '2099'
             )
             select th.stockCode ,min(t1.date_curr) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
-            from tmp_ans t1 , t_hs300 th , t_eastmoney_node_ma ma
+            from tmp_ans t1 , t_stock_code th , t_eastmoney_node_ma ma
             where chg_pre_0 > 0 and chg_pre_1 > 0 and chg_pre_2 > 0 and chg_pre_3 > 0 and chg_pre_4 > 0 -- and chg_pre_5 > 0
             and t1.stockCode = th.fullStockCode
             and th.stockCode not like '30%'
@@ -1033,7 +1033,7 @@
         )
         select -- th.stockCode, th.stockName , th.bkName , min(t.date) date_min, max(t.date) date_max
                th.stockCode ,min(t.date) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
-        from tmp_longtou t, t_hs300 th, tmp_3_bei tb
+        from tmp_longtou t, t_stock_code th, tmp_3_bei tb
         where (t.last >= t.last_pre_20 * 2 or t.last >= t.last_pre_5 * 1.2)
           and th.stockCode not like '30%'
           and th.stockCode not like '68%'
@@ -1080,7 +1080,7 @@
                 and t1.date <= t2.date
                 group by t1.high_pre_1, t1.date, t1.stockCode
                 having lowest > t1.high_pre_1
-                ) t1, t_hs300 th
+                ) t1, t_stock_code th
             where t1.stockCode = th.fullStockCode
               and th.stockCode not like '30%'
               and th.stockCode not like '68%'
@@ -1122,7 +1122,7 @@
                and chg_max_10 > 8 -- and chg > -2 and chg < 2
         )
         select th.stockCode, t1.date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
-        from tmp_ans t1, t_hs300 th
+        from tmp_ans t1, t_stock_code th
         where t1.stockCode = th.fullStockCode
           and th.stockCode not like '30%'
           and th.stockCode not like '68%'
@@ -1200,7 +1200,7 @@
                     , lag(t1.date_curr, 1) over (partition by stockCode order by t1.date_curr ) ans_date_pre_1
                     , t3d.date_pre_1
                     , concat(th.bkName, '-',  th.stockName) last, concat('', chg_next_2) ratioB
-            from tmp_ans t1 , t_hs300 th, tmp_30_duotou t3d
+            from tmp_ans t1 , t_stock_code th, tmp_30_duotou t3d
             where 1 = 1
               and chg_pre_0 >= -0.02 and chg_pre_1 >= -0.02 and chg_pre_2 >= -0.02 and chg_pre_3 >= -0.02 -- and chg_pre_4 >= -0.02 -- and chg_pre_5 > 0 -- 4、必须出现4日连涨
               and t1.stockCode = th.fullStockCode
@@ -1258,7 +1258,7 @@
             )
             select -- ta.date_curr, th.bkName , th.stockName , th.stockCode , th.fullStockCode , ta.chg_next_2
                   th.stockCode, ta.date_curr date, concat(th.bkName, '-',  th.stockName) last, concat('T+2: ', ta.chg_next_2) ratioB
-            from tmp_ans ta , t_hs300 th
+            from tmp_ans ta , t_stock_code th
             where ta.chg_pre_0 < 0 and chg_pre_1 < 0 and chg_pre_2 < 0 and  chg_pre_3 < 0 and chg_pre_4 < 0
             and ta._chg_0 < 0 and _chg_pre_1 < 0 and _chg_pre_1 < 0 and _chg_pre_1 < 0 and _chg_pre_1 < 0
             and volume_0 < LEAST (volume_pre_1, volume_pre_2, volume_pre_3, volume_pre_4)
@@ -1340,7 +1340,7 @@
                    -- distinct t1.fullStockCode, t1.bkName , t1.stockName  -- , t1.date
                    -- th.stockCode ,max(t1.date) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
                    #{calcDate}, max(t1.date), t1.fullStockCode, th.bkName, th.stockCode, th.stockName
-            from tmp_ma_dates t1, t_hs300 th
+            from tmp_ma_dates t1, t_stock_code th
             where 1 = 1 -- and t1.fullStockCode = '1.603659'
             and t1.fullStockCode = th.fullStockCode
             and exists (select 1 from tmp_sp_get t11 where t1.fullStockCode = t11.fullStockCode)
@@ -1382,7 +1382,7 @@
                    , round(avg(case when t1.date_rank <= 20 then t1.last else null end), 3) ma20
                    , round(avg(case when t1.date_rank <= 60 then t1.last else null end), 3) ma60
                    , max(t1.date) date
-            from tmp t1, t_hs300 th
+            from tmp t1, t_stock_code th
             where t1.stockCode = th.fullStockCode
             and th.stockCode not like '30%'
             and th.stockCode not like '68%'

@@ -1,6 +1,6 @@
 package net.my.mapper;
 
-import net.my.controller.AgNewSinaHistoryController;
+import net.my.controller.AgHistorySinaController;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -13,5 +13,5 @@ public interface AgSohuMapper {
     String getMaxDateFromStock();
     String getMaxDateFromEtf();
 
-    int saveDataSohu(List<AgNewSinaHistoryController.DataSohu> dataSohuList);
+    int saveDataSohu(List<AgHistorySinaController.DataSohu> dataSohuList);
 }

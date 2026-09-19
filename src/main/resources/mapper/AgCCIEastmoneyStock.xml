@@ -157,7 +157,7 @@
         , tmp_bigswing as (
 	        select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt
 	               , sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.04 then 1 else 0 end) big_swing_cnt
-	        from t_eastmoney_node ten, t_hs300 th
+	        from t_eastmoney_node ten, t_stock_code th
 	        where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
 	          and ten.`date` not like '9999%'
 	          and th.fullStockCode = ten.stockCode
@@ -182,7 +182,7 @@
                           , t2.date date_2
                           , concat(th.bkName, '-',  th.stockName) last
                           , concat('cci14: ', t1.cci14_2) ratioB,  th.fullStockCode
-	        from tmp_consider_cci t1, tmp_consider_vol t2, t_hs300 th
+	        from tmp_consider_cci t1, tmp_consider_vol t2, t_stock_code th
 	        where t2.date BETWEEN t1.date_pre_5 and t1.`date`
 	          and t1.stockCode = t2.stockCode
 	          and t1.stockCode = th.fullStockCode

@@ -9,7 +9,7 @@
         select *
         from (
                  select concat(case when stockType = 1 then 'sh' when stockType = 0 then 'sz' else '' end, stockCode) stockCode
-                 from t_hs300 th
+                 from t_stock_code th
                  union
                  select concat(case when stockType = 1 then 'sh' when stockType = 0 then 'sz' else '' end, stockCode) stockCode
                  from t_etf te

@@ -3,7 +3,7 @@ select * from t_eastmoney_node where date not like '99%' order by 1 desc;
 -- 1、将数据插入 t_eastmoney_node
 insert into t_eastmoney_node(`date` , stockCode , `open` , `last` , high , low , volume)
 select t1.day date, t2.fullStockCode stockCode, t1.open open, t1.`close` last, t1.high , t1.low, round(t1.volume/100,0)
-from t_sohu_data_history t1, t_hs300 t2
+from t_sohu_data_history t1, t_stock_code t2
 where replace(replace(t1.code, 'sh', '1.'), 'sz', '0.') = t2.fullStockCode
 and t1.day >= '2026-08-27';
 

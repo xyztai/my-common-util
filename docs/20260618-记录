@@ -57,7 +57,7 @@ with tmp_dates as (
 	       , sum(case when ten.`date` = td.date_next_3 then chg else 0 end) chg_next_3
 	       , sum(case when ten.`date` = td.date_next_4 then chg else 0 end) chg_next_4
 	       , td.date_next_0, date_next_1, date_next_2, date_next_3, date_next_4
-	from t_eastmoney_node_right tenr , t_eastmoney_node ten , t_hs300 th, tmp_dates td
+	from t_eastmoney_node_right tenr , t_eastmoney_node ten , t_stock_code th, tmp_dates td
 	where tenr.`date` = td.date_next_0
 	-- and substring(tenr.stockName , 1, 2) >= '07'
 	-- and ten.`date` < '3000'

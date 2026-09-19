@@ -27,10 +27,10 @@ import java.util.stream.Collectors;
 
 
 @RestController
-@RequestMapping("/ag-sina-history")
+@RequestMapping("/ag-history-sina")
 @Slf4j
 @Api(value = "ag", description = "ag接口")
-public class AgNewSinaHistoryController {
+public class AgHistorySinaController {
 
     @Autowired
     private RestTemplate restTemplate;

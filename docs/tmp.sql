@@ -21,7 +21,7 @@
                     and ten.stockCode not like '1.68%'
                     and ten.stockCode not like '1.30%'
                     and ten.last < 80
-                ) t , t_hs300 t3
+                ) t , t_stock_code t3
                 where t.stockCode = concat(t3.stockType , '.', t3.stockCode)
             )
             , tmp_stocks as (
@@ -41,7 +41,7 @@
 	                   , max(tt.`date` ) date
 	            from (
 		            select ten.*, t3.stockName , rank() over (partition by ten.stockCode order by ten.`date` desc) date_rn
-		            from t_eastmoney_node ten, tmp_stocks t2, t_hs300 t3
+		            from t_eastmoney_node ten, tmp_stocks t2, t_stock_code t3
 		            where ten.stockCode = t2.stockCode
 		            and ten.`date` >=  DATE_FORMAT(DATE_SUB(STR_TO_DATE('2026-02-22', '%Y-%m-%d'), INTERVAL 120 DAY), '%Y-%m-%d')
 		            and ten.`date` <= '2026-02-22'
@@ -55,7 +55,7 @@
                   , concat(ten.`date`, '\n',  t3.stockName) date
                   , ten.`last`
                   , concat(round(avg.avg_5, 3),'\n', round(avg.avg_10, 3),'\n', round(avg.avg_20, 3),'\n', round(avg.avg_60, 3) ) ratioB
-           from tmp_avg60 avg, t_eastmoney_node ten, t_hs300 t3
+           from tmp_avg60 avg, t_eastmoney_node ten, t_stock_code t3
            where ten.stockCode = concat(t3.stockType , '.', t3.stockCode)
            and avg.stockCode = ten.stockCode
            and ten.`date` = avg.`date`

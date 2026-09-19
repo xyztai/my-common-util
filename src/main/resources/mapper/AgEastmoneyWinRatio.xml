@@ -135,7 +135,7 @@ from (
             ) t2
             ) t3
             where tag_ + pre_tag_1 + pre_tag_2 + pre_tag_3 + pre_tag_4 + pre_tag_5 + pre_tag_6 = 7
-            ) t9, t_hs300 t3
+            ) t9, t_stock_code t3
         where t9.stockCode = concat(t3.stockType , '.', t3.stockCode )
           and t9.date >  DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d')
           and _9_zhuan != '00'
@@ -275,7 +275,7 @@ from (
             ) t2
             ) t3
             where tag_ + pre_tag_1 + pre_tag_2 + pre_tag_3 + pre_tag_4 + pre_tag_5 + pre_tag_6 = 7
-            ) t9, t_hs300 t3
+            ) t9, t_stock_code t3
         where t9.stockCode = concat(t3.stockType , '.', t3.stockCode )
           and t9.date >  DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d')
           and _9_zhuan != '00'
