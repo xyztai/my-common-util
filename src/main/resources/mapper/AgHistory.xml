@@ -11,48 +11,4 @@
         limit 1
     </select>
 
-    <insert id="saveNodeDatas" parameterType="java.util.List">
-        replace into ${tableName} (`date`, `stockCode`, `infoRaw`)
-        values
-        <foreach collection="eastmoneyNodes" item="item" separator=",">
-            (#{item.date}, #{item.stockCode}, #{item.infoRaw}
-            )
-        </foreach>
-    </insert>
-
-    <update id="updateNodeDatas">
-        update ${tableName}
-        set `date` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -11), ',', 1) ,
-        `open` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -10), ',', 1) ,
-        `last` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -9), ',', 1) ,
-        `high` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -8), ',', 1) ,
-        `low` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -7), ',', 1) ,
-        `volume` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -6), ',', 1) ,
-        `amount` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -5), ',', 1) ,
-        `chg` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -3), ',', 1) ,
-        -- SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -4), ',', 1),
-        -- SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -3), ',', 1),
-        -- SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -2), ',', 1),
-        `exchangeRaw` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -1), ',', 1)
-        where `open` is null
-    </update>
-
-    <select id="getAgDataTypeByCode" resultType="java.lang.String">
-<![CDATA[
-
-        select _type
-        from (
-                select fullStockCode, '1' _type
-	            from t_stock_code
-	            union
-	            select fullStockCode, '2'
-                from t_etf
-	            union
-	            select fullStockCode, '3'
-                from t_index
-        ) t
-        where fullStockCode = #{code}
-]]>
-    </select>
-
 </mapper>

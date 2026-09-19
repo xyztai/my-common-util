@@ -1,360 +1,418 @@
 package net.my.controller;
 
-import com.alibaba.fastjson.JSON;
-import com.google.gson.Gson;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiImplicitParam;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
-import net.my.interceptor.CurrentUser;
-import net.my.interceptor.LoginRequired;
-import net.my.mapper.DataCalcMapper;
-import net.my.pojo.*;
-import org.apache.commons.io.IOUtils;
-import org.apache.logging.log4j.util.Strings;
+import net.my.config.ScheduledTasks;
+import net.my.mapper.AgMapper;
+import net.my.pojo.AgDataType;
+import net.my.pojo.BaseResponse;
+import net.my.pojo.EastmoneyNode;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.io.Resource;
+import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ResourceUtils;
-import org.springframework.util.StringUtils;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
-import java.io.StringWriter;
 import java.math.BigDecimal;
-import java.net.URL;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
+import java.math.RoundingMode;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
+/**
+ * 计算实时的数据
+ * 基本逻辑，按照顺序去外网取数：1、先sina数据；2、后sohu数据
+ */
 @RestController
-@RequestMapping("/ag")
+@RequestMapping("/ag-today")
 @Slf4j
-@Api(value = "ag", description = "ag接口")
+@Api(value = "ag-today", description = "ag接口")
 public class AgController {
-
-    static Map<String, String> map = new LinkedHashMap<>();
-    static Map<String, String> eastmoneyMap = new LinkedHashMap<>();
-    static Map<String, String> eastmoneyHbyqCMap = new LinkedHashMap<>();
-
-    static Map<String, String> eastmoneyIndustryMap = new LinkedHashMap<>();
-
-    static {
-        map.put("sz50", "sh000016");
-        map.put("szzs", "sh000001");
-        map.put("hs300", "sz399300");
-        map.put("szcz", "sz399001");
-        map.put("kc50", "sh000688");
-        map.put("zz1000", "sh000852");
-        map.put("zz2000", "sz399303");
-        map.put("bz50", "bj899050");
-        map.put("hskjzs", "hkHSTECH");
-        map.put("nsdk100", "usNDX");
-        // map.put("zq", "sh600030"); // 中信证券
-        // map.put("ysjs", "sh000819");
-        // map.put("gfcy", "sh601012"); // 隆基
-        // map.put("ktjg", "sz930875");
-        // map.put("rjzs", "sh012637");
-        // map.put("hbyqC", "sh007844");
-        map.put("ljln", "sh601012"); // 隆基绿能
-        map.put("ndsd", "sz300750"); // 宁德时代
-        map.put("ymkd", "sh603259"); // 药明康德
-        map.put("tqly", "sz002466"); // 天齐锂业
-
-
-        eastmoneyMap.put("zq", "1.512880"); // 证券
-        eastmoneyMap.put("ysjs", "1.000819"); // 有色金属
-        eastmoneyMap.put("gfcy", "2.931151"); // 光伏产业
-        eastmoneyMap.put("ktjg", "2.930875"); // 空天军工
-        eastmoneyMap.put("rjzs", "2.H30202"); // 软件指数
-        eastmoneyMap.put("bj", "0.399997"); // 中证白酒
-        eastmoneyMap.put("mt", "0.399998"); // 中证煤炭
-        eastmoneyMap.put("yycx", "2.931484"); // 医药创新
-
-        eastmoneyHbyqCMap.put("hbyqC", "007844.OF");
-    }
-
-    /*
-    sz50	上证50
-    szzs	上证指数
-    hs300	沪深300
-    szcz	深证成指
-    kc50	科创50
-    zz1000	中证1000
-    zz2000	中证2000
-    bz50	北证50
-    hskjzs	恒生科技
-    zq	    证券
-    ysjs	有色金属
-    gfcy	光伏产业
-    ktjg	空天军工
-    rjzs	软件指数
-    hbyqC	华宝油气C
-    nsdk100	纳斯达克100
-     */
 
     @Autowired
     private MyCaffeineCache myCaffeineCache;
 
     @Autowired
-    private ApplicationContext applicationContext;
-
-    @Autowired
-    private DataCalcMapper dataCalcMapper;
+    private AgMapper agMapper;
 
     @Autowired
     private RestTemplate restTemplate;
 
-    public static final String URL_FORMAT = "https://proxy.finance.qq.com/ifzqgtimg/appstock/app/newfqkline/get?_var=kline_dayqfq&param=%s,day,,,%d,qfq";
-    public static final String EASTMONEY_URL_FORMAT =
-            "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=101&fqt=1&lmt=%d";
-    // public static final String EASTMONEY_URL_FORMAT_SUFFIX = "&end=20500000&iscca=1&fields1=f1%2Cf2%2Cf3%2Cf4%2Cf5%2Cf6%2Cf7%2Cf8&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61%2Cf62%2Cf63%2Cf64&ut=f057cbcbce2a86e2866ab8877db1d059&forcect=1";
-    public static final String EASTMONEY_URL_FORMAT_SUFFIX = "&end=20500000&fields1=f1,f2,f3,f4,f5,f6,f7,f8&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61,f62,f63,f64";
-    public static final String EASTMONEY_URL_FORMAT_HBYQC = "https://datacenter.eastmoney.com//securities/api/data/get?type=RPT_F10_FUND_PERNAV&sty=SECURITY_CODE,END_DATE,PER_NAV&filter=(SECUCODE=\"%s\")&source=HSF10&client=APP&p=1&ps=%d&sr=-1&st=END_DATE";
-    public static final String[] TYPES = {"sh000001"};
+    // demo
+    // https://w.sinajs.cn/list=sz000001,sh601666,sh513130,sh000001,sz399300
+    public static final String SINA_URL_FORMAT = "https://w.sinajs.cn/list=%s";
 
-    public static final int HISTORY_DAYS = 320;
 
-    public static final int DAYS_CNT = 1;
+    // demo
+    // https://hqm.stock.sohu.com/getqjson?code=cn_600875,cn_688082
+    public static final String SO_HU_URL_FORMAT = "https://hqm.stock.sohu.com/getqjson?code=%s";
 
-    // 将远程的json文件拉取到本地
-    public static void main(String[] args) {
-        String urlString = "https://quote.eastmoney.com/center/api/sidemenu.json"; // 获取行业基础信息的json
-        String filePath = "sidemenu.json"; // 本地文件路径
 
-        try (InputStream inputStream = new URL(urlString).openStream();
-             FileOutputStream outputStream = new FileOutputStream(filePath)
-        ) {
+    @ApiOperation(value = "获取最新的数据", notes = "访问互联网接口获取数据")
+    @GetMapping("stock-code")
+    @Transactional
+    public BaseResponse getTodayDataStockCode() {
+        AgDataType type = AgDataType.STOCK_CODE;
 
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-
-            System.out.println("JSON文件已保存至: " + filePath);
-            // 读取刚刚存的文件数据
-            if(true) {
-                String jsonString = new String(Files.readAllBytes(Paths.get(filePath)));
-                Gson gson = new Gson();
-                List<EastmoneyIndustryPOJO> list = JSON.parseArray(jsonString, EastmoneyIndustryPOJO.class);
-                System.out.println(list);
-                for(EastmoneyIndustryPOJO l1 : list) {
-                    if("沪深京板块".equals(l1.getTitle()) && !CollectionUtils.isEmpty(l1.getNext())) {
-                        List<EastmoneyIndustryPOJO> l2List = l1.getNext();
-                        for(EastmoneyIndustryPOJO l2 : l2List) {
-                            if("行业板块".equals(l2.getTitle()) && !CollectionUtils.isEmpty(l2.getNext())) {
-                                List<EastmoneyIndustryPOJO> l3List = l2.getNext();
-                                for(EastmoneyIndustryPOJO l3 : l3List) {
-                                    if(Strings.isNotEmpty(l3.getKey()) && l3.getKey().split("-").length > 1)
-                                        System.out.println(String.format("%s: %s", l3.getTitle(), l3.getKey().split("-")[1]));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-
-            // 读取resources下的文件数据
-            if(true) {
-                File file = ResourceUtils.getFile("sidemenu.json");
-                System.out.println(file.toPath().toAbsolutePath().toString());
-                String jsonString = org.apache.commons.io.FileUtils.readFileToString(file, StandardCharsets.UTF_8);
-                Gson gson = new Gson();
-                List<EastmoneyIndustryPOJO> list = JSON.parseArray(jsonString, EastmoneyIndustryPOJO.class);
-                System.out.println(list);
-                for(EastmoneyIndustryPOJO l1 : list) {
-                    if("沪深京板块".equals(l1.getTitle()) && !CollectionUtils.isEmpty(l1.getNext())) {
-                        List<EastmoneyIndustryPOJO> l2List = l1.getNext();
-                        for(EastmoneyIndustryPOJO l2 : l2List) {
-                            if("行业板块".equals(l2.getTitle()) && !CollectionUtils.isEmpty(l2.getNext())) {
-                                List<EastmoneyIndustryPOJO> l3List = l2.getNext();
-                                for(EastmoneyIndustryPOJO l3 : l3List) {
-                                    if(Strings.isNotEmpty(l3.getKey()) && l3.getKey().split("-").length > 1)
-                                        System.out.println(String.format("%s: %s", l3.getTitle(), l3.getKey().split("-")[1]));
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
+        if(ScheduledTasks.taskState != 0) {
+            log.info("taskState={},放弃本次执行", ScheduledTasks.taskState);
+            return BaseResponse.OK;
         }
-    }
-
-    @GetMapping("/industry")
-    public BaseResponse getIndustryHistoryData() {
-        Map<String, Object> resMap = new LinkedHashMap<>();
-        List<String> buyInfos = dataCalcMapper.getBuyInfo();
-        resMap.put("todayBuyInfosSize", CollectionUtils.isEmpty(buyInfos) ? 0 : buyInfos.size());
-        resMap.put("todayBuyInfos", buyInfos);
-        List<String> historyBuyRatioInfos = dataCalcMapper.getHistoryBuyRatio();
-        resMap.put("historyBuyRatioInfosSize", CollectionUtils.isEmpty(historyBuyRatioInfos) ? 0 : historyBuyRatioInfos.size());
-        resMap.put("historyBuyRatioInfos", historyBuyRatioInfos);
-        return RestGeneralResponse.of(resMap);
-    }
-
-
-    @GetMapping("/industry/{days}")
-    public BaseResponse getIndustryHistoryData(@PathVariable("days") Integer days) {
-        List<AgIndustryCalcBO> todoList = new ArrayList<>();
-        List<AgIndustryCalcBO> agIndustryCalcBOList = new ArrayList<>();
-        try {
-            eastmoneyIndustryMap.clear();
-            Resource resource = applicationContext.getResource("classpath:sidemenu.json");
-            // log.info("file-path: {}", resource.getFile().getAbsoluteFile());
-            InputStream inputStream = resource.getInputStream();
-            StringWriter writer = new StringWriter();
-            IOUtils.copy(inputStream, writer, "UTF-8");
-            String jsonString = writer.toString();
-            List<EastmoneyIndustryPOJO> l1List = JSON.parseArray(jsonString, EastmoneyIndustryPOJO.class);
-            for(EastmoneyIndustryPOJO l1 : l1List) {
-                if("沪深京板块".equals(l1.getTitle()) && !CollectionUtils.isEmpty(l1.getNext())) {
-                    List<EastmoneyIndustryPOJO> l2List = l1.getNext();
-                    for(EastmoneyIndustryPOJO l2 : l2List) {
-                        if("行业板块".equals(l2.getTitle()) && !CollectionUtils.isEmpty(l2.getNext())) {
-                            List<EastmoneyIndustryPOJO> l3List = l2.getNext();
-                            for(EastmoneyIndustryPOJO l3 : l3List) {
-                                if(Strings.isNotEmpty(l3.getKey()) && l3.getKey().split("-").length > 1) {
-                                    eastmoneyIndustryMap.put(l3.getTitle(), l3.getKey().split("-")[1]);
-                                    log.info("{}: {}", l3.getTitle(), l3.getKey().split("-")[1]);
-                                }
-                            }
-                        }
-                    }
-                }
+        log.info("getTodayDataStockCode-开始计算今天的数据");
+        ScheduledTasks.taskState = 1;
+        List<String> fullStockCodes = agMapper.getCodes(type.getTableName());
+        List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
+        // 1、先sina数据
+        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            eastmoneyNodeList = getQQResFromSina(fullStockCodes);
+        }
+        // 2、后sohu数据
+        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            eastmoneyNodeList = getQQResFromSohu(fullStockCodes);
+        }
+        // 3、其他的方法，从QQ或者从雪球，只能逐条记录去取，太慢了，不再使用那种方法，相关代码就不删除了
+        if(!CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            int startNum = 0;
+            int stepNum = 100;
+            while(startNum < eastmoneyNodeList.size()) {
+                List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
+                log.info("tmpNodes.size={}", tmpNodes.size());
+                agMapper.saveNodeDatas(type.getTableName(), tmpNodes);
+                startNum += stepNum;
             }
 
-            for(Map.Entry<String, String> entry : eastmoneyIndustryMap.entrySet()) {
-                String zqdm = entry.getValue();
-                String url = String.format(EASTMONEY_URL_FORMAT, zqdm, days) + EASTMONEY_URL_FORMAT_SUFFIX;
+            log.info("getTodayDataStockCode-开始更新基础字段");
+            // 更新基础字段
+            agMapper.updateNodeDatas(type.getTableName());
 
+        }
+
+        ScheduledTasks.taskState = 0;
+        return BaseResponse.OK;
+    }
+
+
+    @ApiOperation(value = "获取最新的数据", notes = "访问互联网接口获取数据")
+    @GetMapping("etf")
+    @Transactional
+    public BaseResponse getTodayDataEtf() {
+        AgDataType type = AgDataType.ETF;
+
+        if(ScheduledTasks.taskState != 0) {
+            log.info("taskState={},放弃本次执行", ScheduledTasks.taskState);
+            return BaseResponse.OK;
+        }
+        log.info("getTodayDataEtf-开始计算今天的数据");
+        ScheduledTasks.taskState = 1;
+        List<String> fullStockCodes = agMapper.getCodes(type.getTableName());
+        List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
+        // 1、先sina数据
+        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            eastmoneyNodeList = getQQResFromSina(fullStockCodes);
+        }
+        // 2、后sohu数据
+        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            eastmoneyNodeList = getQQResFromSohu(fullStockCodes);
+        }
+        // 3、其他的方法，从QQ或者从雪球，只能逐条记录去取，太慢了，不再使用那种方法，相关代码就不删除了
+        if(!CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            int startNum = 0;
+            int stepNum = 100;
+            while(startNum < eastmoneyNodeList.size()) {
+                List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
+                log.info("tmpNodes.size={}", tmpNodes.size());
+                agMapper.saveNodeDatas(type.getTableName(), tmpNodes);
+                startNum += stepNum;
+            }
+
+            log.info("getTodayDataEtf-开始更新基础字段");
+            // 更新基础字段
+            agMapper.updateNodeDatas(type.getTableName());
+
+        }
+
+        ScheduledTasks.taskState = 0;
+        return BaseResponse.OK;
+    }
+
+
+    @ApiOperation(value = "获取最新的数据", notes = "访问互联网接口获取数据")
+    @GetMapping("index")
+    @Transactional
+    public BaseResponse getTodayDataIndex() {
+        AgDataType type = AgDataType.INDEX;
+
+        if(ScheduledTasks.taskState != 0) {
+            log.info("taskState={},放弃本次执行", ScheduledTasks.taskState);
+            return BaseResponse.OK;
+        }
+        log.info("getTodayDataEtf-开始计算今天的数据");
+        ScheduledTasks.taskState = 1;
+        List<String> fullStockCodes = agMapper.getCodes(type.getTableName());
+        List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
+        // 1、先sina数据
+        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            eastmoneyNodeList = getQQResFromSina(fullStockCodes);
+        }
+        // 2、后sohu数据，指数sohu取不到
+//        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
+//            eastmoneyNodeList = getQQResFromSohu(fullStockCodes);
+//        }
+        // 3、其他的方法，从QQ或者从雪球，只能逐条记录去取，太慢了，不再使用那种方法，相关代码就不删除了
+        if(!CollectionUtils.isEmpty(eastmoneyNodeList)) {
+            int startNum = 0;
+            int stepNum = 100;
+            while(startNum < eastmoneyNodeList.size()) {
+                List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
+                log.info("tmpNodes.size={}", tmpNodes.size());
+                agMapper.saveNodeDatas(type.getTableName(), tmpNodes);
+                startNum += stepNum;
+            }
+
+            log.info("getTodayDataEtf-开始更新基础字段");
+            // 更新基础字段
+            agMapper.updateNodeDatas(type.getTableName());
+
+        }
+
+        ScheduledTasks.taskState = 0;
+        return BaseResponse.OK;
+    }
+
+
+    /**
+     * 从sina获取数据，支持code、etf、index
+     * 参数举例 ["0.000050", "0.000060"]
+     * @param fullStockCodes
+     * @return
+     * 返回结果里面只有3个有效字段：date、stockCode、infoRaw
+     */
+    List<EastmoneyNode> getQQResFromSina(List<String> fullStockCodes) {
+        if(CollectionUtils.isEmpty(fullStockCodes)) {
+            return null;
+        }
+
+        List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
+        Map<String, String> resMap = new HashMap<>();
+        List<String> allCodes = new ArrayList<>();
+        allCodes.addAll(fullStockCodes);
+
+        Map<String, String> nameMap = new HashMap<>();
+        // 结构为：{"sz000001":"0.000001"}
+        allCodes.forEach(f -> {
+            nameMap.put((f.substring(0, 2).equals("0.") ? "sz" : "sh") + f.substring(2), f);
+        });
+
+        List<String> allCodesCn = nameMap.keySet().stream().sorted().collect(Collectors.toList());
+        List<String> codes = new ArrayList<>();
+        int startNum = 0;
+        int stepNum = 300;
+        while(startNum < allCodesCn.size()) {
+            List<String> tmpNodes = allCodesCn.stream().skip(startNum).limit(stepNum)
+                    .collect(Collectors.toList());
+            log.info("tmpNodes.size={}", tmpNodes.size());
+            codes.add(String.join(",", tmpNodes));
+            startNum += stepNum;
+        }
+
+        log.info("targetSohuCodes size={}", codes.size());
+        for(String code : codes) {
+            log.info("sohuCode={}", code);
+
+            try {
+                Thread.sleep(2000);
+                String url = String.format(SINA_URL_FORMAT, code);
+                log.info("url: {}", url);
+
+                // 创建请求头
                 HttpHeaders headers = new HttpHeaders();
-                headers.setContentType(MediaType.APPLICATION_JSON_UTF8);
-                headers.set("Referer", "https://wap.eastmoney.com/");
-                headers.set("Origin", "https://wap.eastmoney.com");
-                headers.set("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36");
+                headers.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36");
+                headers.add("referer", "https://quotes.sina.cn");
 
-                log.info("url: {}, zqdm: {}, headers: {}", url, zqdm, JSON.toJSON(headers));
-                String res = "";
-                for(int i = 0; i < 200; i++) {
-                    try {
-                        Thread.sleep(200);
-                        log.info("try num={}, zqdm={}, url={}", i, zqdm, url);
-                        res = restTemplate.getForObject(url, String.class, headers);
-                        if(!StringUtils.isEmpty(res)) {
-                            break;
-                        }
-                    } catch (Exception ex) {
-                        ;
-                    }
-                }
-                if(StringUtils.isEmpty(res)) {
-                    continue;
-                }
+                // 创建HttpEntity
+                HttpEntity<String> entity = new HttpEntity<>(headers);
 
-                assert res != null;
-                log.info("url: {}, zqdm: {}, res: {}", url, zqdm, res);
-                String data = JSON.parseObject(res).getString("data");
-                String dayData = JSON.parseObject(data).getString("klines");
-                List<String> list = JSON.parseObject(dayData, List.class);
-                for(String obj : list) {
-                    String[] tmp = obj.split(",");
-                    String time = tmp[0];
-                    if("2023-01-03".compareTo(time) >= 0)
+                // 发送GET请求
+                ResponseEntity<String> response = restTemplate.exchange(
+                        url,
+                        HttpMethod.GET,
+                        entity,
+                        String.class
+                );
+
+                log.info("响应状态: " + response.getStatusCode());
+                log.info("响应体: " + response.getBody());
+                String res = response.getBody();
+                List<String> lines = Arrays.asList(res.split("\\R"));
+                for(String line : lines) {
+                    String[] entry = line.split("=");
+                    String key = entry[0].substring(11);
+                    String value = entry[1].replace("\"", "").replace(";", "");
+//                    30,1,3,4,5,8/100,9,round((4-5)/2*100,2),round(3/2*100 -100,2),3-2,0
+                    String[] fields = value.split(",");
+                    if(Double.parseDouble(fields[8]) == 0 || Double.parseDouble(fields[9]) == 0) {
                         continue;
-                    // Double oP = Double.parseDouble (((String)innerList.get(1)).replaceAll("\"", ""));
-                    Double cP = Double.parseDouble (tmp[2]);
-                    // Double hP = Double.parseDouble (((String)innerList.get(3)).replaceAll("\"", ""));
-                    // Double lP = Double.parseDouble (((String)innerList.get(4)).replaceAll("\"", ""));
-                    AgIndustryCalcBO bo = AgIndustryCalcBO.builder().name(entry.getKey()).type(zqdm).closePrice(cP).time(time).build();
-                    agIndustryCalcBOList.add(bo);
-                }
-            }
-            agIndustryCalcBOList = agIndustryCalcBOList.stream().sorted(Comparator.comparing(AgIndustryCalcBO::getName).thenComparing(AgIndustryCalcBO::getTime)).collect(Collectors.toList());
-            // expma_5: round((t.close_price - t3.`expma_5`)*2.0/(5.0+1) + t3.`expma_5`, 6) clac_expma_5
-            // expma_37: round((t.close_price - t3.`expma_37`)*2.0/(37.0+1) + t3.`expma_37`, 6) clac_expma_37
-            List<String> names = agIndustryCalcBOList.stream().map(AgIndustryCalcBO::getName).distinct().collect(Collectors.toList());
-            List<AgIndustryCalcBO> agIndustryCalcBOs = dataCalcMapper.getLastestIndustryData();
-            for(String name : names) {
-                List<AgIndustryCalcBO> tmpList = agIndustryCalcBOList.stream().filter(f -> name.equals(f.getName()))
-                        .sorted(Comparator.comparing(AgIndustryCalcBO::getTime)).collect(Collectors.toList());
-                if(!CollectionUtils.isEmpty(tmpList)) {
-                    if(!CollectionUtils.isEmpty(agIndustryCalcBOs) &&
-                            agIndustryCalcBOs.stream().anyMatch(f -> name.equals(f.getName()))) {
-                        AgIndustryCalcBO tmpBo = agIndustryCalcBOs.stream().filter(f -> name.equals(f.getName())).findFirst().get();
-                        log.info("tmpBo: {}", tmpBo);
-                        tmpList = tmpList.stream().filter(f -> f.getTime().compareTo(tmpBo.getTime()) > 0).collect(Collectors.toList());
-                        if(!CollectionUtils.isEmpty(tmpList) && tmpBo != null) {
-                            Double cp = tmpList.get(0).getClosePrice();
-                            Double expma5 = (cp - tmpBo.getExpma5()) * 2.0 / (5.0 + 1) + tmpBo.getExpma5();
-                            tmpList.get(0).setExpma5(getScaleDouble(expma5, 6));
-                            Double expma37 = (cp - tmpBo.getExpma37()) * 2.0 / (37.0 + 1) + tmpBo.getExpma37();
-                            tmpList.get(0).setExpma37(getScaleDouble(expma37, 6));
-                            Double sRation = expma5 / expma37;
-                            tmpList.get(0).setSRatio(getScaleDouble(sRation, 6));
-                            Double bRation = expma37 / expma5;
-                            tmpList.get(0).setBRatio(getScaleDouble(bRation, 6));
-                        }
-                    } else {
-                        tmpList.get(0).setExpma5(tmpList.get(0).getClosePrice());
-                        tmpList.get(0).setExpma37(tmpList.get(0).getClosePrice());
-                        tmpList.get(0).setSRatio(1.0);
-                        tmpList.get(0).setBRatio(1.0);
                     }
-                    if(!CollectionUtils.isEmpty(tmpList)) {
-                        for(int i = 1; i < tmpList.size(); i++) {
-                            Double cp = tmpList.get(i).getClosePrice();
-                            Double expma5 = (cp - tmpList.get(i - 1).getExpma5()) * 2.0 / (5.0 + 1) + tmpList.get(i - 1).getExpma5();
-                            tmpList.get(i).setExpma5(getScaleDouble(expma5, 6));
-                            Double expma37 = (cp - tmpList.get(i - 1).getExpma37()) * 2.0 / (37.0 + 1) + tmpList.get(i - 1).getExpma37();
-                            tmpList.get(i).setExpma37(getScaleDouble(expma37, 6));
-                            Double sRation = expma5 / expma37;
-                            tmpList.get(i).setSRatio(getScaleDouble(sRation, 6));
-                            Double bRation = expma37 / expma5;
-                            tmpList.get(i).setBRatio(getScaleDouble(bRation, 6));
-                        }
-                    }
-                    todoList.addAll(tmpList);
+
+                    resMap.put(nameMap.get(key),
+                            fields[30] + "," + fields[1] + "," + fields[3] + "," + fields[4] + "," + fields[5]
+                                    + "," + new BigDecimal(Double.parseDouble(fields[8])/100).setScale(0, RoundingMode.HALF_UP)
+                                    + "," + fields[9]
+                                    + "," + new BigDecimal((Double.parseDouble(fields[4]) - Double.parseDouble(fields[5]))/Double.parseDouble(fields[2]) * 100).setScale(2, RoundingMode.HALF_UP)
+                                    + "," + new BigDecimal(Double.parseDouble(fields[3])/Double.parseDouble(fields[2]) * 100 - 100).setScale(2, RoundingMode.HALF_UP)
+                                    + "," + new BigDecimal(Double.parseDouble(fields[3]) - Double.parseDouble(fields[2])).setScale(3, RoundingMode.HALF_UP)
+                                    + "," + "0"
+                    );
                 }
+            } catch (Exception ex) {
+                log.error("{}", ex);
+                return eastmoneyNodeList;
             }
-        } catch (Exception ex) {
-            log.error("", ex.getMessage(), ex);
-            ex.printStackTrace();
         }
-        todoList.forEach(f -> dataCalcMapper.delIndustryCalc(f.getType(), f.getTime()));
-        todoList.forEach(f -> dataCalcMapper.saveIndustryCalc(f));
-        Map<String, Object> resMap = new LinkedHashMap<>();
-        resMap.put("insertSize", todoList.size());
-        List<String> buyInfos = dataCalcMapper.getBuyInfo();
-        resMap.put("todayBuyInfos", buyInfos);
-        List<String> historyBuyRatioInfos = dataCalcMapper.getHistoryBuyRatio();
-        resMap.put("historyBuyRatioInfos", historyBuyRatioInfos);
-        return RestGeneralResponse.of(resMap);
+
+        if(!CollectionUtils.isEmpty(resMap)) {
+            log.info("start log resMap, size={}", resMap.size());
+            resMap.entrySet().forEach(f -> {
+                log.info("key={}, value={}", f.getKey(), f.getValue());
+            });
+        }
+
+        if (!CollectionUtils.isEmpty(resMap)) {
+            for (Map.Entry<String, String> entry : resMap.entrySet()) {
+                String item = entry.getValue();
+                String[] xxs = item.split(",");
+                eastmoneyNodeList.add(EastmoneyNode.builder().date(xxs[0]).stockCode(entry.getKey()).infoRaw(item).build());
+            }
+        }
+
+        return eastmoneyNodeList;
     }
 
-    private Double getScaleDouble(Double dou, int scale) {
-        BigDecimal bd = new BigDecimal(dou);
-        return bd.setScale(scale, BigDecimal.ROUND_HALF_UP).doubleValue();
+
+
+    /**
+     * 从sohu获取数据，不能获取指数的
+     * 参数举例 ["0.000050", "0.000060"]
+     * @param fullStockCodes
+     * @return
+     * 返回结果里面只有3个有效字段：date、stockCode、infoRaw
+     */
+    List<EastmoneyNode> getQQResFromSohu(List<String> fullStockCodes) {
+        if(CollectionUtils.isEmpty(fullStockCodes)) {
+            return null;
+        }
+
+        List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
+        Map<String, String> resMap = new HashMap<>();
+        List<String> allCodes = new ArrayList<>();
+        allCodes.addAll(fullStockCodes);
+
+        Map<String, String> nameMap = new HashMap<>();
+        // 结构为：{"cn_000001":"0.000001"}
+        allCodes.forEach(f -> {
+            nameMap.put("cn_" + f.substring(2), f);
+        });
+
+        List<String> allCodesCn = nameMap.keySet().stream().sorted().collect(Collectors.toList());
+        List<String> targetSohuCodes = new ArrayList<>();
+        int startNum = 0;
+        int stepNum = 100;
+        while(startNum < allCodesCn.size()) {
+            List<String> tmpNodes = allCodesCn.stream().skip(startNum).limit(stepNum)
+                    .collect(Collectors.toList());
+            log.info("tmpNodes.size={}", tmpNodes.size());
+            targetSohuCodes.add(String.join(",", tmpNodes));
+            startNum += stepNum;
+        }
+
+        log.info("targetSohuCodes size={}", targetSohuCodes.size());
+        for(String sohuCode : targetSohuCodes) {
+            log.info("sohuCode={}", sohuCode);
+
+            try {
+                Thread.sleep(2000);
+                String url = String.format(SO_HU_URL_FORMAT, sohuCode);
+                log.info("url: {}", url);
+
+                // 创建请求头
+                HttpHeaders headers = new HttpHeaders();
+                headers.add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/144.0.0.0 Safari/537.36");
+
+                // 创建HttpEntity
+                HttpEntity<String> entity = new HttpEntity<>(headers);
+
+                // 发送GET请求
+                ResponseEntity<String> response = restTemplate.exchange(
+                        url,
+                        HttpMethod.GET,
+                        entity,
+                        String.class
+                );
+
+                log.info("响应状态: " + response.getStatusCode());
+                log.info("响应体: " + response.getBody());
+                String res = response.getBody();
+                Map<String, Object> soHuRes = com.alibaba.fastjson2.JSON.parseObject(res, Map.class);
+                log.info("soHuRes={}", com.alibaba.fastjson2.JSON.toJSON(soHuRes));
+                for(Map.Entry<String, Object> entry : soHuRes.entrySet()) {
+                    String key = entry.getKey();
+                    Object obj = entry.getValue();
+                    List<String> values = com.alibaba.fastjson2.JSON.parseArray(obj.toString(), String.class);
+                    List<String> targetValues = new ArrayList<>();
+                    if(
+                            (long)Double.parseDouble(values.get(3).replace("+", "").replace("%", "")) * 10000 == 0
+                                    && (long)Double.parseDouble(values.get(5)) == 0
+                                    && (long)Double.parseDouble(values.get(7)) == 0
+                    ) {
+                        continue;
+                    }
+
+                    targetValues.add(values.get(17).substring(0, 10));
+                    targetValues.add(values.get(14));
+                    targetValues.add(values.get(2));
+                    targetValues.add(values.get(10));
+                    targetValues.add(values.get(11));
+                    targetValues.add(String.format("%d", (long)Double.parseDouble(values.get(5))));
+                    targetValues.add(String.format("%d", (long)Double.parseDouble(values.get(7))*10000));
+                    targetValues.add("0");
+                    targetValues.add(values.get(3).replace("+", "").replace("%", ""));
+                    targetValues.add(values.get(4).replace("+", "").replace("%", ""));
+                    targetValues.add(values.get(8).replace("+", "").replace("%", ""));
+
+                    resMap.put(nameMap.get(key), String.join(",", targetValues));
+                }
+
+            } catch (Exception ex) {
+                log.error("{}", ex);
+                return eastmoneyNodeList;
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(resMap)) {
+            log.info("start log resMap, size={}", resMap.size());
+            resMap.entrySet().forEach(f -> {
+                log.info("key={}, value={}", f.getKey(), f.getValue());
+            });
+        }
+
+        if(!CollectionUtils.isEmpty(resMap)) {
+            for(Map.Entry<String, String> entry : resMap.entrySet()) {
+                String item = entry.getValue();
+                String[] xxs = item.split(",");
+                eastmoneyNodeList.add(EastmoneyNode.builder().date(xxs[0]).stockCode(entry.getKey()).infoRaw(item).build());
+            }
+        }
+
+        return eastmoneyNodeList;
     }
-
-
-
 
 
 }

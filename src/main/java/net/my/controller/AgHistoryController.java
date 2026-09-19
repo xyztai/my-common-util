@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.my.exception.CommonException;
 import net.my.mapper.AgHistoryMapper;
+import net.my.mapper.AgMapper;
 import net.my.pojo.AgDataType;
 import net.my.pojo.BaseResponse;
 import net.my.pojo.EastmoneyNode;
@@ -27,6 +28,7 @@ import java.util.stream.Collectors;
 
 /**
  * 根据表 t_eastmoney_node_str 提取全量的历史数据，但是只能逐个取解析，因为量太大了，接口就会被封
+ * 这个接口非常重要
  */
 @RestController
 @RequestMapping("/ag-history")
@@ -46,19 +48,19 @@ public class AgHistoryController {
     private DataTypeService dataTypeService;
 
     @Autowired
+    private AgMapper agMapper;
+
+    @Autowired
     private AgHistoryMapper agHistoryMapper;
 
     @Autowired
     private RestTemplate restTemplate;
 
-    @Autowired
-    private AgNewSinaController agNewSinaController;
-
     @ApiOperation(value = "获取历史的cp数据（用来补历史数据）zqdm=1.000001", notes = "访问互联网接口获取数据")
     @GetMapping("/historyAll/{zqdm}")
     @Transactional
-    public BaseResponse getHistoryData(@PathVariable("zqdm") String zqdm) {
-        log.info("getHistoryData zqdm={}", zqdm);
+    public BaseResponse historyAll(@PathVariable("zqdm") String zqdm) {
+        log.info("historyAll zqdm={}", zqdm);
 
         // 先判断是否存在，如果存在，则直接取表中的数据，否则就需要访问网络接口，获取数据
         String url = String.format(EASTMONEY_URL_FORMAT_QFQ, zqdm);
@@ -70,7 +72,6 @@ public class AgHistoryController {
         }
 
         try {
-            log.info("/historyAll/{}, url={}", zqdm, url);
             String res = "";
             String tableValue = agHistoryMapper.getStr(zqdm);
             if(!StringUtils.isEmpty(res)) {
@@ -78,6 +79,7 @@ public class AgHistoryController {
                 res = tableValue;
                 log.info("agHistoryMapper.getStr res={}", res);
             } else {
+                log.info("/historyAll/{}, url={}", zqdm, url);
                 // 需要访问网络获取
                 res = restTemplate.getForObject(url, String.class);
                 log.info("restTemplate.getForObject res={}", res);
@@ -118,13 +120,13 @@ public class AgHistoryController {
         while(startNum < eastmoneyNodeList.size()) {
             List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
             log.info("插入infoRaw字段 tmpNodes.size={}", tmpNodes.size());
-            agHistoryMapper.saveNodeDatas(agDataType.getTableName(), tmpNodes);
+            agMapper.saveNodeDatas(agDataType.getTableName(), tmpNodes);
             startNum += stepNum;
         }
 
         log.info("根据infoRaw字段,更新基础字段");
         // 更新基础字段
-        agHistoryMapper.updateNodeDatas(agDataType.getTableName());
+        agMapper.updateNodeDatas(agDataType.getTableName());
 
         return BaseResponse.OK;
     }
