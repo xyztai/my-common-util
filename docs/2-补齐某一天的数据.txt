@@ -1,3 +1,9 @@
 
 1、定时任务同时写入了 t_eastmoney_node/t_eastmoney_node_etf/t_eastmoney_node_index 当天表，以及 t_kline_data_real_time 表；
 2、如果 t_eastmoney_node/t_eastmoney_node_etf/t_eastmoney_node_index 没有数据，
+2.1、可以从t_kline_data_real_time同步过来；
+2.2、如果 t_kline_data_real_time 也没有，则可以从c 的服务器上去取文件，解析落库到t_kline_data_real_time表
+cat 20260911.txt | awk -F'~' '{print  "replace into t_kline_data_real_time(source, kline_time, code, kline_str, day, stock_name, open, last, high, low, volume, amount, chg, zheng_fu, exchangeRaw, ttm, pe, vr) values(\047qq""\047,\047"$31"\047,\047"substr($1,3,8)"\047,\047"$0"\047,\047"substr($31,1,8)"\047,\047"$2"\047,\047"$6"\047,\047"$4"\047,\047"$34"\047,\047"$35"\047,\047"$7"\047,\047"$38"\047,\047"$33"\047,\047"$44"\047,\047"$39"\047,\047"$40"\047,\047"$54"\047,\047"$50"\047);"}' > ans.txt
+
+
+
