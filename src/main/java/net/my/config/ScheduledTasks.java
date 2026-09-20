@@ -78,7 +78,9 @@ public class ScheduledTasks {
     @Value("${executeOnceTaskEnable}")
     private Boolean executeOnceTaskEnable;
 
-    public static Integer taskState = 0; // 为0说明是没人在用，可以执行，如果为1，则不能执行
+    public static Integer taskState4Method = 0; // 为0说明是没人在用，可以执行，如果为1，则不能执行
+    public static Integer taskState4DataGet = 0; // 为0说明是没人在用，可以执行，如果为1，则不能执行
+    public static Integer taskState4DataCalc = 0; // 为0说明是没人在用，可以执行，如果为1，则不能执行
 
 
 //    /**
@@ -228,11 +230,11 @@ public class ScheduledTasks {
     }
 
     public void triggerOnce() {
-        if(taskState != 0) {
-            log.info("taskState={},放弃本次执行", taskState);
+        if(taskState4DataGet != 0) {
+            log.info("taskState4DataGet={},放弃本次执行", taskState4DataGet);
             return;
         }
-        taskState = 1;
+        taskState4DataGet = 1;
 
         // 获得当天数据
         log.info("getTodayDataStockCode start");
@@ -253,13 +255,18 @@ public class ScheduledTasks {
 //        log.info("task 获取index的历史数据 end");
 
         execCalc();
-        taskState = 0;
+        taskState4DataGet = 0;
     }
 
     /**
      * 基于已有的数据，进行数据计算
      */
     void execCalc() {
+        if(taskState4DataCalc != 0) {
+            log.info("taskState4DataCalc={},放弃本次执行", taskState4DataCalc);
+            return;
+        }
+        taskState4DataCalc = 1;
 
         // 1、先计算9倍成交量的数据
         log.info("task stock calcVolMulti9OneDay start");
@@ -815,5 +822,7 @@ public class ScheduledTasks {
 //            // 将数据插入表中
 //            agEastmoneyWinRatioMapper.saveWinRatio(allRatio);
 //        }
+
+        taskState4DataCalc = 0;
     }
 }

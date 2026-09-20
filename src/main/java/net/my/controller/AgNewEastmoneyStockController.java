@@ -1257,20 +1257,20 @@ public class AgNewEastmoneyStockController {
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
-    @ApiOperation(value = "获取历史的cp数据", notes = "访问互联网接口获取数据")
-    @GetMapping("/historyAll")
-    @Transactional
-    public BaseResponse getHistoryDataOuter() {
-        if(ScheduledTasks.taskState != 0) {
-            log.info("taskState={},放弃本次执行", ScheduledTasks.taskState);
-            return BaseResponse.OK;
-        }
-        ScheduledTasks.taskState = 1;
-
-        BaseResponse response = getHistoryData();
-        ScheduledTasks.taskState = 0;
-        return response;
-    }
+//    @ApiOperation(value = "获取历史的cp数据", notes = "访问互联网接口获取数据")
+//    @GetMapping("/historyAll")
+//    @Transactional
+//    public BaseResponse getHistoryDataOuter() {
+//        if(ScheduledTasks.taskState4Method != 0) {
+//            log.info("taskState={},放弃本次执行", ScheduledTasks.taskState4Method);
+//            return BaseResponse.OK;
+//        }
+//        ScheduledTasks.taskState4Method = 1;
+//
+//        BaseResponse response = getHistoryData();
+//        ScheduledTasks.taskState4Method = 0;
+//        return response;
+//    }
 
     @Transactional
     public BaseResponse getHistoryData() {
