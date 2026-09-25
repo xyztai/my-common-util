@@ -62,12 +62,7 @@ public class AgController {
     public BaseResponse getTodayDataStockCode() {
         AgDataType type = AgDataType.STOCK_CODE;
 
-        if(ScheduledTasks.taskState4Method != 0) {
-            log.info("taskState={},放弃本次执行", ScheduledTasks.taskState4Method);
-            return BaseResponse.OK;
-        }
         log.info("getTodayDataStockCode-开始计算今天的数据");
-        ScheduledTasks.taskState4Method = 1;
         List<String> fullStockCodes = agMapper.getCodes(type.getCodeTableName());
         List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
         // 1、先sina数据
@@ -95,7 +90,6 @@ public class AgController {
 
         }
 
-        ScheduledTasks.taskState4Method = 0;
         return BaseResponse.OK;
     }
 
@@ -106,12 +100,7 @@ public class AgController {
     public BaseResponse getTodayDataEtf() {
         AgDataType type = AgDataType.ETF;
 
-        if(ScheduledTasks.taskState4Method != 0) {
-            log.info("taskState={},放弃本次执行", ScheduledTasks.taskState4Method);
-            return BaseResponse.OK;
-        }
         log.info("getTodayDataEtf-开始计算今天的数据");
-        ScheduledTasks.taskState4Method = 1;
         List<String> fullStockCodes = agMapper.getCodes(type.getCodeTableName());
         List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
         // 1、先sina数据
@@ -139,7 +128,6 @@ public class AgController {
 
         }
 
-        ScheduledTasks.taskState4Method = 0;
         return BaseResponse.OK;
     }
 
@@ -150,12 +138,7 @@ public class AgController {
     public BaseResponse getTodayDataIndex() {
         AgDataType type = AgDataType.INDEX;
 
-        if(ScheduledTasks.taskState4Method != 0) {
-            log.info("taskState={},放弃本次执行", ScheduledTasks.taskState4Method);
-            return BaseResponse.OK;
-        }
         log.info("getTodayDataEtf-开始计算今天的数据");
-        ScheduledTasks.taskState4Method = 1;
         List<String> fullStockCodes = agMapper.getCodes(type.getCodeTableName());
         List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
         // 1、先sina数据
@@ -183,7 +166,6 @@ public class AgController {
 
         }
 
-        ScheduledTasks.taskState4Method = 0;
         return BaseResponse.OK;
     }
 
