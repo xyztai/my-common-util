@@ -46,6 +46,9 @@ public class ScheduledTasks {
     private AgCCIController agCCIController;
 
     @Autowired
+    private AgMAController agMAController;
+
+    @Autowired
     private TmpMapper tmpMapper;
 
     @Autowired
@@ -290,6 +293,14 @@ public class ScheduledTasks {
         log.info("task etf cci start");
         agCCIController.historyAllEtf();
         log.info("task etf cci end");
+
+        // 6、此处有计算ma
+        log.info("task stock ma start");
+        agMAController.historyAllStock();
+        log.info("task stock ma end");
+        log.info("task etf ma start");
+        agMAController.historyAllEtf();
+        log.info("task etf ma end");
 
         // 开始进行查询缓存
         ExecutorService executor = Executors.newFixedThreadPool(5);
