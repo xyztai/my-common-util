@@ -1183,12 +1183,12 @@ public class AgNewEastmoneyStockController {
     @GetMapping("/eastmoney-daily-cnt")
     public BaseResponse getDailyCnt() {
         log.info("getDailyCnt");
-        String key = "stock#" + "getDailyCnt";
-        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
-        if(res != null) {
-            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
-            return RestGeneralResponse.of(res);
-        }
+//        String key = "stock#" + "getDailyCnt";
+//        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+//        if(res != null) {
+//            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
+//            return RestGeneralResponse.of(res);
+//        }
 
         List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.getDailyCnt();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
@@ -1204,8 +1204,8 @@ public class AgNewEastmoneyStockController {
             buyDataFromEastmoneys = Arrays.asList(empty);
         }
 
-        myCaffeineCache.put(key, buyDataFromEastmoneys);
-        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
+//        myCaffeineCache.put(key, buyDataFromEastmoneys);
+//        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
