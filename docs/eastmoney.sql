@@ -22,26 +22,6 @@ CREATE TABLE `t_eastmoney_node` (
 ) ENGINE=InnoDB COMMENT='从东财获取的hs300的历史数据'
 
 
-CREATE TABLE `t_eastmoney_node_buy` (
-  `id` int NOT NULL AUTO_INCREMENT,
-  `date` varchar(100) DEFAULT NULL,
-  `stockCode` varchar(200) DEFAULT NULL,
-  `last` double DEFAULT NULL,
-  `clac_expma_5` double DEFAULT NULL,
-  `clac_expma_10` double DEFAULT NULL,
-  `ratioB` double DEFAULT NULL,
-  `rank_` int NOT NULL,
-  `period_cnt_` int NOT NULL,
-  `rank_limit_` int NOT NULL,
-  `create_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP,
-  `update_time` timestamp NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-  PRIMARY KEY (`id`),
-  KEY `t_q_n_d` (`date`),
-  UNIQUE KEY `t_q_n_d_s` (`date`,`stockCode`)
-) ENGINE=InnoDB COMMENT='可以操作买入的历史记录';
-
-
-
 drop table t_etf;
 CREATE TABLE `t_etf` (
                          `id` int NOT NULL AUTO_INCREMENT,

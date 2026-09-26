@@ -373,30 +373,6 @@ public class AgNewEastmoneyStockController {
     }
 
 
-//    /**
-//     * 1、根据 t_eastmoney_node_buy 表获取最近的300条记录
-//     * @return
-//     */
-//    @GetMapping("/special-care-days-eastmoney")
-//    public BaseResponse specialCareDaysEastmoney() {
-//        log.info("specialCareDaysEastmoney");
-//
-//        String key = "special-care-days-eastmoney";
-//        List<SpecialCarePoJo> res = (List<SpecialCarePoJo>) myCaffeineCache.get(key);
-//        if(res != null) {
-//            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
-//            return RestGeneralResponse.of(res);
-//        }
-//
-//        List<SpecialCarePoJo> buyDataFromEastmoneys = agEastmoneyStockMapper.queryEastmoneyExistedBuyData();
-//        buyDataFromEastmoneys = buyDataFromEastmoneys.stream().filter(f -> !f.getStockCode().startsWith("688") && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
-//
-//        myCaffeineCache.put(key, buyDataFromEastmoneys);
-//        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
-//        return RestGeneralResponse.of(buyDataFromEastmoneys);
-//    }
-
-
     /**
      * 101、
      * * @return

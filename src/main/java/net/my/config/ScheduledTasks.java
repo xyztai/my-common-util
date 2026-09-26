@@ -49,12 +49,6 @@ public class ScheduledTasks {
     private AgMAController agMAController;
 
     @Autowired
-    private TmpMapper tmpMapper;
-
-    @Autowired
-    private TmpController tmpController;
-
-    @Autowired
     private KLineRealTimeController KLineRealTimeController;
 
     @Autowired
@@ -208,26 +202,6 @@ public class ScheduledTasks {
      * 2、计算数据后，为查询进行数据缓存
      */
     void execQuery() {
-        // 1、先计算9倍成交量的数据
-        log.info("task stock calcVolMulti9OneDay start");
-        tmpController.calcVolMulti9OneDay(null);
-        log.info("task stock calcVolMulti9OneDay end");
-
-        // 2、再计算均值
-        log.info("task stock calcAvg start");
-        tmpController.calcAvg(null);
-        log.info("task stock calcAvg end");
-
-        // 3、再计算均值的胜率
-        log.info("task stock calcAvgWinRatioOneDay start");
-        List<String> datesAvgWinRatio = tmpMapper.getDatesAvgWinRatioDefault();
-        if(!CollectionUtils.isEmpty(datesAvgWinRatio)) {
-            for(String d : datesAvgWinRatio) {
-                log.info("datesAvgWinRatio calcD={}", d);
-                tmpController.calcAvgWinRatioOneDay(d);
-            }
-        }
-        log.info("task stock calcAvgWinRatioOneDay end");
 
         // 清空缓存
         log.info("task 清空缓存");
