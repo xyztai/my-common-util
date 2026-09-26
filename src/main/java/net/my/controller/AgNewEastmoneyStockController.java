@@ -1008,8 +1008,6 @@ public class AgNewEastmoneyStockController {
             return RestGeneralResponse.of(res);
         }
 
-        // 计算MA
-        genMA();
         // 计算多头数据
         genDuoTou();
         List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryDuoTou();
@@ -1131,19 +1129,6 @@ public class AgNewEastmoneyStockController {
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
-
-    public void genMA() {
-        log.info("genMA start");
-        List<String> calcDates = agEastmoneyStockMapper.getCalcDatesFromMA();
-        if(!CollectionUtils.isEmpty(calcDates)) {
-            for(String calcDate : calcDates) {
-                log.info("genMA calcDate={} start", calcDate);
-                agEastmoneyStockMapper.genMA(calcDate);
-                log.info("genMA calcDate={} end", calcDate);
-            }
-        }
-        log.info("genMA end");
-    }
 
     public void genDuoTou() {
         log.info("genDuoTou start");

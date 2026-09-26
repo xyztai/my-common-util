@@ -49,7 +49,6 @@ public interface AgEastmoneyStockMapper {
     List<String> getCalcDatesFromDuoTou();
     int genDuoTou(@Param("calcDate") String calcDate);
     List<String> getCalcDatesFromMA();
-    int genMA(@Param("calcDate") String calcDate);
 
     int saveRightData(List<SpecialCarePoJo2> eastmoneyNodes);
     String getMaxDate();

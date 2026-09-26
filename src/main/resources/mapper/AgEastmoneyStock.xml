@@ -966,7 +966,8 @@
             select th.stockCode , tenm.date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
             from t_eastmoney_node_ma tenm , t_stock_code th
             where date in (select max(date) from t_eastmoney_node_ma)
-              and tenm .fullStockCode = th.fullStockCode
+              and tenm .stockCode = th.fullStockCode
+              and tenm.ma5 >= tenm.ma10 and tenm.ma10 >= tenm.ma20 and tenm.ma20 >= tenm.ma30 and tenm.ma30 >= tenm.ma60
             order by 3, 2
         ]]>
     </select>
@@ -1002,7 +1003,7 @@
             and t1.stockCode = th.fullStockCode
             and th.stockCode not like '30%'
             and th.stockCode not like '68%'
-            and ma.fullStockCode  = t1.stockCode
+            and ma.stockCode  = t1.stockCode
             and ma.`date` = t1.date_curr
             group by th.bkName, th.stockName, th.stockCode
             having min(t1.date_curr) > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
@@ -1290,10 +1291,10 @@
             )
             , tmp_ma_dates as (
                 select tenm.*
-                       , rank() over (partition by tenm.stockName order by tenm.`date` desc) date_rank_ma
+                       , rank() over (partition by tenm.stockCode order by tenm.`date` desc) date_rank_ma
                 from t_eastmoney_node_ma tenm, tmp_calc_date
                 where date >= small_date_1 and date <= big_date
-                order by fullStockCode , date_rank_ma
+                order by stockCode , date_rank_ma
             ) -- select * from tmp_ma_dates t where t.fullStockCode = '1.603659';
             , tmp_ten_dates as (
                 select ten.stockCode
@@ -1314,38 +1315,38 @@
             ) -- select * from tmp_ten_max_min where stockCode = '1.603659';
             , tmp_sp_get as (
                 select -- t1.*
-                       t1.fullStockCode, t1.bkName , t1.stockName, count(1) cnt, ten.chg_max, max(t1.date) date
+                       t1.stockCode, count(1) cnt, ten.chg_max, max(t1.date) date
                 from tmp_ma_dates t1, tmp_ten_max_min ten
                 where 1 = 1
                 and t1.date_rank_ma <= 5
-                and t1.fullStockCode = ten.stockCode
+                and t1.stockCode = ten.stockCode
                 and t1.`date` BETWEEN ten.date_min and ten.date_max
-                group by t1.fullStockCode, t1.bkName , t1.stockName
+                group by t1.stockCode
                 having cnt >= 3 and chg_max > 5
                 -- and ten.chg > 5
             ) -- select distinct t1.fullStockCode, t1.bkName , t1.stockName , t1.date, chg_max, cnt  from tmp_sp_get t1 where t1.fullStockCode = '1.603659' order by t1.date desc;
             , tmp_sp_drop as (
                 select -- t1.*
-                       distinct t1.fullStockCode, t1.bkName , t1.stockName -- , t1.date
+                       distinct t1.stockCode -- , t1.date
                 from tmp_ma_dates t1, t_eastmoney_node ten, tmp_ten_dates ttd
                 where t1.date_rank_ma <= 5
-                and t1.fullStockCode = ten.stockCode
+                and t1.stockCode = ten.stockCode
                 and t1.date = ten.date
                 and ttd.date_rank <= 5
-                and t1.fullStockCode = ttd.stockCode
+                and t1.stockCode = ttd.stockCode
                 and t1.date = ttd.date
                 and ten.chg < -8
             ) -- select distinct t1.fullStockCode, t1.bkName , t1.stockName , t1.date  from tmp_sp_drop t1 order by t1.date desc;
             select -- t1.*
                    -- distinct t1.fullStockCode, t1.bkName , t1.stockName  -- , t1.date
                    -- th.stockCode ,max(t1.date) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
-                   #{calcDate}, max(t1.date), t1.fullStockCode, th.bkName, th.stockCode, th.stockName
+                   #{calcDate}, max(t1.date), t1.stockCode, th.bkName, th.stockCode, th.stockName
             from tmp_ma_dates t1, t_stock_code th
             where 1 = 1 -- and t1.fullStockCode = '1.603659'
-            and t1.fullStockCode = th.fullStockCode
-            and exists (select 1 from tmp_sp_get t11 where t1.fullStockCode = t11.fullStockCode)
-            and not exists (select 1 from tmp_sp_drop t12 where t1.fullStockCode = t12.fullStockCode)
-            group by t1.fullStockCode, th.bkName, th.stockCode, th.stockName
+            and t1.stockCode = th.fullStockCode
+            and exists (select 1 from tmp_sp_get t11 where t1.stockCode = t11.stockCode)
+            and not exists (select 1 from tmp_sp_drop t12 where t1.stockCode = t12.stockCode)
+            group by t1.stockCode, th.bkName, th.stockCode, th.stockName
             order by 4, 5
         ]]>
     </insert>
@@ -1357,43 +1358,6 @@
         and ten.`date` not like '9999%'
         order by 1
     </select>
-
-    <insert id="genMA" >
-        <![CDATA[
-            replace into t_eastmoney_node_ma(fullStockCode, bkName, stockName, last, ma5, ma10, ma20, ma60, date)
-            with tmp as (
-                select `date`
-                        -- , lag(`date`, 1) over (partition by stockCode order by ten.`date` ) data_pre_1
-                        -- , lag(`date`, 60) over (partition by stockCode order by ten.`date` ) data_pre_60
-                        , rank() over (partition by stockCode order by ten.`date` desc) date_rank
-                        , last
-                        , stockCode
-                from t_eastmoney_node ten
-                where ten.`date` <= #{calcDate}
-                AND ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d'), INTERVAL -120 DAY), '%Y-%m-%d')
-                and ten.`date` not like '9999%'
-                -- and ten.stockCode = '0.002025'
-                order by ten.`date` desc
-            )
-            select t1.stockCode, th.bkName, th.stockName
-                   , avg(case when t1.date_rank <= 1 then t1.last else null end) `last`
-                   , round(avg(case when t1.date_rank <= 5 then t1.last else null end), 3) ma5
-                   , round(avg(case when t1.date_rank <= 10 then t1.last else null end), 3) ma10
-                   , round(avg(case when t1.date_rank <= 20 then t1.last else null end), 3) ma20
-                   , round(avg(case when t1.date_rank <= 60 then t1.last else null end), 3) ma60
-                   , max(t1.date) date
-            from tmp t1, t_stock_code th
-            where t1.stockCode = th.fullStockCode
-            and th.stockCode not like '30%'
-            and th.stockCode not like '68%'
-            and exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 60)
-            group by t1.stockCode, th.stockName , th.bkName
-            having -- `last` >= ma5  and
-                   ma5 >= ma10 and ma10 >= ma20 and ma20 >= ma60
-            order by 2, 1
-        ]]>
-    </insert>
-
 
     <insert id="saveRightData" parameterType="java.util.List">
         replace into t_eastmoney_node_right(`date`, `stockCode`, `stockName`, `info`)
