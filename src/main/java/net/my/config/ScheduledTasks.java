@@ -426,16 +426,6 @@ public class ScheduledTasks {
             }
         }, executor);
 
-        CompletableFuture<Void> stock_task_234 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task stock queryAvg60 start");
-                agNewEastmoneyStockController.queryAvg60();
-                log.info("task stock queryAvg60 end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
         CompletableFuture<Void> stock_task_235 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock considerCCIAndVol start");
@@ -649,7 +639,6 @@ public class ScheduledTasks {
                 , stock_task_230
                 , stock_task_231
                 , stock_task_232
-                , stock_task_234
                 , stock_task_235
                 , stock_task_236
                 // 233 因为有计算，所有在查询之前执行
@@ -686,11 +675,6 @@ public class ScheduledTasks {
         log.info("task agNewEastmoneyStockController.easySnapshotRight end");
 
 
-        // 等所有的计算都结束了，就可以计算策略了
-        // 888 开头的表示策略
-        log.info("task stock strategy_1 start");
-        agEastmoneyStockStrategyController.strategy_1();
-        log.info("task stock strategy_1 end");
 
     }
 }

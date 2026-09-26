@@ -46,7 +46,7 @@ public class AgNewEastmoneyEChartsController {
             return RestGeneralResponse.of(res);
         }
 
-        List<EchartsPoJo> buyDataFromEastmoneys = agEastmoneyEChartsMapper.s69();
+        List<EchartsPoJo> buyDataFromEastmoneys = null;
         if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
             EchartsPoJo empty = new EchartsPoJo();
             empty.setName("--");

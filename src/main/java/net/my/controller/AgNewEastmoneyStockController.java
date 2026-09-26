@@ -1006,39 +1006,6 @@ public class AgNewEastmoneyStockController {
     }
 
     /**
-     * 234、
-     * @return
-     */
-    @GetMapping("/get-right-side-avg20-or-avg60")
-    public BaseResponse queryAvg60() {
-        log.info("queryAvg60");
-        String key = KEY_234;
-        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
-        if(res != null) {
-            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
-            return RestGeneralResponse.of(res);
-        }
-
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryAvg60();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
-                .filter(f -> !f.getStockCode().startsWith("688")
-                        && !f.getStockCode().startsWith("689")
-                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
-            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
-            empty.setDate("--");
-            empty.setStockCode("--");
-            empty.setRatioB("--");
-            empty.setLast("--");
-            buyDataFromEastmoneys = Arrays.asList(empty);
-        }
-
-        myCaffeineCache.put(key, buyDataFromEastmoneys);
-        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
-        return RestGeneralResponse.of(buyDataFromEastmoneys);
-    }
-
-    /**
      * 235、废止，cci的计算有误，该计算返回空
      * @return
      */

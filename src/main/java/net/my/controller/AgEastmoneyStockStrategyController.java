@@ -59,40 +59,6 @@ public class AgEastmoneyStockStrategyController {
 
 
     /**
-     * 88801、
-     * * @return
-     */
-    @GetMapping("/strategy_1")
-    public BaseResponse strategy_1() {
-        log.info("strategy_1");
-        String key = KEY_88801;
-        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
-        if(res != null) {
-            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
-            return RestGeneralResponse.of(res);
-        }
-
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = mapper.strategy_1();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
-                .filter(f -> !f.getStockCode().startsWith("688")
-                        && !f.getStockCode().startsWith("689")
-                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
-            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
-            empty.setDate("--");
-            empty.setStockCode("--");
-            empty.setRatioB("--");
-            empty.setLast("--");
-            buyDataFromEastmoneys = Arrays.asList(empty);
-        }
-
-        myCaffeineCache.put(key, buyDataFromEastmoneys);
-        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
-        return RestGeneralResponse.of(buyDataFromEastmoneys);
-    }
-
-
-    /**
      * 88802、
      * * @return
      */

@@ -8,7 +8,6 @@ import java.util.List;
 
 @Repository
 public interface AgEastmoneyStockStrategyMapper {
-    List<SpecialCarePoJo2> strategy_1();
     List<SpecialCarePoJo2> strategy_2();
     List<SpecialCarePoJo2> strategy_3();
     List<String> getLast5Days();
