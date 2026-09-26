@@ -1,7 +1,7 @@
 package net.my.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import net.my.mapper.AgCCIEastmoneyStockMapper;
+import net.my.mapper.AgMAEastmoneyStockMapper;
 import net.my.pojo.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -13,22 +13,22 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/ag-cci")
+@RequestMapping("/ag-ma")
 @Slf4j
 public class AgMAController {
 
     @Autowired
-    private AgCCIEastmoneyStockMapper mapper;
+    private AgMAEastmoneyStockMapper mapper;
 
     @GetMapping("/history-all/stock")
     public BaseResponse historyAllStock() {
         log.info("historyAllStock start...");
 
-        List<String> calcDates = mapper.getCalcCCIDates4Stock();
+        List<String> calcDates = mapper.getCalcMADates4Stock();
         if(!CollectionUtils.isEmpty(calcDates)) {
             for(String calcDate : calcDates) {
                 log.info("calcDate: {}", calcDate);
-                mapper.genCCIData4Stock(calcDate);
+                mapper.genMAData4Stock(calcDate);
             }
         }
 
@@ -40,11 +40,11 @@ public class AgMAController {
     public BaseResponse historyAllEtf() {
         log.info("historyAllEtf start...");
 
-        List<String> calcDates = mapper.getCalcCCIDates4Etf();
+        List<String> calcDates = mapper.getCalcMADates4Etf();
         if(!CollectionUtils.isEmpty(calcDates)) {
             for(String calcDate : calcDates) {
                 log.info("calcDate: {}", calcDate);
-                mapper.genCCIData4Etf(calcDate);
+                mapper.genMAData4Etf(calcDate);
             }
         }
 
