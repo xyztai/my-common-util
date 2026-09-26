@@ -223,6 +223,7 @@ public class ScheduledTasks {
             log.info("executeOnceTask skip");
         } else {
             execCalc();
+            execQuery();
         }
         log.info("executeOnceTask end...");
         log.info("executeOnceTask Time-Consuming: {} ms", System.currentTimeMillis() - startTime);
@@ -249,12 +250,30 @@ public class ScheduledTasks {
 //        log.info("task 获取index的历史数据 end");
 
         execCalc();
+        execQuery();
     }
 
     /**
-     * 基于已有的数据，进行数据计算
+     * 1、先计算所有需要的数据
      */
     void execCalc() {
+        // 1、此处有计算cci
+        log.info("task cci start");
+        agCCIController.historyAllStock();
+        agCCIController.historyAllEtf();
+        log.info("task cci end");
+
+        // 2、此处有计算ma
+        log.info("task ma start");
+        agMAController.historyAllStock();
+        agMAController.historyAllEtf();
+        log.info("task ma end");
+    }
+
+    /**
+     * 2、计算数据后，为查询进行数据缓存
+     */
+    void execQuery() {
         // 1、先计算9倍成交量的数据
         log.info("task stock calcVolMulti9OneDay start");
         tmpController.calcVolMulti9OneDay(null);
@@ -285,22 +304,6 @@ public class ScheduledTasks {
         log.info("task stock queryDuoTou start");
         agNewEastmoneyStockController.queryDuoTou();
         log.info("task stock queryDuoTou end");
-
-        // 5、此处有计算cci
-        log.info("task stock cci start");
-        agCCIController.historyAllStock();
-        log.info("task stock cci end");
-        log.info("task etf cci start");
-        agCCIController.historyAllEtf();
-        log.info("task etf cci end");
-
-        // 6、此处有计算ma
-        log.info("task stock ma start");
-        agMAController.historyAllStock();
-        log.info("task stock ma end");
-        log.info("task etf ma start");
-        agMAController.historyAllEtf();
-        log.info("task etf ma end");
 
         // 开始进行查询缓存
         ExecutorService executor = Executors.newFixedThreadPool(5);
