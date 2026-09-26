@@ -21,18 +21,34 @@ public class AgNewEastmoneyCCIController {
     private AgCCIEastmoneyStockMapper mapper;
 
     @GetMapping("/history-all/stock")
-    public BaseResponse historyAll() {
-        log.info("historyAll start...");
+    public BaseResponse historyAllStock() {
+        log.info("historyAllStock start...");
 
-        List<String> calcDates = mapper.getCalcCCIDates();
+        List<String> calcDates = mapper.getCalcCCIDates4Stock();
         if(!CollectionUtils.isEmpty(calcDates)) {
             for(String calcDate : calcDates) {
                 log.info("calcDate: {}", calcDate);
-                mapper.genCCIData(calcDate);
+                mapper.genCCIData4Stock(calcDate);
             }
         }
 
-        log.info("historyAll end...");
+        log.info("historyAllStock end...");
+        return BaseResponse.OK;
+    }
+
+    @GetMapping("/history-all/etf")
+    public BaseResponse historyAllEtf() {
+        log.info("historyAllEtf start...");
+
+        List<String> calcDates = mapper.getCalcCCIDates4Etf();
+        if(!CollectionUtils.isEmpty(calcDates)) {
+            for(String calcDate : calcDates) {
+                log.info("calcDate: {}", calcDate);
+                mapper.genCCIData4Etf(calcDate);
+            }
+        }
+
+        log.info("historyAllEtf end...");
         return BaseResponse.OK;
     }
 }

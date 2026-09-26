@@ -285,8 +285,11 @@ public class ScheduledTasks {
 
         // 5、此处有计算cci
         log.info("task stock cci start");
-        agNewEastmoneyCCIController.historyAll();
+        agNewEastmoneyCCIController.historyAllStock();
         log.info("task stock cci end");
+        log.info("task etf cci start");
+        agNewEastmoneyCCIController.historyAllEtf();
+        log.info("task etf cci end");
 
         // 开始进行查询缓存
         ExecutorService executor = Executors.newFixedThreadPool(5);
