@@ -1000,6 +1000,7 @@
             select th.stockCode ,min(t1.date_curr) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
             from tmp_ans t1 , t_stock_code th , t_eastmoney_node_ma ma
             where chg_pre_0 > 0 and chg_pre_1 > 0 and chg_pre_2 > 0 and chg_pre_3 > 0 and chg_pre_4 > 0 -- and chg_pre_5 > 0
+              and ma.ma5 >= ma.ma10 and ma.ma10 >= ma.ma20 and ma.ma20 >= ma.ma30 and ma.ma30 >= ma.ma60
             and t1.stockCode = th.fullStockCode
             and th.stockCode not like '30%'
             and th.stockCode not like '68%'
@@ -1294,6 +1295,7 @@
                        , rank() over (partition by tenm.stockCode order by tenm.`date` desc) date_rank_ma
                 from t_eastmoney_node_ma tenm, tmp_calc_date
                 where date >= small_date_1 and date <= big_date
+                  and tenm.ma5 >= tenm.ma10 and tenm.ma10 >= tenm.ma20 and tenm.ma20 >= tenm.ma30 and tenm.ma30 >= tenm.ma60
                 order by stockCode , date_rank_ma
             ) -- select * from tmp_ma_dates t where t.fullStockCode = '1.603659';
             , tmp_ten_dates as (
