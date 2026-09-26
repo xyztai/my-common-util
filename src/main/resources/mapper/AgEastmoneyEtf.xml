@@ -583,20 +583,6 @@
         ]]>
     </select>
 
-    <delete id="delEtfEastMoneyTmpCalc">
-        delete from t_eastmoney_tmp_calc
-        where methodName = #{methodName}
-    </delete>
-
-    <insert id="saveEtfEastMoneyTmpCalc" parameterType="java.util.List">
-        insert into t_eastmoney_tmp_calc(`methodName`, `date_`, `stockCode`, `ratioB`)
-        values
-        <foreach collection="list" item="item" separator=",">
-            (#{item.methodName}, #{item.date}, #{item.stockCode}, #{item.ratioB}
-            )
-        </foreach>
-    </insert>
-
     <!-- 1、当天前三；2、当天chg>2%；3、相较于前一天，成交量放量25%~100%；4、前一天的chg<2%；5、前一天不在前三；-->
     <select id="investEtfChgTop3" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[

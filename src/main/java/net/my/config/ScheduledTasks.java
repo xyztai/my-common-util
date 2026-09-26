@@ -207,12 +207,6 @@ public class ScheduledTasks {
         log.info("task 清空缓存");
         agNewQQController.invalidateAll();
 
-
-        // 4、此处有计算，需要提前进行计算
-        log.info("task stock queryDuoTou start");
-        agNewEastmoneyStockController.queryDuoTou();
-        log.info("task stock queryDuoTou end");
-
         // 开始进行查询缓存
         ExecutorService executor = Executors.newFixedThreadPool(5);
         // 计算缓存
@@ -539,16 +533,6 @@ public class ScheduledTasks {
             }
         }, executor);
 
-        CompletableFuture<Void> etf_task_206 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task etf queryEtf9ZhuanB start");
-                agNewEastmoneyETFController.queryEtf9ZhuanB();
-                log.info("task etf queryEtf9ZhuanB end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
         CompletableFuture<Void> etf_task_207 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf queryEtf9ZhuanS start");
@@ -652,7 +636,6 @@ public class ScheduledTasks {
                 , etf_task_203
                 , etf_task_204
                 , etf_task_205
-                , etf_task_206
                 , etf_task_207
                 , etf_task_208
                 , etf_task_209

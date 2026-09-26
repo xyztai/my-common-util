@@ -34,7 +34,6 @@ public interface AgEastmoneyStockMapper {
     List<SpecialCarePoJo2> queryBigSwing();
     List<SpecialCarePoJo2> queryBigSwingAndLowestVol();
     List<SpecialCarePoJo2> queryBigSwingAndIn5LowestVol();
-    List<SpecialCarePoJo2> queryDuoTou();
     List<SpecialCarePoJo2> queryDuoTouMA();
     List<SpecialCarePoJo2> queryUp5Lian();
     List<SpecialCarePoJo2> queryOnlyThem();
@@ -44,7 +43,6 @@ public interface AgEastmoneyStockMapper {
     List<SpecialCarePoJo2> down5();
     List<SpecialCarePoJo2> getDailyCnt();
     List<SpecialCarePoJo2> get_000001_lowest();
-    List<String> getCalcDatesFromDuoTou();
     int genDuoTou(@Param("calcDate") String calcDate);
     List<String> getCalcDatesFromMA();
 

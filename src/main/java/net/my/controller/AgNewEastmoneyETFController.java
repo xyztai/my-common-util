@@ -280,45 +280,6 @@ public class AgNewEastmoneyETFController {
     }
 
 
-    /**
-     * 6、queryEtf9ZhuanB
-     * @return
-     */
-    @GetMapping("/queryEtf9ZhuanB")
-    public BaseResponse queryEtf9ZhuanB() {
-        log.info("queryEtf9ZhuanB");
-        String key = KEY_6;
-        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
-        if(res != null) {
-            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
-            return RestGeneralResponse.of(res);
-        }
-
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtf9ZhuanB();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
-                .filter(f -> !f.getStockCode().startsWith("688")
-                        && !f.getStockCode().startsWith("689")
-                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
-            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
-            empty.setDate("--");
-            empty.setStockCode("--");
-            empty.setRatioB("--");
-            empty.setLast("--");
-            buyDataFromEastmoneys = Arrays.asList(empty);
-        } else {
-            String methodName = key;
-            agEastmoneyEtfMapper.delEtfEastMoneyTmpCalc(methodName);
-            List<EastmoneyTmpCalc> calcs = buyDataFromEastmoneys.stream().map(f -> f.toPO(methodName)).collect(Collectors.toList());
-            agEastmoneyEtfMapper.saveEtfEastMoneyTmpCalc(calcs);
-        }
-
-        myCaffeineCache.put(key, buyDataFromEastmoneys);
-        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
-        return RestGeneralResponse.of(buyDataFromEastmoneys);
-    }
-
-
 //    /**
 //     * 7、queryWinRatios
 //     * @return

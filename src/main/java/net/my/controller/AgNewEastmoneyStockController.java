@@ -971,41 +971,6 @@ public class AgNewEastmoneyStockController {
     }
 
     /**
-     * 233、
-     * * @return
-     */
-    @GetMapping("/get-right-side-duo-tou")
-    public BaseResponse queryDuoTou() {
-        log.info("queryDuoTou");
-        String key = KEY_233;
-        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
-        if(res != null) {
-            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
-            return RestGeneralResponse.of(res);
-        }
-
-        // 计算多头数据
-        genDuoTou();
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyStockMapper.queryDuoTou();
-        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
-                .filter(f -> !f.getStockCode().startsWith("688")
-                        && !f.getStockCode().startsWith("689")
-                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
-        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
-            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
-            empty.setDate("--");
-            empty.setStockCode("--");
-            empty.setRatioB("--");
-            empty.setLast("--");
-            buyDataFromEastmoneys = Arrays.asList(empty);
-        }
-
-        myCaffeineCache.put(key, buyDataFromEastmoneys);
-        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
-        return RestGeneralResponse.of(buyDataFromEastmoneys);
-    }
-
-    /**
      * 235、废止，cci的计算有误，该计算返回空
      * @return
      */
@@ -1070,20 +1035,6 @@ public class AgNewEastmoneyStockController {
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
-    }
-
-
-    public void genDuoTou() {
-        log.info("genDuoTou start");
-        List<String> calcDates = agEastmoneyStockMapper.getCalcDatesFromDuoTou();
-        if(!CollectionUtils.isEmpty(calcDates)) {
-            for(String calcDate : calcDates) {
-                log.info("genDuoTou calcDate={} start", calcDate);
-                agEastmoneyStockMapper.genDuoTou(calcDate);
-                log.info("genDuoTou calcDate={} end", calcDate);
-            }
-        }
-        log.info("genDuoTou end");
     }
 
     /**
