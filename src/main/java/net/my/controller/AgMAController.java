@@ -15,7 +15,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/ag-cci")
 @Slf4j
-public class AgNewEastmoneyCCIController {
+public class AgMAController {
 
     @Autowired
     private AgCCIEastmoneyStockMapper mapper;
