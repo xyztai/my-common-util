@@ -13,14 +13,14 @@ import java.util.List;
 
 
 @RestController
-@RequestMapping("/ag-cci-eastmoney-stock")
+@RequestMapping("/ag-cci")
 @Slf4j
 public class AgNewEastmoneyCCIController {
 
     @Autowired
     private AgCCIEastmoneyStockMapper mapper;
 
-    @GetMapping("/history-all")
+    @GetMapping("/history-all/stock")
     public BaseResponse historyAll() {
         log.info("historyAll start...");
 
