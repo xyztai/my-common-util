@@ -16,55 +16,29 @@
 
     <insert id="genMAData4Stock">
         <![CDATA[
-        replace into t_eastmoney_node_ma(`date`, `stockCode`, `MA5`, `MA10`, `MA14`)
+        replace into t_eastmoney_node_ma(`stockCode`, `date`, `last`, `ma5`, `ma10`, `ma20`, `ma30`, `ma60`)
         with tmp as (
             select `date`
-                   -- , lag(`date`, 1) over (partition by stockCode order by ten.`date` ) data_pre_1
-                   -- , lag(`date`, 60) over (partition by stockCode order by ten.`date` ) data_pre_60
-                   , rank() over (partition by stockCode order by ten.`date` desc) date_rank
-                   , last
-                   , stockCode
-                   , chg
-                   , round((high + low + `last`)/3, 6) tp
-                from t_eastmoney_node ten
-                where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d') , INTERVAL -60 DAY), '%Y-%m-%d')
-        and ten.`date` <= #{calcDate}
-        -- and ten.stockCode = '1.600118'
-        order by ten.`date` desc
+                    , rank() over (partition by stockCode order by ten.`date` desc) date_rank
+                    , last
+                    , stockCode
+            from t_eastmoney_node ten
+            where ten.`date` <= #{calcDate}
+            AND ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d'), INTERVAL -120 DAY), '%Y-%m-%d')
+            -- and ten.stockCode = '0.002025'
         )
-        , tmp_md as (
         select t1.stockCode
-        , max(case when t1.date_rank <= 1 then t1.date else null end) date
-        , max(case when t1.date_rank <= 1 then t1.tp else null end) tp
-        , round(avg(case when t1.date_rank <= 5 then t1.tp else null end), 6) avg_tp_5
-        , round(avg(case when t1.date_rank <= 10 then t1.tp else null end), 6) avg_tp_10
-        , round(avg(case when t1.date_rank <= 14 then t1.tp else null end), 6) avg_tp_14
+             , max(case when t1.date_rank = 1 then t1.date else null end) `date`
+             , max(case when t1.date_rank = 1 then t1.last else null end) `last`
+             , round(avg(case when t1.date_rank <= 5 then t1.last else null end), 3) ma5
+             , round(avg(case when t1.date_rank <= 10 then t1.last else null end), 3) ma10
+             , round(avg(case when t1.date_rank <= 20 then t1.last else null end), 3) ma20
+             , round(avg(case when t1.date_rank <= 30 then t1.last else null end), 3) ma30
+             , round(avg(case when t1.date_rank <= 60 then t1.last else null end), 3) ma60
         from tmp t1
-        where exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 14)
+        where exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 60)
         group by t1.stockCode
-        )
-        , tmp_avgdev as (
-        select t1.stockCode
-        , round(avg(case when t1.date_rank <= 5 then abs(t2.avg_tp_5 - t1.tp) else null end), 6) avg_dev_5
-        , round(avg(case when t1.date_rank <= 10 then abs(t2.avg_tp_10 - t1.tp) else null end), 6) avg_dev_10
-        , round(avg(case when t1.date_rank <= 14 then abs(t2.avg_tp_14 - t1.tp) else null end), 6) avg_dev_14
-        from tmp t1, tmp_md t2
-        where t1.stockCode = t2.stockCode
-        group by t1.stockCode
-        ) -- (TYP-MA(TYP,84))/(0.015*AVEDEV(TYP,84)),COLORFF00FF;
-        select -- round((t1.tp - t1.avg_tp_5)/t2.avg_dev/0.015, 2) MA_5, t1.*
-            t1.date
-             , t1.stockCode
-             -- , concat('MA ', round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2)) MA_5
-             , round((t1.tp - t1.avg_tp_5)/(case when t2.avg_dev_5 < 0.0000001 then 0.0000001 else t2.avg_dev_5 end )/0.015, 2) MA5
-             , round((t1.tp - t1.avg_tp_10)/(case when t2.avg_dev_10 < 0.0000001 then 0.0000001 else t2.avg_dev_10 end )/0.015, 2) MA10
-             , round((t1.tp - t1.avg_tp_14)/(case when t2.avg_dev_14 < 0.0000001 then 0.0000001 else t2.avg_dev_14 end )/0.015, 2) MA14
-             -- , round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2) MA5
-             -- , round((t1.tp - t1.avg_tp_10)/t2.avg_dev_10/0.015, 2) MA10
-             -- , round((t1.tp - t1.avg_tp_14)/t2.avg_dev_14/0.015, 2) MA14
-        from tmp_md t1, tmp_avgdev t2
-        where t1.stockCode = t2.stockCode
-        order by 1, 2
+        order by 1
         ]]>
     </insert>
 
@@ -80,55 +54,29 @@
 
     <insert id="genMAData4Etf">
         <![CDATA[
-        replace into t_eastmoney_node_etf_ma(`date`, `stockCode`, `MA5`, `MA10`, `MA14`)
+        replace into t_eastmoney_node_etf_ma(`stockCode`, `date`, `last`, `ma5`, `ma10`, `ma20`, `ma30`, `ma60`)
         with tmp as (
             select `date`
-                   -- , lag(`date`, 1) over (partition by stockCode order by ten.`date` ) data_pre_1
-                   -- , lag(`date`, 60) over (partition by stockCode order by ten.`date` ) data_pre_60
-                   , rank() over (partition by stockCode order by ten.`date` desc) date_rank
-                   , last
-                   , stockCode
-                   , chg
-                   , round((high + low + `last`)/3, 6) tp
-                from t_eastmoney_node ten
-                where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d') , INTERVAL -60 DAY), '%Y-%m-%d')
-        and ten.`date` <= #{calcDate}
-        -- and ten.stockCode = '1.600118'
-        order by ten.`date` desc
+                    , rank() over (partition by stockCode order by ten.`date` desc) date_rank
+                    , last
+                    , stockCode
+            from t_eastmoney_node_etf ten
+            where ten.`date` <= #{calcDate}
+            AND ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d'), INTERVAL -120 DAY), '%Y-%m-%d')
+            -- and ten.stockCode = '0.002025'
         )
-        , tmp_md as (
         select t1.stockCode
-        , max(case when t1.date_rank <= 1 then t1.date else null end) date
-        , max(case when t1.date_rank <= 1 then t1.tp else null end) tp
-        , round(avg(case when t1.date_rank <= 5 then t1.tp else null end), 6) avg_tp_5
-        , round(avg(case when t1.date_rank <= 10 then t1.tp else null end), 6) avg_tp_10
-        , round(avg(case when t1.date_rank <= 14 then t1.tp else null end), 6) avg_tp_14
+             , max(case when t1.date_rank = 1 then t1.date else null end) `date`
+             , max(case when t1.date_rank = 1 then t1.last else null end) `last`
+             , round(avg(case when t1.date_rank <= 5 then t1.last else null end), 3) ma5
+             , round(avg(case when t1.date_rank <= 10 then t1.last else null end), 3) ma10
+             , round(avg(case when t1.date_rank <= 20 then t1.last else null end), 3) ma20
+             , round(avg(case when t1.date_rank <= 30 then t1.last else null end), 3) ma30
+             , round(avg(case when t1.date_rank <= 60 then t1.last else null end), 3) ma60
         from tmp t1
-        where exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 14)
+        where exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 60)
         group by t1.stockCode
-        )
-        , tmp_avgdev as (
-        select t1.stockCode
-        , round(avg(case when t1.date_rank <= 5 then abs(t2.avg_tp_5 - t1.tp) else null end), 6) avg_dev_5
-        , round(avg(case when t1.date_rank <= 10 then abs(t2.avg_tp_10 - t1.tp) else null end), 6) avg_dev_10
-        , round(avg(case when t1.date_rank <= 14 then abs(t2.avg_tp_14 - t1.tp) else null end), 6) avg_dev_14
-        from tmp t1, tmp_md t2
-        where t1.stockCode = t2.stockCode
-        group by t1.stockCode
-        ) -- (TYP-MA(TYP,84))/(0.015*AVEDEV(TYP,84)),COLORFF00FF;
-        select -- round((t1.tp - t1.avg_tp_5)/t2.avg_dev/0.015, 2) MA_5, t1.*
-            t1.date
-             , t1.stockCode
-             -- , concat('MA ', round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2)) MA_5
-             , round((t1.tp - t1.avg_tp_5)/(case when t2.avg_dev_5 < 0.0000001 then 0.0000001 else t2.avg_dev_5 end )/0.015, 2) MA5
-             , round((t1.tp - t1.avg_tp_10)/(case when t2.avg_dev_10 < 0.0000001 then 0.0000001 else t2.avg_dev_10 end )/0.015, 2) MA10
-             , round((t1.tp - t1.avg_tp_14)/(case when t2.avg_dev_14 < 0.0000001 then 0.0000001 else t2.avg_dev_14 end )/0.015, 2) MA14
-             -- , round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2) MA5
-             -- , round((t1.tp - t1.avg_tp_10)/t2.avg_dev_10/0.015, 2) MA10
-             -- , round((t1.tp - t1.avg_tp_14)/t2.avg_dev_14/0.015, 2) MA14
-        from tmp_md t1, tmp_avgdev t2
-        where t1.stockCode = t2.stockCode
-        order by 1, 2
+        order by 1
         ]]>
     </insert>
 
