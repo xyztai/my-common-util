@@ -561,15 +561,15 @@ public class ScheduledTasks {
             }
         }, executor);
 
-        CompletableFuture<Void> stock_task_998 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task stock getDailyCnt start");
-                agNewEastmoneyStockController.getDailyCnt();
-                log.info("task stock getDailyCnt end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
+//        CompletableFuture<Void> stock_task_998 = CompletableFuture.runAsync(() -> {
+//            try {
+//                log.info("task stock getDailyCnt start");
+//                agNewEastmoneyStockController.getDailyCnt();
+//                log.info("task stock getDailyCnt end");
+//            } catch (Exception e) {
+//                Thread.currentThread().interrupt();
+//            }
+//        }, executor);
 
         CompletableFuture<Void> stock_task_999 = CompletableFuture.runAsync(() -> {
             try {
@@ -746,7 +746,7 @@ public class ScheduledTasks {
                 , stock_task_236
                 // 233 因为有计算，所有在查询之前执行
                 , stock_task_997
-                , stock_task_998
+//                , stock_task_998
                 , stock_task_999
 
 
