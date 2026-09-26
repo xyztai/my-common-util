@@ -80,67 +80,11 @@ public class ScheduledTasks {
 
     @Value("${executeOnceTaskEnable}")
     private Boolean executeOnceTaskEnable;
-    
-
-//    /**
-//     * 更新历史参数，以及历史预算数据
-//     */
-//    @Scheduled(cron = "0 0 */12 * * ?")
-//    @Transactional
-//    public void execHistoryExpect() {
-//        log.info("execHistoryExpect begin");
-//        agController.genDailyParaAndHistoryExpect();
-//        log.info("execHistoryExpect end");
-//    }
-
-//    /**
-//     * 更新当前使用的参数数据
-//     */
-//    @Scheduled(initialDelay = 1000 * 5, fixedRate = 1000 * 3600 * 3)
-//    @Transactional
-//    public void execUpdatePara() {
-//        log.info("execUpdatePara begin");
-//        agController.updatePara();
-//        log.info("execUpdatePara end");
-//    }
-
-//    /**
-//     * 自动获取/更新历史上5天的cp数据
-//     */
-//    @Scheduled(cron = "0 */33 * * * ?")
-//    @Transactional
-//    public void execGetHistoryData() {
-//        log.info("execGetHistoryData begin");
-//        // 设置时区为北京
-//        LocalDateTime now = LocalDateTime.now();
-//        ZoneId beijngZoneId = ZoneId.of("Asia/Shanghai");
-//        ZonedDateTime beijingTime = now.atZone(beijngZoneId);
-//        // 输出北京时间
-//        // DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
-//        String formattedTime = beijingTime.format(formatter);
-//        log.info("time: {}", formattedTime);
-//        if(
-//                        (formattedTime.compareTo("03:01:00") > 0 && formattedTime.compareTo("03:55:00") < 0) ||
-//                        (formattedTime.compareTo("06:01:00") > 0 && formattedTime.compareTo("06:55:00") < 0) ||
-//                        (formattedTime.compareTo("15:01:00") > 0 && formattedTime.compareTo("15:55:00") < 0) ||
-//                        (formattedTime.compareTo("18:01:00") > 0 && formattedTime.compareTo("18:55:00") < 0)
-//        ) {
-//            log.info("time to execGetHistoryData");
-////            agNewQQController.getHistoryData(5);
-//            agController.getHistoryData(5);
-////            agController.getIndustryHistoryData(5);
-//        } else {
-//            log.info("not time to execGetHistoryData");
-//        }
-//        log.info("execGetHistoryData end");
-//    }
 
 
     /**
-     * 计算每周的数据
+     * 每周日计算每周的数据
      */
-//    @Scheduled(cron = "0 51,55 * * * ?")
     @Scheduled(cron = "0,30 0 0 ? * SUN")
     public void genWeeklyData() {
         log.info("genWeeklyData start");
@@ -149,7 +93,7 @@ public class ScheduledTasks {
     }
 
     /**
-     * 每日更新下 KLineRealTime 数据
+     * 每日更新下 KLineRealTime 数据，这个数据是为了做数据补偿的，平时不用的
      */
     @Scheduled(cron = "0 51 * * * ?")
     public void execKLineRealTime() {
@@ -183,7 +127,7 @@ public class ScheduledTasks {
     }
 
     /**
-     * 自动获取当前的收盘数据
+     * 自动获取当前的收盘数据，以及计算常用的指数数据，进行查询缓存
      */
     @Scheduled(cron = "0 37 * * * ?")
     public void execGetHistoryDataNew() {
@@ -213,7 +157,7 @@ public class ScheduledTasks {
         log.info("execGetHistoryDataNew Time-Consuming: {} ms", System.currentTimeMillis() - startTime);
     }
 
-    // 启动后，自动计算相关数据
+    // 启动后，自动做查询动作，进行查询缓存
     @Scheduled(initialDelay = 5000, fixedDelay = 7 * 24 * 3600 * 1000)
     public void executeOnceTask() {
         long startTime = System.currentTimeMillis();
@@ -238,16 +182,6 @@ public class ScheduledTasks {
         agController.getTodayDataEtf();
         log.info("getTodayDataIndex start");
         agController.getTodayDataIndex();
-
-//        log.info("task 获取stock的历史数据 start");
-//        agNewEastmoneyStockController.getHistoryData();
-//        log.info("task 获取stock的历史数据 end");
-//        log.info("task 获取etf的历史数据 start");
-//        agNewEastmoneyETFController.getHistoryData();
-//        log.info("task 获取etf的历史数据 end");
-//        log.info("task 获取index的历史数据 start");
-//        agNewEastmoneyIndexController.getHistoryDataOuterSina();
-//        log.info("task 获取index的历史数据 end");
 
         execCalc();
         execQuery();
@@ -783,46 +717,6 @@ public class ScheduledTasks {
         log.info("task stock strategy_1 start");
         agEastmoneyStockStrategyController.strategy_1();
         log.info("task stock strategy_1 end");
-
-
-
-//            agNewQQController.getHistoryData(5);
-//            agNewQQ300Controller.getHistoryData(5);  // QQ 的更新hs300 的
-//            agNew300UsingEastmoneyController.getHistoryData();
-//            agController.getHistoryData(5);
-//            agController.getIndustryHistoryData(5);
-
-        // 计算ratio
-//        List<EastmoneyWinRatioPOJO> allRatio = new ArrayList<>();
-//        log.info("task etf query9ZhuanB_Copy start");
-//        List<EastmoneyWinRatioPOJO> B_09_STOCK = agEastmoneyWinRatioMapper.query9ZhuanB_Copy();
-//        log.info("task etf query9ZhuanB_Copy end");
-//        if(!CollectionUtils.isEmpty(B_09_STOCK)) {
-//            allRatio.addAll(B_09_STOCK);
-//        }
-//        log.info("task etf query9ZhuanS_Copy start");
-//        List<EastmoneyWinRatioPOJO> S_07_STOCK = agEastmoneyWinRatioMapper.query9ZhuanS_Copy();
-//        log.info("task etf query9ZhuanS_Copy end");
-//        if(!CollectionUtils.isEmpty(S_07_STOCK)) {
-//            allRatio.addAll(S_07_STOCK);
-//        }
-//        log.info("task etf queryEtf9ZhuanB_Copy start");
-//        List<EastmoneyWinRatioPOJO> B_09_ETF = agEastmoneyWinRatioMapper.queryEtf9ZhuanB_Copy();
-//        log.info("task etf queryEtf9ZhuanB_Copy end");
-//        if(!CollectionUtils.isEmpty(B_09_ETF)) {
-//            allRatio.addAll(B_09_ETF);
-//        }
-//        log.info("task etf queryEtf9ZhuanS_Copy start");
-//        List<EastmoneyWinRatioPOJO> S_07_ETF = agEastmoneyWinRatioMapper.queryEtf9ZhuanS_Copy();
-//        log.info("task etf queryEtf9ZhuanS_Copy end");
-//        if(!CollectionUtils.isEmpty(S_07_ETF)) {
-//            allRatio.addAll(S_07_ETF);
-//        }
-//        if(!CollectionUtils.isEmpty(allRatio)) {
-//            agEastmoneyWinRatioMapper.delWinRatio();
-//            // 将数据插入表中
-//            agEastmoneyWinRatioMapper.saveWinRatio(allRatio);
-//        }
 
     }
 }
