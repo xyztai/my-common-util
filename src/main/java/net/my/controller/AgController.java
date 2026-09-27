@@ -54,6 +54,12 @@ public class AgController {
     // https://hqm.stock.sohu.com/getqjson?code=cn_600875,cn_688082
     public static final String SO_HU_URL_FORMAT = "https://hqm.stock.sohu.com/getqjson?code=%s";
 
+    @GetMapping("/invalidateAll")
+    public void invalidateAll() {
+        log.info("invalidateAll...");
+        myCaffeineCache.invalidateAll();
+    }
+
 
     @ApiOperation(value = "获取最新的数据", notes = "访问互联网接口获取数据")
     @GetMapping("stock-code")
