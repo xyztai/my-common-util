@@ -7,7 +7,7 @@
     <select id="getHs300List" resultType="net.my.pojo.HsStockPoJo">
         select stockCode, stockType, stockName
         from t_stock
-        where fullStockCode not in (select distinct stockCode from t_eastmoney_node_weekly tenw where date >= #{targetDate})
+        where fullStockCode not in (select distinct stockCode from t_stock_raw_weekly tenw where date >= #{targetDate})
              -- where stockCode not like '30%'
              -- and stockCode not like '68%'
         order by 1
@@ -15,13 +15,13 @@
 
     <select id="getMaxEastMoneyNode" resultType="java.lang.String">
         select max(date)
-        from t_eastmoney_node_weekly
+        from t_stock_raw_weekly
         where stockCode = #{stockCode}
           and `date` not like '99999%'
     </select>
 
     <insert id="saveEastMoneyDatas" parameterType="java.util.List">
-        insert into t_eastmoney_node_weekly(`date`, `stockCode`, `infoRaw`)
+        insert into t_stock_raw_weekly(`date`, `stockCode`, `infoRaw`)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.date}, #{item.stockCode}, #{item.infoRaw}
@@ -30,7 +30,7 @@
     </insert>
 
     <update id="updateEastMoneyDatas">
-        update t_eastmoney_node_weekly
+        update t_stock_raw_weekly
         set `date` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -11), ',', 1) ,
             `open` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -10), ',', 1) ,
             `last` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -9), ',', 1) ,
@@ -49,10 +49,10 @@
 
     <insert id="genWeeklyData">
         <![CDATA[
-        replace into t_eastmoney_node_weekly(`date`, `stockCode`, `open`, `last`, `high`, `low`, `volume`, `amount`, `chg` )
+        replace into t_stock_raw_weekly(`date`, `stockCode`, `open`, `last`, `high`, `low`, `volume`, `amount`, `chg` )
         with tmp_week as (
             select stockCode stockCode_w, max(date) date_w
-            from t_eastmoney_node_weekly
+            from t_stock_raw_weekly
             -- where `date` < '2026-04-10'
             group by stockCode
         )

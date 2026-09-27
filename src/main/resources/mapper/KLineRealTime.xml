@@ -24,7 +24,7 @@
 
 
     <insert id="saveDataQQ" parameterType="java.util.List">
-        replace into t_kline_data_real_time(`source`, `kline_time`, `code`, `kline_str`
+        replace into t_history_qq(`source`, `kline_time`, `code`, `kline_str`
         , `day`, `stock_name`, `open`, `last`, `high`
         , `low`, `volume`, `amount`, `chg`, `zheng_fu`
         , `exchangeRaw`, `ttm`, `pe`, `vr`)
@@ -39,12 +39,12 @@
     </insert>
 
     <delete id="delDuplicateData">
-        DELETE from t_kline_data_real_time
+        DELETE from t_history_qq
         where id in (
             select min_id
             from (
                select code, day , count(1), min(id) min_id, max(id), min(kline_time ), max(kline_time )
-               from t_kline_data_real_time tkdrt
+               from t_history_qq tkdrt
                group by code, day
                having count(1) = 2
             ) t
