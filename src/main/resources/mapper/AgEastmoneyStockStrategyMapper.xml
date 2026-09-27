@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.my.mapper.AgEastmoneyStockStrategyMapper">
+<mapper namespace="net.my.mapper.AgStockStrategyMapper">
 
     <select id="strategy_2" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
@@ -163,14 +163,6 @@
             order by 1 desc
             limit 120
         ) t where not exists (select 1 from t_strategy_result t1 where t1.`date` = t.`date` and t.date and strategy_type = 'strategy_5')
-    </select>
-
-    <select id="getLast5Days" resultType="java.lang.String">
-        select distinct `date`
-        from t_index_raw teni
-        where stockCode = '1.000001'
-        order by 1 desc
-        limit 5;
     </select>
 
     <insert id="gen_strategy_5_default">

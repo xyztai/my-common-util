@@ -10,8 +10,6 @@ public interface AgSinaMapper {
     List<String> getStocks();
     List<String> getEtfs();
     List<String> getIndexs();
-    String getMaxDateFromStock();
-    String getMaxDateFromEtf();
 
     int saveDataSina(List<AgHistorySinaController.DataSohu> dataSohuList);
 }

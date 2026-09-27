@@ -3,7 +3,6 @@ package net.my.config;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
 import net.my.controller.*;
-import net.my.mapper.AgEastmoneyEChartsMapper;
 import net.my.mapper.AgWeekEastmoneyStockMapper;
 import net.my.mapper.KLineRealTimeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -48,9 +47,6 @@ public class ScheduledTasks {
 
     @Autowired
     private AgQueryETFController agQueryETFController;
-
-    @Autowired
-    private AgEastmoneyEChartsMapper agEastmoneyEChartsMapper;
 
     @Autowired
     private AgWeekEastmoneyStockMapper agWeekEastmoneyStockMapper;
@@ -565,32 +561,6 @@ public class ScheduledTasks {
 
 
 
-        // 查询图标数据
-        log.info("echarts stock getBeginDate start");
-        String beginDate = agEastmoneyEChartsMapper.getBeginDate();
-        log.info("echarts stock getBeginDate end");
-
-        CompletableFuture<Void> echart_task_301 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("echarts stock saveEcharts9ZhuanS start");
-                agEastmoneyEChartsMapper.saveEcharts9ZhuanS(beginDate);
-                log.info("echarts stock saveEcharts9ZhuanS end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
-        CompletableFuture<Void> echart_task_302 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("echarts stock saveEcharts9ZhuanB start");
-                agEastmoneyEChartsMapper.saveEcharts9ZhuanB(beginDate);
-                log.info("echarts stock saveEcharts9ZhuanB end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
-
         // 等待所有任务完成
         CompletableFuture<Void> allTasks = CompletableFuture.allOf(
                 stock_task_88802
@@ -630,8 +600,7 @@ public class ScheduledTasks {
                 , etf_task_208
                 , etf_task_209
 
-                , echart_task_301
-                , echart_task_302
+
         );
 
         // 当所有任务完成后执行

@@ -28,24 +28,6 @@
         ]]>
     </select>
 
-    <select id="getMaxDateFromStock" resultType="java.lang.String">
-        <![CDATA[
-        select max(`date`)
-        from t_stock_raw ten
-        where ten.`date` >= '2026-01-01'
-        and ten.`date` not like '9999%'
-        ]]>
-    </select>
-
-    <select id="getMaxDateFromEtf" resultType="java.lang.String">
-        <![CDATA[
-        select max(`date`)
-        from t_etf_raw ten
-        where ten.`date` >= '2026-01-01'
-        and ten.`date` not like '9999%'
-        ]]>
-    </select>
-
     <insert id="saveDataSina" parameterType="java.util.List">
         replace into t_history_sina(`day`, `code`, `open`, `close`, `high`, `low`, `volume`)
         values

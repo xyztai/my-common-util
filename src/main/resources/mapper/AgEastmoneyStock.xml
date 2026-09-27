@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="net.my.mapper.AgEastmoneyStockMapper">
+<mapper namespace="net.my.mapper.AgStockMapper">
 
     <select id="getDailyCnt" resultType="net.my.pojo.SpecialCarePoJo2">
     <![CDATA[
@@ -74,134 +74,6 @@
         order by date desc
         limit 1 offset 15
     </select>
-
-    <select id="getHs300List" resultType="net.my.pojo.HsStockPoJo">
-        select stockCode, stockType, stockName
-        from t_stock
-        -- where stockCode not like '30%'
-        -- and stockCode not like '68%'
-        order by 1
-    </select>
-
-    <select id="getMaxEastMoneyNode" resultType="net.my.pojo.EastmoneyNode">
-        select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-        from t_stock_raw
-        where stockCode = #{stockCode}
-          and `date` not like '99999%'
-        order by date desc
-            limit 1
-    </select>
-
-    <insert id="saveEastMoneyDatas" parameterType="java.util.List">
-        insert into t_stock_raw(`date`, `stockCode`, `infoRaw`)
-        values
-        <foreach collection="list" item="item" separator=",">
-            (#{item.date}, #{item.stockCode}, #{item.infoRaw}
-            )
-        </foreach>
-    </insert>
-
-    <update id="updateEastMoneyDatas">
-        update t_stock_raw
-        set `date` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -11), ',', 1) ,
-            `open` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -10), ',', 1) ,
-            `last` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -9), ',', 1) ,
-            `high` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -8), ',', 1) ,
-            `low` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -7), ',', 1) ,
-            `volume` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -6), ',', 1) ,
-            `amount` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -5), ',', 1) ,
-            `chg` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -3), ',', 1) ,
-            -- SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -4), ',', 1),
-            -- SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -3), ',', 1),
-            -- SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -2), ',', 1),
-            `exchangeRaw` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -1), ',', 1)
-        where `open` is null
-    </update>
-
-    <delete id="deleteExpect99999">
-        DELETE
-        from t_stock_raw
-        where `date` like '99999%'
-    </delete>
-
-    <insert id="insertExpect99999">
-        <![CDATA[
-        replace INTO t_stock_raw (`date`,stockCode,infoRaw,`open`,`last`,high,low,volume,amount,exchangeRaw,clac_expma_5,clac_expma_10)
-        with lastest_info as (
-            select ten.`date` , ten.stockCode , ten.`last`, ten.infoRaw , rank() over (partition by ten.stockCode order by `date` desc) rank_
-            from t_stock_raw ten
-            where ten.`date` > '2025-06-01'
-        )
-        , one_info as (
-            select *
-            from lastest_info tt
-            where tt.rank_ = 1
-        )
-        select '99999+0.01' date, stockCode stockCode, concat('99999+0.01', ',0,', round(`last`*(1+0.01), 3), ',0,0,0,0,0,0,0,0') infoRaw, null, null, null, null, null, null, null, null, null
-        from one_info
-        union all
-        select '99999-0.00' date, stockCode stockCode, concat('99999-0.00', ',0,', round(`last`*(1-0.00), 3), ',0,0,0,0,0,0,0,0') infoRaw, null, null, null, null, null, null, null, null, null
-        from one_info
-        union all
-        select '99999-0.01' date, stockCode stockCode, concat('99999-0.01', ',0,', round(`last`*(1-0.01), 3), ',0,0,0,0,0,0,0,0') infoRaw, null, null, null, null, null, null, null, null, null
-        from one_info
-        union all
-        select '99999-0.02' date, stockCode stockCode, concat('99999-0.02', ',0,', round(`last`*(1-0.02), 3), ',0,0,0,0,0,0,0,0') infoRaw, null, null, null, null, null, null, null, null, null
-        from one_info
-        union all
-        select '99999-0.03' date, stockCode stockCode, concat('99999-0.03', ',0,', round(`last`*(1-0.03), 3), ',0,0,0,0,0,0,0,0') infoRaw, null, null, null, null, null, null, null, null, null
-        from one_info
-        ]]>
-    </insert>
-
-    <select id="getAllNeedUpdateEastMoneyNodes" resultType="net.my.pojo.EastmoneyNode">
-        select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-        from t_stock_raw
-        where clac_expma_5 is null
-    </select>
-
-    <select id="getEastMoneyNodes" resultType="net.my.pojo.EastmoneyNode">
-        select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-        from t_stock_raw
-        where stockCode = #{stockCode}
-          and clac_expma_5 is null
-    </select>
-
-    <select id="getAllMaxEastMoneyNodeHasExpma" resultType="net.my.pojo.EastmoneyNode">
-        select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, expma5, expma10
-        from (
-            select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-            , rank() over (partition by stockCode order by `date` desc) rank_
-            from t_stock_raw
-            where clac_expma_5 is not null
-            and `date` not like '99999%'
-        ) tt
-        where tt.rank_ = 1
-    </select>
-
-    <select id="getMaxEastMoneyNodeHasExpma" resultType="net.my.pojo.EastmoneyNode">
-        select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-        from t_stock_raw
-        where stockCode = #{stockCode}
-          and clac_expma_5 is not null
-          and `date` not like '99999%'
-        order by date desc
-            limit 1
-    </select>
-
-    <update id="updateExpmaEastmoney" parameterType="net.my.pojo.EastmoneyNode">
-        update t_stock_raw
-        set clac_expma_5 = #{expma5}, clac_expma_10=#{expma10}
-        where id = #{id}
-    </update>
-
-    <update id="batchUpdateExpmaEastmoney" parameterType="java.util.List">
-        <foreach collection="list" item="item" separator=";">
-            update t_stock_raw
-            set clac_expma_5 = #{item.expma5}, clac_expma_10=#{item.expma10}
-            where id = #{item.id}
-        </foreach>
-    </update>
 
     <select id="queryEastmoneyToday" resultType="net.my.pojo.SpecialCarePoJo2">
     <![CDATA[
@@ -1218,14 +1090,6 @@
             and th.stockCode not like '68%'
             order by 2 desc
         ]]>
-    </select>
-
-    <select id="getCalcDatesFromMA"  resultType="java.lang.String">
-        select distinct date
-        from t_stock_raw ten
-        where ten.`date` > (select ifnull(max(date), '2023-01-01') from t_stock_ma)
-        and ten.`date` not like '9999%'
-        order by 1
     </select>
 
     <insert id="saveRightData" parameterType="java.util.List">

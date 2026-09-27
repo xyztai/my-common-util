@@ -9,10 +9,5 @@ import java.util.List;
 
 @Repository
 public interface AgWeekEastmoneyStockMapper {
-    // hs300 数据
-    List<HsStockPoJo> getHs300List(@Param("targetDate") String targetDate);
-    String getMaxEastMoneyNode(@Param("stockCode") String stockCode);
-    int saveEastMoneyDatas(List<EastmoneyNode> eastmoneyNodes);
-    int updateEastMoneyDatas();
     int genWeeklyData();
 }

@@ -4,7 +4,7 @@ import io.swagger.annotations.Api;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
-import net.my.mapper.AgEastmoneyEtfMapper;
+import net.my.mapper.AgETFMapper;
 import net.my.pojo.BaseResponse;
 import net.my.pojo.RestGeneralResponse;
 import net.my.pojo.SpecialCarePoJo;
@@ -39,7 +39,7 @@ public class AgQueryETFController {
             "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=%s&klt=101&fqt=1&beg=%s&end=20500101&fields1=f1&fields2=f51,f52,f53,f54,f55,f56,f57,f58,f59,f60,f61";
 
     @Autowired
-    private AgEastmoneyEtfMapper agEastmoneyEtfMapper;
+    private AgETFMapper agETFMapper;
 
     @Autowired
     private RestTemplate restTemplate;
@@ -79,7 +79,7 @@ public class AgQueryETFController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.investEtfChgTop3();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agETFMapper.investEtfChgTop3();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -112,7 +112,7 @@ public class AgQueryETFController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.investEtfChgTop3History();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agETFMapper.investEtfChgTop3History();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -146,7 +146,7 @@ public class AgQueryETFController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyToday();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agETFMapper.queryEtfEastmoneyToday();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -179,7 +179,7 @@ public class AgQueryETFController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyLast60();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agETFMapper.queryEtfEastmoneyLast60();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -212,7 +212,7 @@ public class AgQueryETFController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyVolSuddenlyRised();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agETFMapper.queryEtfEastmoneyVolSuddenlyRised();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -246,7 +246,7 @@ public class AgQueryETFController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtf9ZhuanS();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agETFMapper.queryEtf9ZhuanS();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -279,7 +279,7 @@ public class AgQueryETFController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfLastest90Days();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agETFMapper.queryEtfLastest90Days();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -312,7 +312,7 @@ public class AgQueryETFController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyEtfMapper.queryEtfEastmoneyLatestInfo();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agETFMapper.queryEtfEastmoneyLatestInfo();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")

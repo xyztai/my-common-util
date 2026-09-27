@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AgMAEastmoneyStockMapper {
+public interface AgMAMapper {
     List<String> getCalcMADates4Stock();
     int genMAData4Stock(@Param("calcDate") String calcDate);
 

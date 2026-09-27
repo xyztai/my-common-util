@@ -9,21 +9,8 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AgEastmoneyStockMapper {
+public interface AgStockMapper {
     String getLimitDate();
-    // hs300 数据
-    List<HsStockPoJo> getHs300List();
-    EastmoneyNode getMaxEastMoneyNode(@Param("stockCode") String stockCode);
-    int saveEastMoneyDatas(List<EastmoneyNode> eastmoneyNodes);
-    int updateEastMoneyDatas();
-    int deleteExpect99999();
-    int insertExpect99999();
-    List<EastmoneyNode> getAllNeedUpdateEastMoneyNodes();
-    List<EastmoneyNode> getEastMoneyNodes(@Param("stockCode") String stockCode);
-    List<EastmoneyNode> getAllMaxEastMoneyNodeHasExpma();
-    EastmoneyNode getMaxEastMoneyNodeHasExpma(@Param("stockCode") String stockCode);
-    int updateExpmaEastmoney(EastmoneyNode node);
-    int batchUpdateExpmaEastmoney(List<EastmoneyNode> node);
     List<SpecialCarePoJo2> queryEastmoneyToday();
     List<SpecialCarePoJo2> queryEastmoneyLast30();
     List<SpecialCarePoJo2> queryIndexTop12In1Year();
@@ -45,8 +32,6 @@ public interface AgEastmoneyStockMapper {
     List<SpecialCarePoJo2> down5();
     List<SpecialCarePoJo2> getDailyCnt();
     List<SpecialCarePoJo2> get_000001_lowest();
-    int genDuoTou(@Param("calcDate") String calcDate);
-    List<String> getCalcDatesFromMA();
 
     int saveRightData(List<SpecialCarePoJo2> eastmoneyNodes);
     String getMaxDate();

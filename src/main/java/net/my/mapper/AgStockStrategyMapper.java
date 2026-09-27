@@ -7,10 +7,9 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AgEastmoneyStockStrategyMapper {
+public interface AgStockStrategyMapper {
     List<SpecialCarePoJo2> strategy_2();
     List<SpecialCarePoJo2> strategy_3();
-    List<String> getLast5Days();
     List<String> getLast120Days4Strategy5();
     int gen_strategy_5_default(@Param("calcDate") String calcDate);
     int gen_strategy_5(@Param("calcDate") String calcDate);
