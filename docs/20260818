@@ -3,7 +3,7 @@
 select group_concat(x)
 from (
 	select distinct replace(replace(fullStockCode, '0.', 'sz'), '1.', 'sh') x
-	from t_longtou tl
+	from t_stock_longtou tl
 	where ranking <= 2
 	-- limit 10
 ) t;

@@ -1229,7 +1229,7 @@
     </select>
 
     <insert id="saveRightData" parameterType="java.util.List">
-        replace into t_eastmoney_node_right(`date`, `stockCode`, `stockName`, `info`)
+        replace into t_stock_right(`date`, `stockCode`, `stockName`, `info`)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.date}, #{item.stockCode}, #{item.last}, #{item.ratioB}

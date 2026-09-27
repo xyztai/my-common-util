@@ -76,7 +76,7 @@ group by SUBSTRING(`date` , 1, 4)
 order by 1;
 
 
-select * from t_eastmoney_node_9_zhuan order by 2 desc, 3;
+select * from t_stock_9_zhuan order by 2 desc, 3;
 select count(1), count(distinct _date) _date, max(distinct _date) _date_max, min(distinct _date) _date_min
        , count(distinct case when _9_zhuan = '06' then _date else null end) _06
        , count(distinct case when _9_zhuan = '07' then _date else null end) _07
@@ -84,12 +84,12 @@ select count(1), count(distinct _date) _date, max(distinct _date) _date_max, min
        , count(distinct case when _9_zhuan = '09' then _date else null end) _09
        , MAX(distinct case when _9_zhuan = '09' then _date else null end) _09_date_max
        , min(distinct case when _9_zhuan = '09' then _date else null end) _09_date_min
-from t_eastmoney_node_9_zhuan;
+from t_stock_9_zhuan;
 
 select SUBSTRING(_date, 1, 9) _year, round(sum(s_b)/count(1))
 from (
 	select _date, sum(case when _direction = 'S' then 1 else 0 end)/sum(case when _direction = 'S' then 0 else 1 end) s_b
-	from t_eastmoney_node_9_zhuan
+	from t_stock_9_zhuan
 	group by _date
 	having s_b >= 3 or s_b is NULL
 ) tt
@@ -98,7 +98,7 @@ order by 1 desc;
 
 with tmp as (
 	select _date, sum(case when _direction = 'S' then 1 else 0 end)/sum(case when _direction = 'S' then 0 else 1 end) s_b
-	from t_eastmoney_node_9_zhuan
+	from t_stock_9_zhuan
 	group by _date
 )
 select t1.*, t2.avg_s_b
@@ -109,7 +109,7 @@ order by 1 desc;
 
 with tmp as (
 	select _date, sum(case when _direction = 'S' then 1 else 0 end)/sum(case when _direction = 'S' then 0 else 1 end) s_b
-	from t_eastmoney_node_9_zhuan
+	from t_stock_9_zhuan
 	group by _date
 )
 select t1.*, t2.avg_s_b
@@ -125,8 +125,8 @@ select count(1) from t_stock_raw;
 
 
 
-drop table t_eastmoney_node_9_zhuan;
-CREATE TABLE `t_eastmoney_node_9_zhuan` (
+drop table t_stock_9_zhuan;
+CREATE TABLE `t_stock_9_zhuan` (
   `id` int NOT NULL AUTO_INCREMENT,
   `_date` varchar(100) DEFAULT NULL,
   `_stockCode` varchar(200) DEFAULT NULL,
@@ -138,7 +138,7 @@ CREATE TABLE `t_eastmoney_node_9_zhuan` (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci COMMENT='从东财获取的9转数据'
 
 
-insert into t_eastmoney_node_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
+insert into t_stock_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
         select t9.`date`, t9.stockCode, t9._direction, t9._9_zhuan
         from (
                 select t3.`date`, t3.stockCode , t3.`last`, t3.chg
@@ -233,7 +233,7 @@ insert into t_eastmoney_node_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
 
 
 
--- insert into t_eastmoney_node_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
+-- insert into t_stock_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
         select t9.`date`, t9.stockCode, t9._direction, t9._9_zhuan
         from (
                 select t3.`date`, t3.stockCode , t3.`last`, t3.chg, chg_next_1, chg_next_2, chg_next_3, chg_next_4, chg_next_5, chg_next_6, chg_next_7, chg_next_8, chg_next_9, chg_next_10

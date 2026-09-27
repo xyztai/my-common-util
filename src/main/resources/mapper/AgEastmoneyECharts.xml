@@ -12,7 +12,7 @@
 
     <insert id="saveEcharts9ZhuanS">
         <![CDATA[
-        replace into t_eastmoney_node_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
+        replace into t_stock_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
         select t9.`date`, t9.stockCode, t9._direction, t9._9_zhuan
         from (
                 select t3.`date`, t3.stockCode , t3.`last`, t3.chg
@@ -95,7 +95,7 @@
 
     <insert id="saveEcharts9ZhuanB">
         <![CDATA[
-        replace into t_eastmoney_node_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
+        replace into t_stock_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
         select t9.`date`, t9.stockCode, t9._direction, t9._9_zhuan
         from (
                 select t3.`date`, t3.stockCode , t3.`last`, t3.chg
