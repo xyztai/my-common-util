@@ -1,11 +1,9 @@
 package net.my.controller;
 
-import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
-import net.my.mapper.AgCCIMapper;
 import net.my.mapper.AgQueryStockMapper;
 import net.my.pojo.BaseResponse;
 import net.my.pojo.RestGeneralResponse;
@@ -13,13 +11,13 @@ import net.my.pojo.SpecialCarePoJo;
 import net.my.pojo.SpecialCarePoJo2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
@@ -37,11 +35,6 @@ public class AgQueryStockController {
 
     @Autowired
     private AgQueryStockMapper agQueryStockMapper;
-
-    // 10000、方便截图，进行数据汇总（左侧）
-    private static final String KEY_10000 = "stock#" + "easy-snapshot-left";
-    // 10000、方便截图，进行数据汇总（右侧）
-    private static final String KEY_10001 = "stock#" + "easy-snapshot-right";
 
     // 101、查询出现5连跌，且当天的开盘>收盘、chg<0，可以快进，第二天上涨必须卖出，急快短线，博个反弹
     private static final String KEY_101 = "stock#" + "get-left-side-5-lian-down-must-sell-next-day";
@@ -79,271 +72,10 @@ public class AgQueryStockController {
     private static final String KEY_231 = "stock#" + "get-right-side-query9ZhuanS";
     // 232、查询多头排列的票(ma多头)
     private static final String KEY_232 = "stock#" + "get-right-side-duo-tou-ma";
-    // 233、查询多头排列的票(5>10>20>60)
-    private static final String KEY_233 = "stock#" + "get-right-side-duo-tou";
-    // 234、收盘在20日均或者60日均的位置，可能会反弹
-    private static final String KEY_234 = "stock#" + "get-right-side-avg20-or-avg60";
     // 235、考虑cci在-100掠过，即只是简单地经过-100，且地量+大振幅的目的
     private static final String KEY_235 = "stock#" + "get-right-side-cci-and-low-vol-and-big-swing";
     // 236、查询最近一个月的大波动且Vol是5天内的最低点，很可能是上涨中继
     private static final String KEY_236 = "stock#" + "get-right-side-big-swing-and-lowest-vol-2";
-
-
-    /**
-     * 10000、
-     * @return
-     */
-    @GetMapping("/easy-snapshot-left")
-    public BaseResponse easySnapshotLeft() {
-        log.info("easySnapshotLeft start...");
-        String cacheKey = KEY_10000;
-        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(cacheKey);
-        if(res != null) {
-            log.info("myCaffeineCache get, key={}, cacheRes={}", cacheKey, res);
-            return RestGeneralResponse.of(res);
-        }
-
-        res = new ArrayList<>();
-        Map<String, String> statisRes = new HashMap<>(); // 结构为：601800#--#基础建设-中国交建, KEY_101#KEY_102
-        Set<String> fieldsSet = new HashSet<>();
-
-        String startDate = agQueryStockMapper.getLimitDate();
-        // 依次计算
-        for(String kk : Arrays.asList(KEY_101, KEY_102, KEY_103)) {
-            List<SpecialCarePoJo2> res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
-            log.info("get cache value. key = {}, value = {}", kk, JSON.toJSON(res0));
-            if(!CollectionUtils.isEmpty(res0)){
-                String kkName = "";
-                switch (kk) {
-                    case KEY_101: kkName = "KEY_101"; break;
-                    case KEY_102: kkName = "KEY_102"; break;
-                    case KEY_103: kkName = "KEY_103"; break;
-                    default:
-                        break;
-                }
-
-                String finalKkName = kkName;
-                Set<String> strs = res0.stream()
-                                    .filter(f -> f.getDate().compareTo(startDate) >= 0)
-                                    .map(m -> String.join("#", Arrays.asList(m.getStockCode(), "--", m.getLast(), finalKkName)))
-                                    .collect(Collectors.toSet());
-                if(!CollectionUtils.isEmpty(strs)) {
-                    // 拿到key值的列表
-                    fieldsSet.addAll(strs);
-                }
-            }
-        }
-
-        log.info("fieldsSet = {}", JSON.toJSONString(fieldsSet));
-        // 将数据转到set里面
-        if(!CollectionUtils.isEmpty(fieldsSet)) {
-            for(String str : fieldsSet) {
-                String[] fields = str.split("#");
-                if(fields != null && fields.length >= 4) {
-                    String kk = fields[3];
-                    String key = str.replace(kk, "");
-                    if(!statisRes.containsKey(key)) {
-                        statisRes.put(key, kk + "#");
-                    } else {
-                        statisRes.put(key, statisRes.get(key) + kk + "#");
-                    }
-                }
-            }
-        }
-
-        log.info("statisRes = {}", JSON.toJSONString(statisRes));
-        // 将set里面的数据进行一个统计
-        if(!CollectionUtils.isEmpty(statisRes)) {
-            for(Map.Entry<String, String> entry : statisRes.entrySet()) {
-                SpecialCarePoJo2 tmpPoJo2 = new SpecialCarePoJo2();
-                String key = entry.getKey();
-                String[] fileds = key.split("#");
-                if(fileds != null && fileds.length >= 3) {
-                    tmpPoJo2.setStockCode(fileds[0]);
-                    tmpPoJo2.setDate(fileds[1]);
-                    tmpPoJo2.setLast(fileds[2]);
-                }
-
-                String value = entry.getValue();
-                fileds = value.split("#");
-                if(fileds.length < 2) {
-                    continue;
-                }
-
-                if(fileds != null) {
-                    tmpPoJo2.setLast(String.format(Locale.ROOT, "%02d", fileds.length) + "#" + tmpPoJo2.getLast());
-                    tmpPoJo2.setRatioB(value);
-                }
-                res.add(tmpPoJo2);
-            }
-        }
-
-        if(!CollectionUtils.isEmpty(res)) {
-            res = res.stream()
-                    .sorted(Comparator.comparing(SpecialCarePoJo2::getLast).reversed())
-                    .collect(Collectors.toList());
-            for(SpecialCarePoJo2 pojo2 : res) {
-                String tmp = pojo2.getRatioB();
-                String[] splits = tmp.replace("#", "").split("KEY_");
-                tmp = String.join("_"
-                        , Arrays.stream(splits)
-                                .sorted()
-                                .filter(f -> !StringUtils.isEmpty(f))
-                                .collect(Collectors.toList()));
-                pojo2.setRatioB(tmp);
-            }
-        } else {
-            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
-            empty.setDate("--");
-            empty.setStockCode("--");
-            empty.setRatioB("--");
-            empty.setLast("--");
-            res = Arrays.asList(empty);
-        }
-
-        myCaffeineCache.put(cacheKey, res);
-        log.info("myCaffeineCache put, key={}, res={}", cacheKey, res);
-        return RestGeneralResponse.of(res);
-    }
-
-
-    /**
-     * 10001、
-     * @return
-     */
-    @GetMapping("/easy-snapshot-right")
-    public BaseResponse easySnapshotRight() {
-        log.info("easySnapshotRight start...");
-        String cacheKey = KEY_10001;
-        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(cacheKey);
-        if(res != null) {
-            log.info("myCaffeineCache get, key={}, cacheRes={}", cacheKey, res);
-            return RestGeneralResponse.of(res);
-        }
-
-        res = new ArrayList<>();
-        Map<String, String> statisRes = new HashMap<>(); // 结构为：601800#--#基础建设-中国交建, KEY_101#KEY_102
-        Set<String> fieldsSet = new HashSet<>();
-
-        String startDate = agQueryStockMapper.getLimitDate();
-        // 依次计算
-        for(String kk : Arrays.asList(
-                KEY_221, KEY_222, KEY_223, KEY_224, KEY_225
-                , KEY_226, KEY_227, KEY_228, KEY_229, KEY_230
-                , KEY_231, KEY_232, KEY_233, KEY_234, KEY_235, KEY_236)) {
-            List<SpecialCarePoJo2> res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
-            log.info("get cache value. key = {}, value = {}", kk, JSON.toJSON(res0));
-            if(!CollectionUtils.isEmpty(res0)){
-                String kkName = "";
-                switch (kk) {
-                    case KEY_221: kkName = "KEY_221"; break;
-                    case KEY_222: kkName = "KEY_222"; break;
-                    case KEY_223: kkName = "KEY_223"; break;
-                    case KEY_224: kkName = "KEY_224"; break;
-                    case KEY_225: kkName = "KEY_225"; break;
-                    case KEY_226: kkName = "KEY_226"; break;
-                    case KEY_227: kkName = "KEY_227"; break;
-                    case KEY_228: kkName = "KEY_228"; break;
-                    case KEY_229: kkName = "KEY_229"; break;
-                    case KEY_230: kkName = "KEY_230"; break;
-                    case KEY_231: kkName = "KEY_231"; break;
-                    case KEY_232: kkName = "KEY_232"; break;
-                    case KEY_233: kkName = "KEY_233"; break;
-                    case KEY_234: kkName = "KEY_234"; break;
-                    case KEY_235: kkName = "KEY_235"; break;
-                    case KEY_236: kkName = "KEY_236"; break;
-                    default:
-                        break;
-                }
-
-                String finalKkName = kkName;
-                Set<String> strs = res0.stream()
-                        .filter(f -> f.getDate().compareTo(startDate) >= 0)
-                        .map(m -> String.join("#", Arrays.asList(m.getStockCode(), "--", m.getLast(), finalKkName)))
-                        .collect(Collectors.toSet());
-                if(!CollectionUtils.isEmpty(strs)) {
-                    // 拿到key值的列表
-                    fieldsSet.addAll(strs);
-                }
-            }
-        }
-
-        log.info("fieldsSet = {}", JSON.toJSONString(fieldsSet));
-        // 将数据转到set里面
-        if(!CollectionUtils.isEmpty(fieldsSet)) {
-            for(String str : fieldsSet) {
-                String[] fields = str.split("#");
-                if(fields != null && fields.length >= 4) {
-                    String kk = fields[3];
-                    String key = str.replace(kk, "");
-                    if(!statisRes.containsKey(key)) {
-                        statisRes.put(key, kk + "#");
-                    } else {
-                        statisRes.put(key, statisRes.get(key) + kk + "#");
-                    }
-                }
-            }
-        }
-
-        log.info("statisRes = {}", JSON.toJSONString(statisRes));
-        // 将set里面的数据进行一个统计
-        if(!CollectionUtils.isEmpty(statisRes)) {
-            for(Map.Entry<String, String> entry : statisRes.entrySet()) {
-                SpecialCarePoJo2 tmpPoJo2 = new SpecialCarePoJo2();
-                String key = entry.getKey();
-                String[] fileds = key.split("#");
-                if(fileds != null && fileds.length >= 3) {
-                    tmpPoJo2.setStockCode(fileds[0]);
-                    tmpPoJo2.setDate(fileds[1]);
-                    tmpPoJo2.setLast(fileds[2]);
-                }
-
-                String value = entry.getValue();
-                fileds = value.split("#");
-                if(fileds.length < 3) {
-                    continue;
-                }
-
-                if(fileds != null) {
-                    tmpPoJo2.setLast(String.format(Locale.ROOT, "%02d", fileds.length) + "#" + tmpPoJo2.getLast());
-                    tmpPoJo2.setRatioB(value);
-                }
-                res.add(tmpPoJo2);
-            }
-        }
-
-        if(!CollectionUtils.isEmpty(res)) {
-            res = res.stream()
-                    .sorted(Comparator.comparing(SpecialCarePoJo2::getLast).reversed())
-                    .collect(Collectors.toList());
-            for(SpecialCarePoJo2 pojo2 : res) {
-                String tmp = pojo2.getRatioB();
-                String[] splits = tmp.replace("#", "").split("KEY_");
-                tmp = String.join("_"
-                        , Arrays.stream(splits)
-                                .sorted()
-                                .filter(f -> !StringUtils.isEmpty(f))
-                                .collect(Collectors.toList()));
-                pojo2.setRatioB(tmp);
-            }
-
-            // 将结果保存到数据库
-            String maxDate = agQueryStockMapper.getMaxDate();
-            res.forEach(f -> f.setDate(maxDate));
-            agQueryStockMapper.saveRightData(res);
-        } else {
-            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
-            empty.setDate("--");
-            empty.setStockCode("--");
-            empty.setRatioB("--");
-            empty.setLast("--");
-            res = Arrays.asList(empty);
-        }
-
-        myCaffeineCache.put(cacheKey, res);
-        log.info("myCaffeineCache put, key={}, res={}", cacheKey, res);
-        return RestGeneralResponse.of(res);
-    }
 
 
     /**

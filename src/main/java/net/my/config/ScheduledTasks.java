@@ -531,10 +531,6 @@ public class ScheduledTasks {
             System.out.println("所有任务已完成");
         }).join();
 
-        log.info("task agNewEastmoneyStockController.easySnapshotRight start");
-        agQueryStockController.easySnapshotRight();
-        log.info("task agNewEastmoneyStockController.easySnapshotRight end");
-
 
 
     }
