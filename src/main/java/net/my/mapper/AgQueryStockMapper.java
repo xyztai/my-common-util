@@ -11,8 +11,6 @@ import java.util.List;
 @Repository
 public interface AgQueryStockMapper {
     List<SpecialCarePoJo2> down5();
-    List<SpecialCarePoJo2> queryEastmoneyToday();
-    List<SpecialCarePoJo2> queryEastmoneyLast30();
     List<SpecialCarePoJo2> queryIndexTop12In1Year();
     List<SpecialCarePoJo2> queryEastmoneyVolSuddenlyRisedTriple();
     List<SpecialCarePoJo2> query9ZhuanB();
