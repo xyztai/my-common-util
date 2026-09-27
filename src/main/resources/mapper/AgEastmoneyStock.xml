@@ -66,13 +66,6 @@
     ]]>
     </select>
 
-    <select id="getLimitDate" resultType="java.lang.String">
-        select distinct date
-        from t_stock_raw
-        order by date desc
-        limit 1 offset 15
-    </select>
-
     <select id="queryEastmoneyToday" resultType="net.my.pojo.SpecialCarePoJo2">
     <![CDATA[
         with tmp_all as (
@@ -1061,26 +1054,6 @@
             order by 2 desc
         ]]>
     </select>
-
-    <insert id="saveRightData" parameterType="java.util.List">
-        replace into t_stock_right(`date`, `stockCode`, `stockName`, `info`)
-        values
-        <foreach collection="list" item="item" separator=",">
-            (#{item.date}, #{item.stockCode}, #{item.last}, #{item.ratioB}
-            )
-        </foreach>
-    </insert>
-
-
-    <select id="getMaxDate" resultType="java.lang.String">
-        select max(date) from t_index_raw
-    </select>
-
-
-
-
-
-
 
 
 </mapper>

@@ -10,7 +10,7 @@ import java.util.List;
 
 @Repository
 public interface AgQueryStockMapper {
-    String getLimitDate();
+    List<SpecialCarePoJo2> down5();
     List<SpecialCarePoJo2> queryEastmoneyToday();
     List<SpecialCarePoJo2> queryEastmoneyLast30();
     List<SpecialCarePoJo2> queryIndexTop12In1Year();
@@ -29,10 +29,6 @@ public interface AgQueryStockMapper {
     List<SpecialCarePoJo2> jumpAndWait();
     List<SpecialCarePoJo2> MA20maSSP();
     List<SpecialCarePoJo2> considerAll();
-    List<SpecialCarePoJo2> down5();
     List<SpecialCarePoJo2> getDailyCnt();
     List<SpecialCarePoJo2> get_000001_lowest();
-
-    int saveRightData(List<SpecialCarePoJo2> eastmoneyNodes);
-    String getMaxDate();
 }
