@@ -482,73 +482,12 @@ public class ScheduledTasks {
         CompletableFuture<Void> etf_task_202 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf investEtfChgTop3History start");
-                agQueryETFController.investEtfChgTop3History();
+                agQueryETFController.queryEtfChgTop3History();
                 log.info("task etf investEtfChgTop3History end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
             }
         }, executor);
-
-        CompletableFuture<Void> etf_task_203 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task etf queryEastmoneyToday start");
-                agQueryETFController.queryEastmoneyToday();
-                log.info("task etf queryEastmoneyToday end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
-        CompletableFuture<Void> etf_task_204 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task etf queryEastmoneyLast60 start");
-                agQueryETFController.queryEastmoneyLast60();
-                log.info("task etf queryEastmoneyLast60 end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
-        CompletableFuture<Void> etf_task_205 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task etf queryEastmoneyVolSuddenlyRised start");
-                agQueryETFController.queryEastmoneyVolSuddenlyRised();
-                log.info("task etf queryEastmoneyVolSuddenlyRised end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
-        CompletableFuture<Void> etf_task_208 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task etf queryEastmoneyLatestInfo start");
-                agQueryETFController.queryEastmoneyLatestInfo();
-                log.info("task etf queryEastmoneyLatestInfo end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
-        CompletableFuture<Void> etf_task_209 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task etf queryEtfLastest90Days start");
-                agQueryETFController.queryEtfLastest90Days();
-                log.info("task etf queryEtfLastest90Days end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
-
-
-//        log.info("task stock queryWinRatios start");
-//        agNewEastmoneyStockController.queryWinRatios();
-//        log.info("task stock queryWinRatios end");
-
-//        log.info("task etf queryWinRatios start");
-//        agNewEastmoneyETFController.queryWinRatios();
-//        log.info("task etf queryWinRatios end");
-
 
 
         // 等待所有任务完成
@@ -583,11 +522,6 @@ public class ScheduledTasks {
 
                 , etf_task_201
                 , etf_task_202
-                , etf_task_203
-                , etf_task_204
-                , etf_task_205
-                , etf_task_208
-                , etf_task_209
 
 
         );
