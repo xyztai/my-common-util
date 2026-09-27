@@ -1,10 +1,7 @@
 package net.my.mapper;
 
-import net.my.pojo.EchartsPoJo;
 import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
-
-import java.util.List;
 
 @Repository
 public interface AgEastmoneyEChartsMapper {

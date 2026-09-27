@@ -4,7 +4,6 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
-import net.my.config.ScheduledTasks;
 import net.my.mapper.AgMapper;
 import net.my.pojo.AgDataType;
 import net.my.pojo.BaseResponse;
