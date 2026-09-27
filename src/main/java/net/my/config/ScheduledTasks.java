@@ -251,26 +251,6 @@ public class ScheduledTasks {
             }
         }, executor);
 
-        CompletableFuture<Void> stock_task_103 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task stock queryEastmoneyToday start");
-                agQueryStockController.queryEastmoneyToday();
-                log.info("task stock queryEastmoneyToday end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
-        CompletableFuture<Void> stock_task_104 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task stock queryEastmoneyLast30 start");
-                agQueryStockController.queryEastmoneyLast30();
-                log.info("task stock queryEastmoneyLast30 end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
         CompletableFuture<Void> stock_task_105 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryIndexTop12In1Year start");
@@ -497,8 +477,6 @@ public class ScheduledTasks {
                 , stock_task_88805
                 , stock_task_101
                 , stock_task_102
-                , stock_task_103
-                , stock_task_104
                 , stock_task_105
                 , stock_task_221
                 , stock_task_222
