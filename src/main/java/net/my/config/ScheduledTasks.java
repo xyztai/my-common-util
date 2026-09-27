@@ -1,6 +1,7 @@
 package net.my.config;
 
 import lombok.extern.slf4j.Slf4j;
+import net.my.cache.MyCaffeineCache;
 import net.my.controller.*;
 import net.my.mapper.AgEastmoneyEChartsMapper;
 import net.my.mapper.AgWeekEastmoneyStockMapper;
@@ -24,15 +25,11 @@ import java.util.concurrent.Executors;
 public class ScheduledTasks {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
+    @Autowired
+    private MyCaffeineCache myCaffeineCache;
 
     @Autowired
     private AgController agController;
-
-    @Autowired
-    private AgNewQQController agNewQQController;
-
-    @Autowired
-    private AgNewQQ300Controller agNewQQ300Controller;
 
     @Autowired
     private AgEastmoneyStockStrategyController agEastmoneyStockStrategyController;
@@ -70,6 +67,10 @@ public class ScheduledTasks {
     @Value("${executeOnceTaskEnable}")
     private Boolean executeOnceTaskEnable;
 
+    private void invalidateAll() {
+        log.info("invalidateAll...");
+        myCaffeineCache.invalidateAll();
+    }
 
     /**
      * 每周日计算每周的数据
@@ -200,7 +201,7 @@ public class ScheduledTasks {
 
         // 清空缓存
         log.info("task 清空缓存");
-        agNewQQController.invalidateAll();
+        invalidateAll();
 
         // 开始进行查询缓存
         ExecutorService executor = Executors.newFixedThreadPool(5);

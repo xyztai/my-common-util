@@ -44,12 +44,6 @@ public class AgNewEastmoneyETFController {
     private MyCaffeineCache myCaffeineCache;
 
     @Autowired
-    private AgNewQQ300Controller agNewQQ300Controller;
-
-    @Autowired
-    private AgNewXueqiuController agNewXueqiuController;
-
-    @Autowired
     private AgNewSohuController agNewSohuController;
 
     @Autowired
@@ -493,70 +487,6 @@ public class AgNewEastmoneyETFController {
                             useXueqiu = true;
                         }
                         log.error("eastmoney error", ex);
-                    }
-                }
-
-                if(useQq && !useQqStop) {
-                    log.info("useWay=useQq");
-                    try {
-                        int sleepTime = 750 + new Random().nextInt(500) - 250;
-                        log.info("sleepTime={}", sleepTime);
-                        Thread.sleep(sleepTime);
-                        resFromQQ = agNewQQ300Controller.getQQResReplaceEastmoney(zqdm.replace("0.", "sz").replace("1.", "sh"), 30);
-                        if(!CollectionUtils.isEmpty(resFromQQ)) {
-                            log.info("useQq getQQResReplaceEastmoney res {}:{}", zqdm, JSON.toJSON(resFromQQ));
-                            if(!useXueqiuStop) {
-                                useXueqiu = true;
-                                useEastmoney = false;
-                                useQq = false;
-                            } else if(!useEastmoneyStop) {
-                                useEastmoney = true;
-                                useQq = false;
-                            } else {
-                                Thread.sleep(sleepTime);
-                            }
-                            break;
-                        }
-                    } catch (Exception ex) {
-                        useQqStop = true;
-                        if(!useXueqiuStop) {
-                            useXueqiu = true;
-                        } else if(!useEastmoneyStop) {
-                            useEastmoney = true;
-                        }
-                        log.error("useQq getQQResReplaceEastmoney error", ex);
-                    }
-                }
-
-                if(useXueqiu && !useXueqiuStop) {
-                    log.info("useWay=useXueqiu");
-                    try {
-                        int sleepTime = 750 + new Random().nextInt(500) - 250;
-                        log.info("sleepTime={}", sleepTime);
-                        Thread.sleep(sleepTime);
-                        resFromQQ = agNewXueqiuController.getQQResReplaceEastmoney(zqdm.replace("0.", "SZ").replace("1.", "SH"), 30);
-                        if(!CollectionUtils.isEmpty(resFromQQ)) {
-                            log.info("useXueqiu getQQResReplaceEastmoney res {}:{}", zqdm, JSON.toJSON(resFromQQ));
-                            if(!useEastmoneyStop) {
-                                useEastmoney = true;
-                                useQq = false;
-                                useXueqiu = false;
-                            } else if(!useQqStop) {
-                                useQq = true;
-                                useXueqiu = false;
-                            } else {
-                                Thread.sleep(sleepTime);
-                            }
-                            break;
-                        }
-                    } catch (Exception ex) {
-                        useXueqiuStop = true;
-                        if(!useEastmoneyStop) {
-                            useEastmoney = true;
-                        } else if(!useQqStop) {
-                            useQq = true;
-                        }
-                        log.error("useXueqiu getQQResReplaceEastmoney error", ex);
                     }
                 }
 
