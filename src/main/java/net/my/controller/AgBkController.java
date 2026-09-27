@@ -5,7 +5,7 @@ import com.alibaba.fastjson2.JSONObject;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
-import net.my.mapper.AgEastmoneyBkMapper;
+import net.my.mapper.AgBkMapper;
 import net.my.pojo.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -32,7 +32,7 @@ public class AgBkController {
             "https://push2.eastmoney.com/api/qt/clist/get?fs=b%3A%s&fields=f12%2Cf14&pn=1&pz=2000";
 
     @Autowired
-    private AgEastmoneyBkMapper agEastmoneyBkMapper;
+    private AgBkMapper agBkMapper;
 
     @ApiOperation(value = "获取板块数据", notes = "访问互联网接口获取数据")
     @GetMapping("/bk-list")
@@ -47,7 +47,7 @@ public class AgBkController {
             String f12 = jsonObject.getString("f12");
             String f14 = jsonObject.getString("f14");
             log.info("getHyData replace into t_define_bk(bk_code, bk_name) values ('{}', '{}');", f12, f14);
-            agEastmoneyBkMapper.saveBkInfo(f12, f14);
+            agBkMapper.saveBkInfo(f12, f14);
         }
 
         log.info("getBkData end");

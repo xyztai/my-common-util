@@ -4,6 +4,6 @@ import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface AgEastmoneyBkMapper {
+public interface AgBkMapper {
     int saveBkInfo(@Param("bkCode") String bkCode, @Param("bkName") String bkName);
 }
