@@ -1,7 +1,7 @@
 package net.my.controller;
 
 import lombok.extern.slf4j.Slf4j;
-import net.my.mapper.AgCCIEastmoneyStockMapper;
+import net.my.mapper.AgCCIMapper;
 import net.my.pojo.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -20,7 +20,7 @@ import java.util.List;
 public class AgCCIController {
 
     @Autowired
-    private AgCCIEastmoneyStockMapper mapper;
+    private AgCCIMapper mapper;
 
     @GetMapping("/history-all/stock")
     public BaseResponse historyAllStock() {

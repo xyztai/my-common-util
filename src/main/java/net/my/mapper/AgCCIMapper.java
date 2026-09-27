@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AgCCIEastmoneyStockMapper {
+public interface AgCCIMapper {
     List<String> getCalcCCIDates4Stock();
     int genCCIData4Stock(@Param("calcDate") String calcDate);
 

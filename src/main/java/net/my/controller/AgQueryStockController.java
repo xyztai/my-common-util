@@ -5,11 +5,10 @@ import io.swagger.annotations.Api;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
-import net.my.mapper.AgCCIEastmoneyStockMapper;
+import net.my.mapper.AgCCIMapper;
 import net.my.mapper.AgEastmoneyStockMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -45,7 +44,7 @@ public class AgQueryStockController {
     private AgEastmoneyStockMapper agEastmoneyStockMapper;
 
     @Autowired
-    private AgCCIEastmoneyStockMapper agCCIEastmoneyStockMapper;
+    private AgCCIMapper agCCIMapper;
 
     @Autowired
     private RestTemplate restTemplate;
