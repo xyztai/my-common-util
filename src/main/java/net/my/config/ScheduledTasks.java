@@ -32,10 +32,10 @@ public class ScheduledTasks {
     private AgController agController;
 
     @Autowired
-    private AgEastmoneyStockStrategyController agEastmoneyStockStrategyController;
+    private AgStrategyController agStrategyController;
 
     @Autowired
-    private AgNewEastmoneyStockController agNewEastmoneyStockController;
+    private AgQueryStockController agQueryStockController;
 
     @Autowired
     private AgCCIController agCCIController;
@@ -47,7 +47,7 @@ public class ScheduledTasks {
     private KLineRealTimeController KLineRealTimeController;
 
     @Autowired
-    private AgNewEastmoneyETFController agNewEastmoneyETFController;
+    private AgQueryETFController agQueryETFController;
 
     @Autowired
     private AgEastmoneyEChartsMapper agEastmoneyEChartsMapper;
@@ -205,7 +205,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_88802 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock strategy_2 start");
-                agEastmoneyStockStrategyController.strategy_2();
+                agStrategyController.strategy_2();
                 log.info("task stock strategy_2 end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -216,7 +216,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_88803 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock strategy_3 start");
-                agEastmoneyStockStrategyController.strategy_3();
+                agStrategyController.strategy_3();
                 log.info("task stock strategy_3 end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -227,7 +227,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_88805 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock strategy_5 start");
-                agEastmoneyStockStrategyController.strategy_5();
+                agStrategyController.strategy_5();
                 log.info("task stock strategy_5 end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -238,7 +238,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_101 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock down5 start");
-                agNewEastmoneyStockController.down5();
+                agQueryStockController.down5();
                 log.info("task stock down5 end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -248,7 +248,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_102 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock query9ZhuanB start");
-                agNewEastmoneyStockController.query9ZhuanB();
+                agQueryStockController.query9ZhuanB();
                 log.info("task stock query9ZhuanB end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -258,7 +258,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_103 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryEastmoneyToday start");
-                agNewEastmoneyStockController.queryEastmoneyToday();
+                agQueryStockController.queryEastmoneyToday();
                 log.info("task stock queryEastmoneyToday end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -268,7 +268,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_104 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryEastmoneyLast30 start");
-                agNewEastmoneyStockController.queryEastmoneyLast30();
+                agQueryStockController.queryEastmoneyLast30();
                 log.info("task stock queryEastmoneyLast30 end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -278,7 +278,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_105 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryIndexTop12In1Year start");
-                agNewEastmoneyStockController.queryIndexTop12In1Year();
+                agQueryStockController.queryIndexTop12In1Year();
                 log.info("task stock queryIndexTop12In1Year end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -290,7 +290,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_221 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock considerAll start");
-                agNewEastmoneyStockController.considerAll();
+                agQueryStockController.considerAll();
                 log.info("task stock considerAll end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -301,7 +301,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_222 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock MA20maSSP start");
-                agNewEastmoneyStockController.MA20maSSP();
+                agQueryStockController.MA20maSSP();
                 log.info("task stock MA20maSSP end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -311,7 +311,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_223 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryLatestRiseLimit start");
-                agNewEastmoneyStockController.queryLatestRiseLimit();
+                agQueryStockController.queryLatestRiseLimit();
                 log.info("task stock queryLatestRiseLimit end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -321,7 +321,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_224 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryBigSwingAndLowestVol start");
-                agNewEastmoneyStockController.queryBigSwingAndLowestVol();
+                agQueryStockController.queryBigSwingAndLowestVol();
                 log.info("task stock queryBigSwingAndLowestVol end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -331,7 +331,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_225 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryBigSwing start");
-                agNewEastmoneyStockController.queryBigSwing();
+                agQueryStockController.queryBigSwing();
                 log.info("task stock queryBigSwing end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -341,7 +341,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_226 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryEastmoneyVolSuddenlyRisedTriple start");
-                agNewEastmoneyStockController.queryEastmoneyVolSuddenlyRisedTriple();
+                agQueryStockController.queryEastmoneyVolSuddenlyRisedTriple();
                 log.info("task stock queryEastmoneyVolSuddenlyRisedTriple end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -351,7 +351,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_227 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock query9VolInLastest90Days start");
-                agNewEastmoneyStockController.query9VolInLastest90Days();
+                agQueryStockController.query9VolInLastest90Days();
                 log.info("task stock query9VolInLastest90Days end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -362,7 +362,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_228 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock jumpAndWait start");
-                agNewEastmoneyStockController.jumpAndWait();
+                agQueryStockController.jumpAndWait();
                 log.info("task stock jumpAndWait end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -373,7 +373,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_229 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryOnlyThem start");
-                agNewEastmoneyStockController.queryOnlyThem();
+                agQueryStockController.queryOnlyThem();
                 log.info("task stock queryOnlyThem end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -383,7 +383,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_230 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryUp5Lian start");
-                agNewEastmoneyStockController.queryUp5Lian();
+                agQueryStockController.queryUp5Lian();
                 log.info("task stock queryUp5Lian end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -393,7 +393,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_231 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock query9ZhuanS start");
-                agNewEastmoneyStockController.query9ZhuanS();
+                agQueryStockController.query9ZhuanS();
                 log.info("task stock query9ZhuanS end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -403,7 +403,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_232 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryDuoTouMA start");
-                agNewEastmoneyStockController.queryDuoTouMA();
+                agQueryStockController.queryDuoTouMA();
                 log.info("task stock queryDuoTouMA end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -413,7 +413,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_235 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock considerCCIAndVol start");
-                agNewEastmoneyStockController.considerCCIAndVol();
+                agQueryStockController.considerCCIAndVol();
                 log.info("task stock considerCCIAndVol end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -423,7 +423,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_236 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryBigSwingAndIn5LowestVol start");
-                agNewEastmoneyStockController.queryBigSwingAndIn5LowestVol();
+                agQueryStockController.queryBigSwingAndIn5LowestVol();
                 log.info("task stock queryBigSwingAndIn5LowestVol end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -436,7 +436,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_997 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock get_000001_lowest start");
-                agNewEastmoneyStockController.get_000001_lowest();
+                agQueryStockController.get_000001_lowest();
                 log.info("task stock get_000001_lowest end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -456,7 +456,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> stock_task_999 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task stock queryEastmoneyLatestInfo start");
-                agNewEastmoneyStockController.queryEastmoneyLatestInfo();
+                agQueryStockController.queryEastmoneyLatestInfo();
                 log.info("task stock queryEastmoneyLatestInfo end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -475,7 +475,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> etf_task_201 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf investEtfChgTop3 start");
-                agNewEastmoneyETFController.investEtfChgTop3();
+                agQueryETFController.investEtfChgTop3();
                 log.info("task etf investEtfChgTop3 end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -486,7 +486,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> etf_task_202 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf investEtfChgTop3History start");
-                agNewEastmoneyETFController.investEtfChgTop3History();
+                agQueryETFController.investEtfChgTop3History();
                 log.info("task etf investEtfChgTop3History end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -496,7 +496,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> etf_task_203 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf queryEastmoneyToday start");
-                agNewEastmoneyETFController.queryEastmoneyToday();
+                agQueryETFController.queryEastmoneyToday();
                 log.info("task etf queryEastmoneyToday end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -506,7 +506,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> etf_task_204 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf queryEastmoneyLast60 start");
-                agNewEastmoneyETFController.queryEastmoneyLast60();
+                agQueryETFController.queryEastmoneyLast60();
                 log.info("task etf queryEastmoneyLast60 end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -516,7 +516,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> etf_task_205 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf queryEastmoneyVolSuddenlyRised start");
-                agNewEastmoneyETFController.queryEastmoneyVolSuddenlyRised();
+                agQueryETFController.queryEastmoneyVolSuddenlyRised();
                 log.info("task etf queryEastmoneyVolSuddenlyRised end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -526,7 +526,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> etf_task_207 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf queryEtf9ZhuanS start");
-                agNewEastmoneyETFController.queryEtf9ZhuanS();
+                agQueryETFController.queryEtf9ZhuanS();
                 log.info("task etf queryEtf9ZhuanS end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -536,7 +536,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> etf_task_208 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf queryEastmoneyLatestInfo start");
-                agNewEastmoneyETFController.queryEastmoneyLatestInfo();
+                agQueryETFController.queryEastmoneyLatestInfo();
                 log.info("task etf queryEastmoneyLatestInfo end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -546,7 +546,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> etf_task_209 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf queryEtfLastest90Days start");
-                agNewEastmoneyETFController.queryEtfLastest90Days();
+                agQueryETFController.queryEtfLastest90Days();
                 log.info("task etf queryEtfLastest90Days end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();
@@ -640,7 +640,7 @@ public class ScheduledTasks {
         }).join();
 
         log.info("task agNewEastmoneyStockController.easySnapshotRight start");
-        agNewEastmoneyStockController.easySnapshotRight();
+        agQueryStockController.easySnapshotRight();
         log.info("task agNewEastmoneyStockController.easySnapshotRight end");
 
 

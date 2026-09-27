@@ -28,7 +28,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/ag-eastmoney-etf")
 @Slf4j
 @Api(value = "ag", description = "ag接口")
-public class AgNewEastmoneyETFController {
+public class AgQueryETFController {
 
     // demo: "https://push2his.eastmoney.com/api/qt/stock/kline/get?secid=1.600276&klt=101&fqt=1&beg=0&end=20500101&fields1=f1&fields2=f51%2Cf52%2Cf53%2Cf54%2Cf55%2Cf56%2Cf57%2Cf58%2Cf59%2Cf60%2Cf61";
     // fqt=1 表示前复权

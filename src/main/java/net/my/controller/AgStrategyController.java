@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/ag-eastmoney-stock-strategy")
 @Slf4j
 @Api(value = "ag", description = "ag接口")
-public class AgEastmoneyStockStrategyController {
+public class AgStrategyController {
 
     @Autowired
     private MyCaffeineCache myCaffeineCache;
