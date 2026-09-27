@@ -1,6 +1,6 @@
-drop table t_eastmoney_node;
+drop table t_stock_raw;
 
-CREATE TABLE `t_eastmoney_node` (
+CREATE TABLE `t_stock_raw` (
   `id` int NOT NULL AUTO_INCREMENT,
   `date` varchar(100) DEFAULT NULL,
   `stockCode` varchar(200) DEFAULT NULL,
@@ -76,7 +76,7 @@ INSERT INTO t_etf (stockName,fullStockCode) VALUES
 
 
 
-CREATE TABLE `t_eastmoney_node_etf` (
+CREATE TABLE `t_etf_raw` (
                                         `id` int NOT NULL AUTO_INCREMENT,
                                         `date` varchar(100) DEFAULT NULL,
                                         `stockCode` varchar(200) DEFAULT NULL,

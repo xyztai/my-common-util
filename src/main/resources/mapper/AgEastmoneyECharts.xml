@@ -73,7 +73,7 @@
                                 from (
                                         select ten.`date` , ten.stockCode , ten.`last`, ten.chg
                                             , lead(ten.`last`, 4) over (partition by ten.stockCode order by ten.`date` desc) pre_last_4
-                                        from t_eastmoney_node ten
+                                        from t_stock_raw ten
                                         where ten.`date` not like '9999%'
                                         and ten.`stockCode` not like '0.30%'
                                         and ten.`stockCode` not like '0.68%'
@@ -156,7 +156,7 @@
                                 from (
                                         select ten.`date` , ten.stockCode , ten.`last`, ten.chg
                                             , lead(ten.`last`, 4) over (partition by ten.stockCode order by ten.`date` desc) pre_last_4
-                                        from t_eastmoney_node ten
+                                        from t_stock_raw ten
                                         where ten.`date` not like '9999%'
                                         and ten.`stockCode` not like '0.30%'
                                         and ten.`stockCode` not like '0.68%'

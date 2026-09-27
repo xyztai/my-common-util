@@ -24,8 +24,6 @@ import java.util.concurrent.Executors;
 public class ScheduledTasks {
     private static final SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 
-    @Autowired
-    private DataCalcMapper dataCalc;
 
     @Autowired
     private AgController agController;

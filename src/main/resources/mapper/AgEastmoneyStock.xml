@@ -7,7 +7,7 @@
     <select id="getDailyCnt" resultType="net.my.pojo.SpecialCarePoJo2">
     <![CDATA[
         select '' stockCode, ten.date, concat('cnt: ', count(1)) last, concat('插入时间:', max(create_time), '; 当前时间:', sysdate()) ratioB
-        from t_eastmoney_node ten
+        from t_stock_raw ten
         where ten.`date` > '2026'
           and `date` not like '9999%'
         group by ten.date
@@ -20,7 +20,7 @@
     <![CDATA[
             with tmp_data as (
                 select t.`date` , t.`last` , rank() over (order by t.`date` ) rank_
-                from t_eastmoney_node_index t
+                from t_index_raw t
                 where t.stockCode = '1.000001'
                 and date > '2025'
             )
@@ -38,7 +38,7 @@
                        , t.stockCode
                        , rank() over (partition by t.stockCode order by chg) chg_rank
                        , count(1) over (partition by t.stockCode ) cnt_s
-                from t_eastmoney_node_index t
+                from t_index_raw t
                 where t.stockCode = '1.000001'
                 and date > '2025'
             )
@@ -69,7 +69,7 @@
 
     <select id="getLimitDate" resultType="java.lang.String">
         select distinct date
-        from t_eastmoney_node
+        from t_stock_raw
         where `date` not like '99999%'
         order by date desc
         limit 1 offset 15
@@ -77,7 +77,7 @@
 
     <select id="getHs300List" resultType="net.my.pojo.HsStockPoJo">
         select stockCode, stockType, stockName
-        from t_stock_code
+        from t_stock
         -- where stockCode not like '30%'
         -- and stockCode not like '68%'
         order by 1
@@ -85,7 +85,7 @@
 
     <select id="getMaxEastMoneyNode" resultType="net.my.pojo.EastmoneyNode">
         select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-        from t_eastmoney_node
+        from t_stock_raw
         where stockCode = #{stockCode}
           and `date` not like '99999%'
         order by date desc
@@ -93,7 +93,7 @@
     </select>
 
     <insert id="saveEastMoneyDatas" parameterType="java.util.List">
-        insert into t_eastmoney_node(`date`, `stockCode`, `infoRaw`)
+        insert into t_stock_raw(`date`, `stockCode`, `infoRaw`)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.date}, #{item.stockCode}, #{item.infoRaw}
@@ -102,7 +102,7 @@
     </insert>
 
     <update id="updateEastMoneyDatas">
-        update t_eastmoney_node
+        update t_stock_raw
         set `date` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -11), ',', 1) ,
             `open` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -10), ',', 1) ,
             `last` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -9), ',', 1) ,
@@ -120,16 +120,16 @@
 
     <delete id="deleteExpect99999">
         DELETE
-        from t_eastmoney_node
+        from t_stock_raw
         where `date` like '99999%'
     </delete>
 
     <insert id="insertExpect99999">
         <![CDATA[
-        replace INTO t_eastmoney_node (`date`,stockCode,infoRaw,`open`,`last`,high,low,volume,amount,exchangeRaw,clac_expma_5,clac_expma_10)
+        replace INTO t_stock_raw (`date`,stockCode,infoRaw,`open`,`last`,high,low,volume,amount,exchangeRaw,clac_expma_5,clac_expma_10)
         with lastest_info as (
             select ten.`date` , ten.stockCode , ten.`last`, ten.infoRaw , rank() over (partition by ten.stockCode order by `date` desc) rank_
-            from t_eastmoney_node ten
+            from t_stock_raw ten
             where ten.`date` > '2025-06-01'
         )
         , one_info as (
@@ -156,13 +156,13 @@
 
     <select id="getAllNeedUpdateEastMoneyNodes" resultType="net.my.pojo.EastmoneyNode">
         select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-        from t_eastmoney_node
+        from t_stock_raw
         where clac_expma_5 is null
     </select>
 
     <select id="getEastMoneyNodes" resultType="net.my.pojo.EastmoneyNode">
         select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-        from t_eastmoney_node
+        from t_stock_raw
         where stockCode = #{stockCode}
           and clac_expma_5 is null
     </select>
@@ -172,7 +172,7 @@
         from (
             select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
             , rank() over (partition by stockCode order by `date` desc) rank_
-            from t_eastmoney_node
+            from t_stock_raw
             where clac_expma_5 is not null
             and `date` not like '99999%'
         ) tt
@@ -181,7 +181,7 @@
 
     <select id="getMaxEastMoneyNodeHasExpma" resultType="net.my.pojo.EastmoneyNode">
         select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-        from t_eastmoney_node
+        from t_stock_raw
         where stockCode = #{stockCode}
           and clac_expma_5 is not null
           and `date` not like '99999%'
@@ -190,14 +190,14 @@
     </select>
 
     <update id="updateExpmaEastmoney" parameterType="net.my.pojo.EastmoneyNode">
-        update t_eastmoney_node
+        update t_stock_raw
         set clac_expma_5 = #{expma5}, clac_expma_10=#{expma10}
         where id = #{id}
     </update>
 
     <update id="batchUpdateExpmaEastmoney" parameterType="java.util.List">
         <foreach collection="list" item="item" separator=";">
-            update t_eastmoney_node
+            update t_stock_raw
             set clac_expma_5 = #{item.expma5}, clac_expma_10=#{item.expma10}
             where id = #{item.id}
         </foreach>
@@ -211,7 +211,7 @@
                , round(clac_expma_10/clac_expma_5, 3) ratioB
                , round(clac_expma_5, 3) clac_expma_5
                , round(clac_expma_10, 3) clac_expma_10
-            from t_eastmoney_node ten
+            from t_stock_raw ten
             where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 YEAR), '%Y-%m-%d')
         )
         , tmp_stock_code as (
@@ -274,7 +274,7 @@
                                 , t1.rank_2
                                 , '/3###'
                                 , round(t1.last, 3), '(', case when t1.date like '99999%' then replace(replace(t1.date, '0.0', ''), '99999', '') else t1.chg end, ')', round(t1.clac_expma_5, 3), round(t1.clac_expma_10, 3)) ratioB
-        from tmp_consider_99999 t1, t_stock_code th
+        from tmp_consider_99999 t1, t_stock th
         where t1.stockCode = th.fullStockCode
         order by 1 desc, 2
     ]]>
@@ -286,7 +286,7 @@
             select ten.*
                    -- ten.`date` , ten.stockCode , ten.`last`,
                    -- , rank() over (partition by ten.stockCode order by clac_expma_10/clac_expma_5 desc) rank_, clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
-            from t_eastmoney_node ten
+            from t_stock_raw ten
             where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 365+30 DAY), '%Y-%m-%d')
                or ten.`date` like '9999%'
         )
@@ -316,7 +316,7 @@
                 where t2.`date` BETWEEN t1.start_date and t1.end_date
                 and ( t2.`date` = t1.end_date or t2.`date` not like '9999%' )
                 and t1.end_date like '9999%' -- 9999开头的
-            ) t1, t_stock_code th
+            ) t1, t_stock th
         where t1.rank_ <= 3
           and t1.end_date = t1.`date`
           and t1.stockCode = th.fullStockCode
@@ -332,7 +332,7 @@
                    , teni.`date`
                    , teni.chg
                    , rank() over (partition by teni.stockCode order by chg) chg_rank
-            from t_eastmoney_node_index teni , t_index ti
+            from t_index_raw teni , t_index ti
             where teni.stockCode = ti.fullStockCode
             and teni.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 YEAR), '%Y-%m-%d')
         )
@@ -368,7 +368,7 @@
                                -- , lag(t.chg, 1) over (partition by t.stockCode order by `date` desc) chg_next_1
                                -- , lag(t.volume, 2) over (partition by t.stockCode order by `date` desc) vol_next_2
                                -- , lag(t.chg, 2) over (partition by t.stockCode order by `date` desc) chg_next_2
-                          from t_eastmoney_node t
+                          from t_stock_raw t
                           where t.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -1 YEAR), '%Y-%m-%d')
                             -- and t.stockCode like '%600803'
                             and t.`date` not like '9999%'
@@ -382,7 +382,7 @@
                    -- and date_exists is not null
                    -- and (chg_next_1 >= 0 or (chg_next_1 < 0 and vol_next_1 <= volume*0.618))
                    -- and (chg_next_2 >= 0 or (chg_next_2 < 0 and vol_next_2 <= volume*0.618))
-             ) t1, t_stock_code th
+             ) t1, t_stock th
         where t1.stockCode = th.fullStockCode
         order by 2 desc
     ]]>
@@ -488,7 +488,7 @@
                                             , lag(ten.chg, 8) over (partition by ten.stockCode order by ten.`date` desc) chg_next_8
                                             , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                                             , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
-                                        from t_eastmoney_node ten
+                                        from t_stock_raw ten
                                         where ten.`date` not like '9999%'
                                         and ten.`stockCode` not like '0.30%'
                                         and ten.`stockCode` not like '0.68%'
@@ -500,7 +500,7 @@
                         ) t2
                 ) t3
                 where tag_ + pre_tag_1 + pre_tag_2 + pre_tag_3 + pre_tag_4 + pre_tag_5 = 6
-            ) t9, t_stock_code th
+            ) t9, t_stock th
         where t9.stockCode = th.fullStockCode
           and t9.date >  DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d')
           and _9_zhuan != '00'
@@ -607,7 +607,7 @@
                                             , lag(ten.chg, 8) over (partition by ten.stockCode order by ten.`date` desc) chg_next_8
                                             , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                                             , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
-                                        from t_eastmoney_node ten
+                                        from t_stock_raw ten
                                         where ten.`date` not like '9999%'
                                         and ten.`stockCode` not like '0.30%'
                                         and ten.`stockCode` not like '0.68%'
@@ -619,7 +619,7 @@
                         ) t2
                 ) t3
                 where tag_ + pre_tag_1 + pre_tag_2 + pre_tag_3 + pre_tag_4 + pre_tag_5 = 6
-            ) t9, t_stock_code th
+            ) t9, t_stock th
         where t9.stockCode = th.fullStockCode
           and t9.date >  DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d')
           and _9_zhuan != '00'
@@ -633,10 +633,10 @@
                , concat('last: ', round(t1.last, 3), ', chg: ', t1.chg) ratioB
         from (
                  select t.*, rank() over (partition by t.stockCode order by t.date desc) rank_
-                 from t_eastmoney_node t
+                 from t_stock_raw t
                  where t.`date` > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
                  and t.date not like '99999%'
-             ) t1, t_stock_code th
+             ) t1, t_stock th
         where t1.stockCode = th.fullStockCode
           and t1.rank_ = 1
         order by 2, 1
@@ -659,7 +659,7 @@
                            , ten.high
                            , ten.low
                            , ten.volume
-                    from t_eastmoney_node ten
+                    from t_stock_raw ten
                     where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
                     and DATE not like '9999%'
                     and ten.stockCode not like '0.68%'
@@ -667,7 +667,7 @@
                     and ten.stockCode not like '1.68%'
                     and ten.stockCode not like '1.30%'
                     -- and ten.last < 80
-                ) t , t_stock_code t3
+                ) t , t_stock t3
                 where t.stockCode = concat(t3.stockType , '.', t3.stockCode)
             ) -- select distinct `date`, date_rn from tmp_ where date_rn = 10
             select th.stockCode, t2.`date` date, concat(th.bkName, '-',  th.stockName) last
@@ -675,7 +675,7 @@
                    -- , round(t2.volume/t1.volume,1) highest_ratio
             from (select stockCode, stockName , `date` , volume from tmp_ where vol_min_rank = 1) t1,
                  (select stockCode, stockName , `date` , volume, last, chg from tmp_ where vol_max_rank = 1) t2,
-                 (select distinct `date` from tmp_ where date_rn = 10) t3 , t_stock_code th
+                 (select distinct `date` from tmp_ where date_rn = 10) t3 , t_stock th
             where t1.stockCode = t2.stockCode
             and t2.stockCode = th.fullStockCode
             and t2.`date` >= t3.date -- DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 15 DAY), '%Y-%m-%d')
@@ -709,7 +709,7 @@
                         , LAG (ten.`chg`, 8 ) over (partition by ten.stockCode order by `date` ) chg_pre_8
                         , LAG (ten.`chg`, 9 ) over (partition by ten.stockCode order by `date` ) chg_pre_9
                         , LAG (ten.`chg`, 10 ) over (partition by ten.stockCode order by `date` ) chg_pre_10
-                from t_eastmoney_node ten
+                from t_stock_raw ten
                 where 1 = 1
                 -- and `date` > '2026'
                 and date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
@@ -723,7 +723,7 @@
             select -- t.date, count(1)
                   -- t.*, th.stockName
                   th.stockCode , t.date, concat(th.bkName, '-',  th.stockName) last, '' ratioB
-            from tmp t , t_stock_code th
+            from tmp t , t_stock th
             where 1 = 1
             and t.date_next is null
             and SUBSTRING(t.stockCode , 3) = th.stockCode
@@ -737,7 +737,7 @@
         <![CDATA[
             with tmp as (
                 select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt, sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.05 then 1 else 0 end) big_swing_cnt
-                from t_eastmoney_node ten, t_stock_code th
+                from t_stock_raw ten, t_stock th
                 where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
                 and ten.`date` not like '9999%'
                 and th.fullStockCode = ten.stockCode
@@ -758,10 +758,10 @@
             select
                   t1.stockCode , ten2.date, concat(th.bkName, '-',  th.stockName) last, '' ratioB
                  -- ten2.chg, t1.*
-            from tmp_t t1, t_eastmoney_node ten2, t_stock_code th
+            from tmp_t t1, t_stock_raw ten2, t_stock th
             where t1.fullStockCode = ten2.stockCode
             and th.fullStockCode = ten2.stockCode
-            and ten2.`date` = (select max(date) from t_eastmoney_node ten3 where ten3.`date` < '9999')
+            and ten2.`date` = (select max(date) from t_stock_raw ten3 where ten3.`date` < '9999')
             order by last, 1
         ]]>
     </select>
@@ -781,7 +781,7 @@
                        , rank() over (partition by ten.stockCode order by ten.volume ) volume_rank
                        , rank() over (partition by ten.stockCode order by ten.`date` desc ) date_rank
                        , count(1) over (partition by ten.stockCode ) date_cnt
-                from t_eastmoney_node ten, t_stock_code th, tmp_calc_date t3
+                from t_stock_raw ten, t_stock th, tmp_calc_date t3
                 where `date` between t3.small_date_1 and t3.big_date
                 -- where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 60 DAY), '%Y-%m-%d')
                 and ten.`date` not like '9999%'
@@ -801,7 +801,7 @@
             ,  tmp_big_swing as (
                 select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt
                       , sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.05 then 1 else 0 end) big_swing_cnt
-                from t_eastmoney_node ten, t_stock_code th, tmp_calc_date t3
+                from t_stock_raw ten, t_stock th, tmp_calc_date t3
                 where `date` between t3.small_date_2 and t3.big_date
                 -- where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
                 and ten.`date` not like '9999%'
@@ -823,9 +823,9 @@
             select distinct
                   t1.stockCode ,ten2.date date , concat(t1.bkName, '-',  t1.stockName) last, concat('rank=', t5.volume_rank) ratioB
                  -- ten2.chg, t1.*
-            from tmp_t t1, t_eastmoney_node ten2, tmp_suo_liang_ans t5
+            from tmp_t t1, t_stock_raw ten2, tmp_suo_liang_ans t5
             where t1.fullStockCode = ten2.stockCode
-            -- and ten2.`date` = (select max(date) from t_eastmoney_node ten3 where ten3.`date` < '9999')
+            -- and ten2.`date` = (select max(date) from t_stock_raw ten3 where ten3.`date` < '9999')
             and t5.date = ten2.date
             and t5.stockCode = t1.stockCode
             -- and ten2.chg < 9
@@ -848,7 +848,7 @@
                  , lag(ten.`last`, 2) over (partition by ten.stockCode order by date desc) last_next_2
                  , lag(ten.`last`, 5) over (partition by ten.stockCode order by date desc) last_next_5
                  , rank() over (partition by ten.stockCode order by date) date_rn
-            from t_eastmoney_node ten, tmp_min_date tmd
+            from t_stock_raw ten, tmp_min_date tmd
             where ten.`date` not like '9999%'
             and ten.`date` > tmd.min_date
             order by 1 desc
@@ -864,7 +864,7 @@
                  , lag(ten.`volume`, 3) over (partition by ten.stockCode order by date) vol_pre_3
                  , lag(ten.`volume`, 4) over (partition by ten.stockCode order by date) vol_pre_4
                  , ten.`last`
-            from t_eastmoney_node ten, tmp_min_date tmd
+            from t_stock_raw ten, tmp_min_date tmd
             where ten.`date` not like '9999%'
               and ten.chg < 0.5
               and ten.`date` > tmd.min_date
@@ -880,7 +880,7 @@
         , tmp_bigswing as (
 	        select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt
 	               , sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.04 then 1 else 0 end) big_swing_cnt
-	        from t_eastmoney_node ten, t_stock_code th
+	        from t_stock_raw ten, t_stock th
 	        where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
 	          and ten.`date` not like '9999%'
 	          and th.fullStockCode = ten.stockCode
@@ -911,8 +911,8 @@
     <select id="queryDuoTouMA" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
             select th.stockCode , tenm.date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
-            from t_eastmoney_node_ma tenm , t_stock_code th
-            where date in (select max(date) from t_eastmoney_node_ma)
+            from t_stock_ma tenm , t_stock th
+            where date in (select max(date) from t_stock_ma)
               and tenm .stockCode = th.fullStockCode
               and tenm.ma5 >= tenm.ma10 and tenm.ma10 >= tenm.ma20 and tenm.ma20 >= tenm.ma30 and tenm.ma30 >= tenm.ma60
             order by 3, 2
@@ -924,7 +924,7 @@
             with tmp_date as (
                 select min(date) date_min from (
                     select *
-                    from t_eastmoney_node_index teni
+                    from t_index_raw teni
                     where stockCode = '1.000001'
                     order by `date` desc
                     limit 40
@@ -940,12 +940,12 @@
                        , lag(ten.last - ten.`open`, 4) over (partition by ten.stockCode order by `date`) chg_pre_4
                        , lag(ten.last - ten.`open`, 5) over (partition by ten.stockCode order by `date`) chg_pre_5
                        , ten.*
-                from t_eastmoney_node ten, tmp_date td
+                from t_stock_raw ten, tmp_date td
                 where ten.`date` > td.date_min
                 and ten.`date` < '2099'
             )
             select th.stockCode ,min(t1.date_curr) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
-            from tmp_ans t1 , t_stock_code th , t_eastmoney_node_ma ma
+            from tmp_ans t1 , t_stock th , t_stock_ma ma
             where chg_pre_0 > 0 and chg_pre_1 > 0 and chg_pre_2 > 0 and chg_pre_3 > 0 and chg_pre_4 > 0 -- and chg_pre_5 > 0
               and ma.ma5 >= ma.ma10 and ma.ma10 >= ma.ma20 and ma.ma20 >= ma.ma30 and ma.ma30 >= ma.ma60
             and t1.stockCode = th.fullStockCode
@@ -968,13 +968,13 @@
                  , ten.`last`
                  , lag(ten.`last` , 20) over (partition by ten.stockCode order by ten.`date` ) last_pre_20
 		   , lag(ten.`last` , 5) over (partition by ten.stockCode order by ten.`date` ) last_pre_5
-            from t_eastmoney_node ten
+            from t_stock_raw ten
             where ten.`date` > '2025-01-01'
               and `date` < '2099'
         )
            , tmp_3_bei as (
             select ten.stockCode, max(`last` ) last_max, min(`last` ) last_min
-            from t_eastmoney_node ten
+            from t_stock_raw ten
             where ten.`date` > '2025-01-01'
               and `date` < '2099'
             group by ten.stockCode
@@ -982,7 +982,7 @@
         )
         select -- th.stockCode, th.stockName , th.bkName , min(t.date) date_min, max(t.date) date_max
                th.stockCode ,min(t.date) date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
-        from tmp_longtou t, t_stock_code th, tmp_3_bei tb
+        from tmp_longtou t, t_stock th, tmp_3_bei tb
         where (t.last >= t.last_pre_20 * 2 or t.last >= t.last_pre_5 * 1.2)
           and th.stockCode not like '30%'
           and th.stockCode not like '68%'
@@ -1006,7 +1006,7 @@
                , low
                , stockCode
                , chg
-            from t_eastmoney_node ten
+            from t_stock_raw ten
             where ten.`date` > DATE_FORMAT(DATE_ADD(SYSDATE() , INTERVAL -120 DAY), '%Y-%m-%d')
               and ten.`date` not like '9999%'
             -- and ten.stockCode = '0.002025'
@@ -1029,7 +1029,7 @@
                 and t1.date <= t2.date
                 group by t1.high_pre_1, t1.date, t1.stockCode
                 having lowest > t1.high_pre_1
-                ) t1, t_stock_code th
+                ) t1, t_stock th
             where t1.stockCode = th.fullStockCode
               and th.stockCode not like '30%'
               and th.stockCode not like '68%'
@@ -1048,7 +1048,7 @@
                    , last
                    , stockCode
                    , chg
-                from t_eastmoney_node ten
+                from t_stock_raw ten
                 where ten.`date` > DATE_FORMAT(DATE_ADD(SYSDATE() , INTERVAL -120 DAY), '%Y-%m-%d')
                   and ten.`date` not like '9999%'
                 -- and ten.stockCode = '0.002025'
@@ -1071,7 +1071,7 @@
                and chg_max_10 > 8 -- and chg > -2 and chg < 2
         )
         select th.stockCode, t1.date , concat(th.bkName, '-',  th.stockName) last, '' ratioB
-        from tmp_ans t1, t_stock_code th
+        from tmp_ans t1, t_stock th
         where t1.stockCode = th.fullStockCode
           and th.stockCode not like '30%'
           and th.stockCode not like '68%'
@@ -1094,7 +1094,7 @@
                    , last
                    , chg
                    , stockCode
-                from t_eastmoney_node ten
+                from t_stock_raw ten
                 where ten.`date` <= '2099' -- and  stockCode = '0.002056'
                   AND ten.`date` > DATE_FORMAT(DATE_ADD(SYSDATE() , INTERVAL -90 DAY), '%Y-%m-%d')
         )
@@ -1122,7 +1122,7 @@
         , tmp_date as (
             select min(date) date_min from (
                 select *
-                from t_eastmoney_node_index teni
+                from t_index_raw teni
                 where stockCode = '1.000001'
                 order by `date` desc
                 limit 60
@@ -1139,7 +1139,7 @@
                 -- , lag(ten.last - ten.`open`, 5) over (partition by ten.stockCode order by `date`) chg_pre_5
                     , lead(ten.chg, 2) over (partition by ten.stockCode order by `date`) chg_next_2
                     , ten.*
-            from t_eastmoney_node ten, tmp_date td
+            from t_stock_raw ten, tmp_date td
             where ten.`date` > td.date_min
               and ten.`date` < '2099'
         ) --  select * from tmp_30_duotou  where stockCode = '0.002056'; -- And  chg_pre_0 >= -0.02 and chg_pre_1 >= -0.02 and chg_pre_2 >= -0.02 and chg_pre_3 >= -0.02 and chg_pre_4 >= -0.02;  -- and chg_pre_5 > 0
@@ -1149,7 +1149,7 @@
                     , lag(t1.date_curr, 1) over (partition by stockCode order by t1.date_curr ) ans_date_pre_1
                     , t3d.date_pre_1
                     , concat(th.bkName, '-',  th.stockName) last, concat('', chg_next_2) ratioB
-            from tmp_ans t1 , t_stock_code th, tmp_30_duotou t3d
+            from tmp_ans t1 , t_stock th, tmp_30_duotou t3d
             where 1 = 1
               and chg_pre_0 >= -0.02 and chg_pre_1 >= -0.02 and chg_pre_2 >= -0.02 and chg_pre_3 >= -0.02 -- and chg_pre_4 >= -0.02 -- and chg_pre_5 > 0 -- 4、必须出现4日连涨
               and t1.stockCode = th.fullStockCode
@@ -1172,7 +1172,7 @@
             with tmp_date as (
                 select min(date) date_min from (
                     select *
-                    from t_eastmoney_node_index teni
+                    from t_index_raw teni
                     where stockCode = '1.000001'
                     order by `date` desc
                     limit 60
@@ -1201,13 +1201,13 @@
                         , lag(ten.chg , 4) over (partition by ten.stockCode order by `date`) _chg_pre_4
                         , lead(ten.chg, 1) over (partition by ten.stockCode order by `date`) _chg_next_1
                         , ten.*
-                from t_eastmoney_node ten, tmp_date td
+                from t_stock_raw ten, tmp_date td
                 where ten.`date` > td.date_min
                   and ten.`date` < '2099'
             )
             select -- ta.date_curr, th.bkName , th.stockName , th.stockCode , th.fullStockCode , ta.chg_next_2
                   th.stockCode, ta.date_curr date, concat(th.bkName, '-',  th.stockName) last, concat('T+2: ', ta.chg_next_2) ratioB
-            from tmp_ans ta , t_stock_code th
+            from tmp_ans ta , t_stock th
             where ta.chg_pre_0 < 0 and chg_pre_1 < 0 and chg_pre_2 < 0 and  chg_pre_3 < 0 and chg_pre_4 < 0
             and ta._chg_0 < 0 and _chg_pre_1 < 0 and _chg_pre_1 < 0 and _chg_pre_1 < 0 and _chg_pre_1 < 0
             and volume_0 < LEAST (volume_pre_1, volume_pre_2, volume_pre_3, volume_pre_4)
@@ -1222,8 +1222,8 @@
 
     <select id="getCalcDatesFromMA"  resultType="java.lang.String">
         select distinct date
-        from t_eastmoney_node ten
-        where ten.`date` > (select ifnull(max(date), '2023-01-01') from t_eastmoney_node_ma)
+        from t_stock_raw ten
+        where ten.`date` > (select ifnull(max(date), '2023-01-01') from t_stock_ma)
         and ten.`date` not like '9999%'
         order by 1
     </select>
@@ -1239,7 +1239,7 @@
 
 
     <select id="getMaxDate" resultType="java.lang.String">
-        select max(date) from t_eastmoney_node_index
+        select max(date) from t_index_raw
     </select>
 
 

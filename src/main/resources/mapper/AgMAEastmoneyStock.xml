@@ -6,23 +6,23 @@
 
     <select id="getCalcMADates4Stock" resultType="java.lang.String">
         select DISTINCT `date`
-        from t_eastmoney_node_index teni
+        from t_index_raw teni
         where stockCode = '1.000001'
           and `date` >= '2022-01-01'
-          and not exists (select 1 from t_eastmoney_node_ma t2 where teni.`date` = t2.date)
+          and not exists (select 1 from t_stock_ma t2 where teni.`date` = t2.date)
           and date not like '9999%'
           order by 1
     </select>
 
     <insert id="genMAData4Stock">
         <![CDATA[
-        replace into t_eastmoney_node_ma(`stockCode`, `date`, `last`, `ma5`, `ma10`, `ma20`, `ma30`, `ma60`)
+        replace into t_stock_ma(`stockCode`, `date`, `last`, `ma5`, `ma10`, `ma20`, `ma30`, `ma60`)
         with tmp as (
             select `date`
                     , rank() over (partition by stockCode order by ten.`date` desc) date_rank
                     , last
                     , stockCode
-            from t_eastmoney_node ten
+            from t_stock_raw ten
             where ten.`date` <= #{calcDate}
             AND ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d'), INTERVAL -120 DAY), '%Y-%m-%d')
             -- and ten.stockCode = '0.002025'
@@ -44,23 +44,23 @@
 
     <select id="getCalcMADates4Etf" resultType="java.lang.String">
         select DISTINCT `date`
-        from t_eastmoney_node_index teni
+        from t_index_raw teni
         where stockCode = '1.000001'
           and `date` >= '2022-01-01'
-          and not exists (select 1 from t_eastmoney_node_etf_ma t2 where teni.`date` = t2.date)
+          and not exists (select 1 from t_etf_ma t2 where teni.`date` = t2.date)
           and date not like '9999%'
         order by 1
     </select>
 
     <insert id="genMAData4Etf">
         <![CDATA[
-        replace into t_eastmoney_node_etf_ma(`stockCode`, `date`, `last`, `ma5`, `ma10`, `ma20`, `ma30`, `ma60`)
+        replace into t_etf_ma(`stockCode`, `date`, `last`, `ma5`, `ma10`, `ma20`, `ma30`, `ma60`)
         with tmp as (
             select `date`
                     , rank() over (partition by stockCode order by ten.`date` desc) date_rank
                     , last
                     , stockCode
-            from t_eastmoney_node_etf ten
+            from t_etf_raw ten
             where ten.`date` <= #{calcDate}
             AND ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d'), INTERVAL -120 DAY), '%Y-%m-%d')
             -- and ten.stockCode = '0.002025'

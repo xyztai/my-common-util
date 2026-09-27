@@ -5,7 +5,7 @@
 <mapper namespace="net.my.mapper.AgHistoryMapper">
     <select id="getStr" resultType="java.lang.String">
         select str
-        from t_eastmoney_node_str
+        from t_history_str
         where stockCode = #{stockCode}
         order by id desc
         limit 1

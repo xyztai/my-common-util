@@ -13,7 +13,7 @@
                            , ten.high
                            , ten.low
                            , ten.volume
-                    from t_eastmoney_node ten
+                    from t_stock_raw ten
                     where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
                     and DATE not like '9999%'
                     and ten.stockCode not like '0.68%'
@@ -21,7 +21,7 @@
                     and ten.stockCode not like '1.68%'
                     and ten.stockCode not like '1.30%'
                     and ten.last < 80
-                ) t , t_stock_code t3
+                ) t , t_stock t3
                 where t.stockCode = concat(t3.stockType , '.', t3.stockCode)
             )
             , tmp_stocks as (
@@ -41,7 +41,7 @@
 	                   , max(tt.`date` ) date
 	            from (
 		            select ten.*, t3.stockName , rank() over (partition by ten.stockCode order by ten.`date` desc) date_rn
-		            from t_eastmoney_node ten, tmp_stocks t2, t_stock_code t3
+		            from t_stock_raw ten, tmp_stocks t2, t_stock t3
 		            where ten.stockCode = t2.stockCode
 		            and ten.`date` >=  DATE_FORMAT(DATE_SUB(STR_TO_DATE('2026-02-22', '%Y-%m-%d'), INTERVAL 120 DAY), '%Y-%m-%d')
 		            and ten.`date` <= '2026-02-22'
@@ -55,7 +55,7 @@
                   , concat(ten.`date`, '\n',  t3.stockName) date
                   , ten.`last`
                   , concat(round(avg.avg_5, 3),'\n', round(avg.avg_10, 3),'\n', round(avg.avg_20, 3),'\n', round(avg.avg_60, 3) ) ratioB
-           from tmp_avg60 avg, t_eastmoney_node ten, t_stock_code t3
+           from tmp_avg60 avg, t_stock_raw ten, t_stock t3
            where ten.stockCode = concat(t3.stockType , '.', t3.stockCode)
            and avg.stockCode = ten.stockCode
            and ten.`date` = avg.`date`
@@ -68,10 +68,10 @@
 
 
 
-select min(date), max(date) from t_eastmoney_node;
+select min(date), max(date) from t_stock_raw;
 
 select SUBSTRING(`date` , 1, 4), count(1)
-from t_eastmoney_node
+from t_stock_raw
 group by SUBSTRING(`date` , 1, 4)
 order by 1;
 
@@ -121,7 +121,7 @@ order by 1 desc;
 
 
 
-select count(1) from t_eastmoney_node;
+select count(1) from t_stock_raw;
 
 
 
@@ -199,7 +199,7 @@ insert into t_eastmoney_node_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
                                 from (
                                         select ten.`date` , ten.stockCode , ten.`last`, ten.chg
                                             , lead(ten.`last`, 4) over (partition by ten.stockCode order by ten.`date` desc) pre_last_4
-                                        from t_eastmoney_node ten
+                                        from t_stock_raw ten
                                         where ten.`date` not like '9999%'
                                         and ten.`stockCode` not like '0.30%'
                                         and ten.`stockCode` not like '0.688%'
@@ -314,7 +314,7 @@ insert into t_eastmoney_node_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
                                             , lag(ten.chg, 8) over (partition by ten.stockCode order by ten.`date` desc) chg_next_8
                                             , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                                             , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
-                                        from t_eastmoney_node ten
+                                        from t_stock_raw ten
                                         where ten.`date` not like '9999%'
                                         and ten.`stockCode` not like '0.30%'
                                         and ten.`stockCode` not like '0.688%'

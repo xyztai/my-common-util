@@ -13,5 +13,5 @@ public interface AgSohuMapper {
     String getMaxDateFromStock();
     String getMaxDateFromEtf();
 
-    int saveDataSohu(List<AgHistorySinaController.DataSohu> dataSohuList);
+    int saveDataSina(List<AgHistorySinaController.DataSohu> dataSohuList);
 }

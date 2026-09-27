@@ -6,17 +6,17 @@
 
     <select id="getCalcCCIDates4Stock" resultType="java.lang.String">
         select DISTINCT `date`
-        from t_eastmoney_node_index teni
+        from t_index_raw teni
         where stockCode = '1.000001'
           and `date` >= '2022-01-01'
-          and not exists (select 1 from t_eastmoney_node_cci t2 where teni.`date` = t2.date)
+          and not exists (select 1 from t_stock_cci t2 where teni.`date` = t2.date)
           and date not like '9999%'
           order by 1
     </select>
 
     <insert id="genCCIData4Stock">
         <![CDATA[
-        replace into t_eastmoney_node_cci(`date`, `stockCode`, `cci5`, `cci10`, `cci14`)
+        replace into t_stock_cci(`date`, `stockCode`, `cci5`, `cci10`, `cci14`)
         with tmp as (
             select `date`
                    , rank() over (partition by stockCode order by ten.`date` desc) date_rank
@@ -24,7 +24,7 @@
                    , stockCode
                    , chg
                    , round((high + low + `last`)/3, 6) tp
-            from t_eastmoney_node ten
+            from t_stock_raw ten
             where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d') , INTERVAL -60 DAY), '%Y-%m-%d')
             and ten.`date` <= #{calcDate}
             -- and ten.stockCode = '1.600118'
@@ -67,17 +67,17 @@
 
     <select id="getCalcCCIDates4Etf" resultType="java.lang.String">
         select DISTINCT `date`
-        from t_eastmoney_node_index teni
+        from t_index_raw teni
         where stockCode = '1.000001'
           and `date` >= '2022-01-01'
-          and not exists (select 1 from t_eastmoney_node_etf_cci t2 where teni.`date` = t2.date)
+          and not exists (select 1 from t_etf_cci t2 where teni.`date` = t2.date)
           and date not like '9999%'
         order by 1
     </select>
 
     <insert id="genCCIData4Etf">
         <![CDATA[
-        replace into t_eastmoney_node_etf_cci(`date`, `stockCode`, `cci5`, `cci10`, `cci14`)
+        replace into t_etf_cci(`date`, `stockCode`, `cci5`, `cci10`, `cci14`)
         with tmp as (
             select `date`
                    -- , lag(`date`, 1) over (partition by stockCode order by ten.`date` ) data_pre_1
@@ -87,7 +87,7 @@
                    , stockCode
                    , chg
                    , round((high + low + `last`)/3, 6) tp
-            from t_eastmoney_node_etf ten
+            from t_etf_raw ten
             where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d') , INTERVAL -60 DAY), '%Y-%m-%d')
             and ten.`date` <= #{calcDate}
             -- and ten.stockCode = '1.600118'
@@ -150,7 +150,7 @@
                  , lag(ten.`last`, 2) over (partition by ten.stockCode order by date desc) last_next_2
                  , lag(ten.`last`, 5) over (partition by ten.stockCode order by date desc) last_next_5
                  , rank() over (partition by ten.stockCode order by date) date_rn
-            from t_eastmoney_node ten, tmp_min_date tmd
+            from t_stock_raw ten, tmp_min_date tmd
             where ten.`date` not like '9999%'
             and ten.`date` > tmd.min_date
             order by 1 desc
@@ -166,7 +166,7 @@
                  , lag(ten.`volume`, 3) over (partition by ten.stockCode order by date) vol_pre_3
                  , lag(ten.`volume`, 4) over (partition by ten.stockCode order by date) vol_pre_4
                  , ten.`last`
-            from t_eastmoney_node ten, tmp_min_date tmd
+            from t_stock_raw ten, tmp_min_date tmd
             where ten.`date` not like '9999%'
               and ten.chg < 0.5
               and ten.`date` > tmd.min_date
@@ -185,7 +185,7 @@
                  , tenc.cci14
                  , rank() over (partition by tenc.stockCode order by date desc) date_rn
                  , lag(tenc.`date`, 5) over (partition by tenc.stockCode order by date) date_pre_5
-            from t_eastmoney_node_cci tenc, tmp_min_date tmd
+            from t_stock_cci tenc, tmp_min_date tmd
             where 1 = 1
               and tenc.`date` > tmd.min_date
             order by 1 desc
@@ -224,7 +224,7 @@
         , tmp_bigswing as (
 	        select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt
 	               , sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.04 then 1 else 0 end) big_swing_cnt
-	        from t_eastmoney_node ten, t_stock_code th
+	        from t_stock_raw ten, t_stock th
 	        where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
 	          and ten.`date` not like '9999%'
 	          and th.fullStockCode = ten.stockCode
@@ -249,7 +249,7 @@
                           , t2.date date_2
                           , concat(th.bkName, '-',  th.stockName) last
                           , concat('cci14: ', t1.cci14_2) ratioB,  th.fullStockCode
-	        from tmp_consider_cci t1, tmp_consider_vol t2, t_stock_code th
+	        from tmp_consider_cci t1, tmp_consider_vol t2, t_stock th
 	        where t2.date BETWEEN t1.date_pre_5 and t1.`date`
 	          and t1.stockCode = t2.stockCode
 	          and t1.stockCode = th.fullStockCode

@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * 根据表 t_eastmoney_node_str 提取全量的历史数据，但是只能逐个取解析，因为量太大了，接口就会被封
+ * 根据表 t_history_str 提取全量的历史数据，但是只能逐个取解析，因为量太大了，接口就会被封
  * 这个接口非常重要
  */
 @RestController

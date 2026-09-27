@@ -6,7 +6,7 @@
 
     <select id="getHs300List" resultType="net.my.pojo.HsStockPoJo">
         select stockCode, stockType, stockName
-        from t_stock_code
+        from t_stock
         where fullStockCode not in (select distinct stockCode from t_eastmoney_node_weekly tenw where date >= #{targetDate})
              -- where stockCode not like '30%'
              -- and stockCode not like '68%'
@@ -61,7 +61,7 @@
                    rank() over (partition by ten.stockCode order by `date` ) date_rn
                    , rank() over (partition by ten.stockCode order by `date` desc) revert_date_rn
                    , ten.*
-            from t_eastmoney_node ten, tmp_week tw
+            from t_stock_raw ten, tmp_week tw
             where `date` > tw.date_w
             and `date` <= DATE_FORMAT( sysdate(), '%Y-%m-%d')
             and ten.stockCode = tw.stockCode_w

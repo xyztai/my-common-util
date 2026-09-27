@@ -124,7 +124,7 @@ public class AgHistorySinaController {
                         .collect(Collectors.toList());
                 if(!CollectionUtils.isEmpty(tmpDatas)) {
                     log.info("tmpDatas.size={}", tmpDatas.size());
-                    agSohuMapper.saveDataSohu(tmpDatas);
+                    agSohuMapper.saveDataSina(tmpDatas);
                 }
                 startNum += stepNum;
             }

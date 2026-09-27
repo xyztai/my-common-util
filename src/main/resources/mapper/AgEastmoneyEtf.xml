@@ -12,7 +12,7 @@
 
     <select id="getEtfMaxEastMoneyNode" resultType="net.my.pojo.EastmoneyNode">
         select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-        from t_eastmoney_node_etf
+        from t_etf_raw
         where stockCode = #{stockCode}
           and `date` not like '99999%'
         order by date desc
@@ -20,7 +20,7 @@
     </select>
 
     <insert id="saveEtfEastMoneyDatas" parameterType="java.util.List">
-        insert into t_eastmoney_node_etf(`date`, `stockCode`, `infoRaw`)
+        insert into t_etf_raw(`date`, `stockCode`, `infoRaw`)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.date}, #{item.stockCode}, #{item.infoRaw}
@@ -29,7 +29,7 @@
     </insert>
 
     <update id="updateEtfEastMoneyDatas">
-        update t_eastmoney_node_etf
+        update t_etf_raw
         set `date` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -11), ',', 1) ,
             `open` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -10), ',', 1) ,
             `last` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -9), ',', 1) ,
@@ -47,16 +47,16 @@
 
     <delete id="deleteEtfExpect99999">
         DELETE
-        from t_eastmoney_node_etf
+        from t_etf_raw
         where `date` like '99999%'
     </delete>
 
     <insert id="insertEtfExpect99999">
         <![CDATA[
-        replace INTO t_eastmoney_node_etf (`date`,stockCode,infoRaw,`open`,`last`,high,low,volume,amount,exchangeRaw,clac_expma_5,clac_expma_10)
+        replace INTO t_etf_raw (`date`,stockCode,infoRaw,`open`,`last`,high,low,volume,amount,exchangeRaw,clac_expma_5,clac_expma_10)
         with lastest_info as (
             select ten.`date` , ten.stockCode , ten.`last`, ten.infoRaw , rank() over (partition by ten.stockCode order by `date` desc) rank_
-            from t_eastmoney_node_etf ten
+            from t_etf_raw ten
             where ten.`date` > '2025-06-01'
         )
         , one_info as (
@@ -83,13 +83,13 @@
 
     <select id="getEtfAllNeedUpdateEastMoneyNodes" resultType="net.my.pojo.EastmoneyNode">
         select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-        from t_eastmoney_node_etf
+        from t_etf_raw
         where clac_expma_5 is null
     </select>
 
     <select id="getEtfEastMoneyNodes" resultType="net.my.pojo.EastmoneyNode">
         select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-        from t_eastmoney_node_etf
+        from t_etf_raw
         where stockCode = #{stockCode}
           and clac_expma_5 is null
     </select>
@@ -99,7 +99,7 @@
         from (
             select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
             , rank() over (partition by stockCode order by `date` desc) rank_
-            from t_eastmoney_node_etf
+            from t_etf_raw
             where clac_expma_5 is not null
             and `date` not like '99999%'
         ) tt
@@ -108,7 +108,7 @@
 
     <select id="getEtfMaxEastMoneyNodeHasExpma" resultType="net.my.pojo.EastmoneyNode">
         select id, date, stockCode, open, last, high, low, volume, amount, exchangeRaw, infoRaw, clac_expma_5 expma5, clac_expma_10 expma10
-        from t_eastmoney_node_etf
+        from t_etf_raw
         where stockCode = #{stockCode}
           and clac_expma_5 is not null
           and `date` not like '99999%'
@@ -117,14 +117,14 @@
     </select>
 
     <update id="updateEtfExpmaEastmoney" parameterType="net.my.pojo.EastmoneyNode">
-        update t_eastmoney_node_etf
+        update t_etf_raw
         set clac_expma_5 = #{expma5}, clac_expma_10=#{expma10}
         where id = #{id}
     </update>
 
     <update id="batchUpdateEtfExpmaEastmoney" parameterType="java.util.List">
         <foreach collection="list" item="item" separator=";">
-            update t_eastmoney_node_etf
+            update t_etf_raw
             set clac_expma_5 = #{item.expma5}, clac_expma_10=#{item.expma10}
             where id = #{item.id}
         </foreach>
@@ -138,7 +138,7 @@
            , round(clac_expma_10/clac_expma_5, 3) ratioB
            , round(clac_expma_5, 3) clac_expma_5
            , round(clac_expma_10, 3) clac_expma_10
-        from t_eastmoney_node_etf ten
+        from t_etf_raw ten
         where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 1 YEAR), '%Y-%m-%d')
             )
             , tmp_stock_code as (
@@ -210,7 +210,7 @@
             select ten.*
                    -- ten.`date` , ten.stockCode , ten.`last`,
                    -- , rank() over (partition by ten.stockCode order by clac_expma_10/clac_expma_5 desc) rank_, clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
-            from t_eastmoney_node_etf ten
+            from t_etf_raw ten
             where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 365+60 DAY), '%Y-%m-%d')
                or ten.`date` like '9999%'
         )
@@ -273,7 +273,7 @@
                                -- , lag(t.chg, 1) over (partition by t.stockCode order by `date` desc) chg_next_1
                                -- , lag(t.volume, 2) over (partition by t.stockCode order by `date` desc) vol_next_2
                                -- , lag(t.chg, 2) over (partition by t.stockCode order by `date` desc) chg_next_2
-                          from t_eastmoney_node_etf t
+                          from t_etf_raw t
                           where t.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -1 YEAR), '%Y-%m-%d')
                             -- and t.stockCode like '%600803'
                             and t.`date` not like '9999%'
@@ -389,7 +389,7 @@
                                             , lag(ten.chg, 8) over (partition by ten.stockCode order by ten.`date` desc) chg_next_8
                                             , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                                             , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
-                                        from t_eastmoney_node_etf ten
+                                        from t_etf_raw ten
                                         where ten.`date` not like '9999%'
                                         and ten.`stockCode` not like '0.30%'
                                         and ten.`stockCode` not like '0.68%'
@@ -505,7 +505,7 @@
                                             , lag(ten.chg, 8) over (partition by ten.stockCode order by ten.`date` desc) chg_next_8
                                             , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                                             , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
-                                        from t_eastmoney_node_etf ten
+                                        from t_etf_raw ten
                                         where ten.`date` not like '9999%'
                                         and ten.`stockCode` not like '0.30%'
                                         and ten.`stockCode` not like '0.68%'
@@ -531,7 +531,7 @@
              , concat(round(clac_expma_5, 3), '\n', round(clac_expma_10, 3)) ratioB
         from (
                  select t.*, rank() over (partition by t.stockCode order by t.date desc) rank_
-                 from t_eastmoney_node_etf t
+                 from t_etf_raw t
                  where t.`date` > '2025-01-01' and t.date not like '99999%'
              ) t1, t_etf t3
         where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
@@ -546,7 +546,7 @@
                 select rank() over (partition by tene.stockCode order by tene.volume) - 1 rank_min
                        , rank() over (partition by tene.stockCode order by tene.volume desc) - 1 rank_max
                        , tene.*, te.stockName
-                from t_eastmoney_node_etf tene, t_etf te
+                from t_etf_raw tene, t_etf te
                 where tene .stockCode = concat(te.stockType, '.', te.stockCode )
                   -- and tene.date = '2026-02-13'
                   -- and tene.stockCode = '0.159206'
@@ -587,10 +587,10 @@
     <select id="investEtfChgTop3" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
             with tmp_date_1 as (
-           		select distinct date from t_eastmoney_node_etf where date not like '9999%' order by 1 desc limit 1
+           		select distinct date from t_etf_raw where date not like '9999%' order by 1 desc limit 1
        		)
             , tmp_date_2 as (
-           		select distinct date from t_eastmoney_node_etf where date not like '9999%' order by 1 desc limit 1 offset 1
+           		select distinct date from t_etf_raw where date not like '9999%' order by 1 desc limit 1 offset 1
        		)
        		, tmp_rank_1 as (
 	            select tene.`date`
@@ -599,7 +599,7 @@
 	                   , rank() over (partition by tene.date order by tene.chg desc, tene.stockCode ) chg_rank
 	                   , tene.stockCode
 	                   , t3.stockName
-	            from t_eastmoney_node_etf tene , t_etf t3, tmp_date_1 t5
+	            from t_etf_raw tene , t_etf t3, tmp_date_1 t5
 	            where 1 = 1
 	            and tene.`date` = t5.`date`
 	            and tene.stockCode = concat(t3.stockType , '.', t3.stockCode )
@@ -612,7 +612,7 @@
 	                   , rank() over (partition by tene.date order by tene.chg desc, tene.stockCode ) chg_rank
 	                   , tene.stockCode
 	                   , t3.stockName
-	            from t_eastmoney_node_etf tene , t_etf t3, tmp_date_2 t5
+	            from t_etf_raw tene , t_etf t3, tmp_date_2 t5
 	            where 1 = 1
 	            and tene.`date` = t5.`date`
 	            and tene.stockCode = concat(t3.stockType , '.', t3.stockCode )
@@ -664,7 +664,7 @@
                                 , lag(tene.`volume`, 9) over (partition by tene.stockCode order by tene.`date` )
                                 , lag(tene.`volume`, 10) over (partition by tene.stockCode order by tene.`date` )
                         ), 1) vol_multi
-                from t_eastmoney_node_etf tene , t_etf t3
+                from t_etf_raw tene , t_etf t3
                 where 1 = 1
                 -- and t3.stockName not like '0%'
                 and tene.`date` not like '9999%'

@@ -121,7 +121,7 @@ from (
                 , lag(ten.chg, 8) over (partition by ten.stockCode order by ten.`date` desc) chg_next_8
                 , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                 , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
-            from t_eastmoney_node ten
+            from t_stock_raw ten
             where ten.`date` not like '9999%'
             and ten.`stockCode` not like '0.300%'
             and ten.`stockCode` not like '0.688%'
@@ -135,7 +135,7 @@ from (
             ) t2
             ) t3
             where tag_ + pre_tag_1 + pre_tag_2 + pre_tag_3 + pre_tag_4 + pre_tag_5 + pre_tag_6 = 7
-            ) t9, t_stock_code t3
+            ) t9, t_stock t3
         where t9.stockCode = concat(t3.stockType , '.', t3.stockCode )
           and t9.date >  DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d')
           and _9_zhuan != '00'
@@ -261,7 +261,7 @@ from (
                 , lag(ten.chg, 8) over (partition by ten.stockCode order by ten.`date` desc) chg_next_8
                 , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                 , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
-            from t_eastmoney_node ten
+            from t_stock_raw ten
             where ten.`date` not like '9999%'
             and ten.`stockCode` not like '0.300%'
             and ten.`stockCode` not like '0.688%'
@@ -275,7 +275,7 @@ from (
             ) t2
             ) t3
             where tag_ + pre_tag_1 + pre_tag_2 + pre_tag_3 + pre_tag_4 + pre_tag_5 + pre_tag_6 = 7
-            ) t9, t_stock_code t3
+            ) t9, t_stock t3
         where t9.stockCode = concat(t3.stockType , '.', t3.stockCode )
           and t9.date >  DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -30 DAY), '%Y-%m-%d')
           and _9_zhuan != '00'
@@ -401,7 +401,7 @@ from (
                 , lag(ten.chg, 8) over (partition by ten.stockCode order by ten.`date` desc) chg_next_8
                 , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                 , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
-            from t_eastmoney_node_etf ten
+            from t_etf_raw ten
             where ten.`date` not like '9999%'
             and ten.`stockCode` not like '0.300%'
             and ten.`stockCode` not like '0.688%'
@@ -541,7 +541,7 @@ from (
                 , lag(ten.chg, 8) over (partition by ten.stockCode order by ten.`date` desc) chg_next_8
                 , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                 , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
-            from t_eastmoney_node_etf ten
+            from t_etf_raw ten
             where ten.`date` not like '9999%'
             and ten.`stockCode` not like '0.300%'
             and ten.`stockCode` not like '0.688%'

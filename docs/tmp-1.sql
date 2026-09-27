@@ -2,7 +2,7 @@
 
 
 select *
-from t_eastmoney_node_etf tene
+from t_etf_raw tene
 where tene.stockCode = '0.159659'
 order by 1 desc;
 
@@ -19,7 +19,7 @@ with tmp_etf as (
     select rank() over (partition by tene.stockCode order by tene.volume) - 1 rank_min
 	       , rank() over (partition by tene.stockCode order by tene.volume desc) - 1 rank_max
 	       , tene.*, te.stockName
-    from t_eastmoney_node_etf tene, t_etf te
+    from t_etf_raw tene, t_etf te
     where tene .stockCode = concat(te.stockType, '.', te.stockCode )
       -- and tene.date = '2026-02-13'
       -- and tene.stockCode = '0.159206'
@@ -46,7 +46,7 @@ order by stockName,  te.date desc;
 
 
 select tene.*
-from t_eastmoney_node_etf tene, t_etf te
+from t_etf_raw tene, t_etf te
 where tene .stockCode = concat(te.stockType, '.', te.stockCode )
 -- and tene.date = '2026-02-13'
   and tene.stockCode = '0.159206'

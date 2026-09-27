@@ -5,14 +5,14 @@
 <mapper namespace="net.my.mapper.AgEastmoneyIndexMapper">
     <select id="getStr" resultType="java.lang.String">
         select str
-        from t_eastmoney_node_str
+        from t_history_str
         where stockCode = #{stockCode}
         order by id desc
         limit 1
     </select>
 
     <insert id="saveIndexEastMoneyDatas" parameterType="java.util.List">
-        replace into t_eastmoney_node_index(`date`, `stockCode`, `infoRaw`)
+        replace into t_index_raw(`date`, `stockCode`, `infoRaw`)
         values
         <foreach collection="list" item="item" separator=",">
             (#{item.date}, #{item.stockCode}, #{item.infoRaw}
@@ -21,7 +21,7 @@
     </insert>
 
     <update id="updateIndexEastMoneyDatas">
-        update t_eastmoney_node_index
+        update t_index_raw
         set `date` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -11), ',', 1) ,
         `open` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -10), ',', 1) ,
         `last` = SUBSTRING_index(SUBSTRING_index(infoRaw, ',', -9), ',', 1) ,
@@ -43,7 +43,7 @@
                 , rank() over (order by chg) chg_rank
         from (
             select *
-            from t_eastmoney_node_index
+            from t_index_raw
             order by 1 desc
             limit 250
         ) tt
@@ -69,7 +69,7 @@
             , lead(t.date) over (order by t.`date` ) date_pre
             , lead(t.date, 1) over (order by t.`date` ) date_next_1
             , lead(t.date, 5) over (order by t.`date` ) date_next_5
-            from t_eastmoney_node_index t
+            from t_index_raw t
             where `date` < '2026'
             order by 1 desc
             limit 250
@@ -122,7 +122,7 @@
                         , lead(t.`last`, 8) over (order by t.`date` ) last_next_8
                         , lead(t.`last`, 9) over (order by t.`date` ) last_next_9
                         , lead(t.`last`, 10) over (order by t.`date` ) last_next_10
-                from t_eastmoney_node_index t
+                from t_index_raw t
                 where `date` between DATE_FORMAT(DATE_ADD(STR_TO_DATE('2026-03-07', '%Y-%m-%d'), INTERVAL -250 DAY), '%Y-%m-%d') and '2026-03-07'
                 order by chg -- case when chg_pre_1 is null then 1000 else chg_pre_1 end
                 limit 20

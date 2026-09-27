@@ -36,7 +36,7 @@
         select _type
         from (
                 select fullStockCode, '1' _type
-	            from t_stock_code
+	            from t_stock
 	            union
 	            select fullStockCode, '2'
                 from t_etf
