@@ -19,7 +19,7 @@ import org.springframework.web.client.RestTemplate;
 @RequestMapping("/ag-eastmoney-stock")
 @Slf4j
 @Api(value = "ag", description = "ag接口")
-public class AgNewEastmoneyBkController {
+public class AgBkController {
 
     // 获取行业列表
     public static final String EASTMONEY_URL_HY_LIST =
