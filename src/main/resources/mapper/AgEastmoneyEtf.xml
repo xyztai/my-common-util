@@ -331,10 +331,10 @@
     <select id="investEtfChgTop3" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
             with tmp_date_1 as (
-           		select distinct date from t_etf_raw order by 1 desc limit 1
+                select distinct date from t_index_raw t where t.stockCode = '1.000001' order by 1 desc limit 1
        		)
             , tmp_date_2 as (
-           		select distinct date from t_etf_raw order by 1 desc limit 1 offset 1
+            select distinct date from t_index_raw t where t.stockCode = '1.000001' order by 1 desc limit 1 offset 1
        		)
        		, tmp_rank_1 as (
 	            select tene.`date`
@@ -385,7 +385,6 @@
                 select tene.`date`
                         , lag(tene.date, 1) over (partition by tene.stockCode order by tene.`date` ) date_pre_1
                         , tene.stockCode
-                        , t3.stockName
                         , tene.chg
                         , tene.`last`
                         , tene.volume
@@ -397,56 +396,51 @@
                         , lead(tene.`chg`, 1) over (partition by tene.stockCode order by tene.`date` ) chg_next_1
                         , lead(tene.`chg`, 2) over (partition by tene.stockCode order by tene.`date` ) chg_next_2
                         , rank() over (partition by tene.date order by tene.chg desc, tene.stockCode ) chg_rank
-                        , round(tene.volume/least(lag(tene.`volume`, 1) over (partition by tene.stockCode order by tene.`date` )
-                                , lag(tene.`volume`, 2) over (partition by tene.stockCode order by tene.`date` )
-                                , lag(tene.`volume`, 3) over (partition by tene.stockCode order by tene.`date` )
-                                , lag(tene.`volume`, 4) over (partition by tene.stockCode order by tene.`date` )
-                                , lag(tene.`volume`, 5) over (partition by tene.stockCode order by tene.`date` )
-                                , lag(tene.`volume`, 6) over (partition by tene.stockCode order by tene.`date` )
-                                , lag(tene.`volume`, 7) over (partition by tene.stockCode order by tene.`date` )
-                                , lag(tene.`volume`, 8) over (partition by tene.stockCode order by tene.`date` )
-                                , lag(tene.`volume`, 9) over (partition by tene.stockCode order by tene.`date` )
-                                , lag(tene.`volume`, 10) over (partition by tene.stockCode order by tene.`date` )
-                        ), 1) vol_multi
-                from t_etf_raw tene , t_etf t3
-                where 1 = 1
-                -- and t3.stockName not like '0%'
-                and tene.stockCode = concat(t3.stockType , '.', t3.stockCode )
-	            and date > '2025'
-                -- and tene.chg > 2
+                        , round(tene.volume/
+                                least(lag(tene.`volume`, 1) over (partition by tene.stockCode order by tene.`date` )
+                                    , lag(tene.`volume`, 2) over (partition by tene.stockCode order by tene.`date` )
+                                    , lag(tene.`volume`, 3) over (partition by tene.stockCode order by tene.`date` )
+                                    , lag(tene.`volume`, 4) over (partition by tene.stockCode order by tene.`date` )
+                                    , lag(tene.`volume`, 5) over (partition by tene.stockCode order by tene.`date` )
+                                    , lag(tene.`volume`, 6) over (partition by tene.stockCode order by tene.`date` )
+                                    , lag(tene.`volume`, 7) over (partition by tene.stockCode order by tene.`date` )
+                                    , lag(tene.`volume`, 8) over (partition by tene.stockCode order by tene.`date` )
+                                    , lag(tene.`volume`, 9) over (partition by tene.stockCode order by tene.`date` )
+                                    , lag(tene.`volume`, 10) over (partition by tene.stockCode order by tene.`date` )
+                                    )
+                            , 1) vol_multi
+                from t_etf_raw tene
+                where date > DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -60 DAY), '%Y-%m-%d')
             )
             , tmp_target_res as (
                 select t1.*
                 from tmp_res t1
                 where 1 = 1
-                and t1.chg_rank <= 3
-                and chg_pre_1 < 2
-                -- and t1.chg > 2
+                  and t1.chg_rank <= 3
+                  and chg_pre_1 < 2
             )
             , tmp_ans as (
-	            select t1.*
-	                   , GREATEST(chg_next_1, chg_next_1+chg_next_2) great
-	            from tmp_target_res t1
-	            where not exists(
-	            	select 1
-	            	from tmp_res t2
-	            	where t2.chg_rank <= 3
-	            	-- and t2.chg > 2
-	            	and t1.date_pre_1 = t2.`date`
-	            	and t1.stockCode  = t2.stockCode
-	            )
-	        )
-	        select concat(t11.stockCode, '-', t11.stockName) stockCode
-	               , date
-	               , concat('chg=', t11.chg) last
-	               , concat('后2日，great=', round(great, 1), '%' ) ratioB
-	        from tmp_ans t11
-	        where 1 = 1
-	        and date > '2025'
-	        and chg > 2
-	        and vol_ratio_1 between 25 and 100
-	        -- and vol_multi > 3
-	        order by 2 desc, t11.stockName
+                select t1.*
+                        , GREATEST(chg_next_1, chg_next_1+chg_next_2) great
+                from tmp_target_res t1
+                where not exists(
+                    select 1
+                    from tmp_res t2
+                    where t2.chg_rank <= 3
+                      and t1.date_pre_1 = t2.`date`
+                      and t1.stockCode  = t2.stockCode
+                )
+            )
+            select concat(t11.stockCode, '-', te.stockName) stockCode
+                 , date
+                 , concat('chg=', t11.chg) last
+                 , concat('后2日, great=', round(great, 1), '%' ) ratioB
+            from tmp_ans t11, t_etf te
+            where 1 = 1
+              and t11.stockCode = te.fullStockCode
+              and chg > 2
+              and vol_ratio_1 between 25 and 100
+            order by 2 desc, 1
         ]]>
     </select>
 
