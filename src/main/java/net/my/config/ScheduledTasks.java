@@ -2,19 +2,19 @@ package net.my.config;
 
 import lombok.extern.slf4j.Slf4j;
 import net.my.controller.*;
-import net.my.mapper.*;
+import net.my.mapper.AgEastmoneyEChartsMapper;
+import net.my.mapper.AgWeekEastmoneyStockMapper;
+import net.my.mapper.KLineRealTimeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
-import org.springframework.util.CollectionUtils;
 
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -60,9 +60,6 @@ public class ScheduledTasks {
 
     @Autowired
     private AgNewEastmoneyEChartsController agNewEastmoneyEChartsController;
-
-    @Autowired
-    private net.my.mapper.AgEastmoneyWinRatioMapper agEastmoneyWinRatioMapper;
 
     @Autowired
     private AgWeekEastmoneyStockMapper agWeekEastmoneyStockMapper;

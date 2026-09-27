@@ -2,13 +2,10 @@ package net.my.controller;
 
 import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
-import net.my.config.ScheduledTasks;
 import net.my.mapper.AgEastmoneyEtfMapper;
-import net.my.mapper.AgEastmoneyWinRatioMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -45,9 +42,6 @@ public class AgNewEastmoneyETFController {
 
     @Autowired
     private MyCaffeineCache myCaffeineCache;
-
-    @Autowired
-    private AgEastmoneyWinRatioMapper agEastmoneyWinRatioMapper;
 
     @Autowired
     private AgNewQQ300Controller agNewQQ300Controller;
