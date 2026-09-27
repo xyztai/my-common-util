@@ -3,7 +3,7 @@ package net.my.controller;
 import com.alibaba.fastjson2.JSON;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import net.my.mapper.AgSohuMapper;
+import net.my.mapper.AgSinaMapper;
 import net.my.pojo.BaseResponse;
 import net.my.pojo.RestGeneralResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,7 +35,7 @@ public class AgNewSohuController {
     private RestTemplate restTemplate;
 
     @Autowired
-    private AgSohuMapper agSohuMapper;
+    private AgSinaMapper agSinaMapper;
 
     @GetMapping("/history")
     @Transactional
@@ -52,14 +52,14 @@ public class AgNewSohuController {
         List<String> allCodes = new ArrayList<>();
 
         if(type == 0 || type == 1) {
-            List<String> hsStocks = agSohuMapper.getStocks();
+            List<String> hsStocks = agSinaMapper.getStocks();
             if(!CollectionUtils.isEmpty(hsStocks)) {
                 allCodes.addAll(hsStocks);
             }
         }
 
         if(type == 0 || type == 2) {
-            List<String> hsEtfs = agSohuMapper.getEtfs();
+            List<String> hsEtfs = agSinaMapper.getEtfs();
             if(!CollectionUtils.isEmpty(hsEtfs)) {
                 allCodes.addAll(hsEtfs);
             }
@@ -161,10 +161,10 @@ public class AgNewSohuController {
     }
 
     public String getMaxDateFromStock() {
-        return agSohuMapper.getMaxDateFromStock();
+        return agSinaMapper.getMaxDateFromStock();
     }
 
     public String getMaxDateFromEtf() {
-        return agSohuMapper.getMaxDateFromEtf();
+        return agSinaMapper.getMaxDateFromEtf();
     }
 }

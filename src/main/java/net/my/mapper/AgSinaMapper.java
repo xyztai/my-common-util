@@ -6,7 +6,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AgSohuMapper {
+public interface AgSinaMapper {
     List<String> getStocks();
     List<String> getEtfs();
     List<String> getIndexs();

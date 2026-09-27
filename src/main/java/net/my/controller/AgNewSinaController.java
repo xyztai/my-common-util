@@ -1,9 +1,8 @@
 package net.my.controller;
 
-import com.alibaba.fastjson2.JSON;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
-import net.my.mapper.AgSohuMapper;
+import net.my.mapper.AgSinaMapper;
 import net.my.pojo.BaseResponse;
 import net.my.pojo.RestGeneralResponse;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,7 +20,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.text.DecimalFormat;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -36,7 +34,7 @@ public class AgNewSinaController {
     private RestTemplate restTemplate;
 
     @Autowired
-    private AgSohuMapper agSohuMapper;
+    private AgSinaMapper agSinaMapper;
 
     /**
      * 注意：调用该方法后，还需要 使用 获取sina的历史数据后，需要再加工一下 文档来处理chg数据
@@ -65,14 +63,14 @@ public class AgNewSinaController {
         List<String> allCodes = new ArrayList<>();
 
         if(type == 0 || type == 1) {
-            List<String> hsStocks = agSohuMapper.getStocks();
+            List<String> hsStocks = agSinaMapper.getStocks();
             if(!CollectionUtils.isEmpty(hsStocks)) {
                 allCodes.addAll(hsStocks);
             }
         }
 
         if(type == 0 || type == 2) {
-            List<String> hsEtfs = agSohuMapper.getEtfs();
+            List<String> hsEtfs = agSinaMapper.getEtfs();
             if(!CollectionUtils.isEmpty(hsEtfs)) {
                 allCodes.addAll(hsEtfs);
             }
@@ -200,7 +198,7 @@ public class AgNewSinaController {
     public Map<String, String> getSinaDataForIndex() {
         List<String> allCodes = new ArrayList<>();
 
-        List<String> hsStocks = agSohuMapper.getIndexs();
+        List<String> hsStocks = agSinaMapper.getIndexs();
         if(!CollectionUtils.isEmpty(hsStocks)) {
             allCodes.addAll(hsStocks);
         }
@@ -298,10 +296,10 @@ public class AgNewSinaController {
     }
 
     public String getMaxDateFromStock() {
-        return agSohuMapper.getMaxDateFromStock();
+        return agSinaMapper.getMaxDateFromStock();
     }
 
     public String getMaxDateFromEtf() {
-        return agSohuMapper.getMaxDateFromEtf();
+        return agSinaMapper.getMaxDateFromEtf();
     }
 }
