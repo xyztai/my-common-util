@@ -10,7 +10,6 @@
         where stockCode = '1.000001'
           and `date` >= '2022-01-01'
           and not exists (select 1 from t_stock_ma t2 where teni.`date` = t2.date)
-          and date not like '9999%'
           order by 1
     </select>
 
@@ -48,7 +47,6 @@
         where stockCode = '1.000001'
           and `date` >= '2022-01-01'
           and not exists (select 1 from t_etf_ma t2 where teni.`date` = t2.date)
-          and date not like '9999%'
         order by 1
     </select>
 

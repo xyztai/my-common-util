@@ -19,7 +19,6 @@
         select DISTINCT stockCode
         from tmp_all t1
         where t1.rank_ <= 10
-          and t1.`date` like '9999%'
             )
             , tmp_rank_99999 as (
         select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
@@ -62,7 +61,6 @@
                 , rank() over (partition by stockCode order by rank_ ) rank_2
         from tmp_all t, tmp_stock_code t1
         where t.rank_ <= 10 * 2
-          and t.`date` not like '99999%'
           and t.stockCode = t1.stockCode
             )
             , tmp_consider_99999 as (
@@ -86,7 +84,6 @@
                    -- , rank() over (partition by ten.stockCode order by clac_expma_10/clac_expma_5 desc) rank_, clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
             from t_etf_raw ten
             where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 365+60 DAY), '%Y-%m-%d')
-               or ten.`date` like '9999%'
         )
            , tmp_calc_days as (
             select distinct t1.date end_date
@@ -106,7 +103,6 @@
                 , clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
             from tmp_calc_days t1, tmp_all t2
             where t2.`date` BETWEEN t1.start_date and t1.end_date
-            and t1.end_date not like '9999%' -- 非9999开头
             union
             select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
                 , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_
@@ -115,7 +111,6 @@
             from tmp_calc_days t1, tmp_all t2
             where t2.`date` BETWEEN t1.start_date and t1.end_date
             and ( t2.`date` = t1.end_date or t2.`date` not like '9999%' )
-            and t1.end_date like '9999%' -- 9999开头的
             ) t1, t_etf t3
         where t1.rank_ <= 10
           and t1.end_date = t1.`date`
@@ -150,9 +145,6 @@
                           from t_etf_raw t
                           where t.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -1 YEAR), '%Y-%m-%d')
                             -- and t.stockCode like '%600803'
-                            and t.`date` not like '9999%'
-                            and t.stockCode not like '%.68%'
-                            and t.stockCode not like '%.30%'
                       ) t
                  where t.volume >= 2 * pre_volume
                    and t.chg >= 2
@@ -264,12 +256,7 @@
                                             , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                                             , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
                                         from t_etf_raw ten
-                                        where ten.`date` not like '9999%'
-                                        and ten.`stockCode` not like '0.30%'
-                                        and ten.`stockCode` not like '0.68%'
-                                        and ten.`stockCode` not like '1.30%'
-                                        and ten.`stockCode` not like '1.68%'
-                                        and ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d')
+                                        where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d')
                                         -- and ten.stockCode = '1.600795'
                                 ) t1
                         ) t2
@@ -290,7 +277,7 @@
         from (
                  select t.*, rank() over (partition by t.stockCode order by t.date desc) rank_
                  from t_etf_raw t
-                 where t.`date` > '2025-01-01' and t.date not like '99999%'
+                 where t.`date` > '2025-01-01'
              ) t1, t_etf t3
         where t1.stockCode = concat(t3.stockType , '.', t3.stockCode )
           and t1.rank_ = 1
@@ -308,7 +295,6 @@
                 where tene .stockCode = concat(te.stockType, '.', te.stockCode )
                   -- and tene.date = '2026-02-13'
                   -- and tene.stockCode = '0.159206'
-                  and `date` not like '9999%'
                   and `date` > DATE_FORMAT(DATE_ADD(NOW(), INTERVAL -90 DAY), '%Y-%m-%d')
                   and `date` < DATE_FORMAT(NOW(), '%Y-%m-%d')
             )
@@ -345,10 +331,10 @@
     <select id="investEtfChgTop3" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
             with tmp_date_1 as (
-           		select distinct date from t_etf_raw where date not like '9999%' order by 1 desc limit 1
+           		select distinct date from t_etf_raw order by 1 desc limit 1
        		)
             , tmp_date_2 as (
-           		select distinct date from t_etf_raw where date not like '9999%' order by 1 desc limit 1 offset 1
+           		select distinct date from t_etf_raw order by 1 desc limit 1 offset 1
        		)
        		, tmp_rank_1 as (
 	            select tene.`date`
@@ -425,7 +411,6 @@
                 from t_etf_raw tene , t_etf t3
                 where 1 = 1
                 -- and t3.stockName not like '0%'
-                and tene.`date` not like '9999%'
                 and tene.stockCode = concat(t3.stockType , '.', t3.stockCode )
 	            and date > '2025'
                 -- and tene.chg > 2

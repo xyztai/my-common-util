@@ -23,7 +23,6 @@ with tmp_etf as (
     where tene .stockCode = concat(te.stockType, '.', te.stockCode )
       -- and tene.date = '2026-02-13'
       -- and tene.stockCode = '0.159206'
-      and `date` not like '9999%'
       and `date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE('2025-03-01', '%Y-%m-%d'), INTERVAL -90 DAY), '%Y-%m-%d')
       and `date` < '2025-03-01'
 )
@@ -50,7 +49,6 @@ from t_etf_raw tene, t_etf te
 where tene .stockCode = concat(te.stockType, '.', te.stockCode )
 -- and tene.date = '2026-02-13'
   and tene.stockCode = '0.159206'
-  and `date` not like '9999%'
 -- and `date` > '2025-10-01'
 -- and chg > 10
 order by 1 desc;

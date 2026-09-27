@@ -10,7 +10,6 @@
         where stockCode = '1.000001'
           and `date` >= '2022-01-01'
           and not exists (select 1 from t_stock_cci t2 where teni.`date` = t2.date)
-          and date not like '9999%'
           order by 1
     </select>
 
@@ -71,7 +70,6 @@
         where stockCode = '1.000001'
           and `date` >= '2022-01-01'
           and not exists (select 1 from t_etf_cci t2 where teni.`date` = t2.date)
-          and date not like '9999%'
         order by 1
     </select>
 
@@ -151,8 +149,7 @@
                  , lag(ten.`last`, 5) over (partition by ten.stockCode order by date desc) last_next_5
                  , rank() over (partition by ten.stockCode order by date) date_rn
             from t_stock_raw ten, tmp_min_date tmd
-            where ten.`date` not like '9999%'
-            and ten.`date` > tmd.min_date
+            where ten.`date` > tmd.min_date
             order by 1 desc
          )
          -- 1、考虑低量
@@ -167,7 +164,6 @@
                  , lag(ten.`volume`, 4) over (partition by ten.stockCode order by date) vol_pre_4
                  , ten.`last`
             from t_stock_raw ten, tmp_min_date tmd
-            where ten.`date` not like '9999%'
               and ten.chg < 0.5
               and ten.`date` > tmd.min_date
             order by 1 desc
@@ -226,7 +222,6 @@
 	               , sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.04 then 1 else 0 end) big_swing_cnt
 	        from t_stock_raw ten, t_stock th
 	        where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
-	          and ten.`date` not like '9999%'
 	          and th.fullStockCode = ten.stockCode
 	          and th.stockCode not like '30%'
 	          and th.stockCode not like '68%'

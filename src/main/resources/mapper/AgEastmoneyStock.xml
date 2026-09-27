@@ -9,7 +9,6 @@
         select '' stockCode, ten.date, concat('cnt: ', count(1)) last, concat('插入时间:', max(create_time), '; 当前时间:', sysdate()) ratioB
         from t_stock_raw ten
         where ten.`date` > '2026'
-          and `date` not like '9999%'
         group by ten.date
         order by 2 desc
         limit 22
@@ -70,7 +69,6 @@
     <select id="getLimitDate" resultType="java.lang.String">
         select distinct date
         from t_stock_raw
-        where `date` not like '99999%'
         order by date desc
         limit 1 offset 15
     </select>
@@ -90,7 +88,6 @@
             select DISTINCT stockCode
             from tmp_all t1
             where t1.rank_ <= 5
-              and t1.`date` like '9999%'
         )
         , tmp_rank_99999 as (
             select t.`date`, t.stockCode, t.`last`, t.ratioB, t.clac_expma_5, t.clac_expma_10, t.chg
@@ -133,7 +130,6 @@
                     , rank() over (partition by stockCode order by rank_ ) rank_2
             from tmp_all t, tmp_stock_code t1
             where t.rank_ <= 5 * 2
-              and t.`date` not like '99999%'
               and t.stockCode = t1.stockCode
         )
         , tmp_consider_99999 as (
@@ -179,7 +175,6 @@
                        , clac_expma_10/clac_expma_5 ratioB, clac_expma_5, clac_expma_10
                 from tmp_calc_days t1, tmp_all t2
                 where t2.`date` BETWEEN t1.start_date and t1.end_date
-                and t1.end_date not like '9999%' -- 非9999开头
                 union
                 select t1.end_date, t2.`date` , t2.stockCode , t2.`last`, t2.chg
                     , rank() over (partition by end_date, stockCode order by clac_expma_10/clac_expma_5 desc) rank_
@@ -187,7 +182,6 @@
                 from tmp_calc_days t1, tmp_all t2
                 where t2.`date` BETWEEN t1.start_date and t1.end_date
                 and ( t2.`date` = t1.end_date or t2.`date` not like '9999%' )
-                and t1.end_date like '9999%' -- 9999开头的
             ) t1, t_stock th
         where t1.rank_ <= 3
           and t1.end_date = t1.`date`
@@ -243,9 +237,6 @@
                           from t_stock_raw t
                           where t.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -1 YEAR), '%Y-%m-%d')
                             -- and t.stockCode like '%600803'
-                            and t.`date` not like '9999%'
-                            and t.stockCode not like '%.68%'
-                            and t.stockCode not like '%.30%'
                       ) t
                  where t.volume >= 3 * pre_volume
                    and t.chg >= 3
@@ -361,12 +352,7 @@
                                             , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                                             , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
                                         from t_stock_raw ten
-                                        where ten.`date` not like '9999%'
-                                        and ten.`stockCode` not like '0.30%'
-                                        and ten.`stockCode` not like '0.68%'
-                                        and ten.`stockCode` not like '1.30%'
-                                        and ten.`stockCode` not like '1.68%'
-                                        and ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d')
+                                        where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d')
                                         -- and ten.stockCode = '1.600795'
                                 ) t1
                         ) t2
@@ -480,12 +466,7 @@
                                             , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                                             , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
                                         from t_stock_raw ten
-                                        where ten.`date` not like '9999%'
-                                        and ten.`stockCode` not like '0.30%'
-                                        and ten.`stockCode` not like '0.68%'
-                                        and ten.`stockCode` not like '1.30%'
-                                        and ten.`stockCode` not like '1.68%'
-                                        and ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d')
+                                        where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(SYSDATE(), '%Y-%m-%d'), INTERVAL -60 DAY), '%Y-%m-%d')
                                         -- and ten.stockCode = '1.600795'
                                 ) t1
                         ) t2
@@ -507,7 +488,6 @@
                  select t.*, rank() over (partition by t.stockCode order by t.date desc) rank_
                  from t_stock_raw t
                  where t.`date` > DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
-                 and t.date not like '99999%'
              ) t1, t_stock th
         where t1.stockCode = th.fullStockCode
           and t1.rank_ = 1
@@ -533,7 +513,6 @@
                            , ten.volume
                     from t_stock_raw ten
                     where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
-                    and DATE not like '9999%'
                     and ten.stockCode not like '0.68%'
                     and ten.stockCode not like '0.30%'
                     and ten.stockCode not like '1.68%'
@@ -585,7 +564,6 @@
                 where 1 = 1
                 -- and `date` > '2026'
                 and date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
-                and `date` not like '9999%'
                 and ten.stockCode not like '0.68%'
                 and ten.stockCode not like '0.30%'
                 and ten.stockCode not like '1.68%'
@@ -611,7 +589,6 @@
                 select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt, sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.05 then 1 else 0 end) big_swing_cnt
                 from t_stock_raw ten, t_stock th
                 where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
-                and ten.`date` not like '9999%'
                 and th.fullStockCode = ten.stockCode
                 and th.stockCode not like '30%'
                 and th.stockCode not like '68%'
@@ -656,7 +633,6 @@
                 from t_stock_raw ten, t_stock th, tmp_calc_date t3
                 where `date` between t3.small_date_1 and t3.big_date
                 -- where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 60 DAY), '%Y-%m-%d')
-                and ten.`date` not like '9999%'
                 and th.fullStockCode = ten.stockCode
                 and th.stockCode not like '30%'
                 and th.stockCode not like '68%'
@@ -676,7 +652,6 @@
                 from t_stock_raw ten, t_stock th, tmp_calc_date t3
                 where `date` between t3.small_date_2 and t3.big_date
                 -- where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
-                and ten.`date` not like '9999%'
                 and th.fullStockCode = ten.stockCode
                 and th.stockCode not like '30%'
                 and th.stockCode not like '68%'
@@ -721,8 +696,7 @@
                  , lag(ten.`last`, 5) over (partition by ten.stockCode order by date desc) last_next_5
                  , rank() over (partition by ten.stockCode order by date) date_rn
             from t_stock_raw ten, tmp_min_date tmd
-            where ten.`date` not like '9999%'
-            and ten.`date` > tmd.min_date
+            where ten.`date` > tmd.min_date
             order by 1 desc
          )
          -- 1、考虑低量
@@ -737,8 +711,7 @@
                  , lag(ten.`volume`, 4) over (partition by ten.stockCode order by date) vol_pre_4
                  , ten.`last`
             from t_stock_raw ten, tmp_min_date tmd
-            where ten.`date` not like '9999%'
-              and ten.chg < 0.5
+            where ten.chg < 0.5
               and ten.`date` > tmd.min_date
             order by 1 desc
         )
@@ -754,7 +727,6 @@
 	               , sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.04 then 1 else 0 end) big_swing_cnt
 	        from t_stock_raw ten, t_stock th
 	        where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
-	          and ten.`date` not like '9999%'
 	          and th.fullStockCode = ten.stockCode
 	          and th.stockCode not like '30%'
 	          and th.stockCode not like '68%'
@@ -880,7 +852,6 @@
                , chg
             from t_stock_raw ten
             where ten.`date` > DATE_FORMAT(DATE_ADD(SYSDATE() , INTERVAL -120 DAY), '%Y-%m-%d')
-              and ten.`date` not like '9999%'
             -- and ten.stockCode = '0.002025'
             order by ten.`date` desc
                 )
@@ -922,7 +893,6 @@
                    , chg
                 from t_stock_raw ten
                 where ten.`date` > DATE_FORMAT(DATE_ADD(SYSDATE() , INTERVAL -120 DAY), '%Y-%m-%d')
-                  and ten.`date` not like '9999%'
                 -- and ten.stockCode = '0.002025'
                 order by ten.`date` desc
         )

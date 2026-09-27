@@ -15,12 +15,6 @@
                            , ten.volume
                     from t_stock_raw ten
                     where ten.`date` >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 90 DAY), '%Y-%m-%d')
-                    and DATE not like '9999%'
-                    and ten.stockCode not like '0.68%'
-                    and ten.stockCode not like '0.30%'
-                    and ten.stockCode not like '1.68%'
-                    and ten.stockCode not like '1.30%'
-                    and ten.last < 80
                 ) t , t_stock t3
                 where t.stockCode = concat(t3.stockType , '.', t3.stockCode)
             )
@@ -45,7 +39,6 @@
 		            where ten.stockCode = t2.stockCode
 		            and ten.`date` >=  DATE_FORMAT(DATE_SUB(STR_TO_DATE('2026-02-22', '%Y-%m-%d'), INTERVAL 120 DAY), '%Y-%m-%d')
 		            and ten.`date` <= '2026-02-22'
-		            and ten.`date` not like '9999%'
 		            and ten.stockCode = concat(t3.stockType , '.', t3.stockCode)
 		        ) tt
 		        -- where date_rn <= 60
@@ -200,14 +193,7 @@ insert into t_stock_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
                                         select ten.`date` , ten.stockCode , ten.`last`, ten.chg
                                             , lead(ten.`last`, 4) over (partition by ten.stockCode order by ten.`date` desc) pre_last_4
                                         from t_stock_raw ten
-                                        where ten.`date` not like '9999%'
-                                        and ten.`stockCode` not like '0.30%'
-                                        and ten.`stockCode` not like '0.688%'
-                                        and ten.`stockCode` not like '0.689%'
-                                        and ten.`stockCode` not like '1.30%'
-                                        and ten.`stockCode` not like '1.688%'
-                                        and ten.`stockCode` not like '1.689%'
-                                        and ten.`date` >= '2014-01-01'
+                                        where ten.`date` >= '2014-01-01'
                                         and `date` < '2026-03-01'
                                         -- and ten.stockCode = '1.600795'
                                 ) t1
@@ -315,14 +301,7 @@ insert into t_stock_9_zhuan(_date, _stockCode, _direction, _9_zhuan)
                                             , lag(ten.chg, 9) over (partition by ten.stockCode order by ten.`date` desc) chg_next_9
                                             , lag(ten.chg, 10) over (partition by ten.stockCode order by ten.`date` desc) chg_next_10
                                         from t_stock_raw ten
-                                        where ten.`date` not like '9999%'
-                                        and ten.`stockCode` not like '0.30%'
-                                        and ten.`stockCode` not like '0.688%'
-                                        and ten.`stockCode` not like '0.689%'
-                                        and ten.`stockCode` not like '1.30%'
-                                        and ten.`stockCode` not like '1.688%'
-                                        and ten.`stockCode` not like '1.689%'
-                                        and ten.`date` >= '2024-01-01'
+                                        where ten.`date` >= '2024-01-01'
                                         and ten.`date` < '2025-01-01'
                                         -- and ten.stockCode = '1.600795'
                                 ) t1
