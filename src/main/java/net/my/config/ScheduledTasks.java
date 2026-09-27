@@ -519,16 +519,6 @@ public class ScheduledTasks {
             }
         }, executor);
 
-        CompletableFuture<Void> etf_task_207 = CompletableFuture.runAsync(() -> {
-            try {
-                log.info("task etf queryEtf9ZhuanS start");
-                agQueryETFController.queryEtf9ZhuanS();
-                log.info("task etf queryEtf9ZhuanS end");
-            } catch (Exception e) {
-                Thread.currentThread().interrupt();
-            }
-        }, executor);
-
         CompletableFuture<Void> etf_task_208 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf queryEastmoneyLatestInfo start");
@@ -596,7 +586,6 @@ public class ScheduledTasks {
                 , etf_task_203
                 , etf_task_204
                 , etf_task_205
-                , etf_task_207
                 , etf_task_208
                 , etf_task_209
 

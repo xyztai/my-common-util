@@ -13,7 +13,6 @@ public interface AgQueryETFMapper {
     List<SpecialCarePoJo2> queryEtfEastmoneyToday();
     List<SpecialCarePoJo2> queryEtfEastmoneyLast60();
     List<SpecialCarePoJo2> queryEtfEastmoneyVolSuddenlyRised();
-    List<SpecialCarePoJo2> queryEtf9ZhuanS();
     List<SpecialCarePoJo2> queryEtfEastmoneyLatestInfo();
     List<SpecialCarePoJo2> queryEtfLastest90Days();
 
