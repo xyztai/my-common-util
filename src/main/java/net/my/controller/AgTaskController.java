@@ -10,6 +10,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 
+/**
+ * 担心定时任务失败了，手工触发一次
+ */
 @RestController
 @RequestMapping("/ag-task")
 @Slf4j

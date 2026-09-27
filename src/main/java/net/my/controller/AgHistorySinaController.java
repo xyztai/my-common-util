@@ -26,6 +26,9 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 
+/**
+ * 获取sina的历史数据
+ */
 @RestController
 @RequestMapping("/ag-history-sina")
 @Slf4j

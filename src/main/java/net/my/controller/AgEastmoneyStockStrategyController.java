@@ -19,6 +19,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 
+/**
+ * 计算不同的策略数据
+ */
 @RestController
 @RequestMapping("/ag-eastmoney-stock-strategy")
 @Slf4j

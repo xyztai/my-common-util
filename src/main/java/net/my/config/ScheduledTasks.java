@@ -50,13 +50,7 @@ public class ScheduledTasks {
     private AgNewEastmoneyETFController agNewEastmoneyETFController;
 
     @Autowired
-    private AgNewEastmoneyIndexController agNewEastmoneyIndexController;
-
-    @Autowired
     private AgEastmoneyEChartsMapper agEastmoneyEChartsMapper;
-
-    @Autowired
-    private AgNewEastmoneyEChartsController agNewEastmoneyEChartsController;
 
     @Autowired
     private AgWeekEastmoneyStockMapper agWeekEastmoneyStockMapper;
@@ -644,10 +638,6 @@ public class ScheduledTasks {
         allTasks.thenRun(() -> {
             System.out.println("所有任务已完成");
         }).join();
-
-        log.info("task echarts s69 start");
-        agNewEastmoneyEChartsController.s69();
-        log.info("task echarts s69 end");
 
         log.info("task agNewEastmoneyStockController.easySnapshotRight start");
         agNewEastmoneyStockController.easySnapshotRight();

@@ -8,18 +8,22 @@ import net.my.cache.MyCaffeineCache;
 import net.my.mapper.AgEastmoneyEtfMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 
+/**
+ * etf-根据不同的逻辑来查询数据特征点
+ */
 @RestController
 @RequestMapping("/ag-eastmoney-etf")
 @Slf4j
@@ -42,12 +46,6 @@ public class AgNewEastmoneyETFController {
 
     @Autowired
     private MyCaffeineCache myCaffeineCache;
-
-    @Autowired
-    private AgNewSohuController agNewSohuController;
-
-    @Autowired
-    private AgNewSinaController agNewSinaController;
 
     // 1、根据最近一年的数据，判断今天能否进入 TOP10
     private static final String KEY_1 = "etf#" + "special-care-days-eastmoney-365";
@@ -267,40 +265,6 @@ public class AgNewEastmoneyETFController {
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
-
-//    /**
-//     * 7、queryWinRatios
-//     * @return
-//     */
-//    @GetMapping("/queryWinRatios")
-//    public BaseResponse queryWinRatios() {
-//        log.info("queryWinRatios");
-//        String key = "etf#" + "queryWinRatios";
-//        List<SpecialCarePoJo2> res = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
-//        if(res != null) {
-//            log.info("myCaffeineCache get, key={}, cacheRes={}", key, res);
-//            return RestGeneralResponse.of(res);
-//        }
-//
-//        List<SpecialCarePoJo2> buyDataFromEastmoneys = agEastmoneyWinRatioMapper.queryWinRatios();
-//        buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
-//                .filter(f -> !f.getStockCode().startsWith("688")
-//                        && !f.getStockCode().startsWith("689")
-//                        && !f.getStockCode().startsWith("300")).collect(Collectors.toList());
-//        if(CollectionUtils.isEmpty(buyDataFromEastmoneys)) {
-//            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
-//            empty.setDate("--");
-//            empty.setStockCode("--");
-//            empty.setRatioB("--");
-//            empty.setLast("--");
-//            buyDataFromEastmoneys = Arrays.asList(empty);
-//        }
-//
-//        myCaffeineCache.put(key, buyDataFromEastmoneys);
-//        log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
-//        return RestGeneralResponse.of(buyDataFromEastmoneys);
-//    }
-
     /**
      * 10、近3个月的，成交量暴涨10倍的
      * @return
@@ -367,214 +331,17 @@ public class AgNewEastmoneyETFController {
         return RestGeneralResponse.of(buyDataFromEastmoneys);
     }
 
-//    @ApiOperation(value = "获取历史的cp数据", notes = "访问互联网接口获取数据")
-//    @GetMapping("/historyAll")
-//    @Transactional
-//    public BaseResponse getHistoryDataOuter() {
-//        if (ScheduledTasks.taskState4Method != 0) {
-//            log.info("taskState={},放弃本次执行", ScheduledTasks.taskState4Method);
-//            return BaseResponse.OK;
-//        }
-//        ScheduledTasks.taskState4Method = 1;
-//
-//        BaseResponse response = getHistoryData();
-//        ScheduledTasks.taskState4Method = 0;
-//        return response;
-//    }
-
-    @Transactional
-    public BaseResponse getHistoryData() {
-        List<EastmoneyNode> eastmoneyNodeList = new ArrayList<>();
-        Map<String, EastmoneyNode> eastmoneyNodeMap = new LinkedHashMap<>();
-        List<HsStockPoJo> etfList = agEastmoneyEtfMapper.getEtfList();
-
-        if(CollectionUtils.isEmpty(etfList)) {
-            return BaseResponse.OK;
-        }
-
-        Map<String, String> etfMap = new LinkedHashMap<>();
-        for(HsStockPoJo po : etfList) {
-            String key = po.getStockName() + "-" + po.getStockCode();
-            String value = 0 == po.getStockType() ? "0." + po.getStockCode() : "1." + po.getStockCode();
-            etfMap.put(key, value);
-        }
-
-        // 先sina数据
-        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
-            Map<String, String> sinaMap = agNewSinaController.getQQResReplaceEastmoney(2);
-            if (!CollectionUtils.isEmpty(sinaMap)) {
-                for (Map.Entry<String, String> entry : sinaMap.entrySet()) {
-                    String item = entry.getValue();
-                    String[] xxs = item.split(",");
-                    eastmoneyNodeList.add(EastmoneyNode.builder().date(xxs[0]).stockCode(entry.getKey()).infoRaw(item).build());
-                }
-            }
-        }
-
-        // 后sohu数据
-        if(CollectionUtils.isEmpty(eastmoneyNodeList)) {
-            Map<String, String> soHuMap = agNewSohuController.getQQResReplaceEastmoney(2);
-            if(!CollectionUtils.isEmpty(soHuMap)) {
-                for(Map.Entry<String, String> entry : soHuMap.entrySet()) {
-                    String item = entry.getValue();
-                    String[] xxs = item.split(",");
-                    eastmoneyNodeList.add(EastmoneyNode.builder().date(xxs[0]).stockCode(entry.getKey()).infoRaw(item).build());
-                }
-            }
-        }
-
-        boolean useEastmoney = true;
-        boolean useQq = false;
-        boolean useXueqiu = false;
-        boolean useEastmoneyStop = false;
-        boolean useQqStop = false;
-        boolean useXueqiuStop = false;
-        int zqNo = 1;
-        for(Map.Entry<String, String> entry : etfMap.entrySet()) {
-            if(!CollectionUtils.isEmpty(eastmoneyNodeList)) {
-                log.info("已经由sina/sohu获得数据, eastmoneyNodeList size={}", eastmoneyNodeList.size());
-                String maxDate = agNewSohuController.getMaxDateFromEtf();
-                eastmoneyNodeList = eastmoneyNodeList.stream()
-                        .filter(f -> f.getDate().compareTo(maxDate) > 0)
-                        .collect(Collectors.toList());
-                log.info("已经由sina/sohu获得数据, 待插入数据 eastmoneyNodeList size={}", eastmoneyNodeList.size());
-                break;
-            }
-
-            String zqdm = entry.getValue();
-            log.info("getHistoryData No.{}, etf:{}", zqNo++, zqdm);
-//            if(!zqdm.equals("0.000001")) {
-//                continue;
-//            }
-            
-            String url = String.format(EASTMONEY_URL_FORMAT_QFQ, zqdm);
-
-            EastmoneyNode existsNode = agEastmoneyEtfMapper.getEtfMaxEastMoneyNode(zqdm);
-            if(existsNode != null) {
-                url = String.format(EASTMONEY_URL_BEGIN_FORMAT_QFQ, zqdm, existsNode.getDate().replaceAll("-", ""));
-            }
-
-            log.info("url: {}, zqdm: {}", url, zqdm);
-            String res = "";
-            List<String> resFromQQ = new ArrayList<>();
-            for(int i = 0; i < 3; i++) {
-                if(useEastmoney && !useEastmoneyStop) {
-                    log.info("useWay=useEastmoney");
-                    try {
-                        int sleepTime = 750 + new Random().nextInt(500) - 250;
-                        log.info("sleepTime={}", sleepTime);
-                        Thread.sleep(sleepTime);
-                        log.info("try num={}, stockCode={}, url={}", i, entry.getKey(), url);
-                        res = restTemplate.getForObject(url, String.class);
-                        if(!StringUtils.isEmpty(res)) {
-                            if(!useQqStop) {
-                                useQq = true;
-                                useXueqiu = false;
-                                useEastmoney = false;
-                            } else if(!useXueqiuStop) {
-                                useXueqiu = true;
-                                useEastmoney = false;
-                            } else {
-                                Thread.sleep(sleepTime);
-                            }
-                            break;
-                        }
-                    } catch (Exception ex) {
-                        useEastmoneyStop = true;
-                        if(!useQqStop) {
-                            useQq = true;
-                        } else if(!useXueqiuStop) {
-                            useXueqiu = true;
-                        }
-                        log.error("eastmoney error", ex);
-                    }
-                }
-
-                if(!StringUtils.isEmpty(res) || !CollectionUtils.isEmpty(resFromQQ)) {
-                    break;
-                }
-            }
-            if(StringUtils.isEmpty(res) && CollectionUtils.isEmpty(resFromQQ)) {
-                continue;
-            }
-
-            try {
-                List<String> klines = new ArrayList<>();
-                if(!StringUtils.isEmpty(res)) {
-                    log.info("res={}", res);
-                    EtfEastmoneyRes eastmoneyRes = JSON.parseObject(res, EtfEastmoneyRes.class);
-                    log.info("eastmoneyRes={}", JSON.toJSONString(eastmoneyRes));
-
-//                break;
-
-                    // saveEastMoneyDatas
-                    if(eastmoneyRes == null || eastmoneyRes.getData() == null || CollectionUtils.isEmpty(eastmoneyRes.getData().getKlines())) {
-                        break ;
-                    }
-
-                    klines = eastmoneyRes.getData().getKlines();
-                } else {
-                    klines = resFromQQ;
-                }
-
-                List<EastmoneyNode> nodes = new ArrayList<>();
-                for(String item : klines) {
-                    String[] xxs = item.split(",");
-                    nodes.add(EastmoneyNode.builder().date(xxs[0]).stockCode(zqdm).infoRaw(item).build());
-                }
 
 
-                if(existsNode != null) {
-                    nodes = nodes.stream()
-                            .filter(f -> f.getDate().compareTo(existsNode.getDate()) > 0).collect(Collectors.toList());
-                }
 
-                if(!CollectionUtils.isEmpty(nodes)) {
-                    eastmoneyNodeMap.put(entry.getKey(), nodes.get(nodes.size() - 1));
-                    eastmoneyNodeList.addAll(nodes);
-                }
-            } catch (Exception ex) {
-                log.error("", ex);
-            }
-        }
 
-        int startNum = 0;
-        int stepNum = 100;
-        while(startNum < eastmoneyNodeList.size()) {
-            List<EastmoneyNode> tmpNodes = eastmoneyNodeList.stream().skip(startNum).limit(stepNum).collect(Collectors.toList());
-            log.info("tmpNodes.size={}", tmpNodes.size());
-            agEastmoneyEtfMapper.saveEtfEastMoneyDatas(tmpNodes);
-            startNum += stepNum;
-        }
 
-        log.info("阶段1-非99999数据-开始更新基础字段");
-        // 更新基础字段
-        agEastmoneyEtfMapper.updateEtfEastMoneyDatas();
 
-        // 更新expma字段
-        log.info("阶段1-非99999数据-开始更新expma字段 start");
-        updateExpma();
-        log.info("阶段1-非99999数据-开始更新expma字段 end");
 
-        // 删除 预期数据
-        log.info("阶段2-99999数据-deleteEtfExpect99999");
-        agEastmoneyEtfMapper.deleteEtfExpect99999();
-        // 开始插入 预期数据
-        log.info("阶段2-99999数据-insertEtfExpect99999");
-        agEastmoneyEtfMapper.insertEtfExpect99999();
-
-        // 更新基础字段
-        log.info("阶段2-99999数据-开始更新基础字段");
-        agEastmoneyEtfMapper.updateEtfEastMoneyDatas();
-
-        // 更新expma字段
-        log.info("阶段2-99999数据-开始更新expma字段 start");
-        updateExpma();
-        log.info("阶段2-99999数据-开始更新expma字段 end");
-
-        return RestGeneralResponse.of(eastmoneyNodeMap);
-    }
-
+    /**
+     * 计算expma的方法，先不删除
+      */
+/*
     private void updateExpma() {
         List<HsStockPoJo> etfList = agEastmoneyEtfMapper.getEtfList();
         if(CollectionUtils.isEmpty(etfList)) {
@@ -687,6 +454,7 @@ public class AgNewEastmoneyETFController {
     private double calcExpma(double step, double lastValue, double cp) {
         return (cp - lastValue) * 2.0 / (step + 1) + lastValue;
     }
+*/
 
 
     @Data

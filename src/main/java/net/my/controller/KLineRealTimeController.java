@@ -23,6 +23,9 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+/**
+ * 保存日k线，作为planB
+ */
 @RestController
 @RequestMapping("/k-line-real-time")
 @Slf4j
