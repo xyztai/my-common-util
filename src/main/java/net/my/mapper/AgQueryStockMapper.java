@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AgStockMapper {
+public interface AgQueryStockMapper {
     String getLimitDate();
     List<SpecialCarePoJo2> queryEastmoneyToday();
     List<SpecialCarePoJo2> queryEastmoneyLast30();

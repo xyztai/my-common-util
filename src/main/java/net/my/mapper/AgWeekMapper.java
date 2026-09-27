@@ -8,6 +8,6 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AgWeekEastmoneyStockMapper {
+public interface AgWeekMapper {
     int genWeeklyData();
 }

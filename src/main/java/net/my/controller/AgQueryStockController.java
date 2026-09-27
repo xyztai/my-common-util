@@ -6,7 +6,7 @@ import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
 import net.my.mapper.AgCCIMapper;
-import net.my.mapper.AgStockMapper;
+import net.my.mapper.AgQueryStockMapper;
 import net.my.pojo.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
@@ -41,7 +41,7 @@ public class AgQueryStockController {
     private MyCaffeineCache myCaffeineCache;
 
     @Autowired
-    private AgStockMapper agStockMapper;
+    private AgQueryStockMapper agQueryStockMapper;
 
     @Autowired
     private AgCCIMapper agCCIMapper;
@@ -118,7 +118,7 @@ public class AgQueryStockController {
         Map<String, String> statisRes = new HashMap<>(); // 结构为：601800#--#基础建设-中国交建, KEY_101#KEY_102
         Set<String> fieldsSet = new HashSet<>();
 
-        String startDate = agStockMapper.getLimitDate();
+        String startDate = agQueryStockMapper.getLimitDate();
         // 依次计算
         for(String kk : Arrays.asList(KEY_101, KEY_102, KEY_103)) {
             List<SpecialCarePoJo2> res0 = (List<SpecialCarePoJo2>) myCaffeineCache.get(kk);
@@ -236,7 +236,7 @@ public class AgQueryStockController {
         Map<String, String> statisRes = new HashMap<>(); // 结构为：601800#--#基础建设-中国交建, KEY_101#KEY_102
         Set<String> fieldsSet = new HashSet<>();
 
-        String startDate = agStockMapper.getLimitDate();
+        String startDate = agQueryStockMapper.getLimitDate();
         // 依次计算
         for(String kk : Arrays.asList(
                 KEY_221, KEY_222, KEY_223, KEY_224, KEY_225
@@ -339,9 +339,9 @@ public class AgQueryStockController {
             }
 
             // 将结果保存到数据库
-            String maxDate = agStockMapper.getMaxDate();
+            String maxDate = agQueryStockMapper.getMaxDate();
             res.forEach(f -> f.setDate(maxDate));
-            agStockMapper.saveRightData(res);
+            agQueryStockMapper.saveRightData(res);
         } else {
             SpecialCarePoJo2 empty = new SpecialCarePoJo2();
             empty.setDate("--");
@@ -371,7 +371,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.down5();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.down5();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -405,7 +405,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.query9ZhuanB();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.query9ZhuanB();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -438,7 +438,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.queryEastmoneyToday();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.queryEastmoneyToday();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -471,7 +471,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.queryEastmoneyLast30();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.queryEastmoneyLast30();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -504,7 +504,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.queryIndexTop12In1Year();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.queryIndexTop12In1Year();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -537,7 +537,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.considerAll();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.considerAll();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -570,7 +570,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.MA20maSSP();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.MA20maSSP();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -603,7 +603,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.queryLatestRiseLimit();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.queryLatestRiseLimit();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -636,7 +636,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.queryBigSwingAndLowestVol();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.queryBigSwingAndLowestVol();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -669,7 +669,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.queryBigSwing();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.queryBigSwing();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -703,7 +703,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.queryEastmoneyVolSuddenlyRisedTriple();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.queryEastmoneyVolSuddenlyRisedTriple();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -736,7 +736,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.query9VolInLastest90Days();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.query9VolInLastest90Days();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -769,7 +769,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.jumpAndWait();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.jumpAndWait();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -802,7 +802,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.queryOnlyThem();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.queryOnlyThem();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -835,7 +835,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.queryUp5Lian();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.queryUp5Lian();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -868,7 +868,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.query9ZhuanS();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.query9ZhuanS();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -903,7 +903,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.queryDuoTouMA();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.queryDuoTouMA();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -970,7 +970,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.queryBigSwingAndIn5LowestVol();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.queryBigSwingAndIn5LowestVol();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -1003,7 +1003,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.get_000001_lowest();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.get_000001_lowest();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -1036,7 +1036,7 @@ public class AgQueryStockController {
 //            return RestGeneralResponse.of(res);
 //        }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.getDailyCnt();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.getDailyCnt();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")
@@ -1069,7 +1069,7 @@ public class AgQueryStockController {
             return RestGeneralResponse.of(res);
         }
 
-        List<SpecialCarePoJo2> buyDataFromEastmoneys = agStockMapper.queryEastmoneyLatestInfo();
+        List<SpecialCarePoJo2> buyDataFromEastmoneys = agQueryStockMapper.queryEastmoneyLatestInfo();
         buyDataFromEastmoneys = buyDataFromEastmoneys.stream()
                 .filter(f -> !f.getStockCode().startsWith("688")
                         && !f.getStockCode().startsWith("689")

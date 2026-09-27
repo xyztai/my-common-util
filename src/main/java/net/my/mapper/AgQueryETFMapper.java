@@ -9,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AgETFMapper {
+public interface AgQueryETFMapper {
     List<SpecialCarePoJo2> queryEtfEastmoneyToday();
     List<SpecialCarePoJo2> queryEtfEastmoneyLast60();
     List<SpecialCarePoJo2> queryEtfEastmoneyVolSuddenlyRised();

@@ -7,7 +7,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public interface AgStockStrategyMapper {
+public interface AgStrategyMapper {
     List<SpecialCarePoJo2> strategy_2();
     List<SpecialCarePoJo2> strategy_3();
     List<String> getLast120Days4Strategy5();

@@ -3,7 +3,7 @@ package net.my.config;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
 import net.my.controller.*;
-import net.my.mapper.AgWeekEastmoneyStockMapper;
+import net.my.mapper.AgWeekMapper;
 import net.my.mapper.KLineRealTimeMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -49,7 +49,7 @@ public class ScheduledTasks {
     private AgQueryETFController agQueryETFController;
 
     @Autowired
-    private AgWeekEastmoneyStockMapper agWeekEastmoneyStockMapper;
+    private AgWeekMapper agWeekMapper;
 
     @Autowired
     private KLineRealTimeMapper kLineRealTimeMapper;
@@ -68,7 +68,7 @@ public class ScheduledTasks {
     @Scheduled(cron = "0,30 0 0 ? * SUN")
     public void genWeeklyData() {
         log.info("genWeeklyData start");
-        agWeekEastmoneyStockMapper.genWeeklyData();
+        agWeekMapper.genWeeklyData();
         log.info("genWeeklyData end");
     }
 

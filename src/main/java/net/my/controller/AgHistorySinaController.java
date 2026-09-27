@@ -4,7 +4,7 @@ import com.alibaba.fastjson.JSON;
 import io.swagger.annotations.Api;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
-import net.my.mapper.AgSinaMapper;
+import net.my.mapper.AgHistorySinaMapper;
 import net.my.pojo.BaseResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
@@ -39,7 +39,7 @@ public class AgHistorySinaController {
     private RestTemplate restTemplate;
 
     @Autowired
-    private AgSinaMapper agSinaMapper;
+    private AgHistorySinaMapper agHistorySinaMapper;
 
     // demo
     // http://money.finance.sina.com.cn/quotes_service/api/json_v2.php/CN_MarketData.getKLineData?symbol=sh600039&scale=240&ma=5&datalen=2
@@ -53,17 +53,17 @@ public class AgHistorySinaController {
         log.info("开始获取历史数据 days={} start", days);
         List<String> allCodes = new ArrayList<>();
 
-        List<String> hsStocks = agSinaMapper.getStocks();
+        List<String> hsStocks = agHistorySinaMapper.getStocks();
         if(!CollectionUtils.isEmpty(hsStocks)) {
             allCodes.addAll(hsStocks);
         }
 
-        List<String> hsEtfs = agSinaMapper.getEtfs();
+        List<String> hsEtfs = agHistorySinaMapper.getEtfs();
         if(!CollectionUtils.isEmpty(hsEtfs)) {
             allCodes.addAll(hsEtfs);
         }
 
-        List<String> hsIndexStocks = agSinaMapper.getIndexs();
+        List<String> hsIndexStocks = agHistorySinaMapper.getIndexs();
         if(!CollectionUtils.isEmpty(hsIndexStocks)) {
             allCodes.addAll(hsIndexStocks);
         }
@@ -127,7 +127,7 @@ public class AgHistorySinaController {
                         .collect(Collectors.toList());
                 if(!CollectionUtils.isEmpty(tmpDatas)) {
                     log.info("tmpDatas.size={}", tmpDatas.size());
-                    agSinaMapper.saveDataSina(tmpDatas);
+                    agHistorySinaMapper.saveDataSina(tmpDatas);
                 }
                 startNum += stepNum;
             }

@@ -3,7 +3,7 @@ package net.my.controller;
 import io.swagger.annotations.Api;
 import lombok.extern.slf4j.Slf4j;
 import net.my.cache.MyCaffeineCache;
-import net.my.mapper.AgStockStrategyMapper;
+import net.my.mapper.AgStrategyMapper;
 import net.my.pojo.BaseResponse;
 import net.my.pojo.RestGeneralResponse;
 import net.my.pojo.SpecialCarePoJo2;
@@ -31,7 +31,7 @@ public class AgStrategyController {
     private MyCaffeineCache myCaffeineCache;
 
     @Autowired
-    private AgStockStrategyMapper mapper;
+    private AgStrategyMapper mapper;
 
     /* 策略1
      T日（比如2026-06-11）出现买点机会，看T+1日（比如2026-06-12）
