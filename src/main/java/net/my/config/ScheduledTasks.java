@@ -471,7 +471,7 @@ public class ScheduledTasks {
         CompletableFuture<Void> etf_task_201 = CompletableFuture.runAsync(() -> {
             try {
                 log.info("task etf investEtfChgTop3 start");
-                agQueryETFController.investEtfChgTop3();
+                agQueryETFController.queryEtfChgTop3();
                 log.info("task etf investEtfChgTop3 end");
             } catch (Exception e) {
                 Thread.currentThread().interrupt();

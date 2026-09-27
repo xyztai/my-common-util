@@ -17,6 +17,6 @@ public interface AgQueryETFMapper {
     List<SpecialCarePoJo2> queryEtfEastmoneyLatestInfo();
     List<SpecialCarePoJo2> queryEtfLastest90Days();
 
-    List<SpecialCarePoJo2> investEtfChgTop3();
-    List<SpecialCarePoJo2> investEtfChgTop3History();
+    List<SpecialCarePoJo2> queryEtfChgTop3();
+    List<SpecialCarePoJo2> queryEtfChgTop3History();
 }
