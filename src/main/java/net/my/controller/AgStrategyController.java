@@ -88,6 +88,7 @@ public class AgStrategyController {
             buyDataFromEastmoneys = Arrays.asList(empty);
         }
 
+        buyDataFromEastmoneys.forEach(f -> f.setRatioB(f.getRatioB().replaceAll("=-", "=-----")));
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
@@ -122,6 +123,7 @@ public class AgStrategyController {
             buyDataFromEastmoneys = Arrays.asList(empty);
         }
 
+        buyDataFromEastmoneys.forEach(f -> f.setRatioB(f.getRatioB().replaceAll("=-", "=-----")));
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
@@ -167,7 +169,7 @@ public class AgStrategyController {
             buyDataFromEastmoneys = Arrays.asList(empty);
         }
 
-        buyDataFromEastmoneys.forEach(f -> f.setRatioB(f.getRatioB().replaceAll("=-", "=---")));
+        buyDataFromEastmoneys.forEach(f -> f.setRatioB(f.getRatioB().replaceAll("=-", "=-----")));
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
