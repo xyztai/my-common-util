@@ -1,9 +1,6 @@
 package net.my.mapper;
 
-import net.my.pojo.EastmoneyNode;
-import net.my.pojo.HsStockPoJo;
 import net.my.pojo.SpecialCarePoJo2;
-import org.apache.ibatis.annotations.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
