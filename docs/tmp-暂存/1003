@@ -1,0 +1,153 @@
+WITH boll_calculation AS (
+    SELECT
+        stockCode,
+        `date` ,
+        `last` ,
+        -- 1. 计算20日移动平均线（中轨）
+        AVG(`last` ) OVER(
+            PARTITION BY stockCode
+            ORDER BY `date`
+            ROWS BETWEEN 4 PRECEDING AND CURRENT ROW
+        ) AS mb_5,
+        -- 1. 计算20日移动平均线（中轨）
+        AVG(`last` ) OVER(
+            PARTITION BY stockCode
+            ORDER BY `date`
+            ROWS BETWEEN 9 PRECEDING AND CURRENT ROW
+        ) AS mb_10,
+        -- 1. 计算20日移动平均线（中轨）
+        AVG(`last` ) OVER(
+            PARTITION BY stockCode
+            ORDER BY `date`
+            ROWS BETWEEN 19 PRECEDING AND CURRENT ROW
+        ) AS mb_20,
+        -- 1. 计算20日移动平均线（中轨）
+        AVG(`last` ) OVER(
+            PARTITION BY stockCode
+            ORDER BY `date`
+            ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
+        ) AS mb_30,
+        -- 2. 计算20日总体标准差（MySQL的STDDEV_POP函数）
+        STDDEV_SAMP(`last`) OVER(
+            PARTITION BY stockCode
+            ORDER BY `date`
+            ROWS BETWEEN 19 PRECEDING AND CURRENT ROW
+        ) AS std_dev
+    FROM t_stock_raw
+    where date > '2026-06-01'
+)
+, tmp_boll as (
+	SELECT
+	        stockCode,
+	        `date` ,
+	        `last` ,
+	        mb_5,
+	        mb_10,
+	        mb_20,
+	        mb_30,
+		    ROUND(mb_20, 4) AS MB,                       -- 中轨
+		    ROUND(mb_20 + (2 * std_dev), 4) AS UP,       -- 上轨
+		    ROUND(mb_20 - (2 * std_dev), 4) AS DN        -- 下轨
+	FROM boll_calculation
+	-- where LAST >= 0.99 * mb_5
+	-- and mb_5 >= 0.99 * mb_10
+	-- and mb_10 >= 0.99 * mb_20
+	-- and mb_20 >= 0.99 * mb_30
+)
+select *
+from tmp_boll t
+-- where t.last < t.dn
+ORDER BY stockCode, date desc;
+
+0.159206	2026-09-30	1.281	1.3218	1.3482	1.3463	1.346666666666667	1.3463	1.4054	1.2872
+0.159206	2026-09-29	1.297	1.3428	1.3526	1.3510500000000003	1.3535666666666668	1.3511	1.4029	1.2992
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+WITH t1 AS (
+    -- 步骤 1: 计算每日的典型价格 TP
+    SELECT
+        stockCode,
+        date,
+        (high + low + last) / 3.0 AS tp
+    FROM t_stock_raw
+    where date > '2026-06-01'
+),
+t2 AS (
+    -- 步骤 2: 计算 14 日 TP 的移动平均值 MA
+    SELECT
+        stockCode,
+        date,
+        tp,
+        AVG(tp) OVER(
+            PARTITION BY stockCode
+            ORDER BY date
+            ROWS BETWEEN 13 PRECEDING AND CURRENT ROW
+        ) AS ma
+    FROM t1
+),
+t3 AS (
+    -- 步骤 3: 模拟计算平均绝对偏差 MD
+    -- 用窗口函数再次前溯 14 天，计算每项 |TP_i - 当前MA| 的平均值
+    SELECT
+        stockCode,
+        date,
+        tp,
+        ma,
+        AVG(ABS(tp - ma)) OVER(
+            PARTITION BY stockCode
+            ORDER BY date
+            ROWS BETWEEN 13 PRECEDING AND CURRENT ROW
+        ) AS md
+    FROM t2
+)
+-- 步骤 4: 最终输出 CCI 指标
+SELECT
+    stockCode,
+    date,
+    tp,
+    ma,
+    md,
+    CASE
+        WHEN md = 0 THEN 0 -- 防止分母为 0
+        ELSE (tp - ma) / (0.015 * md)
+    END AS cci
+FROM t3
+ORDER BY stockCode desc, date desc;
+
+1.689009	2026-09-30	36.76	37.285476190476196	1.6433503401360556	-21.31727190250022
+1.689009	2026-09-29	36.35	37.43380952380953	1.8128741496598653	-39.85603097022755
+
+1176227	2026-09-30	1.689009	-40.96	-66.69	           -81.73	2026-09-30 09:37:27	2026-09-30 09:37:27
+1175204	2026-09-29	1.689009	-119.85	-139.35	           -143.96	2026-09-29 09:37:25	2026-09-29 09:37:25
+
+1176227	2026-09-30	1.689009	37.1	36.876	37.223	     37.997	         39.734	40.088	2026-09-30 09:37:29	2026-09-30 09:37:29
+1175204	2026-09-29	1.689009	36.04	37.038	37.246	     38.23	         39.974	40.08	2026-09-29 09:37:26	2026-09-29 09:37:26
+
+
+select *
+from t_stock_cci tsc
+where stockCode = '1.689009'
+order by  1 desc;
+
+
+select *
+from t_stock_ma tsc
+where stockCode = '1.689009'
+order by  1 desc;
+
+
