@@ -28,6 +28,16 @@
             and ten.`date` <= #{calcDate}
             -- and ten.stockCode = '1.600118'
         )
+        -- 另外一种写法，实际计算中不采用这种方式
+        -- , tmp_rows as (
+        --    select t1.stockCode
+        --         , AVG(tp) OVER(
+        --             PARTITION BY stockCode
+        --             ORDER BY date_rank ASC -- 按 rn 升序，等同于时间上的从新到旧
+        --             ROWS BETWEEN CURRENT ROW AND 13 FOLLOWING
+        --           ) AS avg_tp_14
+        --    from tmp t1
+        -- )
         , tmp_md as (
             select t1.stockCode
                 , max(case when t1.date_rank <= 1 then t1.date else null end) date
