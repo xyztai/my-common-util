@@ -354,7 +354,7 @@
                 pre_close,
                 pre_cci,
                 CASE
-                WHEN close < pre_close AND cci > pre_cci AND cci < -100 and pre_cci < -150 THEN '底背离（买入信号）'
+                WHEN close < pre_close AND cci > pre_cci AND pre_cci < -100 THEN '底背离（买入信号）'
                 WHEN close > pre_close AND cci < pre_cci AND pre_cci > 100 THEN '顶背离（卖出信号）'
                 ELSE '无背离'
                 END AS divergence_signal
@@ -396,7 +396,7 @@
                 pre_close,
                 pre_cci,
                 CASE
-                WHEN close < pre_close AND cci > pre_cci AND cci < -100 and pre_cci < -150 THEN '底背离（买入信号）'
+                WHEN close < pre_close AND cci > pre_cci AND pre_cci < -100 THEN '底背离（买入信号）'
                 WHEN close > pre_close AND cci < pre_cci AND pre_cci > 100 THEN '顶背离（卖出信号）'
                 ELSE '无背离'
                 END AS divergence_signal
