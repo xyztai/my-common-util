@@ -27,11 +27,12 @@ public class AgBOLLController {
         log.info("historyAllStock start...");
 
         List<String> calcDates = mapper.getCalcBOLLDates4Stock();
-        if(!CollectionUtils.isEmpty(calcDates)) {
+        while(!CollectionUtils.isEmpty(calcDates)) {
             for(String calcDate : calcDates) {
                 log.info("calcDate: {}", calcDate);
                 mapper.genBOLLData4Stock(calcDate);
             }
+            calcDates = mapper.getCalcBOLLDates4Stock();
         }
 
         log.info("historyAllStock end...");
@@ -43,11 +44,12 @@ public class AgBOLLController {
         log.info("historyAllEtf start...");
 
         List<String> calcDates = mapper.getCalcBOLLDates4Etf();
-        if(!CollectionUtils.isEmpty(calcDates)) {
+        while(!CollectionUtils.isEmpty(calcDates)) {
             for(String calcDate : calcDates) {
                 log.info("calcDate: {}", calcDate);
                 mapper.genBOLLData4Etf(calcDate);
             }
+            calcDates = mapper.getCalcBOLLDates4Etf();
         }
 
         log.info("historyAllEtf end...");
