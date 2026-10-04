@@ -16,7 +16,7 @@
 
     <insert id="genBOLLData4Stock">
         <![CDATA[
-        insert into t_stock_boll(date, stockCode, last, mb_20, boll_up_20, boll_dn_20)
+        replace into t_stock_boll(date, stockCode, last, mb_20, boll_up_20, boll_dn_20)
         WITH boll_calculation AS (
             SELECT
                 `date` ,
@@ -67,7 +67,7 @@
 
     <insert id="genBOLLData4Etf">
         <![CDATA[
-        insert into t_etf_boll(date, stockCode, last, mb_20, boll_up_20, boll_dn_20)
+        replace into t_etf_boll(date, stockCode, last, mb_20, boll_up_20, boll_dn_20)
         WITH boll_calculation AS (
             SELECT
                 `date` ,
