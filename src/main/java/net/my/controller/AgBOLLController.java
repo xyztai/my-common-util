@@ -23,7 +23,7 @@ public class AgBOLLController {
     private AgBOLLMapper mapper;
 
     @GetMapping("/history-all/stock")
-    public BaseResponse historyAllStock() {
+    public BaseResponse historyAllStock() throws InterruptedException {
         log.info("historyAllStock start...");
 
         List<String> calcDates = mapper.getCalcBOLLDates4Stock();
@@ -32,6 +32,7 @@ public class AgBOLLController {
                 log.info("calcDate: {}", calcDate);
                 mapper.genBOLLData4Stock(calcDate);
             }
+            Thread.sleep(3000);
             calcDates = mapper.getCalcBOLLDates4Stock();
         }
 
@@ -40,7 +41,7 @@ public class AgBOLLController {
     }
 
     @GetMapping("/history-all/etf")
-    public BaseResponse historyAllEtf() {
+    public BaseResponse historyAllEtf() throws InterruptedException {
         log.info("historyAllEtf start...");
 
         List<String> calcDates = mapper.getCalcBOLLDates4Etf();
@@ -49,6 +50,7 @@ public class AgBOLLController {
                 log.info("calcDate: {}", calcDate);
                 mapper.genBOLLData4Etf(calcDate);
             }
+            Thread.sleep(3000);
             calcDates = mapper.getCalcBOLLDates4Etf();
         }
 
