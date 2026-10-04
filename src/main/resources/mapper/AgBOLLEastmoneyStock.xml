@@ -48,7 +48,6 @@
                     ROUND(mb_20 + (2 * std_dev_20), 4) AS boll_up_20,       -- 上轨
                     ROUND(mb_20 - (2 * std_dev_20), 4) AS boll_dn_20        -- 下轨
             FROM boll_calculation
-            -- where date_rank <= 1
         )
         select `date`, stockCode, `last`, mb_20, boll_up_20, boll_dn_20
         from tmp_boll t
@@ -100,7 +99,6 @@
                     ROUND(mb_20 + (2 * std_dev_20), 4) AS boll_up_20,       -- 上轨
                     ROUND(mb_20 - (2 * std_dev_20), 4) AS boll_dn_20        -- 下轨
             FROM boll_calculation
-            -- where date_rank <= 1
         )
         select `date`, stockCode, `last`, mb_20, boll_up_20, boll_dn_20
         from tmp_boll t
