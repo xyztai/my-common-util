@@ -326,5 +326,90 @@
         ]]>
     </select>
 
+    <select id="strategy_stock_101" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+        with tmp_data as (
+            select ter.`date` trade_date, ter.stockCode code, ter.`last` close , tec.cci14 cci
+            from t_stock_cci tec , t_stock_raw ter
+            where tec.`date` = ter.`date`
+              and tec.stockCode = ter.stockCode
+              and ter.`date` > DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -30 DAY), '%Y-%m-%d')
+              and SUBSTRING(ter.stockCode, 3) not like '3%'
+              and SUBSTRING(ter.stockCode, 3) not like '68%'
+            -- and ter.stockCode = '0.002422'
+            )
+        , cte_lag as (
+            select LAG(close, 5) OVER(PARTITION BY code ORDER BY trade_date) AS pre_close
+                    , LAG(cci, 5) OVER(PARTITION BY code ORDER BY trade_date) AS pre_cci
+                    , t.*
+            from tmp_data t
+        )
+        -- 判断背离信号
+        , tmp_ans_cci as (
+            SELECT
+                code,
+                trade_date,
+                close,
+                cci,
+                pre_close,
+                pre_cci,
+                CASE
+                WHEN close < pre_close AND cci > pre_cci AND cci < -100 and pre_cci < -150 THEN '底背离（买入信号）'
+                WHEN close > pre_close AND cci < pre_cci AND pre_cci > 100 THEN '顶背离（卖出信号）'
+                ELSE '无背离'
+                END AS divergence_signal
+            FROM cte_lag
+        )
+        select distinct SUBSTRING(t.code, 3) stockCode, t.trade_date date, t1.stockName last, t.divergence_signal ratioB
+        from tmp_ans_cci t, t_stock t1
+        where t.divergence_signal = '底背离（买入信号）'
+          and t.code = t1.fullStockCode
+        ORDER BY trade_date desc, 1
+        ]]>
+    </select>
+
+    <select id="strategy_etf_101" resultType="net.my.pojo.SpecialCarePoJo2">
+        <![CDATA[
+        with tmp_data as (
+            select ter.`date` trade_date, ter.stockCode code, ter.`last` close , tec.cci14 cci
+            from t_etf_cci tec , t_etf_raw ter
+            where tec.`date` = ter.`date`
+              and tec.stockCode = ter.stockCode
+              and ter.`date` > DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -30 DAY), '%Y-%m-%d')
+              and SUBSTRING(ter.stockCode, 3) not like '3%'
+              and SUBSTRING(ter.stockCode, 3) not like '68%'
+            -- and ter.stockCode = '0.002422'
+            )
+        , cte_lag as (
+            select LAG(close, 5) OVER(PARTITION BY code ORDER BY trade_date) AS pre_close
+                    , LAG(cci, 5) OVER(PARTITION BY code ORDER BY trade_date) AS pre_cci
+                    , t.*
+            from tmp_data t
+        )
+        -- 判断背离信号
+        , tmp_ans_cci as (
+            SELECT
+                code,
+                trade_date,
+                close,
+                cci,
+                pre_close,
+                pre_cci,
+                CASE
+                WHEN close < pre_close AND cci > pre_cci AND cci < -100 and pre_cci < -150 THEN '底背离（买入信号）'
+                WHEN close > pre_close AND cci < pre_cci AND pre_cci > 100 THEN '顶背离（卖出信号）'
+                ELSE '无背离'
+                END AS divergence_signal
+            FROM cte_lag
+        )
+        select distinct SUBSTRING(t.code, 3) stockCode, t.trade_date date, t1.stockName last, t.divergence_signal ratioB
+        from tmp_ans_cci t, t_etf t1
+        where t.divergence_signal = '底背离（买入信号）'
+          and t.code = t1.fullStockCode
+        ORDER BY trade_date desc, 1
+        ]]>
+    </select>
+
+
 
 </mapper>

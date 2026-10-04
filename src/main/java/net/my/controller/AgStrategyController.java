@@ -60,6 +60,18 @@ public class AgStrategyController {
     private static final String KEY_88805 = "stock#" + "strategy_5";
 
 
+    /* 策略6 strategy_stock_101
+     stock-cci 底背离，买入
+     */
+    private static final String KEY_STRATEGY_STOCK_101 = "stock#" + "strategy_stock_101";
+
+
+    /* 策略7 strategy_etf_101
+     etf-cci 底背离，买入
+     */
+    private static final String KEY_STRATEGY_ETF_101 = "stock#" + "strategy_etf_101";
+
+
     /**
      * 88802、
      * * @return
@@ -173,6 +185,70 @@ public class AgStrategyController {
         myCaffeineCache.put(key, buyDataFromEastmoneys);
         log.info("myCaffeineCache put, key={}, res={}", key, buyDataFromEastmoneys);
         return RestGeneralResponse.of(buyDataFromEastmoneys);
+    }
+
+
+    /**
+     * 策略6 strategy_stock_101
+     * * @return
+     */
+    @GetMapping("/strategy_stock_101")
+    public BaseResponse strategy_stock_101() {
+        log.info("strategy_stock_101");
+        String key = KEY_STRATEGY_STOCK_101;
+        List<SpecialCarePoJo2> cacheRes = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(cacheRes != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, cacheRes);
+            return RestGeneralResponse.of(cacheRes);
+        }
+
+        List<SpecialCarePoJo2> res = mapper.strategy_stock_101();
+
+        if(CollectionUtils.isEmpty(res)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            res = Arrays.asList(empty);
+        }
+
+        res.forEach(f -> f.setRatioB(f.getRatioB().replaceAll("=-", "=-----")));
+        myCaffeineCache.put(key, res);
+        log.info("myCaffeineCache put, key={}, res={}", key, res);
+        return RestGeneralResponse.of(res);
+    }
+
+
+    /**
+     * 策略7 strategy_etf_101
+     * * @return
+     */
+    @GetMapping("/strategy_etf_101")
+    public BaseResponse strategy_etf_101() {
+        log.info("strategy_etf_101");
+        String key = KEY_STRATEGY_ETF_101;
+        List<SpecialCarePoJo2> cacheRes = (List<SpecialCarePoJo2>) myCaffeineCache.get(key);
+        if(cacheRes != null) {
+            log.info("myCaffeineCache get, key={}, cacheRes={}", key, cacheRes);
+            return RestGeneralResponse.of(cacheRes);
+        }
+
+        List<SpecialCarePoJo2> res = mapper.strategy_etf_101();
+
+        if(CollectionUtils.isEmpty(res)) {
+            SpecialCarePoJo2 empty = new SpecialCarePoJo2();
+            empty.setDate("--");
+            empty.setStockCode("--");
+            empty.setRatioB("--");
+            empty.setLast("--");
+            res = Arrays.asList(empty);
+        }
+
+        res.forEach(f -> f.setRatioB(f.getRatioB().replaceAll("=-", "=-----")));
+        myCaffeineCache.put(key, res);
+        log.info("myCaffeineCache put, key={}, res={}", key, res);
+        return RestGeneralResponse.of(res);
     }
 
 }

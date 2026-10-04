@@ -14,4 +14,7 @@ public interface AgStrategyMapper {
     int gen_strategy_5_default(@Param("calcDate") String calcDate);
     int gen_strategy_5(@Param("calcDate") String calcDate);
     List<SpecialCarePoJo2> strategy_5();
+
+    List<SpecialCarePoJo2> strategy_stock_101();
+    List<SpecialCarePoJo2> strategy_etf_101();
 }
