@@ -239,6 +239,28 @@ public class ScheduledTasks {
             }
         }, executor);
 
+        // 策略6计算
+        CompletableFuture<Void> strategy_stock_101 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock strategy_stock_101 start");
+                agStrategyController.strategy_stock_101();
+                log.info("task stock strategy_stock_101 end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
+        // 策略7计算
+        CompletableFuture<Void> strategy_etf_101 = CompletableFuture.runAsync(() -> {
+            try {
+                log.info("task stock strategy_etf_101 start");
+                agStrategyController.strategy_etf_101();
+                log.info("task stock strategy_etf_101 end");
+            } catch (Exception e) {
+                Thread.currentThread().interrupt();
+            }
+        }, executor);
+
 
         CompletableFuture<Void> stock_task_101 = CompletableFuture.runAsync(() -> {
             try {
@@ -484,6 +506,8 @@ public class ScheduledTasks {
                 stock_task_88802
                 , stock_task_88803
                 , stock_task_88805
+                , strategy_stock_101
+                , strategy_etf_101
                 , stock_task_101
                 , stock_task_102
                 , stock_task_105
