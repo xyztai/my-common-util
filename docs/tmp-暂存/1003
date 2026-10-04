@@ -27,7 +27,7 @@ WITH boll_calculation AS (
             ORDER BY `date`
             ROWS BETWEEN 29 PRECEDING AND CURRENT ROW
         ) AS mb_30,
-        -- 2. 计算20日总体标准差（MySQL的STDDEV_POP函数）
+        -- 2. 计算20日总体标准差（MySQL的 STDDEV_SAMP 函数）
         STDDEV_SAMP(`last`) OVER(
             PARTITION BY stockCode
             ORDER BY `date`

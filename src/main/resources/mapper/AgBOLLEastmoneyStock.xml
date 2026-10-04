@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="net.my.mapper.AgBOLLMapper">
+
+    <select id="getCalcBOLLDates4Stock" resultType="java.lang.String">
+        select DISTINCT `date`
+        from t_index_raw teni
+        where stockCode = '1.000001'
+          and `date` >= '2022-01-01'
+          and not exists (select 1 from t_stock_boll t2 where teni.`date` = t2.date)
+          order by 1
+          limit 1
+    </select>
+
+    <insert id="genBOLLData4Stock">
+        <![CDATA[
+        insert into t_stock_boll(date, stockCode, last, mb_20, boll_up_20, boll_dn_20)
+        WITH boll_calculation AS (
+            SELECT
+                `date` ,
+                stockCode,
+                `last` ,
+                -- 1. 计算20日移动平均线（中轨）
+                AVG(`last` ) OVER(
+                    PARTITION BY stockCode
+                    ORDER BY `date`
+                    ROWS BETWEEN 19 PRECEDING AND CURRENT ROW
+                ) AS mb_20,
+                -- 2. 计算20日总体标准差（MySQL的 STDDEV_SAMP 函数）
+                STDDEV_SAMP(`last`) OVER(
+                    PARTITION BY stockCode
+                    ORDER BY `date`
+                    ROWS BETWEEN 19 PRECEDING AND CURRENT ROW
+                ) AS std_dev_20
+                , rank() over (partition by stockCode order by `date` desc) date_rank
+            FROM t_stock_raw
+            where date > '2026-08-01'
+            and stockCode = '0.000001'
+        )
+        , tmp_boll as (
+            SELECT
+                    `date` ,
+                    stockCode,
+                    `last` ,
+                    ROUND(mb_20, 4) AS mb_20,                       -- 中轨
+                    ROUND(mb_20 + (2 * std_dev_20), 4) AS boll_up_20,       -- 上轨
+                    ROUND(mb_20 - (2 * std_dev_20), 4) AS boll_dn_20        -- 下轨
+            FROM boll_calculation
+            -- where date_rank <= 1
+        )
+        select `date`, stockCode, `last`, mb_20, boll_up_20, boll_dn_20
+        from tmp_boll t
+        ORDER BY date, stockCode
+        ]]>
+    </insert>
+
+    <select id="getCalcBOLLDates4Etf" resultType="java.lang.String">
+        select DISTINCT `date`
+        from t_index_raw teni
+        where stockCode = '1.000001'
+          and `date` >= '2022-01-01'
+          and not exists (select 1 from t_etf_boll t2 where teni.`date` = t2.date)
+        order by 1
+    </select>
+
+    <insert id="genBOLLData4Etf">
+        <![CDATA[
+        insert into t_etf_boll(date, stockCode, last, mb_20, boll_up_20, boll_dn_20)
+        WITH boll_calculation AS (
+            SELECT
+                `date` ,
+                stockCode,
+                `last` ,
+                -- 1. 计算20日移动平均线（中轨）
+                AVG(`last` ) OVER(
+                    PARTITION BY stockCode
+                    ORDER BY `date`
+                    ROWS BETWEEN 19 PRECEDING AND CURRENT ROW
+                ) AS mb_20,
+                -- 2. 计算20日总体标准差（MySQL的 STDDEV_SAMP 函数）
+                STDDEV_SAMP(`last`) OVER(
+                    PARTITION BY stockCode
+                    ORDER BY `date`
+                    ROWS BETWEEN 19 PRECEDING AND CURRENT ROW
+                ) AS std_dev_20
+                , rank() over (partition by stockCode order by `date` desc) date_rank
+            FROM t_etf_raw
+            where date > '2026-08-01'
+            and stockCode = '0.000001'
+        )
+        , tmp_boll as (
+            SELECT
+                    `date` ,
+                    stockCode,
+                    `last` ,
+                    ROUND(mb_20, 4) AS mb_20,                       -- 中轨
+                    ROUND(mb_20 + (2 * std_dev_20), 4) AS boll_up_20,       -- 上轨
+                    ROUND(mb_20 - (2 * std_dev_20), 4) AS boll_dn_20        -- 下轨
+            FROM boll_calculation
+            -- where date_rank <= 1
+        )
+        select `date`, stockCode, `last`, mb_20, boll_up_20, boll_dn_20
+        from tmp_boll t
+        ORDER BY date, stockCode
+        ]]>
+    </insert>
+
+</mapper>
