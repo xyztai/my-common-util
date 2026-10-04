@@ -43,6 +43,9 @@ public class ScheduledTasks {
     private AgMAController agMAController;
 
     @Autowired
+    private AgBOLLController agBOLLController;
+
+    @Autowired
     private KLineRealTimeController KLineRealTimeController;
 
     @Autowired
@@ -182,6 +185,12 @@ public class ScheduledTasks {
         agMAController.historyAllStock();
         agMAController.historyAllEtf();
         log.info("task ma end");
+
+        // 3、此处有计算boll
+        log.info("task boll start");
+        agBOLLController.historyAllStock();
+        agBOLLController.historyAllEtf();
+        log.info("task boll end");
     }
 
     /**
