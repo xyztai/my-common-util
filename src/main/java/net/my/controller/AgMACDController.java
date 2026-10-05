@@ -47,7 +47,7 @@ public class AgMACDController {
         Map<String, String> resMap = new LinkedHashMap<>();
 
         int startNum = 0;
-        int stepNum = 10;
+        int stepNum = 50;
         while(startNum < codes.size()) {
             List<String> batchCodes = codes.stream().skip(startNum).limit(stepNum)
                     .collect(Collectors.toList());
