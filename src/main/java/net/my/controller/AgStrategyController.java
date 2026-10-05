@@ -217,7 +217,7 @@ public class AgStrategyController {
             res = Arrays.asList(empty);
         }
 
-        BaseResponse baseResponse = agMACDController.historyAllStock();
+        BaseResponse baseResponse = agMACDController.historyAllStock(null);
         if(baseResponse instanceof RestGeneralResponse) {
             LinkedHashMap<String, String> macdData = (LinkedHashMap<String, String>) ((RestGeneralResponse)baseResponse).data;
             if(!CollectionUtils.isEmpty(macdData)) {
@@ -230,7 +230,7 @@ public class AgStrategyController {
             }
         }
 
-        res.forEach(f -> f.setRatioB(f.getRatioB().replaceAll("=-", "=-----")));
+//        res.forEach(f -> f.setRatioB(f.getRatioB().replaceAll("=-", "=-----")));
         myCaffeineCache.put(key, res);
         log.info("myCaffeineCache put, key={}, res={}", key, res);
         return RestGeneralResponse.of(res);
@@ -262,7 +262,7 @@ public class AgStrategyController {
             res = Arrays.asList(empty);
         }
 
-        BaseResponse baseResponse = agMACDController.historyAllEtf();
+        BaseResponse baseResponse = agMACDController.historyAllEtf(null);
         if(baseResponse instanceof RestGeneralResponse) {
             LinkedHashMap<String, String> macdData = (LinkedHashMap<String, String>) ((RestGeneralResponse)baseResponse).data;
             if(!CollectionUtils.isEmpty(macdData)) {
@@ -275,7 +275,7 @@ public class AgStrategyController {
             }
         }
 
-        res.forEach(f -> f.setRatioB(f.getRatioB().replaceAll("=-", "=-----")));
+//        res.forEach(f -> f.setRatioB(f.getRatioB().replaceAll("=-", "=-----")));
         myCaffeineCache.put(key, res);
         log.info("myCaffeineCache put, key={}, res={}", key, res);
         return RestGeneralResponse.of(res);

@@ -23,8 +23,8 @@
     <select id="getAllCodesEtf" resultType="java.lang.String">
         select distinct tsr.fullStockCode
         from t_etf tsr
-        where tsr.stockCode not like '3%'
-        and tsr.stockCode not like '68%'
+        -- where tsr.stockCode not like '3%'
+        -- and tsr.stockCode not like '68%'
         order by 1
     </select>
 

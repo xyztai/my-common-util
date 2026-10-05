@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.LinkedHashMap;
@@ -44,7 +45,7 @@ public class AgMACDController {
      * @return
      */
     @GetMapping("/history-all/stock")
-    public BaseResponse historyAllStock(/*@RequestParam("code") String code*/) {
+    public BaseResponse historyAllStock(@RequestParam("codes") List<String> codes) {
         log.info("historyAllStock start...");
 
         String key = KEY_STOCK;
@@ -54,7 +55,9 @@ public class AgMACDController {
             return RestGeneralResponse.of(res);
         }
 
-        List<String> codes = mapper.getAllCodesStock();
+        if(CollectionUtils.isEmpty(codes)) {
+            codes = mapper.getAllCodesStock();
+        }
         if(CollectionUtils.isEmpty(codes)) {
             log.info("codes is empty");
             return BaseResponse.OK;
@@ -133,7 +136,7 @@ public class AgMACDController {
      * @return
      */
     @GetMapping("/history-all/etf")
-    public BaseResponse historyAllEtf(/*@RequestParam("code") String code*/) {
+    public BaseResponse historyAllEtf(@RequestParam("codes") List<String> codes) {
         log.info("historyAllEtf start...");
 
         String key = KEY_ETF;
@@ -143,7 +146,9 @@ public class AgMACDController {
             return RestGeneralResponse.of(res);
         }
 
-        List<String> codes = mapper.getAllCodesEtf();
+        if(CollectionUtils.isEmpty(codes)) {
+            codes = mapper.getAllCodesEtf();
+        }
         if(CollectionUtils.isEmpty(codes)) {
             log.info("codes is empty");
             return BaseResponse.OK;
@@ -174,7 +179,7 @@ public class AgMACDController {
                             for (int j = 0; j < macdResults.size(); j++) {
                                 MACDCalculator.MACDResult r = macdResults.get(j);
                                 if(r.macd > -0.5 && r.macd < 0.5 && calcPrices.get(j).getTradeDate().compareTo("2025-01-01") > 0) {
-                                    resMap.put(code + "-" + calcPrices.get(j).getTradeDate(), String.format("tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
+                                    resMap.put(code.substring(2) + "-" + calcPrices.get(j).getTradeDate(), String.format("tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
                                     log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", j + 1, calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
                                 }
                             }
