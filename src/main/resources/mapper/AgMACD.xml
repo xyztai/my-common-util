@@ -15,7 +15,7 @@
         select tsr.stockCode code, tsr.`date` tradeDate, tsr.`last` closePrice
         from t_stock_raw tsr
         where tsr.stockCode in
-        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+        <foreach collection="batchCodes" index="index" item="item" open="(" separator="," close=")">
             #{item}
         </foreach>
     </select>
