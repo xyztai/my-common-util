@@ -1,5 +1,6 @@
 package net.my.controller;
 
+import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import net.my.mapper.AgMACDMapper;
 import net.my.pojo.BaseResponse;
@@ -9,10 +10,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,27 +45,62 @@ public class AgMACDController {
         }
 
         Map<String, String> resMap = new LinkedHashMap<>();
-        for(int i = 0; i < codes.size(); i++) {
-            String code = codes.get(i);
-            log.info("start calc {}/{}, code={}", i+1, codes.size(), code);
-            List<RawPO> calcPrices = mapper.getClosePrices(code);
-            if(CollectionUtils.isEmpty(calcPrices)) {
-                log.info("calcPrices is empty");
-                return BaseResponse.OK;
-            }
 
-            List<MACDCalculator.MACDResult> macdResults = calculate(calcPrices.stream().map(RawPO::getClosePrice).collect(Collectors.toList()));
+        int startNum = 0;
+        int stepNum = 10;
+        while(startNum < codes.size()) {
+            List<String> batchCodes = codes.stream().skip(startNum).limit(stepNum)
+                    .collect(Collectors.toList());
+            if(!CollectionUtils.isEmpty(batchCodes)) {
+                log.info("start calc {}~{}/{}", startNum + 1, startNum + batchCodes.size(), codes.size());
+                log.info("batchCodes={}", JSON.toJSON(batchCodes));
+                List<RawPO> calcPricesBatch = mapper.getClosePricesBatch(batchCodes);
+                if(!CollectionUtils.isEmpty(calcPricesBatch)) {
+                    for(String code : batchCodes) {
+                        List<RawPO> calcPrices = calcPricesBatch.stream().filter(f -> f.getCode().equals(code)).collect(Collectors.toList());
+                        if(CollectionUtils.isEmpty(calcPrices)) {
+                            log.info("calcPrices(code={}) is empty", code);
+                            continue;
+                        }
 
-            if(!CollectionUtils.isEmpty(macdResults)) {
-                for (int j = 0; j < macdResults.size(); j++) {
-                    MACDCalculator.MACDResult r = macdResults.get(j);
-                    if(r.macd > -0.5 && r.macd < 0.5 && calcPrices.get(j).getTradeDate().compareTo("2025-01-01") > 0) {
-                        resMap.put(code + "-" + calcPrices.get(j).getTradeDate(), String.format("tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
-                        log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", j + 1, calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
+                        List<MACDCalculator.MACDResult> macdResults = calculate(calcPrices.stream().map(RawPO::getClosePrice).collect(Collectors.toList()));
+
+                        if(!CollectionUtils.isEmpty(macdResults)) {
+                            for (int j = 0; j < macdResults.size(); j++) {
+                                MACDCalculator.MACDResult r = macdResults.get(j);
+                                if(r.macd > -0.5 && r.macd < 0.5 && calcPrices.get(j).getTradeDate().compareTo("2025-01-01") > 0) {
+                                    resMap.put(code + "-" + calcPrices.get(j).getTradeDate(), String.format("tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
+                                    log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", j + 1, calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
+                                }
+                            }
+                        }
                     }
                 }
             }
+            startNum += stepNum;
         }
+
+//        for(int i = 0; i < codes.size(); i++) {
+//            String code = codes.get(i);
+//            log.info("start calc {}/{}, code={}", i+1, codes.size(), code);
+//            List<RawPO> calcPrices = mapper.getClosePrices(code);
+//            if(CollectionUtils.isEmpty(calcPrices)) {
+//                log.info("calcPrices is empty");
+//                return BaseResponse.OK;
+//            }
+//
+//            List<MACDCalculator.MACDResult> macdResults = calculate(calcPrices.stream().map(RawPO::getClosePrice).collect(Collectors.toList()));
+//
+//            if(!CollectionUtils.isEmpty(macdResults)) {
+//                for (int j = 0; j < macdResults.size(); j++) {
+//                    MACDCalculator.MACDResult r = macdResults.get(j);
+//                    if(r.macd > -0.5 && r.macd < 0.5 && calcPrices.get(j).getTradeDate().compareTo("2025-01-01") > 0) {
+//                        resMap.put(code + "-" + calcPrices.get(j).getTradeDate(), String.format("tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
+//                        log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", j + 1, calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
+//                    }
+//                }
+//            }
+//        }
 
         if(!CollectionUtils.isEmpty(resMap)) {
             resMap.entrySet().forEach(f -> log.info("key={}, value={}", f.getKey(), f.getValue()));

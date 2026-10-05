@@ -9,6 +9,7 @@ import java.util.List;
 @Repository
 public interface AgMACDMapper {
     List<String> getAllCodes();
+    List<RawPO> getClosePricesBatch(@Param("batchCodes") List<String> batchCodes);
     List<RawPO> getClosePrices(@Param("code") String code);
 
     List<String> getCalcMACDDates4Stock();

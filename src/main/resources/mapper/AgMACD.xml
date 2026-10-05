@@ -11,8 +11,17 @@
         order by 1
     </select>
 
+    <select id="getClosePricesBatch" parameterType="java.util.List" resultType="net.my.pojo.RawPO">
+        select tsr.stockCode code, tsr.`date` tradeDate, tsr.`last` closePrice
+        from t_stock_raw tsr
+        where tsr.stockCode in
+        <foreach collection="list" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+    </select>
+
     <select id="getClosePrices" resultType="net.my.pojo.RawPO">
-        select tsr.`date` tradeDate, tsr.`last` closePrice
+        select tsr.stockCode code, tsr.`date` tradeDate, tsr.`last` closePrice
         from t_stock_raw tsr
         where tsr.stockCode = #{code} -- '1.603920'
         order by `date`
