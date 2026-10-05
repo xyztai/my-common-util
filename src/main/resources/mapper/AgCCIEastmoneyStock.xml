@@ -15,7 +15,7 @@
 
     <insert id="genCCIData4Stock">
         <![CDATA[
-        replace into t_stock_cci(`date`, `stockCode`, `cci5`, `cci10`, `cci14`)
+        replace into t_stock_cci(`date`, `stockCode`, `cci5`, `cci10`, `cci14`, `cci20`)
         with tmp as (
             select `date`
                    , rank() over (partition by stockCode order by ten.`date` desc) date_rank
@@ -24,7 +24,7 @@
                    , chg
                    , round((high + low + `last`)/3, 6) tp
             from t_stock_raw ten
-            where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d') , INTERVAL -60 DAY), '%Y-%m-%d')
+            where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d') , INTERVAL -90 DAY), '%Y-%m-%d')
             and ten.`date` <= #{calcDate}
             -- and ten.stockCode = '1.600118'
         )
@@ -45,8 +45,9 @@
                 , round(avg(case when t1.date_rank <= 5 then t1.tp else null end), 6) avg_tp_5
                 , round(avg(case when t1.date_rank <= 10 then t1.tp else null end), 6) avg_tp_10
                 , round(avg(case when t1.date_rank <= 14 then t1.tp else null end), 6) avg_tp_14
+                , round(avg(case when t1.date_rank <= 20 then t1.tp else null end), 6) avg_tp_20
             from tmp t1
-            where exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 14)
+            where exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 20)
             group by t1.stockCode
         )
         , tmp_avgdev as (
@@ -54,6 +55,7 @@
                 , round(avg(case when t1.date_rank <= 5 then abs(t2.avg_tp_5 - t1.tp) else null end), 6) avg_dev_5
                 , round(avg(case when t1.date_rank <= 10 then abs(t2.avg_tp_10 - t1.tp) else null end), 6) avg_dev_10
                 , round(avg(case when t1.date_rank <= 14 then abs(t2.avg_tp_14 - t1.tp) else null end), 6) avg_dev_14
+                , round(avg(case when t1.date_rank <= 20 then abs(t2.avg_tp_20 - t1.tp) else null end), 6) avg_dev_20
             from tmp t1, tmp_md t2
             where t1.stockCode = t2.stockCode
             group by t1.stockCode
@@ -65,6 +67,7 @@
              , round((t1.tp - t1.avg_tp_5)/(case when t2.avg_dev_5 < 0.0000001 then 0.0000001 else t2.avg_dev_5 end )/0.015, 2) cci5
              , round((t1.tp - t1.avg_tp_10)/(case when t2.avg_dev_10 < 0.0000001 then 0.0000001 else t2.avg_dev_10 end )/0.015, 2) cci10
              , round((t1.tp - t1.avg_tp_14)/(case when t2.avg_dev_14 < 0.0000001 then 0.0000001 else t2.avg_dev_14 end )/0.015, 2) cci14
+             , round((t1.tp - t1.avg_tp_20)/(case when t2.avg_dev_20 < 0.0000001 then 0.0000001 else t2.avg_dev_20 end )/0.015, 2) cci20
              -- , round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2) cci5
              -- , round((t1.tp - t1.avg_tp_10)/t2.avg_dev_10/0.015, 2) cci10
              -- , round((t1.tp - t1.avg_tp_14)/t2.avg_dev_14/0.015, 2) cci14
@@ -85,7 +88,7 @@
 
     <insert id="genCCIData4Etf">
         <![CDATA[
-        replace into t_etf_cci(`date`, `stockCode`, `cci5`, `cci10`, `cci14`)
+        replace into t_etf_cci(`date`, `stockCode`, `cci5`, `cci10`, `cci14`, `cci20`)
         with tmp as (
             select `date`
                    -- , lag(`date`, 1) over (partition by stockCode order by ten.`date` ) data_pre_1
@@ -96,7 +99,7 @@
                    , chg
                    , round((high + low + `last`)/3, 6) tp
             from t_etf_raw ten
-            where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d') , INTERVAL -60 DAY), '%Y-%m-%d')
+            where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d') , INTERVAL -90 DAY), '%Y-%m-%d')
             and ten.`date` <= #{calcDate}
             -- and ten.stockCode = '1.600118'
             order by ten.`date` desc
@@ -108,8 +111,9 @@
                 , round(avg(case when t1.date_rank <= 5 then t1.tp else null end), 6) avg_tp_5
                 , round(avg(case when t1.date_rank <= 10 then t1.tp else null end), 6) avg_tp_10
                 , round(avg(case when t1.date_rank <= 14 then t1.tp else null end), 6) avg_tp_14
+                , round(avg(case when t1.date_rank <= 20 then t1.tp else null end), 6) avg_tp_20
             from tmp t1
-            where exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 14)
+            where exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 20)
             group by t1.stockCode
         )
         , tmp_avgdev as (
@@ -117,6 +121,7 @@
                 , round(avg(case when t1.date_rank <= 5 then abs(t2.avg_tp_5 - t1.tp) else null end), 6) avg_dev_5
                 , round(avg(case when t1.date_rank <= 10 then abs(t2.avg_tp_10 - t1.tp) else null end), 6) avg_dev_10
                 , round(avg(case when t1.date_rank <= 14 then abs(t2.avg_tp_14 - t1.tp) else null end), 6) avg_dev_14
+                , round(avg(case when t1.date_rank <= 20 then abs(t2.avg_tp_20 - t1.tp) else null end), 6) avg_dev_20
             from tmp t1, tmp_md t2
             where t1.stockCode = t2.stockCode
             group by t1.stockCode
@@ -128,6 +133,7 @@
              , round((t1.tp - t1.avg_tp_5)/(case when t2.avg_dev_5 < 0.0000001 then 0.0000001 else t2.avg_dev_5 end )/0.015, 2) cci5
              , round((t1.tp - t1.avg_tp_10)/(case when t2.avg_dev_10 < 0.0000001 then 0.0000001 else t2.avg_dev_10 end )/0.015, 2) cci10
              , round((t1.tp - t1.avg_tp_14)/(case when t2.avg_dev_14 < 0.0000001 then 0.0000001 else t2.avg_dev_14 end )/0.015, 2) cci14
+             , round((t1.tp - t1.avg_tp_20)/(case when t2.avg_dev_20 < 0.0000001 then 0.0000001 else t2.avg_dev_20 end )/0.015, 2) cci20
              -- , round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2) cci5
              -- , round((t1.tp - t1.avg_tp_10)/t2.avg_dev_10/0.015, 2) cci10
              -- , round((t1.tp - t1.avg_tp_14)/t2.avg_dev_14/0.015, 2) cci14
