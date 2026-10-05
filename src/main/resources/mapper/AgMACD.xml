@@ -3,8 +3,16 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="net.my.mapper.AgMACDMapper">
+    <select id="getAllCodes" resultType="java.lang.String">
+        select distinct tsr.fullStockCode
+        from t_stock tsr
+        where tsr.stockCode not like '3%'
+        and tsr.stockCode not like '68%'
+        order by 1
+    </select>
+
     <select id="getClosePrices" resultType="net.my.pojo.RawPO">
-        select  tsr.`date` tradeDate, tsr.`last` closePrice
+        select tsr.`date` tradeDate, tsr.`last` closePrice
         from t_stock_raw tsr
         where tsr.stockCode = #{code} -- '1.603920'
         order by `date`

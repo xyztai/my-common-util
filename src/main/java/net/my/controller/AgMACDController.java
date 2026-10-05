@@ -12,7 +12,10 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static net.my.util.MACDCalculator.calculate;
@@ -30,26 +33,42 @@ public class AgMACDController {
 
     /**
      * demo:1.603920
-     * @param code
      * @return
      */
     @GetMapping("/history-all/stock")
-    public BaseResponse historyAllStock(@RequestParam("code") String code) {
+    public BaseResponse historyAllStock(/*@RequestParam("code") String code*/) {
         log.info("historyAllStock start...");
 
-        List<RawPO> calcPrices = mapper.getClosePrices(code);
-        if(CollectionUtils.isEmpty(calcPrices)) {
-            log.info("calcPrices is empty");
+        List<String> codes = mapper.getAllCodes();
+        if(CollectionUtils.isEmpty(codes)) {
+            log.info("codes is empty");
             return BaseResponse.OK;
         }
 
-        List<MACDCalculator.MACDResult> macdResults = calculate(calcPrices.stream().map(RawPO::getClosePrice).collect(Collectors.toList()));
-
-        if(!CollectionUtils.isEmpty(macdResults)) {
-            for (int i = 0; i < macdResults.size(); i++) {
-                MACDCalculator.MACDResult r = macdResults.get(i);
-                log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", i + 1, calcPrices.get(i).getTradeDate(), r.dif, r.dea, r.macd));
+        Map<String, String> resMap = new LinkedHashMap<>();
+        for(String code : codes) {
+            List<RawPO> calcPrices = mapper.getClosePrices(code);
+            if(CollectionUtils.isEmpty(calcPrices)) {
+                log.info("calcPrices is empty");
+                return BaseResponse.OK;
             }
+
+            List<MACDCalculator.MACDResult> macdResults = calculate(calcPrices.stream().map(RawPO::getClosePrice).collect(Collectors.toList()));
+
+            if(!CollectionUtils.isEmpty(macdResults)) {
+                for (int i = 0; i < macdResults.size(); i++) {
+                    MACDCalculator.MACDResult r = macdResults.get(i);
+                    // log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", i + 1, calcPrices.get(i).getTradeDate(), r.dif, r.dea, r.macd));
+                    if(r.macd > -0.5) {
+                        resMap.put(code + "-" + calcPrices.get(i).getTradeDate(), String.format("tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", calcPrices.get(i).getTradeDate(), r.dif, r.dea, r.macd));
+                        log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", i + 1, calcPrices.get(i).getTradeDate(), r.dif, r.dea, r.macd));
+                    }
+                }
+            }
+        }
+
+        if(!CollectionUtils.isEmpty(resMap)) {
+            resMap.entrySet().forEach(f -> log.info("key={}, value={}", f.getKey(), f.getValue()));
         }
 
         log.info("historyAllStock end...");
