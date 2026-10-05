@@ -3,10 +3,10 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="net.my.mapper.AgMACDMapper">
-    <select id="getClosePrices" resultType="java.lang.Double">
-        select tsr.`last`
+    <select id="getClosePrices" resultType="net.my.pojo.RawPO">
+        select  tsr.`date` tradeDate, tsr.`last` closePrice
         from t_stock_raw tsr
-        where tsr.stockCode = '1.603920'
+        where tsr.stockCode = #{code} -- '1.603920'
         order by `date`
     </select>
 
