@@ -328,85 +328,91 @@
 
     <select id="strategy_stock_101" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        with tmp_data as (
-            select ter.`date` trade_date, ter.stockCode code, ter.`last` close , tec.cci14 cci
-            from t_stock_cci tec , t_stock_raw ter
-            where tec.`date` = ter.`date`
-              and tec.stockCode = ter.stockCode
-              and ter.`date` > DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -30 DAY), '%Y-%m-%d')
-              and SUBSTRING(ter.stockCode, 3) not like '3%'
-              and SUBSTRING(ter.stockCode, 3) not like '68%'
-            -- and ter.stockCode = '0.002422'
-            )
-        , cte_lag as (
-            select LAG(close, 5) OVER(PARTITION BY code ORDER BY trade_date) AS pre_close
-                    , LAG(cci, 5) OVER(PARTITION BY code ORDER BY trade_date) AS pre_cci
-                    , t.*
-            from tmp_data t
+        with tmp_around_10_lowest as (
+            select tsc.*
+                    , rank() over (PARTITION BY tsc.stockCode ORDER BY tsc.`date` desc) AS date_rn
+	                , MIN(tsc.cci14) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND 5 FOLLOWING) AS min_val_around_10
+            from t_stock_cci tsc
+            where tsc.`date` > DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -90 DAY), '%Y-%m-%d')
+              and SUBSTRING(tsc.stockCode, 3) not like '3%'
+              and SUBSTRING(tsc.stockCode, 3) not like '68%'
+            -- and tsc.stockCode in ('0.002025', '1.603920')
+            -- and tsc.`date` <= '2026-07-16'
         )
-        -- 判断背离信号
-        , tmp_ans_cci as (
-            SELECT
-                code,
-                trade_date,
-                close,
-                cci,
-                pre_close,
-                pre_cci,
-                CASE
-                WHEN close < pre_close AND cci > pre_cci AND pre_cci < -100 THEN '底背离（买入信号）'
-                WHEN close > pre_close AND cci < pre_cci AND pre_cci > 100 THEN '顶背离（卖出信号）'
-                ELSE '无背离'
-                END AS divergence_signal
-            FROM cte_lag
+       , tmp_data as (
+            select t1.date, t1.stockCode, t1.cci14, ter.`last`
+                 , LAG(t1.cci14, 1) OVER(PARTITION BY t1.stockCode ORDER BY t1.`date`) AS pre_cci14
+	             , LAG(ter.last, 1) OVER(PARTITION BY ter.stockCode ORDER BY ter.`date`) AS pre_last
+	             , LAG(ter.date, 1) OVER(PARTITION BY ter.stockCode ORDER BY ter.`date`) AS pre_date
+            from tmp_around_10_lowest t1, t_stock_raw ter
+            where t1.cci14 = min_val_around_10
+              and t1.stockCode = ter.stockCode
+              and t1.date = ter.`date`
+              and min_val_around_10 < -100
         )
-        select distinct SUBSTRING(t.code, 3) stockCode, t.trade_date date, t1.stockName last, t.divergence_signal ratioB
-        from tmp_ans_cci t, t_stock t1
-        where t.divergence_signal = '底背离（买入信号）'
-          and t.code = t1.fullStockCode
-        ORDER BY trade_date desc, 1
+       , tmp_ans as (
+            select SUBSTRING(t.stockCode, 3) stockCode, t.date, t1.stockName, t.cci14 - t.pre_cci14 delta
+                 , case WHEN t.last < t.pre_last AND t.cci14 > t.pre_cci14 AND t.cci14 < -100 THEN '底背离（买入信号）'
+                        WHEN t.last > t.pre_last AND t.cci14 < t.pre_cci14 AND t.cci14 > 100 THEN '顶背离（卖出信号）'
+                        ELSE '无背离'
+                        END AS divergence_signal
+                 , t.cci14, t.pre_cci14
+                 , t.last, t.pre_last
+                 , t.pre_date
+            from tmp_data t, t_stock t1
+            where t.cci14 > t.pre_cci14 and t.last < t.pre_last
+              and t.stockCode = t1.fullStockCode
+              and t.date >= DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -15 DAY), '%Y-%m-%d')
+        )
+        select t.stockCode, t.date, t.stockName last
+                , concat('delta=', round(t.delta, 1), ';last=', t.last, ';cci14=', t.cci14, '(pre_date=', pre_date, ';pre_last=', t.pre_last, ';pre_cci14=', t.pre_cci14, ')') ratioB
+        from tmp_ans t
+        order by 2 desc, delta desc
         ]]>
     </select>
 
     <select id="strategy_etf_101" resultType="net.my.pojo.SpecialCarePoJo2">
         <![CDATA[
-        with tmp_data as (
-            select ter.`date` trade_date, ter.stockCode code, ter.`last` close , tec.cci14 cci
-            from t_etf_cci tec , t_etf_raw ter
-            where tec.`date` = ter.`date`
-              and tec.stockCode = ter.stockCode
-              and ter.`date` > DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -30 DAY), '%Y-%m-%d')
-              and SUBSTRING(ter.stockCode, 3) not like '3%'
-              and SUBSTRING(ter.stockCode, 3) not like '68%'
-            -- and ter.stockCode = '0.002422'
-            )
-        , cte_lag as (
-            select LAG(close, 5) OVER(PARTITION BY code ORDER BY trade_date) AS pre_close
-                    , LAG(cci, 5) OVER(PARTITION BY code ORDER BY trade_date) AS pre_cci
-                    , t.*
-            from tmp_data t
+        with tmp_around_10_lowest as (
+            select tsc.*
+                    , rank() over (PARTITION BY tsc.stockCode ORDER BY tsc.`date` desc) AS date_rn
+	                , MIN(tsc.cci14) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND 5 FOLLOWING) AS min_val_around_10
+            from t_etf_cci tsc
+            where tsc.`date` > DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -90 DAY), '%Y-%m-%d')
+              and SUBSTRING(tsc.stockCode, 3) not like '3%'
+              and SUBSTRING(tsc.stockCode, 3) not like '68%'
+            -- and tsc.stockCode in ('0.002025', '1.603920')
+            -- and tsc.`date` <= '2026-07-16'
         )
-        -- 判断背离信号
-        , tmp_ans_cci as (
-            SELECT
-                code,
-                trade_date,
-                close,
-                cci,
-                pre_close,
-                pre_cci,
-                CASE
-                WHEN close < pre_close AND cci > pre_cci AND pre_cci < -100 THEN '底背离（买入信号）'
-                WHEN close > pre_close AND cci < pre_cci AND pre_cci > 100 THEN '顶背离（卖出信号）'
-                ELSE '无背离'
-                END AS divergence_signal
-            FROM cte_lag
+       , tmp_data as (
+            select t1.date, t1.stockCode, t1.cci14, ter.`last`
+                 , LAG(t1.cci14, 1) OVER(PARTITION BY t1.stockCode ORDER BY t1.`date`) AS pre_cci14
+	             , LAG(ter.last, 1) OVER(PARTITION BY ter.stockCode ORDER BY ter.`date`) AS pre_last
+	             , LAG(ter.date, 1) OVER(PARTITION BY ter.stockCode ORDER BY ter.`date`) AS pre_date
+            from tmp_around_10_lowest t1, t_etf_raw ter
+            where t1.cci14 = min_val_around_10
+              and t1.stockCode = ter.stockCode
+              and t1.date = ter.`date`
+              and min_val_around_10 < -100
         )
-        select distinct SUBSTRING(t.code, 3) stockCode, t.trade_date date, t1.stockName last, t.divergence_signal ratioB
-        from tmp_ans_cci t, t_etf t1
-        where t.divergence_signal = '底背离（买入信号）'
-          and t.code = t1.fullStockCode
-        ORDER BY trade_date desc, 1
+       , tmp_ans as (
+            select SUBSTRING(t.stockCode, 3) stockCode, t.date, t1.stockName, t.cci14 - t.pre_cci14 delta
+                 , case WHEN t.last < t.pre_last AND t.cci14 > t.pre_cci14 AND t.cci14 < -100 THEN '底背离（买入信号）'
+                        WHEN t.last > t.pre_last AND t.cci14 < t.pre_cci14 AND t.cci14 > 100 THEN '顶背离（卖出信号）'
+                        ELSE '无背离'
+                        END AS divergence_signal
+                 , t.cci14, t.pre_cci14
+                 , t.last, t.pre_last
+                 , t.pre_date
+            from tmp_data t, t_etf t1
+            where t.cci14 > t.pre_cci14 and t.last < t.pre_last
+              and t.stockCode = t1.fullStockCode
+              and t.date >= DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -15 DAY), '%Y-%m-%d')
+        )
+        select t.stockCode, t.date, t.stockName last
+                , concat('delta=', round(t.delta, 1), ';last=', t.last, ';cci14=', t.cci14, '(pre_date=', pre_date, ';pre_last=', t.pre_last, ';pre_cci14=', t.pre_cci14, ')') ratioB
+        from tmp_ans t
+        order by 2 desc, delta desc
         ]]>
     </select>
 
