@@ -59,7 +59,7 @@ public class AgMACDController {
                 for (int i = 0; i < macdResults.size(); i++) {
                     MACDCalculator.MACDResult r = macdResults.get(i);
                     // log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", i + 1, calcPrices.get(i).getTradeDate(), r.dif, r.dea, r.macd));
-                    if(r.macd > -0.5 && r.macd < 0.5) {
+                    if(r.macd > -0.5 && r.macd < 0.5 && calcPrices.get(i).getTradeDate().compareTo("2025-01-01") > 0) {
                         resMap.put(code + "-" + calcPrices.get(i).getTradeDate(), String.format("tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", calcPrices.get(i).getTradeDate(), r.dif, r.dea, r.macd));
                         log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", i + 1, calcPrices.get(i).getTradeDate(), r.dif, r.dea, r.macd));
                     }
