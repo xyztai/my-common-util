@@ -46,7 +46,9 @@ public class AgMACDController {
         }
 
         Map<String, String> resMap = new LinkedHashMap<>();
-        for(String code : codes) {
+        for(int i = 0; i < codes.size(); i++) {
+            String code = codes.get(i);
+            log.info("start calc {}/{}, code={}", i+1, codes.size(), code);
             List<RawPO> calcPrices = mapper.getClosePrices(code);
             if(CollectionUtils.isEmpty(calcPrices)) {
                 log.info("calcPrices is empty");
@@ -56,12 +58,11 @@ public class AgMACDController {
             List<MACDCalculator.MACDResult> macdResults = calculate(calcPrices.stream().map(RawPO::getClosePrice).collect(Collectors.toList()));
 
             if(!CollectionUtils.isEmpty(macdResults)) {
-                for (int i = 0; i < macdResults.size(); i++) {
-                    MACDCalculator.MACDResult r = macdResults.get(i);
-                    // log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", i + 1, calcPrices.get(i).getTradeDate(), r.dif, r.dea, r.macd));
-                    if(r.macd > -0.5 && r.macd < 0.5 && calcPrices.get(i).getTradeDate().compareTo("2025-01-01") > 0) {
-                        resMap.put(code + "-" + calcPrices.get(i).getTradeDate(), String.format("tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", calcPrices.get(i).getTradeDate(), r.dif, r.dea, r.macd));
-                        log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", i + 1, calcPrices.get(i).getTradeDate(), r.dif, r.dea, r.macd));
+                for (int j = 0; j < macdResults.size(); j++) {
+                    MACDCalculator.MACDResult r = macdResults.get(j);
+                    if(r.macd > -0.5 && r.macd < 0.5 && calcPrices.get(j).getTradeDate().compareTo("2025-01-01") > 0) {
+                        resMap.put(code + "-" + calcPrices.get(j).getTradeDate(), String.format("tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
+                        log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", j + 1, calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
                     }
                 }
             }
