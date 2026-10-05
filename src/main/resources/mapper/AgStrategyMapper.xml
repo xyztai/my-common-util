@@ -362,7 +362,7 @@
             from tmp_data t, t_stock t1
             where t.cci14 > t.pre_cci14 and t.last < t.pre_last
               and t.stockCode = t1.fullStockCode
-              and t.date >= DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -15 DAY), '%Y-%m-%d')
+              -- and t.date >= DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -15 DAY), '%Y-%m-%d')
         )
         select t.stockCode, t.date, t.stockName last
                 , concat('delta=', round(t.delta, 1), ';last=', t.last, ';cci14=', t.cci14, '(pre_date=', pre_date, ';pre_last=', t.pre_last, ';pre_cci14=', t.pre_cci14, ')') ratioB
@@ -407,7 +407,7 @@
             from tmp_data t, t_etf t1
             where t.cci14 > t.pre_cci14 and t.last < t.pre_last
               and t.stockCode = t1.fullStockCode
-              and t.date >= DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -15 DAY), '%Y-%m-%d')
+              -- and t.date >= DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -15 DAY), '%Y-%m-%d')
         )
         select t.stockCode, t.date, t.stockName last
                 , concat('delta=', round(t.delta, 1), ';last=', t.last, ';cci14=', t.cci14, '(pre_date=', pre_date, ';pre_last=', t.pre_last, ';pre_cci14=', t.pre_cci14, ')') ratioB
