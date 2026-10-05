@@ -8,15 +8,9 @@ import java.util.List;
 
 @Repository
 public interface AgMACDMapper {
-    List<String> getAllCodes();
-    List<RawPO> getClosePricesBatch(@Param("batchCodes") List<String> batchCodes);
-    List<RawPO> getClosePrices(@Param("code") String code);
+    List<String> getAllCodesStock();
+    List<RawPO> getClosePricesBatchStock(@Param("batchCodes") List<String> batchCodes);
 
-    List<String> getCalcMACDDates4Stock();
-    int genMACDData4Stock(@Param("calcDate") String calcDate);
-
-
-    List<String> getCalcMACDDates4Etf();
-    int genMACDData4Etf(@Param("calcDate") String calcDate);
-
+    List<String> getAllCodesEtf();
+    List<RawPO> getClosePricesBatchEtf(@Param("batchCodes") List<String> batchCodes);
 }

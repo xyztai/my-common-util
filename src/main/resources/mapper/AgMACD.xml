@@ -3,7 +3,7 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="net.my.mapper.AgMACDMapper">
-    <select id="getAllCodes" resultType="java.lang.String">
+    <select id="getAllCodesStock" resultType="java.lang.String">
         select distinct tsr.fullStockCode
         from t_stock tsr
         where tsr.stockCode not like '3%'
@@ -11,7 +11,7 @@
         order by 1
     </select>
 
-    <select id="getClosePricesBatch" parameterType="java.util.List" resultType="net.my.pojo.RawPO">
+    <select id="getClosePricesBatchStock" parameterType="java.util.List" resultType="net.my.pojo.RawPO">
         select tsr.stockCode code, tsr.`date` tradeDate, tsr.`last` closePrice
         from t_stock_raw tsr
         where tsr.stockCode in
@@ -20,291 +20,21 @@
         </foreach>
     </select>
 
-    <select id="getClosePrices" resultType="net.my.pojo.RawPO">
-        select tsr.stockCode code, tsr.`date` tradeDate, tsr.`last` closePrice
-        from t_stock_raw tsr
-        where tsr.stockCode = #{code} -- '1.603920'
-        order by `date`
-    </select>
-
-    <select id="getCalcMACDDates4Stock" resultType="java.lang.String">
-        select DISTINCT `date`
-        from t_index_raw teni
-        where stockCode = '1.000001'
-          and `date` >= '2022-01-01'
-          and not exists (select 1 from t_stock_cci t2 where teni.`date` = t2.date)
-          order by 1
-    </select>
-
-    <insert id="genMACDData4Stock">
-        <![CDATA[
-        replace into t_stock_cci(`date`, `stockCode`, `cci5`, `cci10`, `cci14`)
-        with tmp as (
-            select `date`
-                   , rank() over (partition by stockCode order by ten.`date` desc) date_rank
-                   , last
-                   , stockCode
-                   , chg
-                   , round((high + low + `last`)/3, 6) tp
-            from t_stock_raw ten
-            where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d') , INTERVAL -60 DAY), '%Y-%m-%d')
-            and ten.`date` <= #{calcDate}
-            -- and ten.stockCode = '1.600118'
-        )
-        -- 另外一种写法，实际计算中不采用这种方式
-        -- , tmp_rows as (
-        --    select t1.stockCode
-        --         , AVG(tp) OVER(
-        --             PARTITION BY stockCode
-        --             ORDER BY date_rank ASC -- 按 rn 升序，等同于时间上的从新到旧
-        --             ROWS BETWEEN CURRENT ROW AND 13 FOLLOWING
-        --           ) AS avg_tp_14
-        --    from tmp t1
-        -- )
-        , tmp_md as (
-            select t1.stockCode
-                , max(case when t1.date_rank <= 1 then t1.date else null end) date
-                , max(case when t1.date_rank <= 1 then t1.tp else null end) tp
-                , round(avg(case when t1.date_rank <= 5 then t1.tp else null end), 6) avg_tp_5
-                , round(avg(case when t1.date_rank <= 10 then t1.tp else null end), 6) avg_tp_10
-                , round(avg(case when t1.date_rank <= 14 then t1.tp else null end), 6) avg_tp_14
-            from tmp t1
-            where exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 14)
-            group by t1.stockCode
-        )
-        , tmp_avgdev as (
-            select t1.stockCode
-                , round(avg(case when t1.date_rank <= 5 then abs(t2.avg_tp_5 - t1.tp) else null end), 6) avg_dev_5
-                , round(avg(case when t1.date_rank <= 10 then abs(t2.avg_tp_10 - t1.tp) else null end), 6) avg_dev_10
-                , round(avg(case when t1.date_rank <= 14 then abs(t2.avg_tp_14 - t1.tp) else null end), 6) avg_dev_14
-            from tmp t1, tmp_md t2
-            where t1.stockCode = t2.stockCode
-            group by t1.stockCode
-        ) -- (TYP-MA(TYP,84))/(0.015*AVEDEV(TYP,84)),COLORFF00FF;
-        select -- round((t1.tp - t1.avg_tp_5)/t2.avg_dev/0.015, 2) cci_5, t1.*
-            t1.date
-             , t1.stockCode
-             -- , concat('cci ', round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2)) cci_5
-             , round((t1.tp - t1.avg_tp_5)/(case when t2.avg_dev_5 < 0.0000001 then 0.0000001 else t2.avg_dev_5 end )/0.015, 2) cci5
-             , round((t1.tp - t1.avg_tp_10)/(case when t2.avg_dev_10 < 0.0000001 then 0.0000001 else t2.avg_dev_10 end )/0.015, 2) cci10
-             , round((t1.tp - t1.avg_tp_14)/(case when t2.avg_dev_14 < 0.0000001 then 0.0000001 else t2.avg_dev_14 end )/0.015, 2) cci14
-             -- , round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2) cci5
-             -- , round((t1.tp - t1.avg_tp_10)/t2.avg_dev_10/0.015, 2) cci10
-             -- , round((t1.tp - t1.avg_tp_14)/t2.avg_dev_14/0.015, 2) cci14
-        from tmp_md t1, tmp_avgdev t2
-        where t1.stockCode = t2.stockCode
-        order by 1, 2
-        ]]>
-    </insert>
-
-    <select id="getCalcMACDDates4Etf" resultType="java.lang.String">
-        select DISTINCT `date`
-        from t_index_raw teni
-        where stockCode = '1.000001'
-          and `date` >= '2022-01-01'
-          and not exists (select 1 from t_etf_cci t2 where teni.`date` = t2.date)
+    <select id="getAllCodesEtf" resultType="java.lang.String">
+        select distinct tsr.fullStockCode
+        from t_etf tsr
+        where tsr.stockCode not like '3%'
+        and tsr.stockCode not like '68%'
         order by 1
     </select>
 
-    <insert id="genMACDData4Etf">
-        <![CDATA[
-        replace into t_etf_cci(`date`, `stockCode`, `cci5`, `cci10`, `cci14`)
-        with tmp as (
-            select `date`
-                   -- , lag(`date`, 1) over (partition by stockCode order by ten.`date` ) data_pre_1
-                   -- , lag(`date`, 60) over (partition by stockCode order by ten.`date` ) data_pre_60
-                   , rank() over (partition by stockCode order by ten.`date` desc) date_rank
-                   , last
-                   , stockCode
-                   , chg
-                   , round((high + low + `last`)/3, 6) tp
-            from t_etf_raw ten
-            where ten.`date` > DATE_FORMAT(DATE_ADD(STR_TO_DATE(#{calcDate}, '%Y-%m-%d') , INTERVAL -60 DAY), '%Y-%m-%d')
-            and ten.`date` <= #{calcDate}
-            -- and ten.stockCode = '1.600118'
-            order by ten.`date` desc
-        )
-        , tmp_md as (
-            select t1.stockCode
-                , max(case when t1.date_rank <= 1 then t1.date else null end) date
-                , max(case when t1.date_rank <= 1 then t1.tp else null end) tp
-                , round(avg(case when t1.date_rank <= 5 then t1.tp else null end), 6) avg_tp_5
-                , round(avg(case when t1.date_rank <= 10 then t1.tp else null end), 6) avg_tp_10
-                , round(avg(case when t1.date_rank <= 14 then t1.tp else null end), 6) avg_tp_14
-            from tmp t1
-            where exists (select 1 from tmp t2 where t1.stockCode = t2.stockCode and t2.date_rank = 14)
-            group by t1.stockCode
-        )
-        , tmp_avgdev as (
-            select t1.stockCode
-                , round(avg(case when t1.date_rank <= 5 then abs(t2.avg_tp_5 - t1.tp) else null end), 6) avg_dev_5
-                , round(avg(case when t1.date_rank <= 10 then abs(t2.avg_tp_10 - t1.tp) else null end), 6) avg_dev_10
-                , round(avg(case when t1.date_rank <= 14 then abs(t2.avg_tp_14 - t1.tp) else null end), 6) avg_dev_14
-            from tmp t1, tmp_md t2
-            where t1.stockCode = t2.stockCode
-            group by t1.stockCode
-        ) -- (TYP-MA(TYP,84))/(0.015*AVEDEV(TYP,84)),COLORFF00FF;
-        select -- round((t1.tp - t1.avg_tp_5)/t2.avg_dev/0.015, 2) cci_5, t1.*
-            t1.date
-             , t1.stockCode
-             -- , concat('cci ', round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2)) cci_5
-             , round((t1.tp - t1.avg_tp_5)/(case when t2.avg_dev_5 < 0.0000001 then 0.0000001 else t2.avg_dev_5 end )/0.015, 2) cci5
-             , round((t1.tp - t1.avg_tp_10)/(case when t2.avg_dev_10 < 0.0000001 then 0.0000001 else t2.avg_dev_10 end )/0.015, 2) cci10
-             , round((t1.tp - t1.avg_tp_14)/(case when t2.avg_dev_14 < 0.0000001 then 0.0000001 else t2.avg_dev_14 end )/0.015, 2) cci14
-             -- , round((t1.tp - t1.avg_tp_5)/t2.avg_dev_5/0.015, 2) cci5
-             -- , round((t1.tp - t1.avg_tp_10)/t2.avg_dev_10/0.015, 2) cci10
-             -- , round((t1.tp - t1.avg_tp_14)/t2.avg_dev_14/0.015, 2) cci14
-        from tmp_md t1, tmp_avgdev t2
-        where t1.stockCode = t2.stockCode
-        order by 1, 2
-        ]]>
-    </insert>
-
-
-
-
-
-
-
-    <select id="considerMACDAndVol" resultType="net.my.pojo.SpecialCarePoJo2">
-        <![CDATA[
-        with
-        tmp_min_date as (select DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d') min_date)
-        , tmp_base_info as (
-            select ten.`date`
-                 , ten.stockCode
-                 , ten.volume
-                 , ten.`last`
-                 , lag(ten.`low`, 1) over (partition by ten.stockCode order by date desc) low_next_1
-                 , ten.chg
-                 , lag(ten.`last`, 1) over (partition by ten.stockCode order by date desc) last_next_1
-                 , lag(ten.`last`, 2) over (partition by ten.stockCode order by date desc) last_next_2
-                 , lag(ten.`last`, 5) over (partition by ten.stockCode order by date desc) last_next_5
-                 , rank() over (partition by ten.stockCode order by date) date_rn
-            from t_stock_raw ten, tmp_min_date tmd
-            where ten.`date` > tmd.min_date
-            order by 1 desc
-         )
-         -- 1、考虑低量
-         , tmp_vol as (
-            select ten.`date`
-                 , ten.stockCode
-                 , ten.volume
-                 , lag(ten.`date`, 1) over (partition by ten.stockCode order by date) date_pre_1
-                 , lag(ten.`volume`, 1) over (partition by ten.stockCode order by date) vol_pre_1
-                 , lag(ten.`volume`, 2) over (partition by ten.stockCode order by date) vol_pre_2
-                 , lag(ten.`volume`, 3) over (partition by ten.stockCode order by date) vol_pre_3
-                 , lag(ten.`volume`, 4) over (partition by ten.stockCode order by date) vol_pre_4
-                 , ten.`last`
-            from t_stock_raw ten, tmp_min_date tmd
-              and ten.chg < 0.5
-              and ten.`date` > tmd.min_date
-            order by 1 desc
-        )
-        -- 找出近5日的，量最低的
-        , tmp_consider_vol as (
-            select tv.*
-            from tmp_vol tv
-            where tv.volume <= least(tv.vol_pre_1, vol_pre_2, vol_pre_3, vol_pre_4) -- or tv.date = '2025-12-15'
-        )  -- select * from tmp_consider_vol  where stockCode = '1.603920' order by 1 desc;
-        -- 2、考虑cci
-        , tmp_cci as (
-            select tenc.`date`
-                 , tenc.stockCode
-                 , tenc.cci14
-                 , rank() over (partition by tenc.stockCode order by date desc) date_rn
-                 , lag(tenc.`date`, 5) over (partition by tenc.stockCode order by date) date_pre_5
-            from t_stock_cci tenc, tmp_min_date tmd
-            where 1 = 1
-              and tenc.`date` > tmd.min_date
-            order by 1 desc
-        )
-        , tmp_cci_d as (
-            select t1.*, t2.cci14 cci14_2, t2.date_rn date_rn_2
-            from tmp_cci t1, tmp_cci t2
-            where t1.stockCode = t2.stockCode
-              and t2.date_rn BETWEEN t1.date_rn and t1.date_rn + 6
-            order by t1.date_rn , date_rn_2
-        )
-        , tmp_consider_cci as (
-            select td.date, td.date_pre_5
-                 , td.stockCode
-                 , max(case when td.date_rn = date_rn_2 then td.cci14_2 else null end) cci14_2
-                 , sum(case when td.cci14_2 < -100 then 1 else 0 end) cci_low_cnt_100_n
-                 , sum(case when td.cci14_2 < -150 then 1 else 0 end) cci_low_cnt_150_n
-                 , ifnull(min(case when td.cci14_2 > -100 then td.date_rn_2  else null end), 0) cci_1
-                 , ifnull(min(case when td.cci14_2 < -100 then td.date_rn_2  else null end), 0) cci_2
-                 , ifnull(max(case when td.cci14_2 > -100 then td.date_rn_2  else null end), 0) cci_4
-                 , count(1) date_cnt
-            from tmp_cci_d td
-            group by td.date, td.stockCode
-            having cci_low_cnt_100_n > 0
-               and cci_low_cnt_100_n <= 3
-               and cci_low_cnt_150_n = 0
-               and cci_1 > 0
-               and cci_2 > 0
-               and cci_4 > 0
-               and cci_1 < cci_2
-               AND cci_2 < cci_4
-               and date_cnt = 7
-            order by td.date desc
-        ) -- select * from tmp_consider_cci t1 where stockCode = '0.000400';
-        -- 3、考虑大振幅
-        , tmp_bigswing as (
-	        select ten.stockCode fullStockCode, th.stockCode , th.bkName, th.stockName , count(1) cnt
-	               , sum(case when (ten.high - ten.low ) / ( ten.`last` / (1+ten.chg*0.01)) > 0.04 then 1 else 0 end) big_swing_cnt
-	        from t_stock_raw ten, t_stock th
-	        where date >= DATE_FORMAT(DATE_SUB(NOW(), INTERVAL 30 DAY), '%Y-%m-%d')
-	          and th.fullStockCode = ten.stockCode
-	          and th.stockCode not like '30%'
-	          and th.stockCode not like '68%'
-	        group by ten.stockCode , th.stockCode , th.bkName, th.stockName
-        )
-        , tmp_consider_bigswing as (
-        	select t.*
-                	, rank() over (partition by t.bkName order by big_swing_cnt desc) rank_
-        	from tmp_bigswing t
-        )
-        , tmp_ans_bigswing as (
-	        select *
-	        from tmp_consider_bigswing
-	        where big_swing_cnt > cnt * 0.6 and rank_ <= 5
-        )     --   select * from tmp_t_bigswing;
-        -- 考虑 cci 和 vol
-        , tmp_ans as (
-            select distinct th.stockCode stockCode
-                          , t1.date
-                          , t2.date date_2
-                          , concat(th.bkName, '-',  th.stockName) last
-                          , concat('cci14: ', t1.cci14_2) ratioB,  th.fullStockCode
-	        from tmp_consider_cci t1, tmp_consider_vol t2, t_stock th
-	        where t2.date BETWEEN t1.date_pre_5 and t1.`date`
-	          and t1.stockCode = t2.stockCode
-	          and t1.stockCode = th.fullStockCode
-	          and th.stockCode not like '30%'
-	          and th.stockCode not like '68%'
-        ) -- select * from tmp_ans  where stockCode = '000400'; -- order by 2 desc, 1
-        , tmp_ans_rank_1 as (
-	        select distinct t1.stockCode, t1.date, t1.last, t1.ratioB, t1.fullStockCode, t2.last last_0, t2.low_next_1, t2.last_next_1, t2.last_next_2, t2.last_next_5, t2.date_rn
-	        from tmp_ans t1, tmp_base_info t2
-	        where t1.date = t2.date
-	          and t1.fullStockCode = t2.stockCode
-        )
-        , tmp_ans_rank_2 as (
-	        select t1.*, t1.date_rn - rank() over (partition by t1.stockCode order by t1.date) date_rank_2
-	        from tmp_ans_rank_1 t1
-        )
-        , tmp_ans_rank_3 as (
-	        select t1.*, rank() over (partition by t1.stockCode, t1.date_rank_2 order by t1.date_rn) date_rank_3
-	        from tmp_ans_rank_2 t1
-        )
-        select t1.stockCode, t1.date, t1.last
-                , concat(t1.ratioB, '__五日内win: ', case when t1.last_0 > last_next_2 and t1.last_0 > last_next_5 then 'No' else 'Yes' end) ratioB
-        from tmp_ans_rank_3 t1
-        where 1 = 1
-          and date_rank_3 = 1
-          and exists (select 1 from tmp_ans_bigswing t2 where t1.stockCode = t2.stockCode)
-        order by 2 desc, 3
-        ]]>
+    <select id="getClosePricesBatchEtf" parameterType="java.util.List" resultType="net.my.pojo.RawPO">
+        select tsr.stockCode code, tsr.`date` tradeDate, tsr.`last` closePrice
+        from t_etf_raw tsr
+        where tsr.stockCode in
+        <foreach collection="batchCodes" index="index" item="item" open="(" separator="," close=")">
+            #{item}
+        </foreach>
     </select>
+
 </mapper>

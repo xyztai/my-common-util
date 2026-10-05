@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.Arrays;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -32,6 +33,9 @@ public class AgStrategyController {
 
     @Autowired
     private AgStrategyMapper mapper;
+
+    @Autowired
+    private AgMACDController agMACDController;
 
     /* 策略1
      T日（比如2026-06-11）出现买点机会，看T+1日（比如2026-06-12）
@@ -213,6 +217,19 @@ public class AgStrategyController {
             res = Arrays.asList(empty);
         }
 
+        BaseResponse baseResponse = agMACDController.historyAllStock();
+        if(baseResponse instanceof RestGeneralResponse) {
+            LinkedHashMap<String, String> macdData = (LinkedHashMap<String, String>) ((RestGeneralResponse)baseResponse).data;
+            if(!CollectionUtils.isEmpty(macdData)) {
+                // code.substring(2) + "-" + calcPrices.get(j).getTradeDate()
+                for(SpecialCarePoJo2 poJo : res) {
+                    if(macdData.containsKey(poJo.getStockCode() + "-" + poJo.getDate())) {
+                        poJo.setRatioB("**符合MACD(" + macdData.get(poJo.getStockCode() + "-" + poJo.getDate()) + ");" + poJo.getRatioB());
+                    }
+                }
+            }
+        }
+
         res.forEach(f -> f.setRatioB(f.getRatioB().replaceAll("=-", "=-----")));
         myCaffeineCache.put(key, res);
         log.info("myCaffeineCache put, key={}, res={}", key, res);
@@ -243,6 +260,19 @@ public class AgStrategyController {
             empty.setRatioB("--");
             empty.setLast("--");
             res = Arrays.asList(empty);
+        }
+
+        BaseResponse baseResponse = agMACDController.historyAllEtf();
+        if(baseResponse instanceof RestGeneralResponse) {
+            LinkedHashMap<String, String> macdData = (LinkedHashMap<String, String>) ((RestGeneralResponse)baseResponse).data;
+            if(!CollectionUtils.isEmpty(macdData)) {
+                // code.substring(2) + "-" + calcPrices.get(j).getTradeDate()
+                for(SpecialCarePoJo2 poJo : res) {
+                    if(macdData.containsKey(poJo.getStockCode() + "-" + poJo.getDate())) {
+                        poJo.setRatioB("**符合MACD(" + macdData.get(poJo.getStockCode() + "-" + poJo.getDate()) + ");" + poJo.getRatioB());
+                    }
+                }
+            }
         }
 
         res.forEach(f -> f.setRatioB(f.getRatioB().replaceAll("=-", "=-----")));
