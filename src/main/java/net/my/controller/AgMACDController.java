@@ -89,7 +89,7 @@ public class AgMACDController {
                                 MACDCalculator.MACDResult r = macdResults.get(j);
                                 if(r.macd > -0.5 && r.macd < 0.5 && calcPrices.get(j).getTradeDate().compareTo("2025-01-01") > 0) {
                                     resMap.put(code.substring(2) + "-" + calcPrices.get(j).getTradeDate(), String.format("tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
-                                    log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", j + 1, calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
+//                                    log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", j + 1, calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
                                 }
                             }
                         }
@@ -127,7 +127,7 @@ public class AgMACDController {
 
         log.info("historyAllStock end...");
         myCaffeineCache.put(key, resMap);
-        log.info("myCaffeineCache put, key={}, res={}", key, JSON.toJSON(resMap));
+        log.info("myCaffeineCache put, key={}, res.size()={}", key, CollectionUtils.isEmpty(resMap) ? 0 : resMap.size());
         return RestGeneralResponse.of(resMap);
     }
 
@@ -180,7 +180,7 @@ public class AgMACDController {
                                 MACDCalculator.MACDResult r = macdResults.get(j);
                                 if(r.macd > -0.5 && r.macd < 0.5 && calcPrices.get(j).getTradeDate().compareTo("2025-01-01") > 0) {
                                     resMap.put(code.substring(2) + "-" + calcPrices.get(j).getTradeDate(), String.format("tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
-                                    log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", j + 1, calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
+//                                    log.info("historyAllStock: {}", String.format("Day %d, tradeDate=%s: DIF=%.4f, DEA=%.4f, MACD=%.4f", j + 1, calcPrices.get(j).getTradeDate(), r.dif, r.dea, r.macd));
                                 }
                             }
                         }
@@ -218,7 +218,7 @@ public class AgMACDController {
 
         log.info("historyAllStock end...");
         myCaffeineCache.put(key, resMap);
-        log.info("myCaffeineCache put, key={}, res={}", key, JSON.toJSON(resMap));
+        log.info("myCaffeineCache put, key={}, res.size()={}", key, CollectionUtils.isEmpty(resMap) ? 0 : resMap.size());
         return RestGeneralResponse.of(resMap);
     }
 
