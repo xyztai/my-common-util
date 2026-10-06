@@ -332,8 +332,8 @@
             select tsc.*
                     , rank() over (PARTITION BY tsc.stockCode ORDER BY tsc.`date`) AS date_rn
 	                -- , MIN(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND 5 FOLLOWING) AS min_val_around_10
-	                , MIN(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND CURRENT ROW) AS min_val_around_10
-	                , max(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND CURRENT ROW) AS max_val_around_10
+	                , MIN(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND CURRENT ROW) AS min_val_pre_5
+	                , max(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND CURRENT ROW) AS max_val_pre_5
             from t_stock_cci tsc
             where tsc.`date` > DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -250 DAY), '%Y-%m-%d')
               and SUBSTRING(tsc.stockCode, 3) not like '3%'
@@ -350,10 +350,10 @@
                  , LAG(t1.date_rn, 1) OVER(PARTITION BY t1.stockCode ORDER BY t1.`date`) AS pre_date_rn
             from tmp_around_10_lowest t1, t_stock_raw ter
             where 1 = 1
-              and (t1.cci20 = min_val_around_10 or max_val_around_10 > -100)
+              and (t1.cci20 = min_val_pre_5 or max_val_pre_5 > -100)
               and t1.stockCode = ter.stockCode
               and t1.date = ter.`date`
-              and min_val_around_10 < -100
+              and min_val_pre_5 < -100
         )
        , tmp_ans as (
             select SUBSTRING(t.stockCode, 3) stockCode, t.date, t1.stockName, t.cci20 - t.pre_cci20 delta
@@ -384,8 +384,8 @@
             select tsc.*
                     , rank() over (PARTITION BY tsc.stockCode ORDER BY tsc.`date`) AS date_rn
 	                -- , MIN(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND 5 FOLLOWING) AS min_val_around_10
-	                , MIN(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND CURRENT ROW) AS min_val_around_10
-	                , max(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND CURRENT ROW) AS max_val_around_10
+	                , MIN(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND CURRENT ROW) AS min_val_pre_5
+	                , max(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND CURRENT ROW) AS max_val_pre_5
             from t_etf_cci tsc
             where tsc.`date` > DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -250 DAY), '%Y-%m-%d')
               and SUBSTRING(tsc.stockCode, 3) not like '3%'
@@ -402,10 +402,10 @@
                  , LAG(t1.date_rn, 1) OVER(PARTITION BY t1.stockCode ORDER BY t1.`date`) AS pre_date_rn
             from tmp_around_10_lowest t1, t_etf_raw ter
             where 1 = 1
-              and (t1.cci20 = min_val_around_10 or max_val_around_10 > -100)
+              and (t1.cci20 = min_val_pre_5 or max_val_pre_5 > -100)
               and t1.stockCode = ter.stockCode
               and t1.date = ter.`date`
-              and min_val_around_10 < -100
+              and min_val_pre_5 < -100
         )
        , tmp_ans as (
             select SUBSTRING(t.stockCode, 3) stockCode, t.date, t1.stockName, t.cci20 - t.pre_cci20 delta
