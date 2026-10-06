@@ -353,7 +353,7 @@
               and (t1.cci20 = min_val_pre_5 or max_val_pre_5 > -100)
               and t1.stockCode = ter.stockCode
               and t1.date = ter.`date`
-              and min_val_pre_5 < -100
+              and t1.cci20 < -100
         )
        , tmp_ans as (
             select SUBSTRING(t.stockCode, 3) stockCode, t.date, t1.stockName, t.cci20 - t.pre_cci20 delta
@@ -405,7 +405,7 @@
               and (t1.cci20 = min_val_pre_5 or max_val_pre_5 > -100)
               and t1.stockCode = ter.stockCode
               and t1.date = ter.`date`
-              and min_val_pre_5 < -100
+              and t1.cci20 < -100
         )
        , tmp_ans as (
             select SUBSTRING(t.stockCode, 3) stockCode, t.date, t1.stockName, t.cci20 - t.pre_cci20 delta
