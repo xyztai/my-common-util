@@ -1,0 +1,86 @@
+
+        with tmp_around_10_lowest as (
+            select tsc.*
+                    , rank() over (PARTITION BY tsc.stockCode ORDER BY tsc.`date`) AS date_rn
+	                -- , MIN(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND 5 FOLLOWING) AS min_val_around_10
+	                , MIN(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 5 PRECEDING AND CURRENT ROW) AS min_val_pre_5
+	                , max(tsc.cci20) OVER (PARTITION BY tsc.stockCode ORDER BY tsc.`date` ROWS BETWEEN 3 PRECEDING AND CURRENT ROW) AS max_val_pre_3
+            from t_stock_cci tsc
+            where tsc.`date` > DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -250 DAY), '%Y-%m-%d')
+              and SUBSTRING(tsc.stockCode, 3) not like '3%'
+              and SUBSTRING(tsc.stockCode, 3) not like '68%'
+            -- and tsc.stockCode in ('0.002025', '1.603920', '1.600522')
+            -- and tsc.`date` <= '2026-07-16'
+        )
+       , tmp_data as (
+            select t1.date, t1.stockCode, t1.cci20, ter.`last`
+                 , LAG(t1.cci20, 1) OVER(PARTITION BY t1.stockCode ORDER BY t1.`date`) AS pre_cci20
+	             , LAG(ter.last, 1) OVER(PARTITION BY ter.stockCode ORDER BY ter.`date`) AS pre_last
+	             , LAG(ter.date, 1) OVER(PARTITION BY ter.stockCode ORDER BY ter.`date`) AS pre_date
+	             , t1.date_rn
+                 , LAG(t1.date_rn, 1) OVER(PARTITION BY t1.stockCode ORDER BY t1.`date`) AS pre_date_rn
+            from tmp_around_10_lowest t1, t_stock_raw ter
+            where 1 = 1
+              and (t1.cci20 = min_val_pre_5 or max_val_pre_3 > -100)
+              and t1.stockCode = ter.stockCode
+              and t1.date = ter.`date`
+              and t1.cci20 < -100
+        )
+       , tmp_ans as (
+            select /*SUBSTRING(t.stockCode, 3)*/ t.stockCode, t.date, t1.stockName, t.cci20 - t.pre_cci20 delta
+                 , case WHEN t.last < t.pre_last AND t.cci20 > t.pre_cci20 AND t.cci20 < -100 THEN '底背离（买入信号）'
+                        WHEN t.last > t.pre_last AND t.cci20 < t.pre_cci20 AND t.cci20 > 100 THEN '顶背离（卖出信号）'
+                        ELSE '无背离'
+                        END AS divergence_signal
+                 , t.cci20, t.pre_cci20
+                 , t.last, t.pre_last
+                 , t.pre_date
+            from tmp_data t, t_stock t1
+            where t.cci20 > t.pre_cci20 and t.last < t.pre_last
+              and t.stockCode = t1.fullStockCode
+              and t.date_rn >= t.pre_date_rn + 5
+              and t.date >= DATE_FORMAT(DATE_ADD(CURRENT_DATE() , INTERVAL -30 DAY), '%Y-%m-%d')
+        ) -- select * from tmp_ans order by 2 desc, 3;
+, tmp_long_down_yin as (
+    select case when open = last and open = high and high > low then 1000
+           else round(((case when open > last then last else open end) - low)/(high - (case when open > last then last else open end)), 1)
+           end down_yin_ratio
+           , max(high) OVER (PARTITION BY stockCode ORDER BY `date` desc ROWS BETWEEN 10 PRECEDING AND 2 PRECEDING) AS max_high_next_10
+           , min(low) OVER (PARTITION BY stockCode ORDER BY `date` desc ROWS BETWEEN 10 PRECEDING AND 2 PRECEDING) AS min_low_next_10
+           , lead(date, 1)  OVER (PARTITION BY stockCode ORDER BY `date`) date_next_1
+           , lead(date, 2)  OVER (PARTITION BY stockCode ORDER BY `date`) date_next_2
+           , lead(date, 3)  OVER (PARTITION BY stockCode ORDER BY `date`) date_next_3
+           , lead(date, 4)  OVER (PARTITION BY stockCode ORDER BY `date`) date_next_4
+           , lead(date, 5)  OVER (PARTITION BY stockCode ORDER BY `date`) date_next_5
+           , t.*
+	from t_stock_raw t
+	where date > '2026-01-01'
+    and SUBSTRING(t.stockCode, 3) not like '3%'
+    and SUBSTRING(t.stockCode, 3) not like '68%'
+)
+select t0.stockName
+       , t0.stockCode abbr_code
+       , round(t1.max_high_next_10/t1.last * 100 - 100, 1) total_high_chg_next_10
+       , round(t1.min_low_next_10/t1.last * 100 - 100, 1) total_low_chg_next_10
+       , t4.*
+from t_stock t0, tmp_long_down_yin t1, t_stock_cci t2
+     , t_stock_boll t3
+     , tmp_ans t4
+where t0.fullStockCode = t1.stockCode
+and t1.down_yin_ratio > 3 -- 1、长下引线
+-- and t0.stockCode = '601921'
+and t1.date = t2.`date`
+and t1.stockCode = t2.stockCode
+-- and t2.cci20 < -100
+and t1.`date` = t3.`date`
+and t1.stockCode = t3.stockCode
+and t1.low < t3.boll_dn_20
+and t1.stockCode = t4.stockCode
+and (t1.date = t4.`date` or t1.date_next_1 = t4.date or t1.date_next_2 = t4.date
+    or t1.date_next_3 = t4.date or t1.date_next_4 = t4.date or t1.date_next_5 = t4.date )
+order by 3;
+
+
+
+
+
